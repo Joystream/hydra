@@ -4,7 +4,7 @@ description: 'Introducing Hydra, a GraphQL query node for substrate chains'
 
 # Overview
 
-![](../.gitbook/assets/photo_2020-08-17-18.10.33.jpeg)
+![A query node builder for Substrate chains](../.gitbook/assets/hydra-logo-horizontallockup.svg)
 
 Hydra is inspired by [TheGraph](http://thegraph.com/) protocol but targets Substrate chains.‌
 
