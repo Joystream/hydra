@@ -4,7 +4,7 @@ description: Entities is the backbone of the data model and translate into the d
 
 # Entities
 
-Entities are the top-level type definitions in the input schema marked with the `@entity` directive. Entity fields are normally built-in scalar types but can also be 
+Entities are the top-level type definitions in the input schema marked with the `@entity` directive. Entity fields are normally built-in scalar types but can also be
 
 * an array of a primitive types
 * an [enum](enums.md),
@@ -13,7 +13,7 @@ Entities are the top-level type definitions in the input schema marked with the 
 
 All entities have an auto-generated `ID` field which is reserved and cannot be used in the input schema.
 
-### Primitive types
+## Primitive types
 
 The following scalar types are supported:
 
@@ -26,7 +26,7 @@ The following scalar types are supported:
 
 Arrays follow the GraphQL [spec](https://spec.graphql.org/June2018/).
 
-### Modifiers and decorators 
+## Modifiers and decorators
 
 By default, each field is nullable. To indicate a no-null constraint mark the field with `!`
 
@@ -34,7 +34,7 @@ If a property must be unique across all entities of the given type, mark it with
 
 Schema comments are natively supported and are propagated to the output schema
 
-### Example
+## Example
 
 ```graphql
 "It is just a boring nine-five person"

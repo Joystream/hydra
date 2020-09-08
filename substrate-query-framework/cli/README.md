@@ -29,6 +29,7 @@ or install via npm:
 ```bash
 npm install -g @dzlzv/hydra-cli
 ```
+
 and then
 
 ```bash
@@ -39,9 +40,10 @@ $ hydra-cli [COMMAND]
 
 Run
 
-```
+```text
 $ hydra-cli scaffold
 ```
+
 and answer the prompts. The scaffolder will generate the following files:
 
 ```text
@@ -53,8 +55,7 @@ and answer the prompts. The scaffolder will generate the following files:
 └── schema.graphql
 ```
 
-By defualt the scaffolder generates mappings and a schema describing Kusama Treasury proposals.
-Generate the indexer and the server:
+By defualt the scaffolder generates mappings and a schema describing Kusama Treasury proposals. Generate the indexer and the server:
 
 ```bash
 $ hydra-cli codegen
@@ -62,14 +63,14 @@ $ hydra-cli codegen
 
 The indexer and server files will be generated in `./generated/indexer` and `./generated/graphql-server` respectively.
 
-In order to run them, a Postges database should be up and running and accept connections. The credentials should be provided in `.env` file. By default, the scaffolder generates a database service  `docker-compose.yml` with the credentials provided. Run 
+In order to run them, a Postges database should be up and running and accept connections. The credentials should be provided in `.env` file. By default, the scaffolder generates a database service `docker-compose.yml` with the credentials provided. Run
 
 ```bash
 $ yarn db:start
 $ yarn db:bootstrap
 ```
 
-to create the database and set up the schema (if the database already exists, skip the first one).
+to create the database and set up the schema \(if the database already exists, skip the first one\).
 
 Now spin up the server and the indexer:
 
@@ -105,13 +106,11 @@ $ yarn indexer:start
 
 Hydra CLI generates a grapqh server and a substrate block indexer.
 
-- Graphql server uses warthog underneath. Hydra generates `model/resolver/service` from the schema that you define in the current working directory (cwd) in a file named `schema.graphql`. For a guide on how to write a schema, follow the [docs](https://app.gitbook.com/@dzhelezov/s/hydra-docs/v/query_node_spec/query-node/docs).
-  
-- Block indexer consumes produced blocks from a substrate based chain. Before running code generation make sure you have `.env` file inside the cwd, and `mappings` directory with `index.ts`. All mapping functions should be exported
-  
-- Which must have variables below with appropriate values:
+* Graphql server uses warthog underneath. Hydra generates `model/resolver/service` from the schema that you define in the current working directory \(cwd\) in a file named `schema.graphql`. For a guide on how to write a schema, follow the [docs](https://app.gitbook.com/@dzhelezov/s/hydra-docs/v/query_node_spec/query-node/docs).
+* Block indexer consumes produced blocks from a substrate based chain. Before running code generation make sure you have `.env` file inside the cwd, and `mappings` directory with `index.ts`. All mapping functions should be exported
+* Which must have variables below with appropriate values:
 
-```
+```text
 # Project name
 PROJECT_NAME=test
 
@@ -141,3 +140,4 @@ TYPE_REGISTER_FUNCTION=<register_type> # name of the function that will called f
 ## Examples
 
 Check out [sample projects](https://github.com/Joystream/joystream/tree/query_node/query-node/examples) for inspiration!
+

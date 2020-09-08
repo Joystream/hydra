@@ -4,7 +4,7 @@ description: Run cross-field and cross-entity full-text queries
 
 # Full-text queries
 
-Full-text queries are able to search across a large amount of text data and aggregate the results across multiple fields and even entities. The query output provides the result rank and a highlight if there is a text match. 
+Full-text queries are able to search across a large amount of text data and aggregate the results across multiple fields and even entities. The query output provides the result rank and a highlight if there is a text match.
 
 In order to enable full-text search queries in the API, decorate any number of `String`fields with `@fulltext(query: <query_name>)` decorator, like this:
 
@@ -48,7 +48,7 @@ query {
             title
          }
       }
-       
+
    }
 }
 ```

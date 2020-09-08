@@ -10,7 +10,7 @@
 ## Installation
 
 {% hint style="warning" %}
-The npm repository and the`hydra-cli`version will likely change in the near future. In such a case simply replace `@dzlzv/hydra-cli`with`<npm_repo>/hydra-cli@<version>` in the instructions below ``
+The npm repository and the`hydra-cli`version will likely change in the near future. In such a case simply replace `@dzlzv/hydra-cli`with`<npm_repo>/hydra-cli@<version>` in the instructions below \`\`
 {% endhint %}
 
 _Global installation:_
@@ -37,7 +37,7 @@ Execute `hydra-cli` commands directly by typing
 npx @dzlzv/hydra-cli <command>
 ```
 
-This provides an isolated way to execute `hydra-cli` commands. 
+This provides an isolated way to execute `hydra-cli` commands.
 
 {% hint style="success" %}
 Run `hydra-cli --version` to check your installation

@@ -1,24 +1,24 @@
 # GraphQL Entity Relationships
 
-### One-To-One (1:1) Relationships
+### One-To-One \(1:1\) Relationships
 
 In One-To-One relation, one entity instance is related to only one instance of another entity. One side of the relationship should always derive.
 
 ```graphql
 type User @entity {
-	name: String!
-	profile: Profile! @derivedFrom(field: "user")
+    name: String!
+    profile: Profile! @derivedFrom(field: "user")
 }
 
 type Profile @entity {
-	avatar: String!
-	user: User!
+    avatar: String!
+    user: User!
 }
 ```
 
 Database tables:
 
-```
+```text
           user
 | Column  | Type
 ----------|-------
@@ -26,7 +26,7 @@ Database tables:
 | name    | character varying
 ```
 
-```
+```text
           profile
 | Column  | Type
 ----------|-------
@@ -35,24 +35,24 @@ Database tables:
 | userId  | character varying FOREIGN KEY UNIQUE CONSTRAINT
 ```
 
-### One-To-Many (1:n) Relationships
+### One-To-Many \(1:n\) Relationships
 
 In One-To-Many relation, one entity instance is related to multiple instance of the other entity.
 
 ```graphql
 type User @entity {
-	name: String
+    name: String
 }
 
 type Post @entity {
-	title: String
-	author: User!
+    title: String
+    author: User!
 }
 ```
 
 Database table for the `Post` entity:
 
-```
+```text
           post
 | Column  | Type
 ----------|-------
@@ -63,19 +63,19 @@ Database table for the `Post` entity:
 
 The only difference between `1:1` and `1:n` is the unique constraint that `1:1` has.
 
-### Many-To-Many (n:n) Relationships
+### Many-To-Many \(n:n\) Relationships
 
 Many-To-Many is a relationship where one entity instance is related to many instance of other entity and vice-versa. In this relationship one side of the relation must derive.
 
 ```graphql
 type User @entity {
-	name: String
-	books: [Book!] @derivedFrom(field: "authors")
+    name: String
+    books: [Book!] @derivedFrom(field: "authors")
 }
 
 type Book @entity {
-	title: String
-	authors: [User!]
+    title: String
+    authors: [User!]
 }
 ```
 
@@ -83,7 +83,7 @@ A junction table is created for n:n relationship.
 
 Database tables:
 
-```
+```text
           book
 | Column  | Type
 ----------|-------
@@ -91,7 +91,7 @@ Database tables:
 | title   | character varying
 ```
 
-```
+```text
           book_user
 | Column  | Type
 ----------|-------
@@ -103,18 +103,17 @@ Database tables:
 
 Defining reverse lookups on an entity allows you to query other side of the relation. Use `@derivedFrom` directive to add reverse lookup to an entity.
 
-**Example**
-If we want to access a user's `posts` from the user entity we should add a derived field to `User` entity:
+**Example** If we want to access a user's `posts` from the user entity we should add a derived field to `User` entity:
 
 ```graphql
 type User @entity {
-	name: String
-	posts: [Post!] @derivedField(field: "author")
+    name: String
+    posts: [Post!] @derivedField(field: "author")
 }
 
 type Post @entity {
-	title: String
-	author: User!
+    title: String
+    author: User!
 }
 ```
 
@@ -126,15 +125,16 @@ Each GraphQL entity has a corresponding typeorm entity and we use these entities
 
 We will create a new post for an existing user:
 
-```ts
+```typescript
 export async function handleNewPost(db: DB, event: SubstrateEvent) {
-	const { userId, title } = event.params;
-	const user = await db.get(User, { where: { id: userId } });
+    const { userId, title } = event.params;
+    const user = await db.get(User, { where: { id: userId } });
 
-	const newPost = new Post();
-	newPost.title = title;
-	newPost.author = user;
+    const newPost = new Post();
+    newPost.title = title;
+    newPost.author = user;
 
-	db.save<Post>(newPost);
+    db.save<Post>(newPost);
 }
 ```
+

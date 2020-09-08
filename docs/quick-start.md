@@ -5,7 +5,7 @@ description: Build a Hydra Indexer and GraphQL server from scratch under five mi
 # Tutorial
 
 {% hint style="info" %}
-Before starting, make sure`hydra-cli`is [installed](install-hydra.md) on your machine together with all the prerequisites. 
+Before starting, make sure`hydra-cli`is [installed](install-hydra.md) on your machine together with all the prerequisites.
 {% endhint %}
 
 ## 0. Hello Hydra!
@@ -101,6 +101,4 @@ This will create Docker images named `hydra-indexer` and `hydra-graphql-server`
 * Describe your own [schema](schema-spec/) in `schema.graphql`
 * Write your indexer [mappings](mappings/)
 * Push your Hydra indexer and GraphQL Docker images to [Docker Hub](https://hub.docker.com/) and deploy  
-
-
 

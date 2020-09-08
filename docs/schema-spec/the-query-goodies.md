@@ -6,7 +6,7 @@ description: >-
 
 # The Goodies
 
-### Filtering
+## Filtering
 
 All the scalar entity types enjoy first-class support in the output schema when it comes to filtering. The standard is known as [OpenCRUD](https://www.opencrud.org/) and dictates who filtering should look like depending on the field type. For example, if the input schema defines the following type:
 
@@ -31,7 +31,7 @@ query {
 }
 ```
 
-### Pagination
+## Pagination
 
 All queries enjoy support of pagination by accepting `offset` and `limit` input parameters. By default, `limit` is set to 5.
 
@@ -43,9 +43,9 @@ query {
 }
 ```
 
-### Ordering
+## Ordering
 
-The results can also be ordered by any property with natural ordering. `_DESC`an  `_ASC` suffixes indicate the direction:
+The results can also be ordered by any property with natural ordering. `_DESC`an `_ASC` suffixes indicate the direction:
 
 ```graphql
 query {
