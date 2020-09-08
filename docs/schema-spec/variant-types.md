@@ -33,7 +33,7 @@ The resulting API will support [inline fragments](https://graphql.org/learn/sche
 
 ```graphql
 query {
-	accounts(limit: 5, orderBy: about_ASC, where: { status_json: { father: { isMale_eq: true }} }) {
+    accounts(limit: 5, orderBy: about_ASC, where: { status_json: { father: { isMale_eq: true }} }) {
     about
     status {
       __typename 

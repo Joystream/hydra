@@ -6,7 +6,7 @@ description: Mappings describe how Substate events should be handled by the inde
 
 A mapping file is a standalone typescript module defining how the Substrate events of interest should be handled by the Hydra indexer.
 
-The event handlers \(aka _mappings_\) should by convention be named `handle<EventName>` , so, for example, a handle for `trasury.Proposal` event should be named `handleProposal` 
+The event handlers \(aka _mappings_\) should by convention be named `handle<EventName>` , so, for example, a handle for `trasury.Proposal` event should be named `handleProposal`
 
 Each handler must have exactly two arguments exported by the Indexer: the `db` handle which gives access to the database and `SubstrateEvent` which contains all the necessary data extracted by the indexer from the Substrate chain.
 
@@ -36,7 +36,7 @@ export async function handleProposed(db: DB, event: SubstrateEvent) {
 }
 ```
 
-Note that required entity classes are exported from 
+Note that required entity classes are exported from
 
 ```text
 ../generated/graphql-server/src/modules/<entity type>/<entity type>
@@ -44,7 +44,7 @@ Note that required entity classes are exported from
 
 and this is where all the auto-generated classes live by default.
 
-Next, the body of the handler transforms the event parameters and extrinsic arguments into the properties of the entity. There is currently no way to enforce type safety here and one should instead inspect the event parameters and extrinsics for the event in question. In the example above, we can consult the Kusama [explorer](https://kusama.subscan.io/extrinsic/0x1bba67ddb62117fc64710e35b6ccbef64d4df528d78310ccca725137e75823d4?event=2022835-5) and check that 
+Next, the body of the handler transforms the event parameters and extrinsic arguments into the properties of the entity. There is currently no way to enforce type safety here and one should instead inspect the event parameters and extrinsics for the event in question. In the example above, we can consult the Kusama [explorer](https://kusama.subscan.io/extrinsic/0x1bba67ddb62117fc64710e35b6ccbef64d4df528d78310ccca725137e75823d4?event=2022835-5) and check that
 
 * `ProposalIndex` is a single named param of `treasury.Proposed` event
 * The extrinsic has to arguments: `value` and `beneficiary`, propagated to the entity in a straightforward fashion.
