@@ -1,6 +1,6 @@
 # Table of contents
 
-* [hydra](README.md)
+* [Hydra](README.md)
 * [Overview](docs/README.md)
   * [Query Node Manifest](docs/manifest-spec.md)
   * [Mappings](docs/mappings/README.md)
@@ -15,7 +15,7 @@
     * [Full-text queries](docs/schema-spec/full-text-queries.md)
     * [Entity Relationships](docs/schema-spec/entity-relationship.md)
   * [Install Hydra](docs/install-hydra.md)
-  * [Query Node schema](docs/schema-spec-1.md)
+  * [Query Node schema](docs/query-node-schema.md)
   * [Tutorial](docs/quick-start.md)
   * [GraphQL Entity Relationships](docs/entity-relationship.md)
   * [indexer](docs/indexer.md)
@@ -24,7 +24,7 @@
   * [kusama-query-node](examples/kusama-query-node.md)
   * [kusama-query-node](examples/kusama-query-node-1.md)
 * [Joystream Query Node](joystream-query-node/README.md)
-  * [Joystream Query Node](joystream-query-node/joystream-query-node-1.md)
+  * [Joystream Query Node](joystream-query-node/joystream-query-node.md)
 * [Substrate Query Node](substrate-query-framework/README.md)
   * [Hydra CLI](substrate-query-framework/cli/README.md)
     * [bin](substrate-query-framework/cli/bin/README.md)
