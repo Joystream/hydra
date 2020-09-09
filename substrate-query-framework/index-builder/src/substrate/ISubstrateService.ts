@@ -8,7 +8,7 @@ import { SubstrateService } from './SubstrateService';
 /**
  * @description ...
  */
-export default interface ISubstrateService {
+export interface ISubstrateService {
   getFinalizedHead(): Promise<Hash>;
   getHeader(hash?: Hash | Uint8Array | string): Promise<Header>;
   subscribeNewHeads(v: Callback<Header>): UnsubscribePromise;

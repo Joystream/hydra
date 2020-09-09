@@ -1,9 +1,6 @@
 // @ts-check
-import {
-  QueryBlockProducer,
-  QueryEventBlock,
-  ISubstrateService,
-} from '..';
+import { QueryEventBlock } from '../model';
+import { BlockProducer } from '.';
 
 import Debug from 'debug';
 import { doInTransaction } from '../db/helper';
@@ -11,13 +8,14 @@ import { PooledExecutor } from './PooledExecutor';
 import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
 import { getIndexerHead } from '../db/dal';
+import { ISubstrateService } from '../substrate';
 
 const debug = Debug('index-builder:indexer');
 
 const WORKERS_NUMBER = numberEnv('INDEXER_WORKERS') || 50;
 
-export default class IndexBuilder {
-  private _producer!: QueryBlockProducer;
+export class IndexBuilder {
+  private _producer!: BlockProducer;
   private _stopped = false;
 
   private _indexingTimer = new Date().getMilliseconds();
@@ -28,12 +26,12 @@ export default class IndexBuilder {
   // of the current indexer head
   private _recentlyIndexedBlocks = new Set<number>();
 
-  private constructor(producer: QueryBlockProducer) {
+  private constructor(producer: BlockProducer) {
     this._producer = producer;
   }
 
   static create(service: ISubstrateService): IndexBuilder {
-    const producer = new QueryBlockProducer(service);
+    const producer = new BlockProducer(service);
 
     return new IndexBuilder(producer);
   }

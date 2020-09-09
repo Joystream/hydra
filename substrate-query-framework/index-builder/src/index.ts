@@ -1,34 +1,20 @@
-import ISubstrateService, { makeSubstrateService } from './substrate/ISubstrateService';
-import BlockProducer from './indexer/BlockProducer';
-import QueryEventProcessingPack from './QueryEventProcessingPack';
-import QueryEvent from './QueryEvent';
-import QueryEventBlock from './QueryEventBlock';
-import IndexBuilder from './indexer/IndexBuilder';
-import QueryNode, { QueryNodeState } from './node/QueryNode';
-import QueryNodeManager from './node/QueryNodeManager';
+import { BlockProducer, IndexBuilder } from './indexer';
 import { DatabaseManager, SavedEntityEvent, makeDatabaseManager, createDBConnection } from './db';
 import BootstrapPack, { BootstrapFunc } from './bootstrap/BootstrapPack';
-import { QueryNodeStartUpOptions } from './node/QueryNodeStartOptions';
 
 export * from './entities';
 export * from './interfaces';
+export * from './model';
+export * from './node';
+export * from './substrate';
 
 export {
-  ISubstrateService,
-  makeSubstrateService,
-  BlockProducer as QueryBlockProducer,
-  QueryEventProcessingPack,
-  QueryEvent,
-  QueryEventBlock,
+  BlockProducer,
   IndexBuilder,
-  QueryNode,
-  QueryNodeState,
-  QueryNodeManager,
   makeDatabaseManager,
   DatabaseManager,
   SavedEntityEvent,
   BootstrapPack,
   BootstrapFunc,
   createDBConnection,
-  QueryNodeStartUpOptions,
 };

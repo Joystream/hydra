@@ -1,6 +1,5 @@
-import ISubstrateService from '../substrate/ISubstrateService';
-import QueryEvent from '../QueryEvent';
-import QueryEventBlock from '../QueryEventBlock';
+import { ISubstrateService } from '../substrate';
+import { QueryEvent, QueryEventBlock } from '../model';
 import { Header, Extrinsic } from '@polkadot/types/interfaces';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';
@@ -15,7 +14,7 @@ const DEBUG_TOPIC = 'index-builder:producer';
 
 const debug = Debug(DEBUG_TOPIC);
 
-export default class BlockProducer extends EventEmitter {
+export class BlockProducer extends EventEmitter {
   private _started: boolean;
 
   private readonly _substrateService: ISubstrateService;

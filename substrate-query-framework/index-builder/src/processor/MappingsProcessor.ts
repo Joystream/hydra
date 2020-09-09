@@ -7,8 +7,8 @@ import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
 import { getIndexerHead, getLastProcessedEvent } from '../db/dal';
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity';
-import { ProcessorOptions } from '../node/QueryNodeStartOptions';
-import { EventHandlerFunc } from '../QueryEventProcessingPack';
+import { ProcessorOptions } from '../node';
+import { EventHandlerFunc } from '../model';
 
 const debug = Debug('index-builder:processor');
 
