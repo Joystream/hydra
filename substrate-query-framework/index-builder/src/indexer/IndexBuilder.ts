@@ -3,14 +3,14 @@ import {
   QueryBlockProducer,
   QueryEventBlock,
   ISubstrateService,
-} from '.';
+} from '..';
 
 import Debug from 'debug';
-import { doInTransaction } from './db/helper';
+import { doInTransaction } from '../db/helper';
 import { PooledExecutor } from './PooledExecutor';
-import { SubstrateEventEntity } from './entities';
-import { numberEnv } from './utils/env-flags';
-import { getIndexerHead } from './db/dal';
+import { SubstrateEventEntity } from '../entities';
+import { numberEnv } from '../utils/env-flags';
+import { getIndexerHead } from '../db/dal';
 
 const debug = Debug('index-builder:indexer');
 
