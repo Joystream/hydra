@@ -1,6 +1,10 @@
+import Debug from 'debug';
+import ExponentialBackOffStrategy, { BackoffStrategy } from './BackOffStategy';
+
 export const POLL_INTERVAL_MS = 100;
 export const DEFAULT_FETCH_TIMEOUT_MS = 500;
 
+const debug = Debug('index-builder:util');
 /**
  * Returns a promise which resolves when a certain condition is met
  * 
@@ -34,6 +38,17 @@ export async function waitFor(condition: () => boolean, exit?: () => boolean , p
   });
 }
 
+/**
+ * Sleep for a given amount of milliseconds
+ * 
+ * @param time For how long to sleep
+ */
+export async function sleep(timeMS: number): Promise<void> {
+  await new Promise((resolve)=>setTimeout(() => {
+    resolve();
+  }, timeMS));
+}
+
 /*
  * Await for the promise or reject after a timeout
  */
@@ -51,4 +66,32 @@ export async function withTimeout<T>(promiseFn: Promise<T>, rejectMsg?: string, 
     promiseFn,
     timeoutPromise
   ]).then(x => x as T);
+}
+
+/**
+ * Tries to resolve the given promise multiple times; gives up after the given number of retries.
+ * If the number of retries is `-1` (default), then it retries ad infinitum.
+ * 
+ * @param promiseFn Promise to resolve
+ * @param retries Number of retries or -1 for infinite number of retries;
+ */
+export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
+  let result: T | undefined = undefined;
+  let _ret = retries;
+
+  while (result === undefined && _ret !== 0) {
+    try {
+      result = await promiseFn;
+      backoff.resetBackoffTime();
+      return result;
+    } catch (e) {
+      await sleep(backoff.getBackOffMs());
+      debug(`An error occured exectuting ${JSON.stringify(promiseFn, null, 2)}: ${JSON.stringify(e, null, 2)}.
+      Number of retries left: ${retries}`);
+      _ret = _ret > 0 ? _ret -1 : _ret;
+      backoff.registerFailure();
+    }
+  }
+  backoff.resetBackoffTime();
+  throw new Error(`Failed to execute after ${retries}`);
 }
