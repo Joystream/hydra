@@ -1,9 +1,8 @@
 import { ConnectionOptions } from 'typeorm';
-import  { SnakeNamingStrategy } from './db/SnakeNamingStrategy';
-import { SubstrateEventEntity, SubstrateExtrinsicEntity } from './entities';
-import { SavedEntityEvent } from './db';
-import { CreateSchema } from './migrations/CreateSchema';
-import { ProcessedEventsLogEntity } from './entities/ProcessedEventsLogEntity';
+import  { SnakeNamingStrategy } from './SnakeNamingStrategy';
+import { SubstrateEventEntity, SubstrateExtrinsicEntity, ProcessedEventsLogEntity } from '../entities';
+import { SavedEntityEvent } from '.';
+import { CreateSchema } from '../migrations/CreateSchema';
 
 const config: () => ConnectionOptions = () => {
   return {
