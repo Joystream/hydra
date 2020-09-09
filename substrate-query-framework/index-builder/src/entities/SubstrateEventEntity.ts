@@ -114,7 +114,7 @@ export class SubstrateEventEntity {
         })
       })
     }
-    debug(`Event entity: ${JSON.stringify(_entity, null, 2)}`);
+    //debug(`Event entity: ${JSON.stringify(_entity, null, 2)}`);
 
     return _entity;
   }
