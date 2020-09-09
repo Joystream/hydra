@@ -1,5 +1,5 @@
 import ISubstrateService, { makeSubstrateService } from './substrate/ISubstrateService';
-import QueryBlockProducer from './indexer/QueryBlockProducer';
+import BlockProducer from './indexer/BlockProducer';
 import QueryEventProcessingPack from './QueryEventProcessingPack';
 import QueryEvent from './QueryEvent';
 import QueryEventBlock from './QueryEventBlock';
@@ -16,7 +16,7 @@ export * from './interfaces';
 export {
   ISubstrateService,
   makeSubstrateService,
-  QueryBlockProducer,
+  BlockProducer as QueryBlockProducer,
   QueryEventProcessingPack,
   QueryEvent,
   QueryEventBlock,

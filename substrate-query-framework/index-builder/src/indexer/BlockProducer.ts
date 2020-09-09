@@ -15,7 +15,7 @@ const DEBUG_TOPIC = 'index-builder:producer';
 
 const debug = Debug(DEBUG_TOPIC);
 
-export default class QueryBlockProducer extends EventEmitter {
+export default class BlockProducer extends EventEmitter {
   private _started: boolean;
 
   private readonly _query_service: ISubstrateService;
