@@ -6,7 +6,7 @@ import * as helper from './helper';
 /**
  * Database access interface. Use typeorm transactional entity manager to perform get/save/remove operations.
  */
-export default interface DatabaseManager {
+export interface DatabaseManager {
   /**
    * Save given entity instance, if entity is exists then just update
    * @param entity
