@@ -15,8 +15,6 @@ import {
   BootstrapFunc,
   DatabaseManager,
   SubstrateEvent,
-  createDBConnection,
-  SavedEntityEvent
 } from '@dzlzv/hydra-indexer-lib/lib';
 
 // Mappings use!
