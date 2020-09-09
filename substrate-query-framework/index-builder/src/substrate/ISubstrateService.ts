@@ -3,12 +3,12 @@ import { Callback, Codec } from '@polkadot/types/types';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { ApiPromise } from '@polkadot/api';
 
-import { QueryService } from './QueryService';
+import { SubstrateService } from './SubstrateService';
 
 /**
  * @description ...
  */
-export default interface ISubstrateQueryService {
+export default interface ISubstrateService {
   getFinalizedHead(): Promise<Hash>;
   getHeader(hash?: Hash | Uint8Array | string): Promise<Header>;
   subscribeNewHeads(v: Callback<Header>): UnsubscribePromise;
@@ -20,6 +20,6 @@ export default interface ISubstrateQueryService {
   //events()
 }
 
-export function makeQueryService(api: ApiPromise): ISubstrateQueryService {
-  return new QueryService(api);
+export function makeSubstrateService(api: ApiPromise): ISubstrateService {
+  return new SubstrateService(api);
 }

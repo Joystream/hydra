@@ -1,4 +1,4 @@
-import ISubstrateQueryService from './ISubstrateQueryService';
+import ISubstrateService from './substrate/ISubstrateService';
 import QueryEvent from './QueryEvent';
 import QueryEventBlock from './QueryEventBlock';
 import { Header, Extrinsic } from '@polkadot/types/interfaces';
@@ -30,7 +30,7 @@ export default class QueryBlockProducer extends EventEmitter {
 
   private _backOffTime = DEFAULT_BACKOFF_TIME_MS;
 
-  private readonly _query_service: ISubstrateQueryService;
+  private readonly _query_service: ISubstrateService;
 
   private _new_heads_unsubscriber: UnsubscribePromise | undefined;
 
@@ -38,7 +38,7 @@ export default class QueryBlockProducer extends EventEmitter {
 
   private _height_of_chain: number;
 
-  constructor(query_service: ISubstrateQueryService) {
+  constructor(query_service: ISubstrateService) {
     super();
 
     this._started = false;

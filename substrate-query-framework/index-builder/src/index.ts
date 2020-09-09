@@ -1,4 +1,4 @@
-import ISubstrateQueryService, { makeQueryService } from './ISubstrateQueryService';
+import ISubstrateService, { makeSubstrateService } from './substrate/ISubstrateService';
 import QueryBlockProducer from './QueryBlockProducer';
 import QueryEventProcessingPack from './QueryEventProcessingPack';
 import QueryEvent from './QueryEvent';
@@ -14,8 +14,8 @@ export * from './entities';
 export * from './interfaces';
 
 export {
-  ISubstrateQueryService,
-  makeQueryService,
+  ISubstrateService,
+  makeSubstrateService,
   QueryBlockProducer,
   QueryEventProcessingPack,
   QueryEvent,

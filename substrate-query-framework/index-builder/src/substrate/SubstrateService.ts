@@ -4,13 +4,13 @@ import { u32 } from '@polkadot/types/primitive';
 import { ApiPromise } from '@polkadot/api';
 import { getSpecTypes } from '@polkadot/types-known';
 
-import { ISubstrateQueryService } from '.';
+import ISubstrateService from './ISubstrateService';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import Debug from 'debug';
 
 const debug = Debug('index-builder:producer');
 
-export class QueryService implements ISubstrateQueryService {
+export class SubstrateService implements ISubstrateService {
   // Enough large number
   private readonly _versionReset = 99999999;
 
