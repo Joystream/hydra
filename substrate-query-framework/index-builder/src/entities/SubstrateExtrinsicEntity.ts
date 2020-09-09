@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
 import { JsonTransformer } from '@anchan828/typeorm-transformers';
 import { AnyJson } from '../interfaces/json-types';
 import * as BN from 'bn.js';
-import { NumericTransformer } from '../db/entities';
+import { NumericTransformer } from '../db';
 import { ExtrinsicArg, SubstrateExtrinsic } from '../interfaces';
 import { SubstrateEventEntity } from './SubstrateEventEntity';
 

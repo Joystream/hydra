@@ -3,7 +3,7 @@ import { Callback, Codec } from '@polkadot/types/types';
 import { u32 } from '@polkadot/types/primitive';
 import { ApiPromise } from '@polkadot/api';
 
-import ISubstrateService from './ISubstrateService';
+import { ISubstrateService } from '.';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import Debug from 'debug';
 import { numberEnv } from '../utils/env-flags';
@@ -12,7 +12,6 @@ import { withTimeout } from '../utils/wait-for';
 const debug = Debug('index-builder:producer');
 
 const SUBSTRATE_API_TIMEOUT = numberEnv('SUBSTRATE_API_TIMEOUT') || 5000;
-
 
 export class SubstrateService implements ISubstrateService {
   // Enough large number

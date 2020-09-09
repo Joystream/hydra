@@ -1,8 +1,8 @@
 import { EventRecord, Extrinsic } from '@polkadot/types/interfaces';
-import { EventParameters } from './interfaces';
+import { EventParameters } from '../interfaces';
 
 
-export default class QueryEvent {
+export class QueryEvent {
   readonly event_record: EventRecord;
 
   readonly block_number: number;

@@ -1,7 +1,7 @@
 import * as shortid from 'shortid';
 import { DeepPartial, createConnection, QueryRunner, Connection, getConnection } from 'typeorm';
 
-import config from '../ormconfig';
+import config from './ormconfig';
 
 import Debug from 'debug';
 

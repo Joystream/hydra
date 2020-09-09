@@ -2,8 +2,8 @@
 
 import { ApiPromise, WsProvider /*RuntimeVersion*/ } from '@polkadot/api';
 
-import { makeSubstrateService, IndexBuilder } from '.';
-import { IndexerOptions } from './QueryNodeStartOptions';
+import { makeSubstrateService, IndexBuilder } from '..';
+import { IndexerOptions } from '.';
 
 export enum QueryNodeState {
   NOT_STARTED,
@@ -14,7 +14,7 @@ export enum QueryNodeState {
   STOPPED,
 }
 
-export default class QueryNode {
+export class QueryNode {
   // State of the node,
   private _state: QueryNodeState;
 

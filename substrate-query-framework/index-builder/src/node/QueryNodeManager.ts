@@ -1,15 +1,16 @@
-import QueryNode, { QueryNodeState } from './QueryNode';
-import { Bootstrapper } from './bootstrap';
-import MappingsProcessor from './processor/MappingsProcessor';
+import { QueryNode, QueryNodeState } from '.';
+import { Bootstrapper } from '../bootstrap';
+import MappingsProcessor from '../processor/MappingsProcessor';
 import { IndexerOptions, BootstrapOptions, ProcessorOptions } from './QueryNodeStartOptions';
-import { createDBConnection } from './db';
+import { createDBConnection } from '../db/helper';
+import { Connection } from 'typeorm';
 
 // Respondible for creating, starting up and shutting down the query node.
 // Currently this class is a bit thin, but it will almost certainly grow
 // as the integration logic between the library types and the application
 // evolves, and that will pay abstraction overhead off in terms of testability of otherwise
 // anonymous code in root file scope.
-export default class QueryNodeManager {
+export class QueryNodeManager {
   private _query_node!: QueryNode;
 
   constructor() {
@@ -52,9 +53,15 @@ export default class QueryNodeManager {
    * Run migrations in the "migrations" folder;
    */
   async migrate(): Promise<void> {
-    const connection = await createDBConnection();
-    await connection.runMigrations();
-    await connection.close();
+    let connection: Connection | undefined;
+    try {
+      connection = await createDBConnection();
+      if (connection)
+        await connection.runMigrations();
+    } finally {
+      if (connection)
+        await connection.close();
+    }
   }
 
 

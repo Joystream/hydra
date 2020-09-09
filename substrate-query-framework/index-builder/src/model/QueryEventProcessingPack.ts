@@ -1,10 +1,11 @@
 // @ts-check
 
-import { DatabaseManager, SubstrateEvent } from '.';
+import { DatabaseManager } from '../db';
+import { SubstrateEvent } from '.';
 
 export type QueryEventProcessorResult = void | Promise<void>;
 export type EventHandlerFunc = (db: DatabaseManager, event: SubstrateEvent) => QueryEventProcessorResult
 
-export default interface QueryEventProcessingPack {
+export interface QueryEventProcessingPack {
   [index: string]: EventHandlerFunc;
 }
