@@ -2,7 +2,6 @@ import {
   BootstrapPack,
   BootstrapFunc,
   SubstrateEvent,
-  SavedEntityEvent
 } from '..';
 
 import { WsProvider, ApiPromise } from '@polkadot/api';
@@ -54,11 +53,11 @@ export default class Bootstrapper {
           continue;
         }
 
-        const bootEvent = this.createBootEvent(boot);
+        //const bootEvent = this.createBootEvent(boot);
         await boot(api, makeDatabaseManager(queryRunner.manager));
 
         // Save the bootstrap events so
-        await SavedEntityEvent.update(bootEvent, queryRunner.manager);
+        //await SavedEntityEvent.update(bootEvent, queryRunner.manager);
       }
 
       debug('Database bootstrap successfull');
@@ -93,12 +92,13 @@ export default class Bootstrapper {
    * @param em  `EntityManager` by `typeorm`
    * @param boot boothandler
    */
-  private async shouldBootstrap(em: EntityManager, boot: BootstrapFunc): Promise<boolean> {
-    const event = await em.findOne(SavedEntityEvent, {
-      where: {
-        eventName: `Bootstrap.${boot.name}`,
-      },
-    });
-    return event ? false : true;
+  private shouldBootstrap(em: EntityManager, boot: BootstrapFunc): Promise<boolean> {
+    // const event = await em.findOne(SavedEntityEvent, {
+    //   where: {
+    //     eventName: `Bootstrap.${boot.name}`,
+    //   },
+    // });
+    // return event ? false : true;
+    throw new Error('Bootstrap is deprecated');
   }
 }
