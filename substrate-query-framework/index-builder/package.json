@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@anchan828/typeorm-transformers": "^0.3.63",
-    "@polkadot/api": "^1.24.1",
+    "@polkadot/api": "^1.31.1",
     "@types/shortid": "^0.0.29",
     "debug": "^4.1.1",
     "shortid": "^2.2.15",
