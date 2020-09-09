@@ -1,4 +1,4 @@
-import ISubstrateQueryService from './ISubstrateQueryService';
+import ISubstrateService from './substrate/ISubstrateService';
 import QueryEvent from './QueryEvent';
 import QueryEventBlock from './QueryEventBlock';
 import { Header, Extrinsic } from '@polkadot/types/interfaces';
@@ -16,12 +16,7 @@ const DEBUG_TOPIC = 'index-builder:producer';
 const DEFAULT_BACKOFF_TIME_MS = 250;
 
 // Maximal delyar between retries 
-const MAX_BACKOFF_TIME_MS = 30 * 60 * 1000;
-
-// There-are no timeouts for the WS fetches, so 
-// we have to abort explicitly. This parameter indicates
-// the period of time after which the API calls are failed by timeout.
-const FETCH_TIMEOUT_MS = 5000;
+const MAX_BACKOFF_TIME_MS = 60 * 1000;
 
 const debug = Debug(DEBUG_TOPIC);
 
@@ -30,7 +25,7 @@ export default class QueryBlockProducer extends EventEmitter {
 
   private _backOffTime = DEFAULT_BACKOFF_TIME_MS;
 
-  private readonly _query_service: ISubstrateQueryService;
+  private readonly _query_service: ISubstrateService;
 
   private _new_heads_unsubscriber: UnsubscribePromise | undefined;
 
@@ -38,7 +33,7 @@ export default class QueryBlockProducer extends EventEmitter {
 
   private _height_of_chain: number;
 
-  constructor(query_service: ISubstrateQueryService) {
+  constructor(query_service: ISubstrateService) {
     super();
 
     this._started = false;
@@ -99,24 +94,6 @@ export default class QueryBlockProducer extends EventEmitter {
 
   }
 
-  /*
-   * Await for the promise or reject after a timeout
-   */
-  private async _withTimeout<T>(promiseFn: Promise<T>, rejectMsg?: string): Promise<T> {
-    // Create a promise that rejects in <ms> milliseconds
-    const timeoutPromise = new Promise((resolve, reject) => {
-      const id = setTimeout(() => {
-        clearTimeout(id);
-        reject(`${rejectMsg || 'Execution time-out'}`);
-      }, FETCH_TIMEOUT_MS)
-    });
-
-    // Returns a race between our timeout and the passed in promise
-    return Promise.race([
-      promiseFn,
-      timeoutPromise
-    ]).then(x => x as T);
-  }
 
   public async fetchBlock(height: number = this._block_to_be_produced_next): Promise<QueryEventBlock> {
     let qeb = undefined
@@ -148,24 +125,15 @@ export default class QueryBlockProducer extends EventEmitter {
   private async _doBlockProduce(height: number = this._block_to_be_produced_next): Promise<QueryEventBlock> {
     debug(`Fetching block #${height.toString()}`);
 
-    const block_hash_of_target = await this._withTimeout(
-         this._query_service.getBlockHash(height.toString()),
-        `Timeout: failed to fetch the block hash at height ${height.toString()}`);
-    
+    const block_hash_of_target = await this._query_service.getBlockHash(height.toString());
     debug(`\tHash ${block_hash_of_target.toString()}.`);
 
-    let records = [];
-
-    records = await this._withTimeout(
-        this._query_service.eventsAt(block_hash_of_target), 
-      `Timeout: failed to fetch events for block ${height.toString()}`);
+    const records = await this._query_service.eventsAt(block_hash_of_target);
     
     debug(`\tRead ${records.length} events.`);
 
     let extrinsics_array: Extrinsic[] = [];
-    const signed_block = await this._withTimeout(
-      this._query_service.getBlock(block_hash_of_target),
-      `Timeout: failed to fetch the block ${height.toString()}`);
+    const signed_block = await this._query_service.getBlock(block_hash_of_target);
 
     debug(`\tFetched full block.`);
 

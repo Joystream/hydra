@@ -2,7 +2,7 @@
 import {
   QueryBlockProducer,
   QueryEventBlock,
-  ISubstrateQueryService,
+  ISubstrateService,
 } from '.';
 
 import Debug from 'debug';
@@ -32,7 +32,7 @@ export default class IndexBuilder {
     this._producer = producer;
   }
 
-  static create(service: ISubstrateQueryService): IndexBuilder {
+  static create(service: ISubstrateService): IndexBuilder {
     const producer = new QueryBlockProducer(service);
 
     return new IndexBuilder(producer);

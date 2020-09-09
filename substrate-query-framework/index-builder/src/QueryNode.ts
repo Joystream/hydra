@@ -2,7 +2,7 @@
 
 import { ApiPromise, WsProvider /*RuntimeVersion*/ } from '@polkadot/api';
 
-import { makeQueryService, IndexBuilder } from '.';
+import { makeSubstrateService, IndexBuilder } from '.';
 import { IndexerOptions } from './QueryNodeStartOptions';
 
 export enum QueryNodeState {
@@ -54,7 +54,7 @@ export default class QueryNode {
     // Create the API and wait until ready
     const api = await ApiPromise.create({ provider });
 
-    const service = makeQueryService(api);
+    const service = makeSubstrateService(api);
 
     const index_buider = IndexBuilder.create(service);
 
