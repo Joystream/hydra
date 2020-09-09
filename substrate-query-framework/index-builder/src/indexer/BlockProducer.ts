@@ -18,61 +18,60 @@ const debug = Debug(DEBUG_TOPIC);
 export default class BlockProducer extends EventEmitter {
   private _started: boolean;
 
-  private readonly _query_service: ISubstrateService;
+  private readonly _substrateService: ISubstrateService;
 
-  private _new_heads_unsubscriber: UnsubscribePromise | undefined;
+  private _newHeadsUnsubscriber: UnsubscribePromise | undefined;
 
-  private _block_to_be_produced_next: number;
+  private _blockToProduceNext: number;
 
-  private _height_of_chain: number;
+  private _chainHeight: number;
 
-  constructor(query_service: ISubstrateService) {
+  constructor(substrateService: ISubstrateService) {
     super();
 
     this._started = false;
-    this._query_service = query_service;
+    this._substrateService = substrateService;
 
     // TODO
     // need to set this up, when state is better, it
     // will be refactored
-    this._new_heads_unsubscriber = undefined;
+    this._newHeadsUnsubscriber = undefined;
 
-    this._block_to_be_produced_next = 0;
-    this._height_of_chain = 0;
+    this._blockToProduceNext = 0;
+    this._chainHeight = 0;
   }
 
-  // TODO: We cannot assume first block has events... we need more robust logic.
-  async start(at_block?: number): Promise<void> {
+  async start(atBlock?: number): Promise<void> {
     if (this._started) throw Error(`Cannot start when already started.`);
 
     // mark as started
     this._started = true;
 
     // Try to get initial header right away
-    const finalizedHeadHash = await this._query_service.getFinalizedHead();
-    const header = await this._query_service.getHeader(finalizedHeadHash);
-    this._height_of_chain = header.number.toNumber();
+    const finalizedHeadHash = await this._substrateService.getFinalizedHead();
+    const header = await this._substrateService.getHeader(finalizedHeadHash);
+    this._chainHeight = header.number.toNumber();
 
-    if (at_block) {
-      this._block_to_be_produced_next = at_block;
+    if (atBlock) {
+      this._blockToProduceNext = atBlock;
       
-      if (at_block > this._height_of_chain) throw Error(`Provided block is ahead of chain.`);
+      if (atBlock > this._chainHeight) throw Error(`Provided block is ahead of chain.`);
     }
 
     //
-    this._new_heads_unsubscriber = this._query_service.subscribeNewHeads((header) => {
+    this._newHeadsUnsubscriber = this._substrateService.subscribeNewHeads((header) => {
       this._OnNewHeads(header);
     });
 
-    debug(`Starting the block producer, next block: ${this._block_to_be_produced_next.toString()}`);
+    debug(`Starting the block producer, next block: ${this._blockToProduceNext.toString()}`);
   }
 
   async stop(): Promise<void> {
     if (!this._started) throw new Error(`Cannot stop when not already started.`);
 
     // THIS IS VERY CRUDE, NEED TO MANAGE LOTS OF STUFF HERE!
-    if (this._new_heads_unsubscriber) {
-      (await this._new_heads_unsubscriber)();
+    if (this._newHeadsUnsubscriber) {
+      (await this._newHeadsUnsubscriber)();
     }
     
     this._started = false;
@@ -81,40 +80,40 @@ export default class BlockProducer extends EventEmitter {
   private _OnNewHeads(header: Header) {
     assert(this._started, 'Has to be started to process new heads.');
 
-    this._height_of_chain = header.number.toNumber();
+    this._chainHeight = header.number.toNumber();
 
-    debug(`New block found at height #${this._height_of_chain.toString()}`);
+    debug(`New block found at height #${this._chainHeight.toString()}`);
 
   }
 
 
-  public async fetchBlock(height: number = this._block_to_be_produced_next): Promise<QueryEventBlock> {
+  public async fetchBlock(height: number): Promise<QueryEventBlock> {
     return retry(this._doBlockProduce(height));
   }
 
 
   /**
-   * This sub-routing does the actual fetching and block processing.
+   * This sub-routine does the actual fetching and block processing.
    * It can throw errors which should be handled by the top-level code 
    * (in this case _produce_block())
    */
-  private async _doBlockProduce(height: number = this._block_to_be_produced_next): Promise<QueryEventBlock> {
+  private async _doBlockProduce(height: number): Promise<QueryEventBlock> {
     debug(`Fetching block #${height.toString()}`);
 
-    const block_hash_of_target = await this._query_service.getBlockHash(height.toString());
-    debug(`\tHash ${block_hash_of_target.toString()}.`);
+    const targetHash = await this._substrateService.getBlockHash(height.toString());
+    debug(`\tHash ${targetHash.toString()}.`);
 
-    const records = await this._query_service.eventsAt(block_hash_of_target);
+    const records = await this._substrateService.eventsAt(targetHash);
     
     debug(`\tRead ${records.length} events.`);
 
-    let extrinsics_array: Extrinsic[] = [];
-    const signed_block = await this._query_service.getBlock(block_hash_of_target);
+    let blockExtrinsics: Extrinsic[] = [];
+    const signedBlock = await this._substrateService.getBlock(targetHash);
 
     debug(`\tFetched full block.`);
 
-    extrinsics_array = signed_block.block.extrinsics.toArray();
-    const query_events: QueryEvent[] = records.map(
+    blockExtrinsics = signedBlock.block.extrinsics.toArray();
+    const blockEvents: QueryEvent[] = records.map(
       (record, index): QueryEvent => {
           // Extract the phase, event
         const { phase } = record;
@@ -122,32 +121,32 @@ export default class BlockProducer extends EventEmitter {
           // Try to recover extrinsic: only possible if its right phase, and extrinsics arra is non-empty, the last constraint
           // is needed to avoid events from build config code in genesis, and possibly other cases.
         const extrinsic =
-          phase.isApplyExtrinsic && extrinsics_array.length
-            ? extrinsics_array[Number.parseInt(phase.asApplyExtrinsic.toString())]
+          phase.isApplyExtrinsic && blockExtrinsics.length
+            ? blockExtrinsics[Number.parseInt(phase.asApplyExtrinsic.toString())]
               : undefined;
 
-        const query_event = new QueryEvent(record, height, index, extrinsic);
+        const event = new QueryEvent(record, height, index, extrinsic);
 
         // Reduce log verbosity and log only if a flag is set
         if (process.env.LOG_QUERY_EVENTS) {
-          query_event.log(0, debug);
+          event.log(0, debug);
         }
         
-        return query_event;
+        return event;
       }
     );
 
-    const query_block = new QueryEventBlock(height, query_events);
+    const eventBlock = new QueryEventBlock(height, blockEvents);
     //this.emit('QueryEventBlock', query_block);
     debug(`Produced query event block.`);
-    return query_block;
+    return eventBlock;
   }
 
 
   private async checkHeightOrWait(): Promise<void> {
     return await waitFor(
       // when to resolve
-      () => this._block_to_be_produced_next <= this._height_of_chain,
+      () => this._blockToProduceNext <= this._chainHeight,
       //exit condition
       () => !this._started )
     
@@ -156,9 +155,9 @@ export default class BlockProducer extends EventEmitter {
   public async * blockHeights(): AsyncGenerator<number> {
     while (this._started) {
       await this.checkHeightOrWait();
-      debug(`Yield: ${this._block_to_be_produced_next.toString()}`);
-      yield this._block_to_be_produced_next;
-      this._block_to_be_produced_next++;
+      debug(`Yield: ${this._blockToProduceNext.toString()}`);
+      yield this._blockToProduceNext;
+      this._blockToProduceNext++;
     }
   }
 
