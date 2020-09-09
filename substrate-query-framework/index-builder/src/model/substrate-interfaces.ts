@@ -1,5 +1,5 @@
 import { Codec } from '@polkadot/types/types';
-import { AnyJson } from './json-types'
+import { AnyJson } from '../interfaces/json-types'
 import * as BN from 'bn.js';
 
 export interface EventParameters {
