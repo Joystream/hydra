@@ -4,11 +4,11 @@ import QueryEventProcessingPack from './QueryEventProcessingPack';
 import QueryEvent from './QueryEvent';
 import QueryEventBlock from './QueryEventBlock';
 import IndexBuilder from './indexer/IndexBuilder';
-import QueryNode, { QueryNodeState } from './QueryNode';
-import QueryNodeManager from './QueryNodeManager';
+import QueryNode, { QueryNodeState } from './node/QueryNode';
+import QueryNodeManager from './node/QueryNodeManager';
 import { DatabaseManager, SavedEntityEvent, makeDatabaseManager, createDBConnection } from './db';
 import BootstrapPack, { BootstrapFunc } from './bootstrap/BootstrapPack';
-import { QueryNodeStartUpOptions } from './QueryNodeStartOptions';
+import { QueryNodeStartUpOptions } from './node/QueryNodeStartOptions';
 
 export * from './entities';
 export * from './interfaces';

@@ -1,15 +1,15 @@
-import QueryNode, { QueryNodeState } from './QueryNode';
-import { Bootstrapper } from './bootstrap';
-import MappingsProcessor from './processor/MappingsProcessor';
+import { QueryNode, QueryNodeState } from '.';
+import { Bootstrapper } from '../bootstrap';
+import MappingsProcessor from '../processor/MappingsProcessor';
 import { IndexerOptions, BootstrapOptions, ProcessorOptions } from './QueryNodeStartOptions';
-import { createDBConnection } from './db';
+import { createDBConnection } from '../db';
 
 // Respondible for creating, starting up and shutting down the query node.
 // Currently this class is a bit thin, but it will almost certainly grow
 // as the integration logic between the library types and the application
 // evolves, and that will pay abstraction overhead off in terms of testability of otherwise
 // anonymous code in root file scope.
-export default class QueryNodeManager {
+export class QueryNodeManager {
   private _query_node!: QueryNode;
 
   constructor() {

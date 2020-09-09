@@ -1,7 +1,7 @@
 //import { BlockNumber } from '@polkadot/types/interfaces';
-import QueryEvent from './QueryEvent';
+import { QueryEvent } from './';
 
-export default class QueryEventBlock {
+export class QueryEventBlock {
   readonly block_number: number;
 
   readonly query_events: QueryEvent[];

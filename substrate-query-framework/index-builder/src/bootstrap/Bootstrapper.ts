@@ -10,7 +10,7 @@ import { getConnection, EntityManager } from 'typeorm';
 import { makeDatabaseManager } from '..';
 
 import Debug from 'debug';
-import { BootstrapOptions } from '../QueryNodeStartOptions';
+import { BootstrapOptions } from '../node/QueryNodeStartOptions';
 const debug = Debug('index-builder:bootstrapper');
 
 export default class Bootstrapper {
