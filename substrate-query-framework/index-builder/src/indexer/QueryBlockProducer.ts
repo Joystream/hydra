@@ -1,29 +1,22 @@
-import ISubstrateService from './substrate/ISubstrateService';
-import QueryEvent from './QueryEvent';
-import QueryEventBlock from './QueryEventBlock';
+import ISubstrateService from '../substrate/ISubstrateService';
+import QueryEvent from '../QueryEvent';
+import QueryEventBlock from '../QueryEventBlock';
 import { Header, Extrinsic } from '@polkadot/types/interfaces';
 import { EventEmitter } from 'events';
 import * as assert from 'assert';
 
 import Debug from 'debug';
 import { UnsubscribePromise } from '@polkadot/api/types';
-import { waitFor } from './utils/wait-for';
+import { waitFor, retry } from '../utils/wait-for';
 
 
 const DEBUG_TOPIC = 'index-builder:producer';
 
-// start with 250ms delay before retrying to produce a block
-const DEFAULT_BACKOFF_TIME_MS = 250;
-
-// Maximal delyar between retries 
-const MAX_BACKOFF_TIME_MS = 60 * 1000;
 
 const debug = Debug(DEBUG_TOPIC);
 
 export default class QueryBlockProducer extends EventEmitter {
   private _started: boolean;
-
-  private _backOffTime = DEFAULT_BACKOFF_TIME_MS;
 
   private readonly _query_service: ISubstrateService;
 
@@ -96,24 +89,7 @@ export default class QueryBlockProducer extends EventEmitter {
 
 
   public async fetchBlock(height: number = this._block_to_be_produced_next): Promise<QueryEventBlock> {
-    let qeb = undefined
-    while (!qeb) {
-      try {
-        qeb = await this._doBlockProduce(height);
-        this._resetBackOffTime();
-        return qeb;
-      } catch (e) {
-        console.error(e);
-        debug(`An error occured while producting block ${this._block_to_be_produced_next.toString()}`);
-          // waiting until the next retry
-        debug(`Retrying after ${this._backOffTime} ms`);
-        await new Promise((resolve)=>setTimeout(() => {
-            resolve();
-        }, this._backOffTime));
-        this._increaseBackOffTime();
-      }
-    }
-    return qeb;
+    return retry(this._doBlockProduce(height));
   }
 
 
@@ -165,14 +141,6 @@ export default class QueryBlockProducer extends EventEmitter {
     //this.emit('QueryEventBlock', query_block);
     debug(`Produced query event block.`);
     return query_block;
-  }
-
-  private _resetBackOffTime() {
-    this._backOffTime = DEFAULT_BACKOFF_TIME_MS;
-  } 
-
-  private _increaseBackOffTime() {
-    this._backOffTime = Math.min(this._backOffTime * 2, MAX_BACKOFF_TIME_MS);
   }
 
 
