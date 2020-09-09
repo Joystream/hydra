@@ -1,4 +1,5 @@
 export const POLL_INTERVAL_MS = 100;
+export const DEFAULT_FETCH_TIMEOUT_MS = 500;
 
 /**
  * Returns a promise which resolves when a certain condition is met
@@ -33,3 +34,21 @@ export async function waitFor(condition: () => boolean, exit?: () => boolean , p
   });
 }
 
+/*
+ * Await for the promise or reject after a timeout
+ */
+export async function withTimeout<T>(promiseFn: Promise<T>, rejectMsg?: string, timeoutMS?: number): Promise<T> {
+    // Create a promise that rejects in <ms> milliseconds
+  const timeoutPromise = new Promise((resolve, reject) => {
+    const id = setTimeout(() => {
+      clearTimeout(id);
+      reject(`${rejectMsg || 'Execution time-out'}`);
+    }, timeoutMS || DEFAULT_FETCH_TIMEOUT_MS)
+  });
+
+    // Returns a race between our timeout and the passed in promise
+  return Promise.race([
+    promiseFn,
+    timeoutPromise
+  ]).then(x => x as T);
+}
