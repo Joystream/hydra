@@ -7,10 +7,13 @@ import * as assert from 'assert';
 import Debug from 'debug';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { waitFor, retry } from '../utils/wait-for';
+import { numberEnv } from '../utils/env-flags';
 
 
 const DEBUG_TOPIC = 'index-builder:producer';
 
+// by default, retry infinite number of times
+const BLOCK_PRODUCER_FETCH_RETRIES = numberEnv('BLOCK_PRODUCER_FETCH_RETRIES') || -1;
 
 const debug = Debug(DEBUG_TOPIC);
 
@@ -87,7 +90,7 @@ export class BlockProducer extends EventEmitter {
 
 
   public async fetchBlock(height: number): Promise<QueryEventBlock> {
-    return retry(this._doBlockProduce(height));
+    return retry(this._doBlockProduce(height), BLOCK_PRODUCER_FETCH_RETRIES);
   }
 
 
