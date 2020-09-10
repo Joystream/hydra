@@ -86,8 +86,8 @@ export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: Bac
       return result;
     } catch (e) {
       await sleep(backoff.getBackOffMs());
-      debug(`An error occured exectuting ${JSON.stringify(promiseFn, null, 2)}: ${JSON.stringify(e, null, 2)}.
-      Number of retries left: ${retries}`);
+      debug(`An error occured: ${JSON.stringify(e, null, 2)}. Retrying in ${backoff.getBackOffMs()}ms. 
+            Number of retries left: ${retries}`);
       _ret = _ret > 0 ? _ret -1 : _ret;
       backoff.registerFailure();
     }
