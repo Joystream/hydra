@@ -28,33 +28,33 @@ export class SubstrateService implements ISubstrateService {
   }
 
   async getHeader(hash: Hash | Uint8Array | string): Promise<Header> {
-    return this._withTimeout(this._api.rpc.chain.getHeader(hash));
+    return this._withTimeout(this._api.rpc.chain.getHeader(hash), `Getting block header of ${JSON.stringify(hash)}`);
   }
 
   getFinalizedHead(): Promise<Hash> {
-    return this._withTimeout(this._api.rpc.chain.getFinalizedHead());
+    return this._withTimeout(this._api.rpc.chain.getFinalizedHead(), `Getting finalized head`);
   }
 
   subscribeNewHeads(v: Callback<Header>): UnsubscribePromise {
-    return this._withTimeout(this._api.rpc.chain.subscribeNewHeads(v));
+    return this._withTimeout(this._api.rpc.chain.subscribeNewHeads(v), `Subscribing to new heads`);
   }
 
   async getBlockHash(blockNumber?: BlockNumber | Uint8Array | number | string): Promise<Hash> {
     debug(`Fetching block hash: BlockNumber: ${JSON.stringify(blockNumber)}`)
-    return this._withTimeout(this._api.rpc.chain.getBlockHash(blockNumber));
+    return this._withTimeout(this._api.rpc.chain.getBlockHash(blockNumber), `Getting block hash of ${JSON.stringify(blockNumber)}`);
   }
 
   async getBlock(hash: Hash | Uint8Array | string): Promise<SignedBlock> {
     debug(`Fething block: BlockHash: ${JSON.stringify(hash)}`)
-    return this._withTimeout(this._api.rpc.chain.getBlock(hash));
+    return this._withTimeout(this._api.rpc.chain.getBlock(hash), `Getting block at ${JSON.stringify(hash)}`);
   }
 
   async eventsAt(hash: Hash | Uint8Array | string): Promise<EventRecord[] & Codec> {
     debug(`Fething events. BlockHash:  ${JSON.stringify(hash)}`)
-    return this._withTimeout(this._api.query.system.events.at(hash));
+    return this._withTimeout(this._api.query.system.events.at(hash), `Fetching events at ${JSON.stringify(hash)}`);
   }
 
-  private async _withTimeout<T>(promiseFn: Promise<T>): Promise<T> {
-    return withTimeout(promiseFn, `Timed out: ${JSON.stringify(promiseFn, null, 2)}`, SUBSTRATE_API_TIMEOUT);
+  private async _withTimeout<T>(promiseFn: Promise<T>, functionName: string): Promise<T> {
+    return withTimeout(promiseFn, `Timed out: ${functionName}`, SUBSTRATE_API_TIMEOUT);
   }
 }
