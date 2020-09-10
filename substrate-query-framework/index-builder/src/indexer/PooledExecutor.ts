@@ -42,6 +42,7 @@
  * @returns {Promise<void>}
  */
 import Debug from 'debug';
+import { logError } from '../utils/errors';
 const debug = Debug('index-builder:pooled-executor');
 
 
@@ -56,27 +57,27 @@ export class PooledExecutor<T, R, N> {
     const queue = Array(this.concurrency).fill(null);
 
     let stop = false;
-
+    let error: Error | undefined = undefined;
     const poller = async () => {
       do {
         let next = undefined;
         try {
           next = await this.generator.next();
         } catch (e) {
-          console.error(e);
-          debug(`Error getting next generator value: ${JSON.stringify(next, null, 2)}`);
+          error = new Error(`Error getting next generator value, ${logError(e)}`);
+          debug(`Error getting next generator value`);
         }
         if (next == undefined || next.done === true) {
           debug('Generator is done, exiting');
-          return;
+          break;
         }
 
         let result = true;
         try {
           await this.processor(next.value);
         } catch (e) {
-          console.error(e);
-          debug(`Error during execution: ${JSON.stringify(e, null, 2)}`);
+          debug(`Error during poll execution`);
+          error = new Error(`One of the workers have failed, stopping the pool. ${logError(e)}`);
           result = false;
         } 
 
@@ -85,6 +86,10 @@ export class PooledExecutor<T, R, N> {
           stop = true;
         }
       } while (!stop);
+      if (error) {
+        // bubble the error to the top
+        throw error;
+      }
     };
 
     await Promise.all(queue.map(poller));

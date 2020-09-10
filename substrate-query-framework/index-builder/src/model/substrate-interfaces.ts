@@ -1,5 +1,5 @@
 import { Codec } from '@polkadot/types/types';
-import { AnyJson } from '../interfaces/json-types'
+import { AnyJson, AnyJsonField } from '../interfaces/json-types'
 import * as BN from 'bn.js';
 
 export interface EventParameters {
@@ -10,7 +10,7 @@ export interface EventParameters {
 export interface ExtrinsicArg {
   type: string;
   name: string;
-  value: AnyJson;
+  value: AnyJsonField;
 }
 
 export interface SubstrateEvent {
