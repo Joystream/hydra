@@ -11,6 +11,7 @@ export function numberEnv(envVariable: string): number | undefined {
   let value = undefined;
   try {
     value = Number.parseInt(process.env[envVariable] || '');
+    debug(`Using ${envVariable}: ${value}`);
   } catch (e) {
     console.error(`Cannot parse env ${envVariable} value ${process.env[envVariable] || ''} into a number`);
   }
