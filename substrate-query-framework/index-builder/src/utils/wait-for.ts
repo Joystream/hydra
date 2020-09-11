@@ -1,5 +1,6 @@
 import Debug from 'debug';
 import ExponentialBackOffStrategy, { BackoffStrategy } from './BackOffStategy';
+import { logError } from './errors';
 
 export const POLL_INTERVAL_MS = 100;
 export const DEFAULT_FETCH_TIMEOUT_MS = 500;
@@ -94,4 +95,25 @@ export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: Bac
   }
   backoff.resetBackoffTime();
   throw new Error(`Failed to execute after ${retries}`);
+}
+
+export async function retryWithBackoff<T>(promiseFn: Promise<T>, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
+  let result: T | undefined = undefined;
+  let _ret = retries;
+  let error: Error | undefined = undefined;
+
+  backoff.resetBackoffTime();
+  while (result === undefined && _ret !== 0) {
+    try {
+      result = await withTimeout(promiseFn, `Timeout  after ${backoff.getBackOffMs()}`, backoff.getBackOffMs());
+      return result;
+    } catch (e) {
+      error = new Error(e);
+      backoff.registerFailure();
+      debug(`Retrying in ${backoff.getBackOffMs()}ms. Number of retries left: ${_ret}. Error: ${logError(error)}`);
+      _ret = _ret > 0 ? _ret -1 : _ret;
+    }
+  }
+  backoff.resetBackoffTime();
+  throw new Error(`Failed to resolve promise after ${retries}. Last error: ${logError(error)}`);
 }
