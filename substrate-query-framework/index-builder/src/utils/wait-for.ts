@@ -88,7 +88,7 @@ export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: Bac
     } catch (e) {
       await sleep(backoff.getBackOffMs());
       debug(`An error occured: ${JSON.stringify(e, null, 2)}. Retrying in ${backoff.getBackOffMs()}ms. 
-            Number of retries left: ${retries}`);
+            Number of retries left: ${_ret}`);
       _ret = _ret > 0 ? _ret -1 : _ret;
       backoff.registerFailure();
     }
@@ -110,8 +110,8 @@ export async function retryWithBackoff<T>(promiseFn: Promise<T>, retries = -1, b
     } catch (e) {
       error = new Error(e);
       backoff.registerFailure();
+      _ret--;
       debug(`Retrying in ${backoff.getBackOffMs()}ms. Number of retries left: ${_ret}. Error: ${logError(error)}`);
-      _ret = _ret > 0 ? _ret -1 : _ret;
     }
   }
   backoff.resetBackoffTime();
