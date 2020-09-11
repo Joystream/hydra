@@ -79,6 +79,7 @@ export async function withTimeout<T>(promiseFn: Promise<T>, rejectMsg?: string, 
 export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
   let result: T | undefined = undefined;
   let _ret = retries;
+  let error: Error | undefined = undefined;
 
   while (result === undefined && _ret !== 0) {
     try {
@@ -86,6 +87,7 @@ export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: Bac
       backoff.resetBackoffTime();
       return result;
     } catch (e) {
+      error = new Error(e);
       await sleep(backoff.getBackOffMs());
       debug(`An error occured: ${JSON.stringify(e, null, 2)}. Retrying in ${backoff.getBackOffMs()}ms. 
             Number of retries left: ${_ret}`);
@@ -94,27 +96,9 @@ export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: Bac
     }
   }
   backoff.resetBackoffTime();
-  throw new Error(`Failed to execute after ${retries}`);
+  throw new Error(`Failed to resolve promise after ${retries}. Last error: ${logError(error)}`);
 }
 
-export async function retryWithBackoff<T>(promiseFn: Promise<T>, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
-  let result: T | undefined = undefined;
-  let _ret = retries;
-  let error: Error | undefined = undefined;
-
-  backoff.resetBackoffTime();
-  while (result === undefined && _ret !== 0) {
-    try {
-      result = await withTimeout(promiseFn, `Timeout  after ${backoff.getBackOffMs()}`, backoff.getBackOffMs());
-      return result;
-    } catch (e) {
-      await sleep(backoff.getBackOffMs());
-      error = new Error(e);
-      backoff.registerFailure();
-      _ret--;
-      debug(`Retrying in ${backoff.getBackOffMs()}ms. Number of retries left: ${_ret}. Error: ${logError(error)}`);
-    }
-  }
-  backoff.resetBackoffTime();
-  throw new Error(`Failed to resolve promise after ${retries}. Last error: ${logError(error)}`);
+export async function retryWithTimeout<T>(promiseFn: Promise<T>, timeout: number, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
+  return await retry ( withTimeout(promiseFn, `Timed out: ${timeout} ms`, timeout), retries, backoff ); 
 }

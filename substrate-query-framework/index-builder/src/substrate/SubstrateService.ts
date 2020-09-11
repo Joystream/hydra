@@ -7,9 +7,8 @@ import { ISubstrateService } from '.';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import Debug from 'debug';
 import { numberEnv } from '../utils/env-flags';
-import { retryWithBackoff } from '../utils/wait-for';
+import { retryWithTimeout } from '../utils/wait-for';
 import { logError } from '../utils/errors';
-import { ExponentialBackOffStrategy } from '../utils/BackOffStategy';
 
 const debug = Debug('index-builder:producer');
 
@@ -60,9 +59,7 @@ export class SubstrateService implements ISubstrateService {
 
   private async _retryWithBackoff<T>(promiseFn: Promise<T>, functionName: string): Promise<T> {
     try {
-      const backoffStrategy = new ExponentialBackOffStrategy();
-      backoffStrategy.maxBackOffTime = SUBSTRATE_API_TIMEOUT;
-      return await retryWithBackoff(promiseFn, SUBSTRATE_API_CALL_RETRIES, backoffStrategy)
+      return await retryWithTimeout(promiseFn, SUBSTRATE_API_TIMEOUT, SUBSTRATE_API_CALL_RETRIES);
     } catch (e) {
       throw new Error(`Substrated API call ${functionName} failed. Error: ${logError(e)}`); 
     }
