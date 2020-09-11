@@ -1,5 +1,5 @@
 import Debug from 'debug';
-import ExponentialBackOffStrategy, { BackoffStrategy } from './BackOffStategy';
+import { ExponentialBackOffStrategy, BackoffStrategy } from './BackOffStategy';
 import { logError } from './errors';
 
 export const POLL_INTERVAL_MS = 100;

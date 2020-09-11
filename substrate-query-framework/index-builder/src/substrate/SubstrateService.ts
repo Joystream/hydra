@@ -9,7 +9,7 @@ import Debug from 'debug';
 import { numberEnv } from '../utils/env-flags';
 import { retryWithBackoff } from '../utils/wait-for';
 import { logError } from '../utils/errors';
-import ExponentialBackOffStrategy from '../utils/BackOffStategy';
+import { ExponentialBackOffStrategy } from '../utils/BackOffStategy';
 
 const debug = Debug('index-builder:producer');
 
