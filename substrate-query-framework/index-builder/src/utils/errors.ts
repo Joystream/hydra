@@ -7,5 +7,9 @@
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function logError(e: any): string {
-  return JSON.stringify(e, null, 2);
+  let details = '';
+  if (e instanceof Error) {
+    details = `name: ${e.name}, message: ${e.message}, stack: ${e.stack || ''}`
+  }
+  return `${JSON.stringify(e, null, 2)} ${details}`;
 }
