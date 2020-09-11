@@ -108,6 +108,7 @@ export async function retryWithBackoff<T>(promiseFn: Promise<T>, retries = -1, b
       result = await withTimeout(promiseFn, `Timeout  after ${backoff.getBackOffMs()}`, backoff.getBackOffMs());
       return result;
     } catch (e) {
+      await sleep(backoff.getBackOffMs());
       error = new Error(e);
       backoff.registerFailure();
       _ret--;
