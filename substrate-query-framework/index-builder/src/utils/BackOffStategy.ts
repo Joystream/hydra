@@ -21,13 +21,14 @@ const MAX_BACKOFF_TIME: number = numberEnv('MAX_BACKOFF_TIME_MS') || 1000 * 60 *
 export default class ExponentialBackOffStrategy implements BackoffStrategy {
   
   private backoffTime = INITIAL_BACKOFF_TIME;
+  public maxBackOffTime = MAX_BACKOFF_TIME;
 
   public resetBackoffTime(): void {
     this.backoffTime = INITIAL_BACKOFF_TIME;
   }
 
   public registerFailure(): void {
-    this.backoffTime = Math.min(MAX_BACKOFF_TIME, Math.ceil(this.backoffTime * 1.2));
+    this.backoffTime = Math.min(this.maxBackOffTime, Math.ceil(this.backoffTime * 1.2));
   }
 
   public getBackOffMs(): number {
