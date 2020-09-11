@@ -14,10 +14,8 @@ import { ExponentialBackOffStrategy } from '../utils/BackOffStategy';
 const debug = Debug('index-builder:producer');
 
 const SUBSTRATE_API_TIMEOUT = numberEnv('SUBSTRATE_API_TIMEOUT') || 5000;
-const SUBSTRATE_API_CALL_RETRIES = numberEnv('SUBSTRATE_API_CALL_RETRIES') || 10;
+const SUBSTRATE_API_CALL_RETRIES = numberEnv('SUBSTRATE_API_CALL_RETRIES') || 20;
 
-const backoffStrategy = new ExponentialBackOffStrategy();
-backoffStrategy.maxBackOffTime = SUBSTRATE_API_TIMEOUT;
 
 export class SubstrateService implements ISubstrateService {
   // Enough large number
@@ -62,6 +60,8 @@ export class SubstrateService implements ISubstrateService {
 
   private async _retryWithBackoff<T>(promiseFn: Promise<T>, functionName: string): Promise<T> {
     try {
+      const backoffStrategy = new ExponentialBackOffStrategy();
+      backoffStrategy.maxBackOffTime = SUBSTRATE_API_TIMEOUT;
       return await retryWithBackoff(promiseFn, SUBSTRATE_API_CALL_RETRIES, backoffStrategy)
     } catch (e) {
       throw new Error(`Substrated API call ${functionName} failed. Error: ${logError(e)}`); 
