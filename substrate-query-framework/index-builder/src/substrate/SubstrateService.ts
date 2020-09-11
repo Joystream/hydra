@@ -13,7 +13,7 @@ import { ExponentialBackOffStrategy } from '../utils/BackOffStategy';
 
 const debug = Debug('index-builder:producer');
 
-const SUBSTRATE_API_TIMEOUT = numberEnv('SUBSTRATE_API_TIMEOUT') || 5000;
+const SUBSTRATE_API_TIMEOUT = numberEnv('SUBSTRATE_API_TIMEOUT') || 1000 * 60 * 5;
 const SUBSTRATE_API_CALL_RETRIES = numberEnv('SUBSTRATE_API_CALL_RETRIES') || 20;
 
 
