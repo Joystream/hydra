@@ -8,6 +8,7 @@ import Debug from 'debug';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { waitFor, retry } from '../utils/wait-for';
 import { numberEnv } from '../utils/env-flags';
+import { ConstantBackOffStrategy } from '../utils/BackOffStategy';
 
 
 const DEBUG_TOPIC = 'index-builder:producer';
@@ -90,7 +91,8 @@ export class BlockProducer extends EventEmitter {
 
 
   public async fetchBlock(height: number): Promise<QueryEventBlock> {
-    return retry(this._doBlockProduce(height), BLOCK_PRODUCER_FETCH_RETRIES);
+    return retry(this._doBlockProduce(height), 
+      BLOCK_PRODUCER_FETCH_RETRIES, new ConstantBackOffStrategy(1000 * 5)); // retry after 5 seconds
   }
 
 
