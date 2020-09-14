@@ -31,33 +31,33 @@ export class SubstrateService implements ISubstrateService {
   }
 
   async getHeader(hash: Hash | Uint8Array | string): Promise<Header> {
-    return this._retryWithBackoff(this._api.rpc.chain.getHeader(hash), `Getting block header of ${JSON.stringify(hash)}`);
+    return this._retryWithBackoff(() => this._api.rpc.chain.getHeader(hash), `Getting block header of ${JSON.stringify(hash)}`);
   }
 
   getFinalizedHead(): Promise<Hash> {
-    return this._retryWithBackoff(this._api.rpc.chain.getFinalizedHead(), `Getting finalized head`);
+    return this._retryWithBackoff(() => this._api.rpc.chain.getFinalizedHead(), `Getting finalized head`);
   }
 
   subscribeNewHeads(v: Callback<Header>): UnsubscribePromise {
-    return this._retryWithBackoff(this._api.rpc.chain.subscribeNewHeads(v), `Subscribing to new heads`);
+    return this._retryWithBackoff(() => this._api.rpc.chain.subscribeNewHeads(v), `Subscribing to new heads`);
   }
 
   async getBlockHash(blockNumber?: BlockNumber | Uint8Array | number | string): Promise<Hash> {
     debug(`Fetching block hash: BlockNumber: ${JSON.stringify(blockNumber)}`)
-    return this._retryWithBackoff(this._api.rpc.chain.getBlockHash(blockNumber), `Getting block hash of ${JSON.stringify(blockNumber)}`);
+    return this._retryWithBackoff(() => this._api.rpc.chain.getBlockHash(blockNumber), `Getting block hash of ${JSON.stringify(blockNumber)}`);
   }
 
   async getBlock(hash: Hash | Uint8Array | string): Promise<SignedBlock> {
     debug(`Fething block: BlockHash: ${JSON.stringify(hash)}`)
-    return this._retryWithBackoff(this._api.rpc.chain.getBlock(hash), `Getting block at ${JSON.stringify(hash)}`);
+    return this._retryWithBackoff(() => this._api.rpc.chain.getBlock(hash), `Getting block at ${JSON.stringify(hash)}`);
   }
 
   async eventsAt(hash: Hash | Uint8Array | string): Promise<EventRecord[] & Codec> {
     debug(`Fething events. BlockHash:  ${JSON.stringify(hash)}`)
-    return this._retryWithBackoff(this._api.query.system.events.at(hash), `Fetching events at ${JSON.stringify(hash)}`);
+    return this._retryWithBackoff(() => this._api.query.system.events.at(hash), `Fetching events at ${JSON.stringify(hash)}`);
   }
 
-  private async _retryWithBackoff<T>(promiseFn: Promise<T>, functionName: string): Promise<T> {
+  private async _retryWithBackoff<T>(promiseFn: () => Promise<T>, functionName: string): Promise<T> {
     try {
       return await retryWithTimeout(promiseFn, SUBSTRATE_API_TIMEOUT, SUBSTRATE_API_CALL_RETRIES);
     } catch (e) {

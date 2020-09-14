@@ -76,14 +76,14 @@ export async function withTimeout<T>(promiseFn: Promise<T>, rejectMsg?: string, 
  * @param promiseFn Promise to resolve
  * @param retries Number of retries or -1 for infinite number of retries;
  */
-export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
+export async function retry<T>(promiseFn: () => Promise<T>, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
   let result: T | undefined = undefined;
   let _ret = retries;
   let error: Error | undefined = undefined;
 
   while (result === undefined && _ret !== 0) {
     try {
-      result = await promiseFn;
+      result = await promiseFn();
       backoff.resetBackoffTime();
       return result;
     } catch (e) {
@@ -99,6 +99,10 @@ export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: Bac
   throw new Error(`Failed to resolve promise after ${retries}. Last error: ${logError(error)}`);
 }
 
-export async function retryWithTimeout<T>(promiseFn: Promise<T>, timeout: number, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
-  return await retry ( withTimeout(promiseFn, `Timed out: ${timeout} ms`, timeout), retries, backoff ); 
+export async function retryWithTimeout<T>(promiseFn: () => Promise<T>, timeout: number, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
+  return await retry (() => {
+    const prom = promiseFn();
+    return withTimeout(prom, `Timed out: ${timeout} ms`, timeout)
+  }, retries, backoff)
+   
 }

@@ -91,7 +91,7 @@ export class BlockProducer extends EventEmitter {
 
 
   public async fetchBlock(height: number): Promise<QueryEventBlock> {
-    return retry(this._doBlockProduce(height), 
+    return retry(() => this._doBlockProduce(height), 
       BLOCK_PRODUCER_FETCH_RETRIES, new ConstantBackOffStrategy(1000 * 5)); // retry after 5 seconds
   }
 
