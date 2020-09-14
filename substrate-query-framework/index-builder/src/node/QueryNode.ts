@@ -46,7 +46,7 @@ export class QueryNode {
         await this.stop();
         throw new Error(`WS provider has been disconnected. Shutting down the node`);
       }
-      debug(`Disconnected. Waiting until the the node stopped...`)
+      debug(`Disconnected. Waiting until the node is stopped...`)
     })
   }
 
