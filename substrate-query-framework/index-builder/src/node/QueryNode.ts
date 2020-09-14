@@ -4,6 +4,10 @@ import { ApiPromise, WsProvider /*RuntimeVersion*/ } from '@polkadot/api';
 
 import { makeSubstrateService, IndexBuilder } from '..';
 import { IndexerOptions } from '.';
+import Debug from 'debug';
+
+const debug = Debug('index-builder:query-node');
+
 
 export enum QueryNodeState {
   NOT_STARTED,
@@ -35,6 +39,15 @@ export class QueryNode {
     this._api = api;
     this._indexBuilder = indexBuilder;
     this._atBlock = atBlock;
+
+    this._websocketProvider.on('error', async () => {
+      debug(`Disconnected.`)
+      if (this.state == QueryNodeState.STARTED) {
+        await this.stop();
+        throw new Error(`WS provider has been disconnected. Shutting down the node`);
+      }
+      debug(`Disconnected. Waiting until the the node stopped...`)
+    })
   }
 
   static async create(options: IndexerOptions): Promise<QueryNode> {
@@ -64,15 +77,15 @@ export class QueryNode {
   async start(): Promise<void> {
     if (this._state != QueryNodeState.NOT_STARTED) throw new Error('Starting requires ');
 
-    this._state = QueryNodeState.STARTING;
+    this._state = QueryNodeState.STARTED;
 
     // Start only the indexer
     await this._indexBuilder.start(this._atBlock);
     
-    this._state = QueryNodeState.STARTED;
   }
 
   async stop(): Promise<void> {
+    debug(`Query node state: ${this._state}`);
     if (this._state != QueryNodeState.STARTED) throw new Error('Can only stop once fully started');
 
     this._state = QueryNodeState.STOPPING;
