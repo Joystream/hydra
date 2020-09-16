@@ -1,6 +1,5 @@
 import { Entity, Column, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { AnyJson } from '../interfaces/json-types';
-import { JsonTransformer } from '@anchan828/typeorm-transformers';
+import { AnyJson, AnyJsonField } from '../interfaces/json-types';
 import { QueryEvent } from '..';
 import * as BN from 'bn.js';
 import Debug from 'debug';
@@ -36,8 +35,7 @@ export class SubstrateEventEntity {
   method!: string;
 
   @Column({
-    type: 'jsonb',
-    transformer: new JsonTransformer<AnyJson>()
+    type: 'jsonb'
   })
   phase!: AnyJson;
 
@@ -48,8 +46,7 @@ export class SubstrateEventEntity {
   index!: number;
 
   @Column({
-    type: 'jsonb',
-    transformer: new JsonTransformer<EventParam[]>([]),
+    type: 'jsonb'
   })
   params!: EventParam[];
 
@@ -68,9 +65,9 @@ export class SubstrateEventEntity {
     _entity.index = q.indexInBlock;
     _entity.id = SubstrateEventEntity.formatId(_entity.blockNumber, _entity.index);
     _entity.method = q.event_record.event.method || 'NO_METHOD';
-    _entity.name = q.event_name;
-    _entity.phase = q.event_record.phase.toJSON();
     _entity.section = q.event_record.event.section || 'NO_SECTION';
+    _entity.name = `${_entity.section}.${_entity.method}`;
+    _entity.phase = (q.event_record.phase.toJSON() || {}) as AnyJson;
     
     _entity.params = [];
 
@@ -96,20 +93,20 @@ export class SubstrateEventEntity {
       extr.signer = e.signer.toString();
       extr.method = e.method.methodName || 'NO_METHOD';
       extr.section = e.method.sectionName || 'NO_SECTION';
-      extr.meta = e.meta.toJSON();
+      extr.meta = (e.meta.toJSON() || {}) as AnyJson;
       extr.hash = e.hash.toString();
       extr.isSigned = e.isSigned
       extr.tip = new BN(e.tip.toString()),
       extr.versionInfo = e.version.toString();
       extr.nonce = e.nonce.toNumber();
-      extr.era = e.era.toJSON();
+      extr.era = (e.era.toJSON() || {}) as AnyJson;
       
       extr.args = []
       
       e.method.args.forEach((data, index) => {
         extr.args.push({
           type: data.toRawType(),
-          value: data.toJSON(),
+          value: (data.toJSON() || '') as AnyJsonField,
           name: e.meta.args[index].name.toString()
         })
       })
