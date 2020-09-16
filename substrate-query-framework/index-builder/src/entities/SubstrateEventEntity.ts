@@ -120,7 +120,7 @@ export class SubstrateEventEntity {
   // the reason for such formatting is to be able to efficiently sort events 
   // by ID
   public static formatId(blockNumber: number, index: number): string {
-    return `${String(blockNumber).padStart(16, '0')}-${String(index).padStart(5, '0')}`;
+    return `${String(blockNumber).padStart(16, '0')}-${String(index).padStart(6, '0')}`;
   }
 }
 
