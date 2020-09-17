@@ -15,6 +15,8 @@ export interface ProcessorOptions {
   mappingToEventTranslator?: (mapping: string) => string;
   name?: string;
   atBlock?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  entities?: any[];
 }
 
 export interface BootstrapOptions {
