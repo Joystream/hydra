@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-indexer-lib",
   "description": "Block index builder for substrate based chains",
-  "version": "0.0.10-alpha",
+  "version": "0.0.13-alpha",
   "main": "index.js",
   "license": "MIT",
   "repository": "git@github.com:Joystream/joystream.git",
@@ -40,7 +40,7 @@
     "eslint": "^7.1.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
-    "mocha": "^8.1.1",
+    "mocha": "^8.1.3",
     "nyc": "^15.1.0",
     "pg": "^8.3.2",
     "pgtools": "^0.3.0",

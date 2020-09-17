@@ -1,6 +1,7 @@
 // @ts-check
 import { QueryEventBlock } from '../model';
 import { BlockProducer } from '.';
+import * as _ from 'lodash';
 
 import Debug from 'debug';
 import { doInTransaction } from '../db/helper';
@@ -84,15 +85,20 @@ export class IndexBuilder {
     return async (h: number) => {
       debug(`Processing block #${h.toString()}`);  
       const queryEventsBlock: QueryEventBlock = await this._producer.fetchBlock(h);
-      
-      debug(`Read ${queryEventsBlock.query_events.length} events`);  
-      
-      const qeEntities: SubstrateEventEntity[] = queryEventsBlock.query_events.map(
-        (qe) => SubstrateEventEntity.fromQueryEvent(qe));
+      const batches = _.chunk(queryEventsBlock.query_events, 100);
+      debug(`Read ${queryEventsBlock.query_events.length} events; saving in ${batches.length} batches`);  
       
       await doInTransaction(async (queryRunner) => {
-        debug(`Saving query event entities`);
-        await queryRunner.manager.save(qeEntities);
+        debug(`Saving event entities`);
+
+        let saved = 0;
+        for (let batch of batches) {
+          const qeEntities = batch.map((event) => SubstrateEventEntity.fromQueryEvent(event));
+          await queryRunner.manager.save(qeEntities);
+          saved += qeEntities.length;
+          batch = [];
+          debug(`Saved ${saved} events`);
+        }
         debug(`Done block #${h.toString()}`);
       });
 
