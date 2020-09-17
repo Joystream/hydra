@@ -43,7 +43,8 @@ export class QueryNodeManager {
    * @param options options passed to create the mappings
    */
   async process(options: ProcessorOptions): Promise<void> {
-    await createDBConnection();
+    const extraEntities = options.entities ? options.entities : [];
+    await createDBConnection(extraEntities);
     
     const processor =  MappingsProcessor.create(options);
     await processor.start();
