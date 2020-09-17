@@ -10,6 +10,7 @@ import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
 import { getIndexerHead } from '../db/dal';
 import { ISubstrateService } from '../substrate';
+import { getConnection } from 'typeorm';
 
 const debug = Debug('index-builder:indexer');
 
@@ -74,11 +75,10 @@ export class IndexBuilder {
   }
 
   async stop(): Promise<void> { 
-    return new Promise<void>((resolve) => {
-      debug('Index builder has been stopped (NOOP)');
-      this._stopped = true;
-      resolve();
-    });
+    debug('Stopping the indexer and closing the DB connection');
+    await getConnection().close();
+    debug('Index builder has been stopped');
+    this._stopped = true;
   }
 
   _indexBlock(): (h: number) => Promise<void> {

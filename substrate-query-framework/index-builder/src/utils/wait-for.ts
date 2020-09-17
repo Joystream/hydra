@@ -1,5 +1,6 @@
 import Debug from 'debug';
-import ExponentialBackOffStrategy, { BackoffStrategy } from './BackOffStategy';
+import { ExponentialBackOffStrategy, BackoffStrategy } from './BackOffStategy';
+import { logError } from './errors';
 
 export const POLL_INTERVAL_MS = 100;
 export const DEFAULT_FETCH_TIMEOUT_MS = 500;
@@ -75,23 +76,33 @@ export async function withTimeout<T>(promiseFn: Promise<T>, rejectMsg?: string, 
  * @param promiseFn Promise to resolve
  * @param retries Number of retries or -1 for infinite number of retries;
  */
-export async function retry<T>(promiseFn: Promise<T>, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
+export async function retry<T>(promiseFn: () => Promise<T>, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
   let result: T | undefined = undefined;
   let _ret = retries;
+  let error: Error | undefined = undefined;
 
   while (result === undefined && _ret !== 0) {
     try {
-      result = await promiseFn;
+      result = await promiseFn();
       backoff.resetBackoffTime();
       return result;
     } catch (e) {
+      error = new Error(e);
       await sleep(backoff.getBackOffMs());
-      debug(`An error occured exectuting ${JSON.stringify(promiseFn, null, 2)}: ${JSON.stringify(e, null, 2)}.
-      Number of retries left: ${retries}`);
+      debug(`An error occured: ${JSON.stringify(e, null, 2)}. Retrying in ${backoff.getBackOffMs()}ms. 
+            Number of retries left: ${_ret}`);
       _ret = _ret > 0 ? _ret -1 : _ret;
       backoff.registerFailure();
     }
   }
   backoff.resetBackoffTime();
-  throw new Error(`Failed to execute after ${retries}`);
+  throw new Error(`Failed to resolve promise after ${retries}. Last error: ${logError(error)}`);
+}
+
+export async function retryWithTimeout<T>(promiseFn: () => Promise<T>, timeout: number, retries = -1, backoff: BackoffStrategy = new ExponentialBackOffStrategy()): Promise<T> {
+  return await retry (() => {
+    const prom = promiseFn();
+    return withTimeout(prom, `Timed out: ${timeout} ms`, timeout)
+  }, retries, backoff)
+   
 }

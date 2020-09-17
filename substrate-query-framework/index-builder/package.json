@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-indexer-lib",
   "description": "Block index builder for substrate based chains",
-  "version": "0.0.13-alpha",
+  "version": "0.0.13-alpha.14",
   "main": "index.js",
   "license": "MIT",
   "repository": "git@github.com:Joystream/joystream.git",
@@ -11,6 +11,7 @@
     "README.md"
   ],
   "scripts": {
+    "pub": "yarn build && yarn publish --access public",
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
@@ -45,7 +46,7 @@
     "pg": "^8.3.2",
     "pgtools": "^0.3.0",
     "ts-mockito": "^2.6.1",
-    "ts-node": "^8",
+    "ts-node": "^9.0.0",
     "typescript": "^3.8",
     "util": "^0.12.3",
     "warthog": "https://github.com/metmirr/warthog/releases/download/v2.9.7/warthog-v2.9.7.tgz"

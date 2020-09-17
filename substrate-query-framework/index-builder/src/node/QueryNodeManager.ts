@@ -4,6 +4,10 @@ import MappingsProcessor from '../processor/MappingsProcessor';
 import { IndexerOptions, BootstrapOptions, ProcessorOptions } from './QueryNodeStartOptions';
 import { createDBConnection } from '../db/helper';
 import { Connection } from 'typeorm';
+import Debug from 'debug';
+
+
+const debug = Debug('index-builder:producer');
 
 // Respondible for creating, starting up and shutting down the query node.
 // Currently this class is a bit thin, but it will almost certainly grow
@@ -14,6 +18,8 @@ export class QueryNodeManager {
   private _query_node!: QueryNode;
 
   constructor() {
+    // TODO: a bit hacky, but okay for now
+    debug(`Hydra indexer lib version: ${process.env.npm_package_dependencies__dzlzv_hydra_indexer_lib || 'UNKNOWN'}`);
     // Hook into application
     process.on('exit', () => this._onProcessExit());
   }
