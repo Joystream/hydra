@@ -7,11 +7,15 @@ import {
   IntField,
   BooleanField,
   JsonObject,
+  Fields,
+  WarthogField,
 } from 'warthog'
+import { Field } from 'type-graphql'
 import { SubstrateEvent } from '../substrate-event/substrate-event.model'
 import * as BN from 'bn.js'
-
-import { OneToOne } from 'typeorm'
+import { NumericTransformer } from '@dzlzv/hydra-indexer-lib/lib/db/transformers'
+import { OneToOne, Column } from 'typeorm'
+import { GraphQLBigNumber } from '../../types/scalars'
 
 export interface ExtrinsicArg {
   type: string
@@ -21,7 +25,9 @@ export interface ExtrinsicArg {
 
 @Model({ db: { name: 'substrate_extrinsic' } })
 export class SubstrateExtrinsic extends BaseModel {
-  @NumericField()
+  @Field(() => GraphQLBigNumber)
+  @WarthogField('numeric')
+  @Column({ type: 'numeric', transformer: new NumericTransformer() })
   tip!: BN
 
   @IntField()
