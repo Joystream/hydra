@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
-import { JsonTransformer } from '@anchan828/typeorm-transformers';
 import { AnyJson } from '../interfaces/json-types';
 import * as BN from 'bn.js';
 import { NumericTransformer } from '../db';
@@ -30,8 +29,7 @@ export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
   versionInfo!: string;  
   
   @Column({
-    type: 'jsonb',
-    transformer: new JsonTransformer<AnyJson>({}),
+    type: 'jsonb'
   })
   meta!: AnyJson
 
@@ -43,7 +41,6 @@ export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
   
   @Column({ 
     type: 'jsonb', 
-    transformer: new JsonTransformer<ExtrinsicArg[]>([]), 
   })     
   args!: ExtrinsicArg[];
   
@@ -57,8 +54,7 @@ export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
   nonce!: number;            
   
   @Column({
-    type: 'jsonb', 
-    transformer: new JsonTransformer<AnyJson>({})
+    type: 'jsonb' 
   })      
   era!: AnyJson;         
   
