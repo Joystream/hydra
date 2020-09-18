@@ -29,7 +29,7 @@
     "playground": "warthog playground",
     "prettier": "prettier ./{src,test,tools}/**/*.ts --write",
     "start": "yarn start:prod",
-    "start:dev": "ts-node-dev src/index.ts",
+    "start:dev": "DEBUG=index-server:*,index-builder:* ts-node-dev src/index.ts",
     "start:dev:watch": "nodemon -e ts,graphql -x ts-node --type-check src/index.ts",
     "start:prod": "WARTHOG_ENV=production yarn dotenv:generate && node dist/src/index.js",
     "test": "DEBUG= jest --verbose --coverage",
