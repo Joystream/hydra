@@ -12,7 +12,7 @@ import {
 } from 'type-graphql'
 import { Inject } from 'typedi'
 import { Min } from 'class-validator'
-import { PageInfo, Fields, RawFields } from 'warthog'
+import { PageInfo, Fields, RawFields, NestedFields } from 'warthog'
 
 import {
   SubstrateEventWhereArgs,
@@ -86,10 +86,13 @@ export class SubstrateEventResolver {
   @Query(() => SubstrateEventConnection)
   async eventsConnection(
     @Args() { where, orderBy, ...pageOptions }: EventConnectionWhereArgs,
-    @RawFields() fields: Record<string, unknown>
+    @RawFields() fields: Record<string, any>
   ): Promise<SubstrateEventConnection> {
     debug(`Page options: ${JSON.stringify(pageOptions, null, 2)}`)
     debug(`Fields: ${JSON.stringify(fields, null, 2)}`)
+    if (fields.edges && fields.edges?.node && fields.edges?.node?.params) {
+      fields.edges.node.params = {} // treat params as a scalar
+    }
     return this.service.findConnection<SubstrateEventWhereInput>(
       where,
       orderBy,
@@ -101,12 +104,15 @@ export class SubstrateEventResolver {
   @Query(() => [SubstrateEvent])
   async substrateEvents(
     @Args() { where, orderBy, limit, offset }: SubstrateEventWhereArgs,
-    @Fields() fields: string[]
+    @Fields() fields: string[],
+    @NestedFields() nested: Record<string, unknown>
   ): Promise<SubstrateEvent[]> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const _fields = Object.assign([], fields)
     // add params even if not requested;
-    _fields.push('params')
+    if (nested.params) {
+      _fields.push('params')
+    }
     return this.service.find<SubstrateEventWhereInput>(
       where,
       orderBy, // by default order by ID
