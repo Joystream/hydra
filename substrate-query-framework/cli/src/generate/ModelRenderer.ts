@@ -135,7 +135,7 @@ export class ModelRenderer extends AbstractRenderer {
         returnTypeFunc,
         rootArgType: entityName,
         fieldName: f.name,
-        rootArgName: utils.camelCase(entityName),
+        rootArgName: 'r', // disable utils.camelCase(entityName) could be a reverved ts/js keyword ie `class`
         returnType: utils.generateResolverReturnType(returnTypeFunc, f.isList),
       });
       fieldResolverImports.add(utils.generateEntityImport(returnTypeFunc));
