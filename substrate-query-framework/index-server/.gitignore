@@ -1,0 +1,8 @@
+# Dependencies
+node_modules
+generated
+dist
+
+# OS metadata
+.DS_Store
+Thumbs.db
