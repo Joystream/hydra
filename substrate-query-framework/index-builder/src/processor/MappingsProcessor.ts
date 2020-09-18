@@ -20,8 +20,10 @@ const BATCH_SIZE = numberEnv('PROCESSOR_BATCH_SIZE') || 10;
 // between the updates and the load to the database
 const PROCESSOR_BLOCKS_POLL_INTERVAL = numberEnv('PROCESSOR_BLOCKS_POLL_INTERVAL') || 2000; // 1 second
 
-// mapping name is the same as the event name: <section>_<method>
-const DEFAULT_MAPPINGS_TRANSLATOR = (m: string) => m;
+// Get the even name from the mapper name. By default, we assume the handlers
+// are of the form <section>_<method> which is translated into the canonical event name of the 
+// form <section>.<method>
+const DEFAULT_MAPPINGS_TRANSLATOR = (m: string) => `${m.split('_')[0]}.${m.split('_')[1]}`;
 
 export default class MappingsProcessor {
   
