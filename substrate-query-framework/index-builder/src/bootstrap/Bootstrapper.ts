@@ -72,14 +72,14 @@ export default class Bootstrapper {
   }
 
   /**
-   * This creates a generic bootstrap event for compatibility with DB
-   * and bookeeping of successfull bootstrap events
+   * DEPRECATED, DO NOT USE
    */
   private createBootEvent(boot: BootstrapFunc): SubstrateEvent {
     return {
       event_name: 'Bootstrap',
       event_method: `Bootstrap.${boot.name}`,
       event_params: {},
+      id: 'bootstrap',
       index: (Date.now() / 1000) | 0, // simply put the timestamp here
       block_number: process.env.BLOCK_HEIGHT ? Number.parseInt(process.env.BLOCK_HEIGHT) : 0,
     };

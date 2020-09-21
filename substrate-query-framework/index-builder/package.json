@@ -21,7 +21,9 @@
     "@polkadot/api": "^1.31.1",
     "@types/shortid": "^0.0.29",
     "debug": "^4.1.1",
+    "reflect-metadata": "^0.1.13",
     "shortid": "^2.2.15",
+    "typedi": "^0.8.0",
     "typeorm": "^0.2.25"
   },
   "devDependencies": {

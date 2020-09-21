@@ -1,6 +1,5 @@
 import { QueryEventProcessingPack } from '../model';
 import { BootstrapPack } from '../bootstrap';
-
 export type QueryNodeStartUpOptions = IndexerOptions | ProcessorOptions | BootstrapOptions;
 
 export interface IndexerOptions  {

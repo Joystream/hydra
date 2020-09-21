@@ -18,6 +18,7 @@ export interface SubstrateEvent {
   event_method: string;
   event_params: EventParameters;
   index: number;
+  id: string;
   block_number: number;
   extrinsic?: SubstrateExtrinsic;
 }
