@@ -18,7 +18,7 @@ type Member implements About @entity {
     handle: String!
 }
 
-type Account implements Abount @entity {
+type Account implements About @entity {
     about: String!
     accountId: Bytes   
 }
