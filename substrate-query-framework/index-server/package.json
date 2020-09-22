@@ -57,7 +57,7 @@
     ]
   },
   "dependencies": {
-    "@dzlzv/hydra-indexer-lib": "../index-builder",
+    "@dzlzv/hydra-indexer-lib": "0.0.14-alpha",
     "bn.js": "^5.1.3",
     "dotenv": "^8.2.0",
     "graphql-parse-resolve-info": "^4.9.0",
