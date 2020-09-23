@@ -9,6 +9,7 @@ import {
   Int,
   ObjectType,
   ArgsType,
+  ID,
 } from 'type-graphql'
 import { Inject } from 'typedi'
 import { Min } from 'class-validator'
@@ -36,6 +37,28 @@ export class SubstrateEventEdge {
 
   @Field(() => String, { nullable: false })
   cursor!: string
+}
+
+@ObjectType()
+export class SubstrateEventPage {
+  @Field(() => [SubstrateEvent])
+  events!: SubstrateEvent[]
+
+  @Field(() => Int)
+  totalCount!: number
+}
+
+@ArgsType()
+export class SubstrateEventPageInput {
+  @Field(() => ID, { nullable: true })
+  afterID?: string
+
+  @Field(() => Int, { nullable: true })
+  @Min(0)
+  limit?: number
+
+  @Field(() => SubstrateEventWhereInput, { nullable: true })
+  where?: SubstrateEventWhereInput
 }
 
 @ObjectType()
@@ -72,8 +95,8 @@ export class EventConnectionWhereArgs extends ConnectionPageInputOptions {
   @Field(() => SubstrateEventWhereInput, { nullable: true })
   where?: SubstrateEventWhereInput
 
-  @Field(() => SubstrateEventOrderByEnum, { nullable: true })
-  orderBy?: SubstrateExtrinsicOrderByEnum
+  @Field(() => [SubstrateEventOrderByEnum], { nullable: true })
+  orderBy?: SubstrateExtrinsicOrderByEnum[]
 }
 
 @Resolver(SubstrateEvent)
@@ -99,6 +122,18 @@ export class SubstrateEventResolver {
       pageOptions,
       fields
     ) as Promise<SubstrateEventConnection>
+  }
+
+  @Query(() => SubstrateEventPage)
+  async substrateEventsAfter(
+    @Args() { afterID, where, limit }: SubstrateEventPageInput,
+    @RawFields() fields: Record<string, any>
+  ): Promise<SubstrateEventPage> {
+    debug(`Raw fields: ${JSON.stringify(fields, null, 2)}`)
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const _fields = Object.keys(fields.events) as string[]
+
+    return this.service.findAfter(where, afterID, limit, _fields)
   }
 
   @Query(() => [SubstrateEvent])

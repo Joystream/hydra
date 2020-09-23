@@ -1,5 +1,5 @@
 import { Service } from 'typedi'
-import { Repository, createQueryBuilder, getConnection } from 'typeorm'
+import { Repository, createQueryBuilder } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
 import { BaseService, RelayPageOptionsInput, ConnectionResult } from 'warthog'
 import { SubstrateEvent } from './substrate-event.model'
@@ -8,6 +8,10 @@ import { SubstrateEventWhereInput } from '../../../generated'
 import { getIndexerHead } from '@dzlzv/hydra-indexer-lib/lib/db/dal'
 import { ConnectionInputFields } from 'warthog/dist/types/core/GraphQLInfoService'
 import Debug from 'debug'
+import {
+  SubstrateEventEdge,
+  SubstrateEventPage,
+} from './substrate-event.resolver'
 
 const debug = Debug('index-server:event-server')
 
@@ -29,6 +33,29 @@ export class SubstrateEventService extends BaseService<SubstrateEvent> {
     return extrinsic
   }
 
+  async findAfter<W extends SubstrateEventWhereInput>(
+    where: any = {}, // V3: WhereExpression = {},
+    after?: string,
+    limit?: number,
+    fields?: string[]
+  ): Promise<SubstrateEventPage> {
+    limit = limit ?? 20
+    if (after) {
+      where = { ...where, AND: [{ 'id_gt': after }] }
+    }
+    const [events, totalCount] = await this.buildFindQuery<W>(
+      where,
+      'id_ASC',
+      { limit },
+      fields
+    ).getManyAndCount()
+
+    return {
+      totalCount,
+      events,
+    } as SubstrateEventPage
+  }
+
   async findConnection<W extends SubstrateEventWhereInput>(
     whereInput?: W, // V3: WhereExpression = {},
     orderBy?: string | string[],
@@ -40,6 +67,33 @@ export class SubstrateEventService extends BaseService<SubstrateEvent> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     // const _whereInput = whereInput || ({} as W)
     // _whereInput.blockNumber_lte = indexerHead
-    return super.findConnection(whereInput, orderBy, pageOptions, fields)
+
+    const emptyResult: ConnectionResult<SubstrateEvent> = {
+      totalCount: 0,
+      edges: [],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: '',
+        endCursor: '',
+      },
+    }
+
+    let result
+    try {
+      result = await super.findConnection(
+        whereInput,
+        orderBy,
+        pageOptions,
+        fields
+      )
+    } catch (e) {
+      // HACK around https://github.com/goldcaddy77/warthog/blob/b4649819be8b9af1627f2261532fcae6140246a2/src/core/RelayService.ts#L89
+      if (e && e.message === 'Items is empty') {
+        return emptyResult
+      }
+      throw e
+    }
+    return result
   }
 }
