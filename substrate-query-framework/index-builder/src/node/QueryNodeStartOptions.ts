@@ -16,6 +16,7 @@ export interface ProcessorOptions {
   atBlock?: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entities?: any[];
+  indexerEndpointURL?: string;
 }
 
 export interface BootstrapOptions {

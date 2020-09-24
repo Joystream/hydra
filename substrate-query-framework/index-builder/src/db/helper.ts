@@ -4,6 +4,7 @@ import { DeepPartial, createConnection, QueryRunner, Connection, getConnection }
 import config from './ormconfig';
 
 import Debug from 'debug';
+import { logError } from '../utils/errors';
 
 const debug = Debug('index-builder:helper');
 
@@ -51,7 +52,7 @@ export async function doInTransaction<T>(fn: (qn: QueryRunner) => Promise<T>): P
     
     return result;
   } catch (error) {
-    console.error(`Rolling back the transaction due to errors: ${JSON.stringify(error, null, 2)}`);
+    console.error(`Rolling back the transaction due to errors: ${logError(error)}`);
 
     // Since we have errors lets rollback changes we made
     await queryRunner.rollbackTransaction();

@@ -1,13 +1,13 @@
 import { makeDatabaseManager, SubstrateEvent, getLastProcessedEvent } from '..';
 import Debug from 'debug';
 import { doInTransaction } from '../db/helper';
-import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity';
 import { ProcessorOptions } from '../node';
 import { Inject, Service } from 'typedi';
-import { IProcessorSource, DBSource, HandlerLookupService } from '.'; 
+import { IProcessorSource, GraphQLSource, HandlerLookupService } from '.'; 
 import { QueryRunner, getRepository } from 'typeorm';
+import { logError } from '../utils/errors';
 
 const debug = Debug('index-builder:processor');
 
@@ -34,7 +34,7 @@ export class MappingsProcessor {
 
   constructor(
     @Inject('ProcessorOptions') protected options: ProcessorOptions,
-    @Inject('ProcessorSource') protected  eventsSource: IProcessorSource = new DBSource(),
+    @Inject('ProcessorSource') protected  eventsSource: IProcessorSource = new GraphQLSource(options),
     @Inject() protected handlerLookup = new HandlerLookupService(options)
   ) {
 
@@ -71,9 +71,8 @@ export class MappingsProcessor {
           await new Promise(resolve => setTimeout(resolve, PROCESSOR_BLOCKS_POLL_INTERVAL));
         }
       } catch (e) {
-        console.error(`Stopping the proccessor due to errors: ${JSON.stringify(e, null, 2)}`);
+        console.error(`Stopping the proccessor due to errors: ${logError(e)}`);
         this.stop();
-        debug(`Error: ${JSON.stringify(e, null, 2)}`);
         throw new Error(e);
       }
     }
