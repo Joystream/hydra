@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import {MigrationInterface, QueryRunner, TableIndex} from "typeorm";
 
 export class CreateSchema implements MigrationInterface {
     name = 'CreateSchema1599069895583'
@@ -8,13 +8,20 @@ export class CreateSchema implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "substrate_event" ("id" character varying NOT NULL, "name" character varying NOT NULL, "section" character varying, "method" character varying NOT NULL, "phase" jsonb NOT NULL, "block_number" integer NOT NULL, "index" integer NOT NULL, "params" jsonb NOT NULL, "extrinsic_id" integer, CONSTRAINT "REL_039d734d88baa87b2a46c95117" UNIQUE ("extrinsic_id"), CONSTRAINT "PK_eb7d4a5378857e4a4e82fb6e16d" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "processed_events_log" ("id" SERIAL NOT NULL, "processor" character varying NOT NULL, "event_id" character varying NOT NULL, "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_2d074516252c7a3090ddc44b9a5" PRIMARY KEY ("id"))`);
         await queryRunner.query(`ALTER TABLE "substrate_event" ADD CONSTRAINT "FK_039d734d88baa87b2a46c951175" FOREIGN KEY ("extrinsic_id") REFERENCES "substrate_extrinsic"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+
+        await queryRunner.createIndex("substrate_event", new TableIndex({
+            name: "block_number_idx",
+            columnNames: ["block_number"]
+        }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE "substrate_event" DROP CONSTRAINT "FK_039d734d88baa87b2a46c951175"`);
         await queryRunner.query(`DROP TABLE "processed_events_log"`);
+        await queryRunner.dropIndex("substrate_event", "block_number_idx");
         await queryRunner.query(`DROP TABLE "substrate_event"`);
         await queryRunner.query(`DROP TABLE "substrate_extrinsic"`);
+
     }
 
 }
