@@ -5,13 +5,8 @@ import { BaseService, RelayPageOptionsInput, ConnectionResult } from 'warthog'
 import { SubstrateEvent } from './substrate-event.model'
 import { SubstrateExtrinsic } from '../substrate-extrinsic/substrate-extrinsic.model'
 import { SubstrateEventWhereInput } from '../../../generated'
-import { getIndexerHead } from '@dzlzv/hydra-indexer-lib/lib/db/dal'
 import { ConnectionInputFields } from 'warthog/dist/types/core/GraphQLInfoService'
 import Debug from 'debug'
-import {
-  SubstrateEventEdge,
-  SubstrateEventPage,
-} from './substrate-event.resolver'
 
 const debug = Debug('index-server:event-server')
 
@@ -38,22 +33,19 @@ export class SubstrateEventService extends BaseService<SubstrateEvent> {
     after?: string,
     limit?: number,
     fields?: string[]
-  ): Promise<SubstrateEventPage> {
+  ): Promise<SubstrateEvent[]> {
     limit = limit ?? 20
     if (after) {
       where = { ...where, AND: [{ 'id_gt': after }] }
     }
-    const [events, totalCount] = await this.buildFindQuery<W>(
+    const events = await this.buildFindQuery<W>(
       where,
       'id_ASC',
       { limit },
       fields
-    ).getManyAndCount()
+    ).getMany()
 
-    return {
-      totalCount,
-      events,
-    } as SubstrateEventPage
+    return events
   }
 
   async findConnection<W extends SubstrateEventWhereInput>(

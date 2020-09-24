@@ -10,40 +10,30 @@ const debug = Debug('index-builder:processor');
 const GET_EVENTS_AFTER_QUERY = `
 query GetEventsAfterID( $afterID: ID, $names: [String!]!, $size: Int) {
   substrateEventsAfter(where: { name_in: $names }, afterID: $afterID, limit: $size) {
-    events {
-      id
-        name 
-        method
-        params {
-          name
-          type
-          value
-        }
-        index 
-        blockNumber
-        extrinsic {
-          method
-          section
-          versionInfo
-          signer
-          args
-          signature
-          hash
-          tip
-      }
+    id
+    name 
+    method
+    params {
+      name
+      type
+      value
     }
-    totalCount
+    index 
+    blockNumber
+    extrinsic {
+      method
+      section
+      versionInfo
+      signer
+      args
+      signature
+      hash
+      tip
+    }
   }
 }
 `
 
-
-interface EventsAfterData {
-  substrateEventsAfter: {
-    events: Array<SubstrateEvent>,
-    totalCount: number
-  }
-}
 
 
 export class GraphQLSource implements IProcessorSource {
@@ -60,9 +50,10 @@ export class GraphQLSource implements IProcessorSource {
 
   async nextBatch(filter: EventFilter, size: number): Promise<SubstrateEvent[]> {
     debug(`Filter: ${JSON.stringify(filter, null, 2)}`)
-    const data = await this.graphClient.request<EventsAfterData>(GET_EVENTS_AFTER_QUERY, { size, names: filter.names, afterID: filter.afterID});
-    debug(`Events remaining: ${data.substrateEventsAfter.totalCount}`);
-    return data.substrateEventsAfter.events;
+    const data = await this.graphClient.request<{ substrateEventsAfter: SubstrateEvent[] }>(GET_EVENTS_AFTER_QUERY, { size, names: filter.names, afterID: filter.afterID});
+    debug(`Fetched ${data.substrateEventsAfter.length} events`);
+    debug(`Events: ${JSON.stringify(data, null, 2)} events`);
+    return data.substrateEventsAfter;
 
   }
 

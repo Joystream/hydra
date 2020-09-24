@@ -39,15 +39,6 @@ export class SubstrateEventEdge {
   cursor!: string
 }
 
-@ObjectType()
-export class SubstrateEventPage {
-  @Field(() => [SubstrateEvent])
-  events!: SubstrateEvent[]
-
-  @Field(() => Int)
-  totalCount!: number
-}
-
 @ArgsType()
 export class SubstrateEventPageInput {
   @Field(() => ID, { nullable: true })
@@ -124,14 +115,20 @@ export class SubstrateEventResolver {
     ) as Promise<SubstrateEventConnection>
   }
 
-  @Query(() => SubstrateEventPage)
+  // TODO: So really we just need a where input for ID
+  @Query(() => [SubstrateEvent])
   async substrateEventsAfter(
     @Args() { afterID, where, limit }: SubstrateEventPageInput,
-    @RawFields() fields: Record<string, any>
-  ): Promise<SubstrateEventPage> {
+    @Fields() fields: string[],
+    @NestedFields() nested: Record<string, unknown>
+  ): Promise<SubstrateEvent[]> {
     debug(`Raw fields: ${JSON.stringify(fields, null, 2)}`)
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const _fields = Object.keys(fields.events) as string[]
+    const _fields = Object.assign([], fields)
+    // add params even if not requested;
+    if (nested.params) {
+      _fields.push('params')
+    }
 
     return this.service.findAfter(where, afterID, limit, _fields)
   }

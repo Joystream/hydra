@@ -2,12 +2,10 @@ import {
   BaseModel,
   Model,
   StringField,
-  NumericField,
   JSONField,
   IntField,
   BooleanField,
   JsonObject,
-  Fields,
   WarthogField,
 } from 'warthog'
 import { Field } from 'type-graphql'
