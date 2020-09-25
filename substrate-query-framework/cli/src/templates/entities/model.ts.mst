@@ -135,4 +135,11 @@ export {{#isInterface}}abstract{{/isInterface}} class {{className}}
   {{/is.union}}
 
 {{/fields}}
+
+{{^interfaces}}
+  constructor(init?: Partial<{{className}}>) {
+		super();
+		Object.assign(this, init);
+	}
+{{/interfaces}}
 }
