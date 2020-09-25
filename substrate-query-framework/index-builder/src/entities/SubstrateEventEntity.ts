@@ -4,16 +4,11 @@ import { QueryEvent } from '..';
 import * as BN from 'bn.js';
 import Debug from 'debug';
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity';
+import { EventParam } from '../model/substrate-interfaces'
 
 const debug = Debug('index-builder:QueryEventEntity');
 
 export const EVENT_TABLE_NAME = 'substrate_event'
-
-export interface EventParam {
-  type: string;
-  name: string;
-  value: AnyJson;
-}
 
 
 @Entity({
@@ -77,8 +72,8 @@ export class SubstrateEventEntity {
       q.event_record.event.data.forEach((data, index) => {
         _entity.params.push({
           type: event.typeDef[index].type,
-          name: event.typeDef[index].name || '',
-          value: data.toJSON(),
+          name: event.typeDef[index].name || event.typeDef[index].displayName || 'NO_NAME',
+          value: data ? data.toJSON() : {},
         } as EventParam)
       });
     }

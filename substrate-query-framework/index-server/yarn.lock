@@ -236,8 +236,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@dzlzv/hydra-indexer-lib@../index-builder":
+"@dzlzv/hydra-indexer-lib@0.0.14-alpha":
   version "0.0.14-alpha"
+  resolved "https://registry.yarnpkg.com/@dzlzv/hydra-indexer-lib/-/hydra-indexer-lib-0.0.14-alpha.tgz#4b1c98e2375f0a4392c07d3b60f45c88de92db92"
+  integrity sha512-h+cibwa6r30vI51/B17xK5qjxYuXbuTJcHycAmXgCsP9HtiEyCmBHVXuL5BYNAuf2nbs6yIjGMeoM6qSjpF2tg==
   dependencies:
     "@polkadot/api" "^1.31.1"
     "@types/shortid" "^0.0.29"
@@ -7171,10 +7173,10 @@ ts-jest@^24.1.0:
     semver "^5.5"
     yargs-parser "10.x"
 
-ts-node-dev@^1.0.0-pre.60:
-  version "1.0.0-pre.62"
-  resolved "https://registry.yarnpkg.com/ts-node-dev/-/ts-node-dev-1.0.0-pre.62.tgz#835644c43669b659a880379b9d06df86cef665ad"
-  integrity sha512-hfsEuCqUZOVnZ86l7A3icxD1nFt1HEmLVbx4YOHCkrbSHPBNWcw+IczAPZo3zz7YiOm9vs0xG6OENNrkgm89tQ==
+ts-node-dev@^1.0.0-pre.63:
+  version "1.0.0-pre.63"
+  resolved "https://registry.yarnpkg.com/ts-node-dev/-/ts-node-dev-1.0.0-pre.63.tgz#0e69df26cef35a728362d93348f13caa2cb2c512"
+  integrity sha512-KURricXsXtiB4R+NCgiKgE01wyTe/GlXTdAPIhliDhF3kCn00kzyepAc1H8kbUJCmz0oYQq/GQ6CMtiWovs9qg==
   dependencies:
     chokidar "^3.4.0"
     dateformat "~1.0.4-1.2.3"
@@ -7202,10 +7204,21 @@ ts-node@^7.0.1:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
-ts-node@^8.10, ts-node@^8.10.2:
+ts-node@^8.10.2:
   version "8.10.2"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.10.2.tgz#eee03764633b1234ddd37f8db9ec10b75ec7fb8d"
   integrity sha512-ISJJGgkIpDdBhWVu3jufsWpK3Rzo7bdiIXJjQc0ynKxVOVcg2oIrf2H2cejminGrptVc6q6/uynAHNCuWGbpVA==
+  dependencies:
+    arg "^4.1.0"
+    diff "^4.0.1"
+    make-error "^1.1.1"
+    source-map-support "^0.5.17"
+    yn "3.1.1"
+
+ts-node@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-9.0.0.tgz#e7699d2a110cc8c0d3b831715e417688683460b3"
+  integrity sha512-/TqB4SnererCDR/vb4S/QvSZvzQMJN8daAslg7MeaiHvD8rDZsSfXmNeNumyZZzMned72Xoq/isQljYSt8Ynfg==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"

@@ -9,6 +9,7 @@ import {
   Int,
   ObjectType,
   ArgsType,
+  ID,
 } from 'type-graphql'
 import { Inject } from 'typedi'
 import { Min } from 'class-validator'
@@ -36,6 +37,19 @@ export class SubstrateEventEdge {
 
   @Field(() => String, { nullable: false })
   cursor!: string
+}
+
+@ArgsType()
+export class SubstrateEventPageInput {
+  @Field(() => ID, { nullable: true })
+  afterID?: string
+
+  @Field(() => Int, { nullable: true })
+  @Min(0)
+  limit?: number
+
+  @Field(() => SubstrateEventWhereInput, { nullable: true })
+  where?: SubstrateEventWhereInput
 }
 
 @ObjectType()
@@ -72,8 +86,8 @@ export class EventConnectionWhereArgs extends ConnectionPageInputOptions {
   @Field(() => SubstrateEventWhereInput, { nullable: true })
   where?: SubstrateEventWhereInput
 
-  @Field(() => SubstrateEventOrderByEnum, { nullable: true })
-  orderBy?: SubstrateExtrinsicOrderByEnum
+  @Field(() => [SubstrateEventOrderByEnum], { nullable: true })
+  orderBy?: SubstrateExtrinsicOrderByEnum[]
 }
 
 @Resolver(SubstrateEvent)
@@ -99,6 +113,24 @@ export class SubstrateEventResolver {
       pageOptions,
       fields
     ) as Promise<SubstrateEventConnection>
+  }
+
+  // TODO: So really we just need a where input for ID
+  @Query(() => [SubstrateEvent])
+  async substrateEventsAfter(
+    @Args() { afterID, where, limit }: SubstrateEventPageInput,
+    @Fields() fields: string[],
+    @NestedFields() nested: Record<string, unknown>
+  ): Promise<SubstrateEvent[]> {
+    debug(`Raw fields: ${JSON.stringify(fields, null, 2)}`)
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const _fields = Object.assign([], fields)
+    // add params even if not requested;
+    if (nested.params) {
+      _fields.push('params')
+    }
+
+    return this.service.findAfter(where, afterID, limit, _fields)
   }
 
   @Query(() => [SubstrateEvent])

@@ -1,6 +1,6 @@
 import * as BN from 'bn.js';
 
-export declare type AnyJsonField = string | number | boolean | null | undefined | AnyJson | Array<AnyJsonField> | Array<AnyJson>
+export declare type AnyJsonField = string | number | boolean | AnyJson | Array<AnyJsonField> | Array<AnyJson>
 
 export declare type AnyJson = {
     [index: string]: AnyJsonField;
