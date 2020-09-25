@@ -1,3 +1,7 @@
+# 0.0.14-alpha.1
+
+- The mappings processor sources events from a GraphQL endpoint
+
 # 0.0.14-alpha
 
 Breaking changes:
