@@ -6,6 +6,7 @@ export interface IndexerOptions  {
   atBlock?: number;
   typeRegistrator?: () => void;
   wsProviderURI: string;
+  redisURI?: string;
 }
 
 export interface ProcessorOptions {

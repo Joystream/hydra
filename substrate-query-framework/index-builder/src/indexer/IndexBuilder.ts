@@ -8,57 +8,66 @@ import { doInTransaction } from '../db/helper';
 import { PooledExecutor } from './PooledExecutor';
 import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
-import { getIndexerHead } from '../db/dal';
 import { ISubstrateService } from '../substrate';
 import { getConnection } from 'typeorm';
+import { IndexerStatusService } from './IndexerStatusService';
+import Container, { Inject } from 'typedi';
+import * as IORedis from 'ioredis';
+import { stringifyWithTs } from '../utils/stringify';
 
 const debug = Debug('index-builder:indexer');
 
 const WORKERS_NUMBER = numberEnv('INDEXER_WORKERS') || 50;
 
+export interface BlockPayload {
+  height: number,
+  ts: number 
+  events?: string[]
+}
+
+export const BLOCK_COMPLETE_CHANNEL = 'hydra:indexer:block:complete';
+export const BLOCK_START_CHANNEL = 'hydra:indexer:block:started';
+
+
 export class IndexBuilder {
+  
   private _producer!: BlockProducer;
   private _stopped = false;
+  private redisPub: IORedis.Redis;
+  
 
-  private _indexingTimer = new Date().getMilliseconds();
-
-  private _indexerHead = -1;
-
-  // set containing the indexer block heights that are ahead 
-  // of the current indexer head
-  private _recentlyIndexedBlocks = new Set<number>();
-
-  private constructor(producer: BlockProducer) {
+  private constructor(producer: BlockProducer, 
+    @Inject() protected statusService = new IndexerStatusService()) {
+    this.redisPub = Container.get<() => IORedis.Redis>('RedisClient')();
     this._producer = producer;
   }
 
   static create(service: ISubstrateService): IndexBuilder {
     const producer = new BlockProducer(service);
-
+    
     return new IndexBuilder(producer);
   }
 
   async start(atBlock?: number): Promise<void> {
     debug('Spawned worker.');
     
-    this._indexerHead = await getIndexerHead();
+    const lastHead = await this.statusService.getIndexerHead();
     
-    debug(`Last indexed block in the database: ${this._indexerHead.toString()}`);
-    let startBlock = this._indexerHead + 1;
+    debug(`Last indexed block in the database: ${lastHead.toString()}`);
+    let startBlock = lastHead + 1;
     
     if (atBlock) {
       debug(`Got block height hint: ${atBlock}`);
-      if (this._indexerHead >= 0 && process.env.FORCE_BLOCK_HEIGHT !== 'true') {
+      if (lastHead >= 0 && process.env.FORCE_BLOCK_HEIGHT !== 'true') {
         debug(
           `WARNING! The database contains indexed blocks.
-          The last indexed block height is ${this._indexerHead}. The indexer 
-          will continue from block ${this._indexerHead} ignoring the start 
+          The last indexed block height is ${lastHead}. The indexer 
+          will continue from block ${lastHead} ignoring the start 
           block height hint. Set the environment variable FORCE_BLOCK_HEIGHT to true 
           if you want to start from ${atBlock} anyway.`
         );
       } else {
         startBlock = Math.max(startBlock, atBlock);
-        this._indexerHead = startBlock - 1;
       }
     }
 
@@ -83,7 +92,12 @@ export class IndexBuilder {
 
   _indexBlock(): (h: number) => Promise<void> {
     return async (h: number) => {
-      debug(`Processing block #${h.toString()}`);  
+      debug(`Processing block #${h.toString()}`); 
+      
+      await this.redisPub.publish(BLOCK_START_CHANNEL, stringifyWithTs({
+        height: h,
+      })); 
+
       const queryEventsBlock: QueryEventBlock = await this._producer.fetchBlock(h);
       const batches = _.chunk(queryEventsBlock.query_events, 100);
       debug(`Read ${queryEventsBlock.query_events.length} events; saving in ${batches.length} batches`);  
@@ -100,33 +114,13 @@ export class IndexBuilder {
           debug(`Saved ${saved} events`);
         }
         debug(`Done block #${h.toString()}`);
-      });
+      }); 
 
-      this._recentlyIndexedBlocks.add(h);
-      this._updateIndexerHead();
+      await this.redisPub.publish(BLOCK_COMPLETE_CHANNEL, stringifyWithTs({
+        height: h,
+        events: queryEventsBlock.query_events.map((e) => e.event_name)
+      }));
     }
-  }
-
-  private _updateIndexerHead(): void {
-    let nextHead = this._indexerHead + 1;
-    while (this._recentlyIndexedBlocks.has(nextHead)) {
-      this._indexerHead = nextHead;
-
-      if (this._indexerHead % 100 === 0) {
-        const _newTime = new Date().getMilliseconds();
-        debug(`Indexed 100 blocks in ${_newTime - this._indexingTimer} ms`);
-        this._indexingTimer = _newTime;
-      }
-
-      debug(`Updated indexer head to ${this._indexerHead}`);
-      // remove from the set as we don't need to keep it anymore
-      this._recentlyIndexedBlocks.delete(nextHead);
-      nextHead++;
-    }
-  }
-
-  public get indexerHead(): number {
-    return this._indexerHead;
   }
   
 }
