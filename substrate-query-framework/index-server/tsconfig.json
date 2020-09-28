@@ -19,6 +19,6 @@
     "strictNullChecks": true,
     "types": ["isomorphic-fetch", "node"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "db/**/*.ts"],
   "exclude": ["node_modules/**/*", "generated/**/*", "tools/**/*"]
 }
