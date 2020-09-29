@@ -1,5 +1,5 @@
 // @ts-check
-import { QueryEventBlock } from '../model';
+import { QueryEventBlock, QueryEvent } from '../model';
 import { BlockProducer } from '.';
 import * as _ from 'lodash';
 
@@ -13,7 +13,8 @@ import { getConnection } from 'typeorm';
 import { IndexerStatusService } from './IndexerStatusService';
 import Container, { Inject } from 'typedi';
 import * as IORedis from 'ioredis';
-import { stringifyWithTs } from '../utils/stringify';
+import { stringifyWithTs, withTs } from '../utils/stringify';
+import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-consts';
 
 const debug = Debug('index-builder:indexer');
 
@@ -22,12 +23,8 @@ const WORKERS_NUMBER = numberEnv('INDEXER_WORKERS') || 50;
 export interface BlockPayload {
   height: number,
   ts: number 
-  events?: string[]
+  events?: { id: string, name: string }[]
 }
-
-export const BLOCK_COMPLETE_CHANNEL = 'hydra:indexer:block:complete';
-export const BLOCK_START_CHANNEL = 'hydra:indexer:block:started';
-
 
 export class IndexBuilder {
   
@@ -94,6 +91,12 @@ export class IndexBuilder {
     return async (h: number) => {
       debug(`Processing block #${h.toString()}`); 
       
+      const done = await this.statusService.isComplete(h);
+      if (done) {
+        debug(`Block ${h} has already been indexed`);
+        return;
+      }
+      
       await this.redisPub.publish(BLOCK_START_CHANNEL, stringifyWithTs({
         height: h,
       })); 
@@ -116,11 +119,20 @@ export class IndexBuilder {
         debug(`Done block #${h.toString()}`);
       }); 
 
-      await this.redisPub.publish(BLOCK_COMPLETE_CHANNEL, stringifyWithTs({
-        height: h,
-        events: queryEventsBlock.query_events.map((e) => e.event_name)
-      }));
+      await this.redisPub.publish(BLOCK_COMPLETE_CHANNEL, JSON.stringify(this.toPayload(queryEventsBlock)));
     }
   }
   
+
+  toPayload(qeb: QueryEventBlock): BlockPayload {
+    return (withTs({
+      height: qeb.block_number,
+      events: qeb.query_events.map((e) => {
+        return {
+          name: e.event_name,
+          id: SubstrateEventEntity.formatId(qeb.block_number, e.index)
+        }
+      })
+    }) as unknown) as BlockPayload
+  }
 }

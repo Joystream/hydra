@@ -1,25 +1,20 @@
 import Container, { Service } from 'typedi'
-import { getIndexerHead } from '../db/dal';
+import { getIndexerHead as slowIndexerHead } from '../db/dal';
 import Debug from 'debug';
 import * as IORedis from 'ioredis';
-import { IndexBuilder } from '..';
 import { logError } from '../utils/errors';
-import { BlockPayload, BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './IndexBuilder';
+import { BlockPayload } from './IndexBuilder';
 import { stringifyWithTs } from '../utils/stringify';
-const debug = Debug('index-builder:indexer');
+import { INDEXER_HEAD_BLOCK, 
+  INDEXER_NEW_HEAD_CHANNEL, 
+  INDEXER_RECENTLY_COMPLETE_BLOCKS, 
+  BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL, EVENT_LAST, EVENT_TOTAL } from './redis-consts';
 
-export const INDEXER_NEW_HEAD_CHANNEL = 'hydra:indexer:head:new';
-export const INDEXER_HEAD_BLOCK = 'hydra:indexer:head';
-export const INDEXER_RECENTLY_COMPLETE_BLOCKS = 'hydra:indexer:block:recent';
+const debug = Debug('index-builder:status-server');
 
 @Service()
 export class IndexerStatusService {
 
-  
-  // set containing the indexer block heights that are ahead 
-  // of the current indexer head
-  private _indexerHead = -1;
-  private initialized = false;
   private redisSub: IORedis.Redis;
   private redisPub: IORedis.Redis;
   private redisClient: IORedis.Redis;
@@ -36,63 +31,98 @@ export class IndexerStatusService {
     .catch((e) => { throw new Error(e) });
     
     this.redisSub.on('message', (channel, message) => {
-      debug(`Got message: ${message as string}`);
-      if (channel === BLOCK_COMPLETE_CHANNEL) {
-        this.onCompleteBlock((JSON.parse(message) as BlockPayload).height)
-          .catch((e) => { throw new Error(`Error connecting to Redis: ${logError(e)}`) });
-      }
+      this.onNewMessage(channel, message)
+          .catch((e) => { throw new Error(`Error connecting to Redis: ${logError(e)}`) })
     })
   }  
   
-  async getIndexerHead(): Promise<number> {
-    if (!this.initialized) {
-      this._indexerHead 
-      const headVal = await this.redisClient.get(INDEXER_HEAD_BLOCK);
-      debug(`Got ${headVal || 'null'} from Redis cache`);
-      if ( headVal !== null) {
-        this._indexerHead = Number.parseInt(headVal);
-      } else {
-        debug(`Redis cache is empty, loading from the database`);
-        this._indexerHead = await getIndexerHead();
-        debug(`Loaded ${this._indexerHead}`);
-        await this.updateHead();
-      }
-      this.initialized = true;
+  async onNewMessage(channel: string, message: string): Promise<void> {
+    if (channel === BLOCK_COMPLETE_CHANNEL) {
+      const payload = JSON.parse(message) as BlockPayload;
+      await this.updateIndexerHead(payload.height);
+      await this.updateLastEvents(payload);
     }
-    // TODO: replace with a Redis call or GraphQL subscription
-    return this._indexerHead;
   }
 
-  private async updateHead(): Promise<void> {
-    await this.redisClient.set(INDEXER_HEAD_BLOCK, this._indexerHead);
-    await this.redisPub.publish(INDEXER_NEW_HEAD_CHANNEL, stringifyWithTs({height: this._indexerHead}))
+  async getIndexerHead(): Promise<number> {
+    const headVal = await this.redisClient.get(INDEXER_HEAD_BLOCK);
+    debug(`Got ${headVal || 'null'} from Redis cache`);
+    if ( headVal !== null) {
+      return Number.parseInt(headVal);
+    } 
+
+    debug(`Redis cache is empty, loading from the database`);
+    const _indexerHead = await slowIndexerHead();
+    debug(`Loaded ${_indexerHead}`);
+    await this.updateHeadKey(_indexerHead);
+    return _indexerHead;
+  }
+     
+
+  private async updateHeadKey(height: number): Promise<void> {
+    debug(`Updating the indexer head to ${height}`);
+    await this.redisClient.set(INDEXER_HEAD_BLOCK, height);
+    await this.redisPub.publish(INDEXER_NEW_HEAD_CHANNEL, stringifyWithTs({ height }))
+  }
+
+  async updateLastEvents(payload: BlockPayload): Promise<void> {
+    if (!payload.events) {
+      debug(`No events in the payload`);
+      return;
+    }
+    for (const e of payload.events) {
+      await this.redisClient.hset(EVENT_LAST, e.name, e.id);
+      await this.redisClient.hincrby(EVENT_TOTAL, e.name, 1);
+      await this.redisClient.hincrby(EVENT_TOTAL, 'ALL', 1);
+    }
+  }
+
+  async isComplete(h: number): Promise<boolean> {
+    const head = await this.getIndexerHead(); // this op is fast
+    if (h <= head) {
+       return true;
+    }
+    const isRecent = await this.redisClient.sismember(INDEXER_RECENTLY_COMPLETE_BLOCKS, `${h}`);
+    return (isRecent === 1); // ismember returned true;
   }
 
   /**
    * 
    * @param h height of the completed block
    */
-  async onCompleteBlock(h: number): Promise<void> {
+  async updateIndexerHead(h: number): Promise<void> {
     debug(`On complete block: ${h}`);
     await this.redisClient.sadd(INDEXER_RECENTLY_COMPLETE_BLOCKS, `${h}`);
     
-    let nextHead = this._indexerHead + 1;
+    let nextHead = await this.getIndexerHead();
     let nextHeadComplete = true;
+    const toPrune = [];
     while (nextHeadComplete) {
-      const resp = await this.redisClient.sismember(INDEXER_RECENTLY_COMPLETE_BLOCKS, `${nextHead}`);
-      nextHeadComplete = (resp === 1); // ismember returned true;
-      if (!nextHeadComplete) {
-        break;
-      }
-      
-      await this.redisClient.set(INDEXER_HEAD_BLOCK, nextHead);
-      debug(`Updated indexer head to ${nextHead}`);
+      nextHeadComplete = await this.isComplete(nextHead + 1); // ismember returned true;
       // remove from the set as we don't need to keep it anymore
-      await this.redisClient.srem(INDEXER_RECENTLY_COMPLETE_BLOCKS, this._indexerHead);
-      this._indexerHead = nextHead;
-      await this.updateHead();
-      nextHead++;
+      if (nextHeadComplete) {
+        toPrune.push(nextHead);
+        debug(`The block ${nextHead} is complete`);
+        nextHead++;
+      } 
+    }
+
+    const currentHead = await this.getIndexerHead();
+    debug(`Next head: ${nextHead}, current head: ${currentHead}`);
+    if (nextHead > currentHead) {
+      debug(`Updated the indexer head from ${currentHead} to ${nextHead}`);
+      await this.updateHeadKey(nextHead);
+      // the invariant here is that we never
+      // prune heights that are less than the current indexer head
+      // We may have some leftovers due to concurrency 
+      await this.pruneRecent(toPrune)
     }
   }
 
+  async pruneRecent(heights: number[]): Promise<void> {
+    for (const h of heights) {
+      await this.redisClient.srem(INDEXER_RECENTLY_COMPLETE_BLOCKS, h);
+    } 
+    debug(`Pruned ${heights.length} elements`);
+  }
 }
