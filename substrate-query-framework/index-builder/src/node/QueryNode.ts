@@ -1,8 +1,7 @@
 // @ts-check
-
 import { ApiPromise, WsProvider /*RuntimeVersion*/ } from '@polkadot/api';
 
-import { makeSubstrateService, IndexBuilder } from '..';
+import { makeSubstrateService, IndexBuilder, BlockProducer } from '..';
 import { IndexerOptions } from '.';
 import Debug from 'debug';
 import * as Redis from 'ioredis';
@@ -72,14 +71,17 @@ export class QueryNode {
 
     const service = makeSubstrateService(api);
 
+    Container.set('SubstrateService', service);
+    //Container.set('BlockProducer', new BlockProducer());
+
     const redisURL = options.redisURI || process.env.REDIS_URI;
     if (!redisURL) {
       throw new Error(`Redis URL is not provided`);
     }
     
-    Container.set('RedisClient', () => new Redis(redisURL));
+    Container.set('RedisClientFactory', () => new Redis(redisURL));
 
-    const index_buider = IndexBuilder.create(service);
+    const index_buider = Container.get<IndexBuilder>(IndexBuilder);
     
     return new QueryNode(provider, api, index_buider, atBlock);
   }

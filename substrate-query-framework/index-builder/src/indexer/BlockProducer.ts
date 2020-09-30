@@ -9,6 +9,8 @@ import { UnsubscribePromise } from '@polkadot/api/types';
 import { waitFor, retry } from '../utils/wait-for';
 import { numberEnv } from '../utils/env-flags';
 import { ConstantBackOffStrategy } from '../utils/BackOffStategy';
+import { IBlockProducer } from './IBlockProducer';
+import { Service, Inject } from 'typedi';
 
 
 const DEBUG_TOPIC = 'index-builder:producer';
@@ -18,26 +20,22 @@ const BLOCK_PRODUCER_FETCH_RETRIES = numberEnv('BLOCK_PRODUCER_FETCH_RETRIES') |
 
 const debug = Debug(DEBUG_TOPIC);
 
-export class BlockProducer extends EventEmitter {
+@Service('BlockProducer')
+export class BlockProducer implements IBlockProducer {
   private _started: boolean;
-
-  private readonly _substrateService: ISubstrateService;
 
   private _newHeadsUnsubscriber: UnsubscribePromise | undefined;
 
   private _blockToProduceNext: number;
 
   private _chainHeight: number;
+  
+  @Inject('SubstrateService') 
+  private readonly substrateService!: ISubstrateService
 
-  constructor(substrateService: ISubstrateService) {
-    super();
+  constructor() {
 
     this._started = false;
-    this._substrateService = substrateService;
-
-    // TODO
-    // need to set this up, when state is better, it
-    // will be refactored
     this._newHeadsUnsubscriber = undefined;
 
     this._blockToProduceNext = 0;
@@ -45,14 +43,15 @@ export class BlockProducer extends EventEmitter {
   }
 
   async start(atBlock?: number): Promise<void> {
+    assert(this.substrateService, 'SubstrateService must be set');
     if (this._started) throw Error(`Cannot start when already started.`);
 
     // mark as started
     this._started = true;
 
     // Try to get initial header right away
-    const finalizedHeadHash = await this._substrateService.getFinalizedHead();
-    const header = await this._substrateService.getHeader(finalizedHeadHash);
+    const finalizedHeadHash = await this.substrateService.getFinalizedHead();
+    const header = await this.substrateService.getHeader(finalizedHeadHash);
     this._chainHeight = header.number.toNumber();
 
     if (atBlock) {
@@ -62,7 +61,7 @@ export class BlockProducer extends EventEmitter {
     }
 
     //
-    this._newHeadsUnsubscriber = this._substrateService.subscribeNewHeads((header) => {
+    this._newHeadsUnsubscriber = this.substrateService.subscribeNewHeads((header) => {
       this._OnNewHeads(header);
     });
 
@@ -91,6 +90,9 @@ export class BlockProducer extends EventEmitter {
 
 
   public async fetchBlock(height: number): Promise<QueryEventBlock> {
+    if (height > this._chainHeight) {
+      throw new Error(`Cannot fetch block at height ${height}, current chain height is ${this._chainHeight}`);
+    }
     return retry(() => this._doBlockProduce(height), 
       BLOCK_PRODUCER_FETCH_RETRIES, new ConstantBackOffStrategy(1000 * 5)); // retry after 5 seconds
   }
@@ -104,15 +106,15 @@ export class BlockProducer extends EventEmitter {
   private async _doBlockProduce(height: number): Promise<QueryEventBlock> {
     debug(`Fetching block #${height.toString()}`);
 
-    const targetHash = await this._substrateService.getBlockHash(height.toString());
+    const targetHash = await this.substrateService.getBlockHash(height.toString());
     debug(`\tHash ${targetHash.toString()}.`);
 
-    const records = await this._substrateService.eventsAt(targetHash);
+    const records = await this.substrateService.eventsAt(targetHash);
     
     debug(`\tRead ${records.length} events.`);
 
     let blockExtrinsics: Extrinsic[] = [];
-    const signedBlock = await this._substrateService.getBlock(targetHash);
+    const signedBlock = await this.substrateService.getBlock(targetHash);
 
     debug(`\tFetched full block.`);
 

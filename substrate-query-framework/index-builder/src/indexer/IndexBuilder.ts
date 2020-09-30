@@ -8,13 +8,13 @@ import { doInTransaction } from '../db/helper';
 import { PooledExecutor } from './PooledExecutor';
 import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
-import { ISubstrateService } from '../substrate';
-import { getConnection } from 'typeorm';
 import { IndexerStatusService } from './IndexerStatusService';
-import Container, { Inject } from 'typedi';
+import Container, { Inject, Service } from 'typedi';
 import * as IORedis from 'ioredis';
 import { stringifyWithTs, withTs } from '../utils/stringify';
 import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-consts';
+import { IBlockProducer } from './IBlockProducer';
+import { assert } from 'console';
 
 const debug = Debug('index-builder:indexer');
 
@@ -26,26 +26,23 @@ export interface BlockPayload {
   events?: { id: string, name: string }[]
 }
 
+@Service()
 export class IndexBuilder {
-  
-  private _producer!: BlockProducer;
   private _stopped = false;
   private redisPub: IORedis.Redis;
   
+  @Inject('BlockProducer') private producer!: IBlockProducer;
+  @Inject('StatusService') protected statusService!: IndexerStatusService;
 
-  private constructor(producer: BlockProducer, 
-    @Inject() protected statusService = new IndexerStatusService()) {
-    this.redisPub = Container.get<() => IORedis.Redis>('RedisClient')();
-    this._producer = producer;
-  }
-
-  static create(service: ISubstrateService): IndexBuilder {
-    const producer = new BlockProducer(service);
-    
-    return new IndexBuilder(producer);
+  public constructor() {
+    this.redisPub = Container.get<() => IORedis.Redis>('RedisClientFactory')();
   }
 
   async start(atBlock?: number): Promise<void> {
+    assert(this.producer, 'BlockProducer must be set');
+    assert(this.statusService, 'StatusService must be set');
+    assert(this.redisPub, 'RedisClient must be initialized');
+
     debug('Spawned worker.');
     
     const lastHead = await this.statusService.getIndexerHead();
@@ -70,9 +67,9 @@ export class IndexBuilder {
 
     debug(`Starting the block indexer at block ${startBlock}`);
 
-    await this._producer.start(startBlock);
+    await this.producer.start(startBlock);
 
-    const poolExecutor = new PooledExecutor(WORKERS_NUMBER, this._producer.blockHeights(), this._indexBlock());
+    const poolExecutor = new PooledExecutor(WORKERS_NUMBER, this.producer.blockHeights(), this._indexBlock());
     
     debug('Started a pool of indexers.');
 
@@ -101,7 +98,7 @@ export class IndexBuilder {
         height: h,
       })); 
 
-      const queryEventsBlock: QueryEventBlock = await this._producer.fetchBlock(h);
+      const queryEventsBlock: QueryEventBlock = await this.producer.fetchBlock(h);
       const batches = _.chunk(queryEventsBlock.query_events, 100);
       debug(`Read ${queryEventsBlock.query_events.length} events; saving in ${batches.length} batches`);  
       

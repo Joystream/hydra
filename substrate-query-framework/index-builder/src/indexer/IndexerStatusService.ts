@@ -12,7 +12,7 @@ import { INDEXER_HEAD_BLOCK,
 
 const debug = Debug('index-builder:status-server');
 
-@Service()
+@Service('StatusService')
 export class IndexerStatusService {
 
   private redisSub: IORedis.Redis;
@@ -20,7 +20,7 @@ export class IndexerStatusService {
   private redisClient: IORedis.Redis;
 
   constructor() {
-    const clientFactory = Container.get<() => IORedis.Redis>('RedisClient');
+    const clientFactory = Container.get<() => IORedis.Redis>('RedisClientFactory');
     this.redisSub = clientFactory();
     this.redisPub = clientFactory();
     this.redisClient = clientFactory();
