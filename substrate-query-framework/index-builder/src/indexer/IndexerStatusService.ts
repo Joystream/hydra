@@ -34,16 +34,23 @@ export class IndexerStatusService {
       this.onNewMessage(channel, message)
           .catch((e) => { throw new Error(`Error connecting to Redis: ${logError(e)}`) })
     })
-  }  
   
+  }  
+
+
+  async onBlockComplete(payload: BlockPayload): Promise<void> {
+    if (await this.isComplete(payload.height)) {
+      debug(`Ignoring ${payload.height}: already processed`);
+    }
+    await this.updateIndexerHead(payload.height);
+    await this.updateLastEvents(payload);
+  }
+
+
   async onNewMessage(channel: string, message: string): Promise<void> {
     if (channel === BLOCK_COMPLETE_CHANNEL) {
       const payload = JSON.parse(message) as BlockPayload;
-      if (await this.isComplete(payload.height)) {
-        debug(`Ignoring ${payload.height}: already processed`);
-      }
-      await this.updateIndexerHead(payload.height);
-      await this.updateLastEvents(payload);
+      await this.onBlockComplete(payload);
     }
   }
 

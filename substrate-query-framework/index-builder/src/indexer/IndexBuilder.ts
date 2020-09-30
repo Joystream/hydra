@@ -1,6 +1,5 @@
 // @ts-check
-import { QueryEventBlock, QueryEvent } from '../model';
-import { BlockProducer } from '.';
+import { QueryEventBlock } from '../model';
 import * as _ from 'lodash';
 
 import Debug from 'debug';
@@ -9,12 +8,13 @@ import { PooledExecutor } from './PooledExecutor';
 import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
 import { IndexerStatusService } from './IndexerStatusService';
-import Container, { Inject, Service } from 'typedi';
-import * as IORedis from 'ioredis';
-import { stringifyWithTs, withTs } from '../utils/stringify';
+import { Inject, Service } from 'typedi';
+//import * as IORedis from 'ioredis';
+import { withTs } from '../utils/stringify';
 import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-consts';
 import { IBlockProducer } from './IBlockProducer';
 import { assert } from 'console';
+import { EventEmitter } from 'events';
 
 const debug = Debug('index-builder:indexer');
 
@@ -26,23 +26,22 @@ export interface BlockPayload {
   events?: { id: string, name: string }[]
 }
 
-@Service()
-export class IndexBuilder {
+@Service('IndexBuilder')
+export class IndexBuilder extends EventEmitter {
   private _stopped = false;
-  private redisPub: IORedis.Redis;
+  //private redisPub: IORedis.Redis;
   
-  @Inject('BlockProducer') private producer!: IBlockProducer;
+  @Inject('BlockProducer') private producer!: IBlockProducer<QueryEventBlock>;
   @Inject('StatusService') protected statusService!: IndexerStatusService;
 
   public constructor() {
-    this.redisPub = Container.get<() => IORedis.Redis>('RedisClientFactory')();
+    super();
   }
 
   async start(atBlock?: number): Promise<void> {
     assert(this.producer, 'BlockProducer must be set');
     assert(this.statusService, 'StatusService must be set');
-    assert(this.redisPub, 'RedisClient must be initialized');
-
+    
     debug('Spawned worker.');
     
     const lastHead = await this.statusService.getIndexerHead();
@@ -77,9 +76,7 @@ export class IndexBuilder {
 
   }
 
-  async stop(): Promise<void> { 
-    debug('Stopping the indexer and closing the DB connection');
-    await getConnection().close();
+  stop(): void { 
     debug('Index builder has been stopped');
     this._stopped = true;
   }
@@ -94,32 +91,36 @@ export class IndexBuilder {
         return;
       }
       
-      await this.redisPub.publish(BLOCK_START_CHANNEL, stringifyWithTs({
+      this.emit(BLOCK_START_CHANNEL, {
         height: h,
-      })); 
+      })
 
       const queryEventsBlock: QueryEventBlock = await this.producer.fetchBlock(h);
-      const batches = _.chunk(queryEventsBlock.query_events, 100);
-      debug(`Read ${queryEventsBlock.query_events.length} events; saving in ${batches.length} batches`);  
-      
-      await doInTransaction(async (queryRunner) => {
-        debug(`Saving event entities`);
-
-        let saved = 0;
-        for (let batch of batches) {
-          const qeEntities = batch.map((event) => SubstrateEventEntity.fromQueryEvent(event));
-          await queryRunner.manager.save(qeEntities);
-          saved += qeEntities.length;
-          batch = [];
-          debug(`Saved ${saved} events`);
-        }
-        debug(`Done block #${h.toString()}`);
-      }); 
-
-      await this.redisPub.publish(BLOCK_COMPLETE_CHANNEL, JSON.stringify(this.toPayload(queryEventsBlock)));
+    
+      await this.transformAndPersist(queryEventsBlock);
+      debug(`Done block #${h.toString()}`);
+    
+      this.emit(BLOCK_COMPLETE_CHANNEL, this.toPayload(queryEventsBlock));
     }
   }
   
+  async transformAndPersist(queryEventsBlock: QueryEventBlock): Promise<void> {
+    const batches = _.chunk(queryEventsBlock.query_events, 100);
+    debug(`Read ${queryEventsBlock.query_events.length} events; saving in ${batches.length} batches`);  
+    
+    await doInTransaction(async (queryRunner) => {
+      debug(`Saving event entities`);
+
+      let saved = 0;
+      for (let batch of batches) {
+        const qeEntities = batch.map((event) => SubstrateEventEntity.fromQueryEvent(event));
+        await queryRunner.manager.save(qeEntities);
+        saved += qeEntities.length;
+        batch = [];
+        debug(`Saved ${saved} events`);
+      }
+    }); 
+  }
 
   toPayload(qeb: QueryEventBlock): BlockPayload {
     return (withTs({

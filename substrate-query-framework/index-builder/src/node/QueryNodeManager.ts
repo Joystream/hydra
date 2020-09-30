@@ -3,9 +3,10 @@ import { Bootstrapper } from '../bootstrap';
 import { MappingsProcessor } from '../processor/MappingsProcessor';
 import { IndexerOptions, BootstrapOptions, ProcessorOptions } from './QueryNodeStartOptions';
 import { createDBConnection } from '../db/helper';
-import { Connection } from 'typeorm';
+import { Connection, getConnection } from 'typeorm';
 import Debug from 'debug';
 import { Service } from 'typedi';
+import { logError } from '../utils/errors';
 
 
 const debug = Debug('index-builder:producer');
@@ -75,7 +76,9 @@ export class QueryNodeManager {
   }
 
 
-   _onProcessExit(): void  {
+  _onProcessExit(): void  {
+    debug('Stopping and closing the DB connection');
+    getConnection().close().catch((e) => console.error(logError(e)));
     // Stop if query node has been constructed and started.
     if (this._query_node && this._query_node.state == QueryNodeState.STARTED) {
       // we can't to better as the process is exiting, so leaving the promise floating

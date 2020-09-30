@@ -1,7 +1,6 @@
 import { ISubstrateService } from '../substrate';
 import { QueryEvent, QueryEventBlock } from '../model';
 import { Header, Extrinsic } from '@polkadot/types/interfaces';
-import { EventEmitter } from 'events';
 import * as assert from 'assert';
 
 import Debug from 'debug';
@@ -21,7 +20,7 @@ const BLOCK_PRODUCER_FETCH_RETRIES = numberEnv('BLOCK_PRODUCER_FETCH_RETRIES') |
 const debug = Debug(DEBUG_TOPIC);
 
 @Service('BlockProducer')
-export class BlockProducer implements IBlockProducer {
+export class BlockProducer implements IBlockProducer<QueryEventBlock> {
   private _started: boolean;
 
   private _newHeadsUnsubscriber: UnsubscribePromise | undefined;
@@ -29,7 +28,7 @@ export class BlockProducer implements IBlockProducer {
   private _blockToProduceNext: number;
 
   private _chainHeight: number;
-  
+
   @Inject('SubstrateService') 
   private readonly substrateService!: ISubstrateService
 
