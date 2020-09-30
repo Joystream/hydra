@@ -9,11 +9,12 @@ import { INDEXER_HEAD_BLOCK,
   INDEXER_NEW_HEAD_CHANNEL, 
   INDEXER_RECENTLY_COMPLETE_BLOCKS, 
   BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL, EVENT_LAST, EVENT_TOTAL } from './redis-consts';
+import { IStatusService } from './IStatusService';
 
 const debug = Debug('index-builder:status-server');
 
 @Service('StatusService')
-export class IndexerStatusService {
+export class IndexerStatusService implements IStatusService {
 
   private redisSub: IORedis.Redis;
   private redisPub: IORedis.Redis;
@@ -41,6 +42,7 @@ export class IndexerStatusService {
   async onBlockComplete(payload: BlockPayload): Promise<void> {
     if (await this.isComplete(payload.height)) {
       debug(`Ignoring ${payload.height}: already processed`);
+      return;
     }
     await this.updateIndexerHead(payload.height);
     await this.updateLastEvents(payload);
@@ -56,7 +58,6 @@ export class IndexerStatusService {
 
   async getIndexerHead(): Promise<number> {
     const headVal = await this.redisClient.get(INDEXER_HEAD_BLOCK);
-    debug(`Got ${headVal || 'null'} from Redis cache`);
     if ( headVal !== null) {
       return Number.parseInt(headVal);
     } 
@@ -70,9 +71,9 @@ export class IndexerStatusService {
      
 
   private async updateHeadKey(height: number): Promise<void> {
-    debug(`Updating the indexer head to ${height}`);
     await this.redisClient.set(INDEXER_HEAD_BLOCK, height);
     await this.redisPub.publish(INDEXER_NEW_HEAD_CHANNEL, stringifyWithTs({ height }))
+    debug(`Updated the indexer head to ${height}`);
   }
 
   async updateLastEvents(payload: BlockPayload): Promise<void> {
@@ -112,15 +113,14 @@ export class IndexerStatusService {
       // remove from the set as we don't need to keep it anymore
       if (nextHeadComplete) {
         toPrune.push(nextHead);
-        debug(`The block ${nextHead} is complete`);
+        debug(`Queued ${nextHead} for pruning from the recent blocks`);
         nextHead++;
       } 
     }
 
     const currentHead = await this.getIndexerHead();
-    debug(`Next head: ${nextHead}, current head: ${currentHead}`);
     if (nextHead > currentHead) {
-      debug(`Updated the indexer head from ${currentHead} to ${nextHead}`);
+      debug(`Updating the indexer head from ${currentHead} to ${nextHead}`);
       await this.updateHeadKey(nextHead);
       // the invariant here is that we never
       // prune heights that are less than the current indexer head

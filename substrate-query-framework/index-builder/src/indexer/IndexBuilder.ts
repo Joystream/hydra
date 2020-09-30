@@ -7,14 +7,13 @@ import { doInTransaction } from '../db/helper';
 import { PooledExecutor } from './PooledExecutor';
 import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
-import { IndexerStatusService } from './IndexerStatusService';
 import { Inject, Service } from 'typedi';
-//import * as IORedis from 'ioredis';
 import { withTs } from '../utils/stringify';
 import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-consts';
 import { IBlockProducer } from './IBlockProducer';
 import { assert } from 'console';
 import { EventEmitter } from 'events';
+import { IStatusService } from './IStatusService';
 
 const debug = Debug('index-builder:indexer');
 
@@ -29,10 +28,9 @@ export interface BlockPayload {
 @Service('IndexBuilder')
 export class IndexBuilder extends EventEmitter {
   private _stopped = false;
-  //private redisPub: IORedis.Redis;
   
   @Inject('BlockProducer') private producer!: IBlockProducer<QueryEventBlock>;
-  @Inject('StatusService') protected statusService!: IndexerStatusService;
+  @Inject('StatusService') protected statusService!: IStatusService;
 
   public constructor() {
     super();
