@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 
 @Entity({
   name: 'processed_events_log'
@@ -13,6 +13,7 @@ export class ProcessedEventsLogEntity {
 
   // the indexed event reference
   @Column()
+  @Index()
   eventId!: string;
 
   // When the event is added to the database

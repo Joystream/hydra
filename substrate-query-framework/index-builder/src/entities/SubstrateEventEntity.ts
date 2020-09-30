@@ -1,4 +1,4 @@
-import { Entity, Column, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Column, JoinColumn, OneToOne, PrimaryColumn, Index } from 'typeorm';
 import { AnyJson, AnyJsonField } from '../interfaces/json-types';
 import { QueryEvent } from '..';
 import * as BN from 'bn.js';
@@ -14,6 +14,7 @@ export const EVENT_TABLE_NAME = 'substrate_event'
 @Entity({
   name: EVENT_TABLE_NAME
 })
+@Index(["blockNumber", "index"], { unique: true })
 export class SubstrateEventEntity {
   @PrimaryColumn()
   id!: string;   
@@ -35,6 +36,7 @@ export class SubstrateEventEntity {
   phase!: AnyJson;
 
   @Column()
+  @Index()
   blockNumber!: number;
 
   @Column()
