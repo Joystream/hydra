@@ -4,7 +4,14 @@
     "noEmit": true,
     "rootDir": "./..",
     "strict": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "typeRoots": [
+      "./node_modules/@types",
+    ],
+    "types": [
+      "node",
+      "mocha"
+    ]
   },
   "include": ["./src/**/*.ts", "./test/**/*.ts"]
 }
