@@ -5,7 +5,6 @@ import { ProviderInterfaceEmitted } from '@polkadot/rpc-provider/types';
 import { makeSubstrateService, IndexBuilder } from '..';
 import { IndexerOptions } from '.';
 import Debug from 'debug';
-import * as Redis from 'ioredis';
 
 import Container from 'typedi';
 import { RedisRelayer } from '../indexer/RedisRelayer';
@@ -46,10 +45,10 @@ export class QueryNode {
     this._atBlock = atBlock;
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    ['error', 'disconnected'].forEach((e) => this._websocketProvider.on(e as ProviderInterfaceEmitted, async () => {
+    ['error', 'disconnected'].forEach((e) => this._websocketProvider.on(e as ProviderInterfaceEmitted, () => {
       debug(`Disconnected.`)
       if (this.state == QueryNodeState.STARTED) {
-        await this.stop();
+        this.stop();
         throw new Error(`WS provider has been disconnected. Shutting down the node`);
       }
       debug(`Disconnected. Waiting until the node is stopped...`)
@@ -99,18 +98,18 @@ export class QueryNode {
     } finally {
       // if due tot error, it will bubble up
       debug(`Stopping the query node`);
-      await this.stop();
+      this.stop();
     }
     
   }
 
-  async stop(): Promise<void> {
+  stop(): void{
     debug(`Query node state: ${this._state}`);
     if (this._state != QueryNodeState.STARTED) throw new Error('Can only stop once fully started');
 
     this._state = QueryNodeState.STOPPING;
 
-    await this._indexBuilder.stop();
+    this._indexBuilder.stop();
     
     this._state = QueryNodeState.STOPPED;
   }

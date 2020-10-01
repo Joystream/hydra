@@ -38,7 +38,11 @@ export class QueryNodeManager {
     await createDBConnection();
 
     this._query_node = await QueryNode.create(options);
-    await this._query_node.start();
+    try {
+      await this._query_node.start();
+    } finally {
+      this._onProcessExit();
+    }
   }
 
   async bootstrap(options: BootstrapOptions): Promise<void> {
