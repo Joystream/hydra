@@ -5,10 +5,10 @@ import { ProviderInterfaceEmitted } from '@polkadot/rpc-provider/types';
 import { makeSubstrateService, IndexBuilder } from '..';
 import { IndexerOptions } from '.';
 import Debug from 'debug';
-import * as Redis from 'ioredis';
 
 import Container from 'typedi';
 import { RedisRelayer } from '../indexer/RedisRelayer';
+import { RedisClientFactory } from '../redis/RedisClientFactory';
 
 const debug = Debug('index-builder:query-node');
 
@@ -45,10 +45,10 @@ export class QueryNode {
     this._atBlock = atBlock;
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    ['error', 'disconnected'].forEach((e) => this._websocketProvider.on(e as ProviderInterfaceEmitted, async () => {
+    ['error', 'disconnected'].forEach((e) => this._websocketProvider.on(e as ProviderInterfaceEmitted, () => {
       debug(`Disconnected.`)
       if (this.state == QueryNodeState.STARTED) {
-        await this.stop();
+        this.stop();
         throw new Error(`WS provider has been disconnected. Shutting down the node`);
       }
       debug(`Disconnected. Waiting until the node is stopped...`)
@@ -76,14 +76,9 @@ export class QueryNode {
     const service = makeSubstrateService(api);
 
     Container.set('SubstrateService', service);
-    //Container.set('BlockProducer', new BlockProducer());
-
+   
     const redisURL = options.redisURI || process.env.REDIS_URI;
-    if (!redisURL) {
-      throw new Error(`Redis URL is not provided`);
-    }
-    
-    Container.set('RedisClientFactory', () => new Redis(redisURL));
+    Container.set('RedisClientFactory', new RedisClientFactory(redisURL));
 
     const index_buider = Container.get<IndexBuilder>(IndexBuilder);
     // force TypeDI to create it
@@ -98,17 +93,23 @@ export class QueryNode {
     this._state = QueryNodeState.STARTED;
 
     // Start only the indexer
-    await this._indexBuilder.start(this._atBlock);
+    try {
+      await this._indexBuilder.start(this._atBlock);
+    } finally {
+      // if due tot error, it will bubble up
+      debug(`Stopping the query node`);
+      this.stop();
+    }
     
   }
 
-  async stop(): Promise<void> {
+  stop(): void{
     debug(`Query node state: ${this._state}`);
     if (this._state != QueryNodeState.STARTED) throw new Error('Can only stop once fully started');
 
     this._state = QueryNodeState.STOPPING;
 
-    await this._indexBuilder.stop();
+    this._indexBuilder.stop();
     
     this._state = QueryNodeState.STOPPED;
   }

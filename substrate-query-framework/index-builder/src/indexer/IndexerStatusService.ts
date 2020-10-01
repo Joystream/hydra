@@ -10,6 +10,7 @@ import { INDEXER_HEAD_BLOCK,
   INDEXER_RECENTLY_COMPLETE_BLOCKS, 
   BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL, EVENT_LAST, EVENT_TOTAL } from './redis-consts';
 import { IStatusService } from './IStatusService';
+import { RedisClientFactory } from '../redis/RedisClientFactory';
 
 const debug = Debug('index-builder:status-server');
 
@@ -21,10 +22,10 @@ export class IndexerStatusService implements IStatusService {
   private redisClient: IORedis.Redis;
 
   constructor() {
-    const clientFactory = Container.get<() => IORedis.Redis>('RedisClientFactory');
-    this.redisSub = clientFactory();
-    this.redisPub = clientFactory();
-    this.redisClient = clientFactory();
+    const clientFactory = Container.get<RedisClientFactory>('RedisClientFactory');
+    this.redisSub = clientFactory.getClient();
+    this.redisPub = clientFactory.getClient();
+    this.redisClient = clientFactory.getClient();
     this.redisSub.subscribe([BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL])
     .then(() =>
       debug(`Subscribed to the indexer channels`)
@@ -63,12 +64,18 @@ export class IndexerStatusService implements IStatusService {
     } 
 
     debug(`Redis cache is empty, loading from the database`);
-    const _indexerHead = await slowIndexerHead();
+    const _indexerHead = await this.slowIndexerHead();
     debug(`Loaded ${_indexerHead}`);
     await this.updateHeadKey(_indexerHead);
     return _indexerHead;
   }
-     
+  
+  /**
+   * Simply re-delegate to simplify mocking purpose
+   * */ 
+  async slowIndexerHead(): Promise<number> {
+    return await slowIndexerHead();
+  }
 
   private async updateHeadKey(height: number): Promise<void> {
     await this.redisClient.set(INDEXER_HEAD_BLOCK, height);
@@ -102,7 +109,6 @@ export class IndexerStatusService implements IStatusService {
    * @param h height of the completed block
    */
   async updateIndexerHead(h: number): Promise<void> {
-    debug(`On complete block: ${h}`);
     await this.redisClient.sadd(INDEXER_RECENTLY_COMPLETE_BLOCKS, `${h}`);
     
     let nextHead = await this.getIndexerHead();

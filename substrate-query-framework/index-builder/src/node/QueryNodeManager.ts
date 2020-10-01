@@ -5,11 +5,12 @@ import { IndexerOptions, BootstrapOptions, ProcessorOptions } from './QueryNodeS
 import { createDBConnection } from '../db/helper';
 import { Connection, getConnection } from 'typeorm';
 import Debug from 'debug';
-import { Service } from 'typedi';
+import Container, { Service } from 'typedi';
 import { logError } from '../utils/errors';
+import { RedisClientFactory } from '../redis/RedisClientFactory';
 
 
-const debug = Debug('index-builder:producer');
+const debug = Debug('index-builder:manager');
 
 // Respondible for creating, starting up and shutting down the query node.
 // Currently this class is a bit thin, but it will almost certainly grow
@@ -37,7 +38,11 @@ export class QueryNodeManager {
     await createDBConnection();
 
     this._query_node = await QueryNode.create(options);
-    await this._query_node.start();
+    try {
+      await this._query_node.start();
+    } finally {
+      this._onProcessExit();
+    }
   }
 
   async bootstrap(options: BootstrapOptions): Promise<void> {
@@ -78,7 +83,21 @@ export class QueryNodeManager {
 
   _onProcessExit(): void  {
     debug('Stopping and closing the DB connection');
-    getConnection().close().catch((e) => console.error(logError(e)));
+    try {
+      const connection = getConnection();
+      if (connection) {
+        debug('Closing the database connection');
+        connection.close().catch((e) => { throw new Error(e) });
+      }
+    } catch (e) {
+      debug(`Error closing DB connection: ${logError(e)}`);
+    }
+    try {
+      const clientFactory = Container.get<RedisClientFactory>('RedisClientFactory');
+      clientFactory.closeAll();
+    } catch (e) {
+      debug(`Error closing down redis connections`)
+    }
     // Stop if query node has been constructed and started.
     if (this._query_node && this._query_node.state == QueryNodeState.STARTED) {
       // we can't to better as the process is exiting, so leaving the promise floating

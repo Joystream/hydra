@@ -70,8 +70,12 @@ export class IndexBuilder extends EventEmitter {
     
     debug('Started a pool of indexers.');
 
-    await poolExecutor.run(() => this._stopped);
-
+    try {
+      await poolExecutor.run(() => this._stopped);
+    } finally {
+      this.stop();
+    }
+    
   }
 
   stop(): void { 
