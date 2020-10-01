@@ -9,6 +9,7 @@ import * as Redis from 'ioredis';
 
 import Container from 'typedi';
 import { RedisRelayer } from '../indexer/RedisRelayer';
+import { RedisClientFactory } from '../redis/RedisClientFactory';
 
 const debug = Debug('index-builder:query-node');
 
@@ -76,14 +77,9 @@ export class QueryNode {
     const service = makeSubstrateService(api);
 
     Container.set('SubstrateService', service);
-    //Container.set('BlockProducer', new BlockProducer());
-
+   
     const redisURL = options.redisURI || process.env.REDIS_URI;
-    if (!redisURL) {
-      throw new Error(`Redis URL is not provided`);
-    }
-    
-    Container.set('RedisClientFactory', () => new Redis(redisURL));
+    Container.set('RedisClientFactory', new RedisClientFactory(redisURL));
 
     const index_buider = Container.get<IndexBuilder>(IndexBuilder);
     // force TypeDI to create it
@@ -98,7 +94,13 @@ export class QueryNode {
     this._state = QueryNodeState.STARTED;
 
     // Start only the indexer
-    await this._indexBuilder.start(this._atBlock);
+    try {
+      await this._indexBuilder.start(this._atBlock);
+    } finally {
+      // if due tot error, it will bubble up
+      debug(`Stopping the query node`);
+      await this.stop();
+    }
     
   }
 

@@ -1,8 +1,18 @@
 import { EventRecord, Extrinsic } from '@polkadot/types/interfaces';
 import { EventParameters } from '../interfaces';
 
+export interface QueryEvent {
+  event_record: EventRecord;
+  block_number: number;
+  indexInBlock: number;
+  event_name: string;
+  event_method: string;
+  event_params: EventParameters;
+  extrinsic?: Extrinsic;
+  index: number
+}
 
-export class QueryEvent {
+export class QueryEventImpl implements QueryEvent {
   readonly event_record: EventRecord;
 
   readonly block_number: number;

@@ -7,13 +7,16 @@ import { doInTransaction } from '../db/helper';
 import { PooledExecutor } from './PooledExecutor';
 import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
-import { Inject, Service } from 'typedi';
+import Container, { Inject, Service } from 'typedi';
 import { withTs } from '../utils/stringify';
 import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-consts';
 import { IBlockProducer } from './IBlockProducer';
 import { assert } from 'console';
 import { EventEmitter } from 'events';
 import { IStatusService } from './IStatusService';
+import { getConnection } from 'typeorm';
+import { logError } from '../utils/errors';
+import { RedisClientFactory } from '../redis/RedisClientFactory';
 
 const debug = Debug('index-builder:indexer');
 
@@ -70,8 +73,12 @@ export class IndexBuilder extends EventEmitter {
     
     debug('Started a pool of indexers.');
 
-    await poolExecutor.run(() => this._stopped);
-
+    try {
+      await poolExecutor.run(() => this._stopped);
+    } finally {
+      this.stop();
+    }
+    
   }
 
   stop(): void { 

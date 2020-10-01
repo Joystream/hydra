@@ -5,6 +5,7 @@ import IORedis = require('ioredis');
 import Debug from 'debug';
 import { stringifyWithTs } from '../utils/stringify';
 import { logError } from '../utils/errors';
+import { RedisClientFactory } from '../redis/RedisClientFactory';
 
 const debug = Debug('index-builder:redis-relayer');
 
@@ -21,8 +22,8 @@ export class RedisRelayer {
   private indexBuilder!: IndexBuilder
 
   public constructor() {
-    const clientFactory = Container.get<() => IORedis.Redis>('RedisClientFactory');
-    this.redisPub = clientFactory();
+    const clientFactory = Container.get<RedisClientFactory>('RedisClientFactory');
+    this.redisPub = clientFactory.getClient();
     this.indexBuilder = Container.get<IndexBuilder>(IndexBuilder);
     // Relay local events globablly via redis
     const events = [BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL]
