@@ -1,4 +1,13 @@
-import { Entity, Column, JoinColumn, OneToOne, PrimaryColumn, Index } from 'typeorm';
+import { 
+  Entity, 
+  Column, 
+  JoinColumn, 
+  OneToOne, 
+  PrimaryColumn, 
+  Index, 
+  CreateDateColumn,
+  UpdateDateColumn,
+  VersionColumn } from 'typeorm';
 import { AnyJson, AnyJsonField } from '../interfaces/json-types';
 import { QueryEvent } from '..';
 import * as BN from 'bn.js';
@@ -20,6 +29,7 @@ export class SubstrateEventEntity {
   id!: string;   
 
   @Column()
+  @Index()
   name!: string;
 
   @Column({
@@ -54,6 +64,31 @@ export class SubstrateEventEntity {
   })
   @JoinColumn()
   extrinsic?: SubstrateExtrinsicEntity;
+
+  // Warthog Fields
+  @CreateDateColumn() 
+  createdAt!: Date;
+  @Column({
+    default: 'hydra-indexer'
+  }) 
+  createdById!: string;
+  
+  @UpdateDateColumn({ nullable: true })
+  updatedAt?: Date;
+  
+  @Column({ 
+    nullable: true 
+  })
+  updatedById?: string;
+  
+  @Column({ nullable: true })
+  deletedAt?: Date;
+  
+  @Column({ nullable: true })
+  deletedById?: string;
+  
+  @VersionColumn() 
+  version!: number;
 
   static fromQueryEvent(q: QueryEvent): SubstrateEventEntity {
     const _entity =  new SubstrateEventEntity();

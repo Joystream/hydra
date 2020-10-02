@@ -93,8 +93,11 @@ export class QueryNodeManager {
       debug(`Error closing DB connection: ${logError(e)}`);
     }
     try {
-      const clientFactory = Container.get<RedisClientFactory>('RedisClientFactory');
-      clientFactory.closeAll();
+      if (Container.has('RedisClientFactory')) {
+        const clientFactory = Container.get<RedisClientFactory>('RedisClientFactory');
+        clientFactory.closeAll();
+        debug('Closed all redis clients');        
+      }
     } catch (e) {
       debug(`Error closing down redis connections`)
     }

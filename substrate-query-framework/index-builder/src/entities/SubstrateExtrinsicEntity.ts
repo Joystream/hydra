@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import { 
+  Entity, 
+  PrimaryGeneratedColumn, 
+  Column, 
+  OneToOne, 
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+  VersionColumn } from 'typeorm';
 import { AnyJson } from '../interfaces/json-types';
 import * as BN from 'bn.js';
 import { NumericTransformer } from '../db';
@@ -23,6 +31,7 @@ export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
   @Column({
     type: 'numeric'
   })  
+  @Index()
   blockNumber!: number;    
   
   @Column()     
@@ -66,5 +75,31 @@ export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
 
   @OneToOne(() => SubstrateEventEntity, (event: SubstrateEventEntity) => event.extrinsic) // specify inverse side as a second parameter
   event!: SubstrateEventEntity;
+
+  // Warthog Fields
+  @CreateDateColumn() 
+  createdAt!: Date;
+  
+  @Column({
+    default: 'hydra-indexer'
+  }) 
+  createdById!: string;
+
+  @UpdateDateColumn({ nullable: true })
+  updatedAt?: Date;
+  
+  @Column({ 
+    nullable: true 
+  })
+  updatedById?: string;
+  
+  @Column({ nullable: true })
+  deletedAt?: Date;
+  
+  @Column({ nullable: true })
+  deletedById?: string;
+  
+  @VersionColumn() 
+  version!: number;
   
 }
