@@ -16,6 +16,10 @@ export class ProcessedEventsLogEntity {
   @Index()
   eventId!: string;
 
+  // last block the processor has scanned
+  @Column()
+  lastScannedBlock!: number;
+
   // When the event is added to the database
   @Column('timestamp without time zone', {
     default: () => 'now()',

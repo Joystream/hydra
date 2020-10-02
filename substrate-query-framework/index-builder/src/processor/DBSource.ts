@@ -4,12 +4,17 @@ import { getRepository, MoreThan, In, LessThanOrEqual, FindConditions } from 'ty
 import { SubstrateEventEntity } from '../entities';
 import { Inject, Service } from 'typedi';
 import { IndexerStatusService } from '../indexer';
+import { getIndexerHead } from '../db';
 
 @Service('ProcessorSource')
 export class DBSource implements IProcessorSource {
   
 
   constructor(@Inject() protected indexerService: IndexerStatusService = new IndexerStatusService()) {}
+  
+  async indexerHead(): Promise<number> {
+    return getIndexerHead();
+  }
 
   async nextBatch(filter: EventFilter, size: number): Promise<SubstrateEvent[]> {
     const indexerHead = await this.indexerService.getIndexerHead(); 
