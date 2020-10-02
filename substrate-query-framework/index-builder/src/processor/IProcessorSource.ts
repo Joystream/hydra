@@ -1,4 +1,5 @@
 import { SubstrateEvent } from '../model';
+import { EventEmitter } from 'typeorm/platform/PlatformTools';
 
 
 export interface EventFilter {
@@ -8,9 +9,11 @@ export interface EventFilter {
   toBlock: number
 }
 
-export interface IProcessorSource {
+export interface IProcessorSource extends EventEmitter {
   
   nextBatch(filter: EventFilter, limit: number): Promise<SubstrateEvent[]>;
 
   indexerHead(): Promise<number>;
+
+  subscribe(events: string[]): Promise<void>;
 }

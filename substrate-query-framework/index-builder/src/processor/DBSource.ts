@@ -1,26 +1,35 @@
 import { IProcessorSource, EventFilter } from './IProcessorSource';
 import { SubstrateEvent } from '../model';
-import { getRepository, MoreThan, In, LessThanOrEqual, FindConditions } from 'typeorm';
+import { getRepository, MoreThan, In, FindConditions, Between } from 'typeorm';
 import { SubstrateEventEntity } from '../entities';
 import { Inject, Service } from 'typedi';
 import { IndexerStatusService } from '../indexer';
 import { getIndexerHead } from '../db';
+import { EventEmitter } from 'events';
 
 @Service('ProcessorSource')
-export class DBSource implements IProcessorSource {
+export class DBSource extends EventEmitter implements IProcessorSource {
   
 
-  constructor(@Inject() protected indexerService: IndexerStatusService = new IndexerStatusService()) {}
+  constructor(@Inject() protected indexerService: IndexerStatusService = new IndexerStatusService()) {
+    super();
+  }
+
+
+  subscribe(events: string[]): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  
   
   async indexerHead(): Promise<number> {
     return getIndexerHead();
   }
 
   async nextBatch(filter: EventFilter, size: number): Promise<SubstrateEvent[]> {
-    const indexerHead = await this.indexerService.getIndexerHead(); 
+    //const indexerHead = await this.indexerService.getIndexerHead(); 
     const where: FindConditions<SubstrateEventEntity>[]= [{
       name: In(filter.names),
-      blockNumber: LessThanOrEqual(indexerHead)
+      blockNumber: Between(filter.fromBlock, filter.toBlock) 
     }]
 
     if (filter.afterID) {

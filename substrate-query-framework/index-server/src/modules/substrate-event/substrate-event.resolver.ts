@@ -31,6 +31,15 @@ import Debug from 'debug'
 const debug = Debug('index-server:event-resolver')
 
 @ObjectType()
+export class IndexerHead {
+  @Field(() => Number, { nullable: false })
+  height!: number
+
+  @Field(() => [String], { nullable: true })
+  events?: string[]
+}
+
+@ObjectType()
 export class SubstrateEventEdge {
   @Field(() => SubstrateEvent, { nullable: false })
   node!: SubstrateEvent
@@ -167,4 +176,17 @@ export class SubstrateEventResolver {
   ): Promise<SubstrateExtrinsic | undefined> {
     return this.service.getExtrinsic(event.id)
   }
+
+  // TODO: Move to a separate module
+  // @Subscription(() => IndexerHead, { topics: 'indexer:head' })
+  // async newIndexerHead(
+  //   @Root() payload: BlockPayload,
+  //   @Ctx() ctx: PubSubContext
+  // ): Promise<IndexerHead> {
+  //   debug(`Notification payload: ${JSON.stringify(payload, null, 2)}`)
+  //   const res = await ctx.pubSub
+  //     ?.asyncIterator<IndexerHead>('indexer:head')
+  //     .next()
+  //   return res?.value
+  // }
 }

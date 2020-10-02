@@ -9,8 +9,12 @@ export * from './node';
 export * from './substrate';
 export * from './db';
 export * from './processor';
+<<<<<<< Updated upstream
 export * from './redis';
 
+=======
+export * from './indexer';
+>>>>>>> Stashed changes
 
 export {
   BlockProducer,

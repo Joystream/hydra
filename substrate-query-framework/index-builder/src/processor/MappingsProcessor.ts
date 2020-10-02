@@ -1,15 +1,15 @@
-import { makeDatabaseManager, SubstrateEvent, loadState } from '..';
+import { makeDatabaseManager, SubstrateEvent } from '..';
 import Debug from 'debug';
 import { doInTransaction } from '../db/helper';
 import { numberEnv } from '../utils/env-flags';
-import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity';
 import { ProcessorOptions } from '../node';
 import { Inject, Service } from 'typedi';
 import { IProcessorSource, GraphQLSource, HandlerLookupService } from '.'; 
-import { QueryRunner, getRepository } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { logError } from '../utils/errors';
 import { IProcessorState, ProcessorStateHandler } from './ProcessorStateHandler';
 import { EventFilter } from './IProcessorSource';
+import { waitFor } from '../utils/wait-for';
 
 const debug = Debug('index-builder:processor');
 
@@ -28,6 +28,7 @@ export class MappingsProcessor {
   private state!: IProcessorState;
   private _started = false;
   private currentFilter!: EventFilter;
+  private indexerHead!: number; // current indexer head we are aware of
 
   private _name = DEFAULT_PROCESSOR_NAME;
 
@@ -37,7 +38,20 @@ export class MappingsProcessor {
     @Inject() protected handlerLookup = new HandlerLookupService(options),
     @Inject('ProcessorStateHandler') protected stateHandler = new ProcessorStateHandler(options.name || DEFAULT_PROCESSOR_NAME) 
   ) {
-
+    // TODO: uncomment this block when eventSource will emit
+    // this.eventsSource.on('NewIndexerHead', (h: number) => { 
+    //   debug(`New Indexer Head: ${h}`)
+    //   this.indexerHead = h 
+    // });
+    // For now, simply update indexerHead regularly
+    setInterval(() => {
+      this.eventsSource.indexerHead()
+        .then((h) => { 
+          debug(`New indexer head: ${h}`)
+          this.indexerHead = h 
+        })
+        .catch((e) => debug(`Error fetching new indexer head: ${logError(e)}`));
+    }, 60 * 1000) // every minute 
   }
 
 
@@ -45,6 +59,15 @@ export class MappingsProcessor {
     debug('Spawned the processor');
   
     this.state = await this.stateHandler.init(this.options.atBlock)
+    this.indexerHead = await this.eventsSource.indexerHead();
+    
+    this.currentFilter = {
+      afterID: this.state.lastProcessedEvent,
+      fromBlock: this.state.lastScannedBlock,
+      toBlock: Math.min(this.state.lastScannedBlock + BLOCK_WINDOW - 1, this.indexerHead),
+      names: this.handlerLookup.eventsToHandle()
+    }
+
     this._started = true;
     await this.processingLoop();
   }
@@ -55,20 +78,19 @@ export class MappingsProcessor {
 
 
   private async nextFilter(): Promise<EventFilter> {
-    const indexerHead = await this.eventsSource.indexerHead();
-    if (this.currentFilter) {
-      this.currentFilter.fromBlock = this.state.lastScannedBlock;
-      this.currentFilter.toBlock = Math.min(this.currentFilter.fromBlock + BLOCK_WINDOW - 1, indexerHead);
-      this.currentFilter.afterID = this.state.lastProcessedEvent;
-    } else {
-      this.currentFilter = {
-        afterID: this.state.lastProcessedEvent,
-        fromBlock: this.state.lastScannedBlock,
-        toBlock: Math.min(this.state.lastScannedBlock + BLOCK_WINDOW - 1, indexerHead),
-        names: this.handlerLookup.eventsToHandle()
-      }
-    }
-    debug(`Next filter: ${JSON.stringify(this.nextFilter, null, 2)}`);
+    
+    debug(`Indexer Head: ${this.indexerHead} Last Scanned Block: ${this.state.lastScannedBlock}`);
+
+    // here we should eventually listen only to the events
+    await waitFor(
+      () => (this.indexerHead - this.state.lastScannedBlock) > 2,
+      () => !this._started)
+
+    this.currentFilter.fromBlock = this.state.lastScannedBlock;
+    this.currentFilter.toBlock = Math.min(this.currentFilter.fromBlock + BLOCK_WINDOW - 1, this.indexerHead);
+    this.currentFilter.afterID = this.state.lastProcessedEvent;
+    
+    debug(`Next filter: ${JSON.stringify(this.currentFilter, null, 2)}`);
     return this.currentFilter;
   }
 
@@ -77,6 +99,7 @@ export class MappingsProcessor {
     while (this._started) {
       try {
         const nextFilter = await this.nextFilter();
+
         const events = await this.eventsSource.nextBatch(nextFilter,  BATCH_SIZE);
         debug(`Processing new batch of events of size: ${events.length}`);
         if (events.length > 0) {
@@ -86,8 +109,8 @@ export class MappingsProcessor {
           // TODO: we should really subsribe to new indexer heads here and update accordingly
           this.state.lastScannedBlock = this.currentFilter.toBlock - 1;
           await this.stateHandler.persist(this.state);
-          await new Promise(resolve => setTimeout(resolve, PROCESSOR_BLOCKS_POLL_INTERVAL));
         }
+
       } catch (e) {
         console.error(`Stopping the proccessor due to errors: ${logError(e)}`);
         this.stop();
@@ -113,31 +136,12 @@ export class MappingsProcessor {
         this.state.lastScannedBlock = event.blockNumber;
 
         await this.stateHandler.persist(this.state);
+
+        debug(`Event ${event.id} done`)
       
       });
       
     }
   }
 
-  // private async init(atBlock?: number): Promise<void> {
-  //   if (atBlock) {
-  //     debug(`Got block height hint: ${atBlock}`);
-  //   }
-    
-  //   const lastProcessedEvent = await getLastProcessedEvent(DEFAULT_PROCESSOR_NAME);
-
-  //   if (lastProcessedEvent) {
-  //     debug(`Found the most recent processed event ${lastProcessedEvent.eventId}`);
-  //     this._lastEventIndex = lastProcessedEvent.eventId;
-  //   } 
-
-  //   if (atBlock && this._lastEventIndex) {
-  //     debug(
-  //       `WARNING! Existing processed history detected on the database!
-  //       Last processed event id ${this._lastEventIndex}. The indexer 
-  //       will continue from block ${this._lastEventIndex.split('-')[0]} and ignore the block height hint.`
-  //     );
-  //   }
-    
-  }
 }

@@ -2,15 +2,16 @@ import 'reflect-metadata'
 import { BaseContext, Server } from 'warthog'
 import { Logger } from './logger'
 
-interface Context extends BaseContext {
-  user: {
+// TODO: add authentication
+export interface Context extends BaseContext {
+  user?: {
     email: string
     id: string
     permissions: string
   }
 }
 
-export function getServer(appOptions = {}, dbOptions = {}) {
+export function getServer(appOptions = {}, dbOptions = {}): Server<Context> {
   return new Server<Context>(
     {
       // Inject a fake user.  In a real app you'd parse a JWT to add the user

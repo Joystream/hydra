@@ -4,12 +4,13 @@ import { ProcessorOptions } from '../node';
 import { GraphQLClient } from 'graphql-request';
 import { Inject } from 'typedi';
 import Debug from 'debug';
+import { EventEmitter } from 'events';
 
 const debug = Debug('index-builder:processor');
 
 const GET_EVENTS_AFTER_QUERY = `
 query GetEventsAfterID( $afterID: ID, $names: [String!]!, $fromBlock: Int, $toBlock: Int, $size: Int) {
-  substrateEventsAfter(where: { name_in: $names, blockNumber_gte: $fromBlock, blockNumber_lt: $toBlock }, afterID: $afterID, limit: $size) {
+  substrateEventsAfter(where: { name_in: $names, blockNumber_gte: $fromBlock, blockNumber_lte: $toBlock }, afterID: $afterID, limit: $size) {
     id
     name 
     method
@@ -44,16 +45,22 @@ query {
 `
 
 
-export class GraphQLSource implements IProcessorSource {
+export class GraphQLSource extends EventEmitter implements IProcessorSource {
   private graphClient: GraphQLClient;
 
   constructor(@Inject('ProcessorOptions') protected options: ProcessorOptions) {
+    super();
     const _endpoint = options.indexerEndpointURL || process.env.INDEXER_ENDPOINT_URL;
     if (!_endpoint) {
       throw new Error(`Indexer endpoint is not provided`);
     }
     debug(`Using Indexer API endpoint ${_endpoint}`);
     this.graphClient = new GraphQLClient(_endpoint);
+  }
+  
+  // TODO: implement
+  subscribe(events: string[]): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 
 
