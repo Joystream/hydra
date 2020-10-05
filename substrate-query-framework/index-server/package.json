@@ -57,7 +57,7 @@
     ]
   },
   "dependencies": {
-    "@dzlzv/hydra-indexer-lib": "0.0.14-alpha",
+    "@dzlzv/hydra-indexer-lib": "0.0.15-alpha.0",
     "@types/ioredis": "^4.17.4",
     "bn.js": "^5.1.3",
     "dotenv": "^8.2.0",
