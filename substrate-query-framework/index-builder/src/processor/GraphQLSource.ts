@@ -38,7 +38,7 @@ query GetEventsAfterID( $afterID: ID, $names: [String!]!, $fromBlock: Int, $toBl
 // to be replaced with a ws subsription 
 const GET_INDEXER_HEAD = `
 query {
-  indexerStatus() {
+  indexerStatus {
     head
   }
 }

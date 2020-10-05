@@ -5,14 +5,24 @@ import * as IORedis from 'ioredis';
 import { logError } from '../utils/errors';
 import { BlockPayload } from './IndexBuilder';
 import { stringifyWithTs } from '../utils/stringify';
-import { INDEXER_HEAD_BLOCK, 
+import { 
+  INDEXER_HEAD_BLOCK, 
   INDEXER_NEW_HEAD_CHANNEL, 
   INDEXER_RECENTLY_COMPLETE_BLOCKS, 
-  BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL, EVENT_LAST, EVENT_TOTAL } from './redis-consts';
+  BLOCK_START_CHANNEL, 
+  BLOCK_COMPLETE_CHANNEL, 
+  EVENT_LAST, 
+  EVENT_TOTAL, 
+  BLOCK_CACHE_PREFIX 
+} from './redis-consts';
 import { IStatusService } from './IStatusService';
 import { RedisClientFactory } from '../redis/RedisClientFactory';
+import { numberEnv } from '../utils/env-flags';
 
 const debug = Debug('index-builder:status-server');
+
+// keep one hour of blocks by default
+const BLOCK_CACHE_TTL_SEC = numberEnv('BLOCK_CACHE_TTL_SEC') ||  60 * 60; 
 
 @Service('StatusService')
 export class IndexerStatusService implements IStatusService {
@@ -47,6 +57,8 @@ export class IndexerStatusService implements IStatusService {
     }
     await this.updateIndexerHead(payload.height);
     await this.updateLastEvents(payload);
+    // TODO: move into a separate cache service and cache also events, extrinsics etc
+    await this.updateCache(payload); 
   }
 
 
@@ -93,6 +105,11 @@ export class IndexerStatusService implements IStatusService {
       await this.redisClient.hincrby(EVENT_TOTAL, e.name, 1);
       await this.redisClient.hincrby(EVENT_TOTAL, 'ALL', 1);
     }
+  }
+
+  async updateCache(payload: BlockPayload): Promise<void> {
+    await this.redisClient.set(`${BLOCK_CACHE_PREFIX}:${payload.height}`, 
+        JSON.stringify(payload), 'EX', BLOCK_CACHE_TTL_SEC)
   }
 
   async isComplete(h: number): Promise<boolean> {
