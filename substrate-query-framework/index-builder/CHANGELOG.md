@@ -10,8 +10,12 @@
 
 ### Hydra Processor
 
-- Hydra Processor uses a GraphQL endpoint for fetching events, extrinsics and the current indexer head
+- Hydra Processor fetches repeatedly updates the indexer head from the Indexer GraphQL endpoint
 - More efficient event fetching
+
+## 0.0.14-alpha.1
+
+- The mappings processor sources events from a GraphQL endpoint
 
 ## 0.0.14-alpha
 
