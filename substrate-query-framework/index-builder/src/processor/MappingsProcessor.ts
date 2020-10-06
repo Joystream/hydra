@@ -65,7 +65,7 @@ export class MappingsProcessor {
     this.currentFilter = {
       afterID: this.state.lastProcessedEvent,
       fromBlock: this.state.lastScannedBlock,
-      toBlock: Math.min(this.state.lastScannedBlock + BLOCK_WINDOW - 1, this.indexerHead),
+      toBlock: Math.min(this.state.lastScannedBlock + BLOCK_WINDOW, this.indexerHead),
       names: this.handlerLookup.eventsToHandle()
     }
 
@@ -88,10 +88,10 @@ export class MappingsProcessor {
       () => !this._started)
 
     this.currentFilter.fromBlock = this.state.lastScannedBlock;
-    this.currentFilter.toBlock = Math.min(this.currentFilter.fromBlock + BLOCK_WINDOW - 1, this.indexerHead);
+    this.currentFilter.toBlock = Math.min(this.currentFilter.fromBlock + BLOCK_WINDOW, this.indexerHead);
     this.currentFilter.afterID = this.state.lastProcessedEvent;
     
-    debug(`Next filter: ${JSON.stringify(this.currentFilter, null, 2)}`);
+    //debug(`Next filter: ${JSON.stringify(this.currentFilter, null, 2)}`);
     return this.currentFilter;
   }
 
@@ -108,7 +108,8 @@ export class MappingsProcessor {
         } else {
           // If there is nothing to process, wait and update the indexer head
           // TODO: we should really subsribe to new indexer heads here and update accordingly
-          this.state.lastScannedBlock = this.currentFilter.toBlock - 1;
+          this.state.lastScannedBlock = this.currentFilter.toBlock;
+          // if we haven't found anything matching just take the genesis
           this.state.lastProcessedEvent = this.state.lastProcessedEvent || SubstrateEventEntity.formatId(0, 0);
           await this.stateHandler.persist(this.state);
         }
