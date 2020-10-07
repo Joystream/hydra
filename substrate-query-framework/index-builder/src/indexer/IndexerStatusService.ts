@@ -8,21 +8,18 @@ import { stringifyWithTs } from '../utils/stringify';
 import { 
   INDEXER_HEAD_BLOCK, 
   INDEXER_NEW_HEAD_CHANNEL, 
-  INDEXER_RECENTLY_COMPLETE_BLOCKS, 
   BLOCK_START_CHANNEL, 
   BLOCK_COMPLETE_CHANNEL, 
   EVENT_LAST, 
   EVENT_TOTAL, 
   BLOCK_CACHE_PREFIX 
-} from './redis-consts';
+} from './redis-keys';
 import { IStatusService } from './IStatusService';
 import { RedisClientFactory } from '../redis/RedisClientFactory';
-import { numberEnv } from '../utils/env-flags';
+import { BLOCK_CACHE_TTL_SEC, INDEXER_HEAD_TTL_SEC } from './indexer-consts';
 
 const debug = Debug('index-builder:status-server');
 
-// keep one hour of blocks by default
-const BLOCK_CACHE_TTL_SEC = numberEnv('BLOCK_CACHE_TTL_SEC') ||  60 * 60; 
 
 @Service('StatusService')
 export class IndexerStatusService implements IStatusService {
@@ -53,12 +50,13 @@ export class IndexerStatusService implements IStatusService {
   async onBlockComplete(payload: BlockPayload): Promise<void> {
     if (await this.isComplete(payload.height)) {
       debug(`Ignoring ${payload.height}: already processed`);
-      return;
+      return; 
     }
+    // TODO: move into a separate cache service and cache also events, extrinsics etc
+    await this.updateBlockCache(payload); 
     await this.updateIndexerHead(payload.height);
     await this.updateLastEvents(payload);
-    // TODO: move into a separate cache service and cache also events, extrinsics etc
-    await this.updateCache(payload); 
+
   }
 
 
@@ -90,7 +88,9 @@ export class IndexerStatusService implements IStatusService {
   }
 
   private async updateHeadKey(height: number): Promise<void> {
-    await this.redisClient.set(INDEXER_HEAD_BLOCK, height);
+    // set TTL to the indexer head key. If the indexer status is stuck for some reason,
+    // this will result in fetching the indexer head from the database
+    await this.redisClient.set(INDEXER_HEAD_BLOCK, height, 'EX', INDEXER_HEAD_TTL_SEC);
     await this.redisPub.publish(INDEXER_NEW_HEAD_CHANNEL, stringifyWithTs({ height }))
     debug(`Updated the indexer head to ${height}`);
   }
@@ -107,7 +107,7 @@ export class IndexerStatusService implements IStatusService {
     }
   }
 
-  async updateCache(payload: BlockPayload): Promise<void> {
+  async updateBlockCache(payload: BlockPayload): Promise<void> {
     await this.redisClient.set(`${BLOCK_CACHE_PREFIX}:${payload.height}`, 
         JSON.stringify(payload), 'EX', BLOCK_CACHE_TTL_SEC)
   }
@@ -117,8 +117,8 @@ export class IndexerStatusService implements IStatusService {
     if (h <= head) {
        return true;
     }
-    const isRecent = await this.redisClient.sismember(INDEXER_RECENTLY_COMPLETE_BLOCKS, `${h}`);
-    return (isRecent === 1); // ismember returned true;
+    const isRecent = await this.redisClient.get(`${BLOCK_CACHE_PREFIX}:${h}`);
+    return (isRecent !== null); 
   }
 
   /**
@@ -126,36 +126,20 @@ export class IndexerStatusService implements IStatusService {
    * @param h height of the completed block
    */
   async updateIndexerHead(h: number): Promise<void> {
-    await this.redisClient.sadd(INDEXER_RECENTLY_COMPLETE_BLOCKS, `${h}`);
-    
-    let nextHead = await this.getIndexerHead();
-    let nextHeadComplete = true;
-    const toPrune = [];
-    while (nextHeadComplete) {
-      nextHeadComplete = await this.isComplete(nextHead + 1); // ismember returned true;
-      // remove from the set as we don't need to keep it anymore
+    let head = await this.getIndexerHead();
+    let nextHeadComplete = false;
+    do {
+      nextHeadComplete = await this.isComplete(head + 1); 
       if (nextHeadComplete) {
-        toPrune.push(nextHead);
-        debug(`Queued ${nextHead} for pruning from the recent blocks`);
-        nextHead++;
+        head++;
       } 
-    }
+    } while (nextHeadComplete)
 
     const currentHead = await this.getIndexerHead();
-    if (nextHead > currentHead) {
-      debug(`Updating the indexer head from ${currentHead} to ${nextHead}`);
-      await this.updateHeadKey(nextHead);
-      // the invariant here is that we never
-      // prune heights that are less than the current indexer head
-      // We may have some leftovers due to concurrency 
-      await this.pruneRecent(toPrune)
+    if (head > currentHead) {
+      debug(`Updating the indexer head from ${currentHead} to ${head}`);
+      await this.updateHeadKey(head);
     }
   }
 
-  async pruneRecent(heights: number[]): Promise<void> {
-    for (const h of heights) {
-      await this.redisClient.srem(INDEXER_RECENTLY_COMPLETE_BLOCKS, h);
-    } 
-    debug(`Pruned ${heights.length} elements`);
-  }
 }
