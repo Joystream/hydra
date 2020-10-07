@@ -9,10 +9,22 @@ import * as Redis from 'ioredis';
 
 const manager = new QueryNodeManager();
 
-export async function setupDB(): Promise<void> {
+export async function resetDb(): Promise<void> {
+  try {
+    await dropDb();
+  } catch (e) {
+    // ignore
+  }
+  try {
+    await setupDb();  
+  } catch (e) {
+    //ignore;
+  }
+}
+
+export async function setupDb(): Promise<void> {
   await createDb();
   await manager.migrate(); 
-  await createDBConnection();
 }
 
 export async function clearRedis(): Promise<void> {
@@ -28,17 +40,9 @@ export async function clearRedis(): Promise<void> {
 
 
 before(async () => {
-  try {
-    await dropDb();
-  } catch (e) {
-    // ignore
-  }
-  try {
-    await setupDB();  
-    await clearRedis();
-  } catch (e) {
-    console.error(e);
-  }
+  await setupDb();
+  await createDBConnection();
+
 });
 
 after(async () => {

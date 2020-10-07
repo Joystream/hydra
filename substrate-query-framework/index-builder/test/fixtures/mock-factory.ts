@@ -1,5 +1,13 @@
 import { QueryEventBlock, QueryEvent } from "../../src";
 import { Phase, Event, EventRecord } from '@polkadot/types/interfaces';
+import { BlockPayload } from "../../src/indexer";
+import { withTs } from "../../src/utils/stringify";
+
+export function blockPayload(height: number): BlockPayload {
+  return withTs({
+    height
+  }) as unknown as BlockPayload
+}
 
 export function queryEventBlock(block = 0): QueryEventBlock {
   const gen = queryEvent(block);

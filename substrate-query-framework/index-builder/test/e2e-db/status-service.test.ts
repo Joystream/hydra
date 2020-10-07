@@ -7,28 +7,23 @@ import { describe } from 'mocha';
 import { IndexBuilder, QueryEventBlock } from '../../src';
 import Container from 'typedi';
 import { IndexerStatusService, IBlockProducer,  } from '../../src/indexer';
-import { sleep } from '../../src/utils/wait-for';
+import { sleep, waitForAsync } from '../../src/utils/wait-for';
 import Debug from 'debug'; 
 import { RedisRelayer } from '../../src/indexer/RedisRelayer';
 import { RedisClientFactory } from '../../src/redis/RedisClientFactory';
-import { queryEventBlock } from '../fixtures/qeb-factory';
+import { blockPayload, queryEventBlock } from '../fixtures/mock-factory';
 import { EVENT_TOTAL } from '../../src/indexer/redis-consts';
+import { clearRedis, resetDb } from './setup-db'
 
 const debug = Debug('index-builder:status-service-test')
-
-const SLOW_BLOCK_HEIGHT = 4;
 const FINAL_CHAIN_HEIGHT = 7;
 
 class MockBlockProducer implements IBlockProducer<QueryEventBlock> {
   private height = 0;
 
   async fetchBlock(height: number): Promise<QueryEventBlock> {
-    if (height === SLOW_BLOCK_HEIGHT) {
-      await sleep(1000) // block 4 gonna be large and slow...
-    } else {
-      await sleep(5);
-    }
     debug(`Fetched mock block at height ${height}`);
+    await sleep(100);
     return queryEventBlock(height);
   }
 
@@ -61,29 +56,36 @@ describe('IndexerStatusService', () => {
     
   })
 
-  after(async () => {
-    await Container.get<RedisClientFactory>('RedisClientFactory').getClient().flushall();
+  beforeEach(async () => {
+    await sleep(300);
+    await clearRedis();
+    await resetDb();
   })
 
   it('should properly update indexer heads', async () => {
-    await Promise.race([
-      await indexBuilder.start(),
-      await sleep(10)
-    ]);
+    await statusService.onBlockComplete(blockPayload(0));
+    await statusService.onBlockComplete(blockPayload(1));
+    await statusService.onBlockComplete(blockPayload(2));
+    await statusService.onBlockComplete(blockPayload(3));
+    await statusService.onBlockComplete(blockPayload(5));
+    await statusService.onBlockComplete(blockPayload(6));
+    await statusService.onBlockComplete(blockPayload(7));
+
     let head = await statusService.getIndexerHead();
     // see MockBlockProducer for the block times
-    expect(head).equals(SLOW_BLOCK_HEIGHT - 1, `Block ${SLOW_BLOCK_HEIGHT} is not processed yet`); // block no 4 is slow, so the indexer head is at height 3
-    await sleep(1100); // now wait for block no 4 to be finished
+    expect(head).equals(3, `Block 4 is not processed yet`); // block no 4 is slow, so the indexer head is at height 3
+    await statusService.onBlockComplete(blockPayload(4)); // now wait for block no 4 to be finished
     head = await statusService.getIndexerHead();
-    expect(head).equals(FINAL_CHAIN_HEIGHT, `The indexer should eventually process all blockcs`);
+    expect(head).equals(7, `The indexer should eventually process all blockcs`);
     
   })
 
   it('should count events', async() => {
     await indexBuilder.start();
-    // if run separately, wait until all blocks are produced
-    await sleep(1200);
-    
+    // wait until all blocks are produced
+    await waitForAsync(async () => { const head = await statusService.getIndexerHead(); return head == FINAL_CHAIN_HEIGHT }, undefined, 300);
+    await sleep(300);
+
     const redisClient = Container.get<RedisClientFactory>('RedisClientFactory').getClient();
     const totalEventsVal = await redisClient.hget(EVENT_TOTAL, 'ALL') || '0';
     const totalEvents = Number.parseInt(totalEventsVal);
