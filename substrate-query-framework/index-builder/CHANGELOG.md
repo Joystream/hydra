@@ -1,5 +1,10 @@
 # Changelog of major updates
 
+## 0.0.15-alpha.2
+
+- Reworked indexer head updates by IndexerStatusService to make it more stable against Redis outages. 
+By default the indexer head expires after 15 mins which forces the update from the database
+
 ## 0.0.15-alpha.1
 
 ### Hydra Indexer

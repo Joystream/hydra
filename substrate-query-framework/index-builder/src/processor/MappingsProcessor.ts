@@ -20,7 +20,7 @@ const BATCH_SIZE = numberEnv('PROCESSOR_BATCH_SIZE') || 10;
 // Interval at which the processor pulls new blocks from the database
 // The interval is reasonably large by default. The trade-off is the latency 
 // between the updates and the load to the database
-const PROCESSOR_BLOCKS_POLL_INTERVAL = numberEnv('PROCESSOR_BLOCKS_POLL_INTERVAL') || 10000; // 10 seconds
+const PROCESSOR_POLL_INTERVAL = numberEnv('PROCESSOR_POLL_INTERVAL') || 60 * 1000; // 10 seconds
 
 @Service('MappingsProcessor')
 export class MappingsProcessor {
@@ -52,7 +52,7 @@ export class MappingsProcessor {
           this.indexerHead = h 
         })
         .catch((e) => debug(`Error fetching new indexer head: ${logError(e)}`));
-    }, 60 * 1000) // every minute 
+    }, PROCESSOR_POLL_INTERVAL) // every minute 
   }
 
 

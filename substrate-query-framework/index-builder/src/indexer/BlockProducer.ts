@@ -6,7 +6,6 @@ import * as assert from 'assert';
 import Debug from 'debug';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { waitFor, retry } from '../utils/wait-for';
-import { numberEnv } from '../utils/env-flags';
 import { ConstantBackOffStrategy } from '../utils/BackOffStategy';
 import { IBlockProducer } from './IBlockProducer';
 import { Service, Inject } from 'typedi';

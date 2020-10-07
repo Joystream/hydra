@@ -125,7 +125,7 @@ export class IndexerStatusService implements IStatusService {
    * 
    * @param h height of the completed block
    */
-  async updateIndexerHead(h: number): Promise<void> {
+  async updateIndexerHead(): Promise<void> {
     let head = await this.getIndexerHead();
     let nextHeadComplete = false;
     do {
