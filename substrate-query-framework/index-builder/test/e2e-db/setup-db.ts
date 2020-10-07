@@ -7,14 +7,15 @@ import { before, after } from 'mocha';
 import { createDBConnection } from '../../src/db/helper';
 import * as Redis from 'ioredis';
 
+const manager = new QueryNodeManager();
+
 export async function setupDB(): Promise<void> {
   await createDb();
-  const manager = new QueryNodeManager();
   await manager.migrate(); 
   await createDBConnection();
 }
 
-export async function setupRedis(): Promise<void> {
+export async function clearRedis(): Promise<void> {
   const redisURL = process.env.REDIS_URI;
   if (!redisURL) {
     throw new Error(`Redis URL is not provided`);
@@ -25,6 +26,7 @@ export async function setupRedis(): Promise<void> {
   await redis.quit();
 }
 
+
 before(async () => {
   try {
     await dropDb();
@@ -33,7 +35,7 @@ before(async () => {
   }
   try {
     await setupDB();  
-    await setupRedis();
+    await clearRedis();
   } catch (e) {
     console.error(e);
   }

@@ -17,8 +17,8 @@ export function getPgConfig(): { [index: string] : unknown } {
   };
 }
 
-export async function dropDb(): Promise<void> {
-  const database = process.env.DB_NAME;
+export async function dropDb(db?: string): Promise<void> {
+  const database = db || process.env.DB_NAME;
   const drop = util.promisify(dropdb);
 
   try {
@@ -28,8 +28,8 @@ export async function dropDb(): Promise<void> {
   }
 }
 
-export async function createDb(): Promise<void> {
-  const database = process.env.DB_NAME;
+export async function createDb(db?: string): Promise<void> {
+  const database = db || process.env.DB_NAME;
   const create = util.promisify(createdb);
 
   try {
