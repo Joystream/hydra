@@ -126,7 +126,6 @@ export class IndexerStatusService implements IStatusService {
    * @param h height of the completed block
    */
   async updateIndexerHead(h: number): Promise<void> {
-    debug(`On complete block: ${h}`);
     await this.redisClient.sadd(INDEXER_RECENTLY_COMPLETE_BLOCKS, `${h}`);
     
     let nextHead = await this.getIndexerHead();

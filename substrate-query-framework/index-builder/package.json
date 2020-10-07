@@ -15,20 +15,22 @@
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
-    "i-test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --file ./test/e2e-db/setup-db.ts \"test/e2e-db/**/*.test.ts\"",
+    "i-test": "docker-compose -f docker-compose-test.yml up test && yarn post-i-test",
+    "post-i-test": "docker-compose -f docker-compose-test.yml down",
+    "i-test-local": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --file ./test/e2e-db/setup-db.ts \"test/e2e-db/**/*.test.ts\"",
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },
   "dependencies": {
-    "@polkadot/api": "^1.31.1",
+    "@polkadot/api": "^2.1.1",
     "@types/ioredis": "^4.17.4",
+    "@types/lodash": "^4.14.161",
     "@types/shortid": "^0.0.29",
     "debug": "^4.1.1",
     "graphql": "15",
     "graphql-request": "^3.1.0",
     "ioredis": "^4.17.3",
+    "lodash": "^4.17.20",
     "reflect-metadata": "^0.1.13",
-    "rsmq": "^0.12.2",
-    "rsmq-promise": "^1.0.4",
     "shortid": "^2.2.15",
     "typedi": "^0.8.0",
     "typeorm": "^0.2.25"
@@ -57,8 +59,7 @@
     "ts-mockito": "^2.6.1",
     "ts-node": "^9.0.0",
     "typescript": "^3.8",
-    "util": "^0.12.3",
-    "warthog": "https://github.com/metmirr/warthog/releases/download/v2.9.7/warthog-v2.9.7.tgz"
+    "util": "^0.12.3"
   },
   "husky": {
     "hooks": {

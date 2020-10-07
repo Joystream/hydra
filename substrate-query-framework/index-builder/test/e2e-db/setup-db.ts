@@ -5,18 +5,29 @@ import { createDb, dropDb } from '../utils';
 import { QueryNodeManager } from '../../src';
 import { before, after } from 'mocha';
 import { createDBConnection } from '../../src/db/helper';
-import Container from 'typedi';
 import * as Redis from 'ioredis';
-import { RedisClientFactory } from '../../src/redis/RedisClientFactory';
 
-export async function setupDB(): Promise<void> {
-  await createDb();
-  const manager = new QueryNodeManager();
-  await manager.migrate(); 
-  await createDBConnection();
+const manager = new QueryNodeManager();
+
+export async function resetDb(): Promise<void> {
+  try {
+    await dropDb();
+  } catch (e) {
+    // ignore
+  }
+  try {
+    await setupDb();  
+  } catch (e) {
+    //ignore;
+  }
 }
 
-export async function setupRedis(): Promise<void> {
+export async function setupDb(): Promise<void> {
+  await createDb();
+  await manager.migrate(); 
+}
+
+export async function clearRedis(): Promise<void> {
   const redisURL = process.env.REDIS_URI;
   if (!redisURL) {
     throw new Error(`Redis URL is not provided`);
@@ -24,24 +35,13 @@ export async function setupRedis(): Promise<void> {
   const redis = new Redis(redisURL);
   await redis.flushall();
 
-  Container.set('RedisClientFactory', new RedisClientFactory(redisURL));
   await redis.quit();
 }
 
-const manager = new QueryNodeManager();
 
 before(async () => {
-  try {
-    await dropDb();
-  } catch (e) {
-    // ignore
-  }
-  try {
-    await setupDB();  
-    await setupRedis();
-  } catch (e) {
-    console.error(e);
-  }
+  await setupDb();
+  await createDBConnection();
 });
 
 after(async () => {

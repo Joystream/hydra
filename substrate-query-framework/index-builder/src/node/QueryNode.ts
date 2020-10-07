@@ -7,6 +7,9 @@ import { IndexerOptions } from '.';
 import Debug from 'debug';
 
 import Container from 'typedi';
+import registry from '../substrate/typeRegistry';
+import typesSpec from '../substrate/typesSpec';
+
 import { RedisRelayer } from '../indexer/RedisRelayer';
 import { RedisClientFactory } from '../redis/RedisClientFactory';
 
@@ -71,7 +74,10 @@ export class QueryNode {
     typeRegistrator ? typeRegistrator() : null;
 
     // Create the API and wait until ready
-    const api = await ApiPromise.create({ provider });
+    const apiPromise = new ApiPromise({ provider, registry, typesSpec });
+    const api = await apiPromise.isReadyOrError;
+
+    debug(`Api is ready`);
 
     const service = makeSubstrateService(api);
 
