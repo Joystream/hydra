@@ -9,21 +9,15 @@ import { SubstrateEventEntity } from '../entities';
 import { numberEnv } from '../utils/env-flags';
 import { Inject, Service } from 'typedi';
 import { withTs } from '../utils/stringify';
-import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-consts';
+import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-keys';
 import { IBlockProducer } from './IBlockProducer';
 import { assert } from 'console';
 import { EventEmitter } from 'events';
 import { IStatusService } from './IStatusService';
+import { WORKERS_NUMBER } from './indexer-consts';
+import { toPayload } from '../model/BlockPayload';
 
 const debug = Debug('index-builder:indexer');
-
-const WORKERS_NUMBER = numberEnv('INDEXER_WORKERS') || 50;
-
-export interface BlockPayload {
-  height: number,
-  ts: number 
-  events?: { id: string, name: string }[]
-}
 
 @Service('IndexBuilder')
 export class IndexBuilder extends EventEmitter {
@@ -102,7 +96,7 @@ export class IndexBuilder extends EventEmitter {
       await this.transformAndPersist(queryEventsBlock);
       debug(`Done block #${h.toString()}`);
     
-      this.emit(BLOCK_COMPLETE_CHANNEL, this.toPayload(queryEventsBlock));
+      this.emit(BLOCK_COMPLETE_CHANNEL, toPayload(queryEventsBlock));
     }
   }
   
@@ -124,15 +118,4 @@ export class IndexBuilder extends EventEmitter {
     }); 
   }
 
-  toPayload(qeb: QueryEventBlock): BlockPayload {
-    return (withTs({
-      height: qeb.block_number,
-      events: qeb.query_events.map((e) => {
-        return {
-          name: e.event_name,
-          id: SubstrateEventEntity.formatId(qeb.block_number, e.index)
-        }
-      })
-    }) as unknown) as BlockPayload
-  }
 }

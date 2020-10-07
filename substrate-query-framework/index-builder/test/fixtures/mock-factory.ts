@@ -1,6 +1,6 @@
 import { QueryEventBlock, QueryEvent } from "../../src";
 import { Phase, Event, EventRecord } from '@polkadot/types/interfaces';
-import { BlockPayload } from "../../src/indexer";
+import { BlockPayload } from "../../src/model";
 import { withTs } from "../../src/utils/stringify";
 
 export function blockPayload(height: number): BlockPayload {

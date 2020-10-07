@@ -1,5 +1,5 @@
 import Container, { Service } from 'typedi';
-import { BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL } from './redis-consts';
+import { BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL } from './redis-keys';
 import { IndexBuilder } from './IndexBuilder';
 import IORedis = require('ioredis');
 import Debug from 'debug';

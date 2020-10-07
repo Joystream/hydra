@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
   VersionColumn } from 'typeorm';
 import { AnyJson, AnyJsonField } from '../interfaces/json-types';
-import { QueryEvent } from '..';
+import { formatEventId, QueryEvent } from '..';
 import * as BN from 'bn.js';
 import Debug from 'debug';
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity';
@@ -95,7 +95,7 @@ export class SubstrateEventEntity {
     
     _entity.blockNumber = q.block_number;
     _entity.index = q.indexInBlock;
-    _entity.id = SubstrateEventEntity.formatId(_entity.blockNumber, _entity.index);
+    _entity.id = formatEventId(_entity.blockNumber, _entity.index);
     _entity.method = q.event_record.event.method || 'NO_METHOD';
     _entity.section = q.event_record.event.section || 'NO_SECTION';
     _entity.name = `${_entity.section}.${_entity.method}`;
@@ -148,11 +148,5 @@ export class SubstrateEventEntity {
     return _entity;
   }
 
-  // return id in the format 000000..00<blockNum>-000<index> 
-  // the reason for such formatting is to be able to efficiently sort events 
-  // by ID
-  public static formatId(blockNumber: number, index: number): string {
-    return `${String(blockNumber).padStart(16, '0')}-${String(index).padStart(6, '0')}`;
-  }
 }
 

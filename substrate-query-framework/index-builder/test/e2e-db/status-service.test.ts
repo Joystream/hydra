@@ -12,7 +12,7 @@ import Debug from 'debug';
 import { RedisRelayer } from '../../src/indexer/RedisRelayer';
 import { RedisClientFactory } from '../../src/redis/RedisClientFactory';
 import { blockPayload, queryEventBlock } from '../fixtures/mock-factory';
-import { EVENT_TOTAL } from '../../src/indexer/redis-consts';
+import { EVENT_TOTAL } from '../../src/indexer/redis-keys';
 import { clearRedis, resetDb } from './setup-db'
 
 const debug = Debug('index-builder:status-service-test')

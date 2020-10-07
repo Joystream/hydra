@@ -8,6 +8,14 @@ export const DEFAULT_FETCH_TIMEOUT_MS = 500;
 
 const debug = Debug('index-builder:util');
 
+/**
+ * Resolves when an async call resolves to true, and rejects if any call rejects.
+ * 
+ * 
+ * @param condition Async condition to be satisfied
+ * @param exit Force exit handle
+ * @param pollInterval 
+ */
 export async function waitForAsync(condition: () => Promise<boolean>, exit?: () => boolean, pollInterval = POLL_INTERVAL_MS): Promise<void> {
   let cond = await condition(); 
   while (!cond) {

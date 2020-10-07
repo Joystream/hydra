@@ -1,5 +1,5 @@
 import { EventRecord, Extrinsic } from '@polkadot/types/interfaces';
-import { EventParameters } from '../interfaces';
+import { Codec } from '@polkadot/types/types';
 
 export interface QueryEvent {
   event_record: EventRecord;
@@ -10,6 +10,11 @@ export interface QueryEvent {
   event_params: EventParameters;
   extrinsic?: Extrinsic;
   index: number
+}
+
+export interface EventParameters {
+  // TODO how do we reprsent it?
+  [key: string]: Codec;
 }
 
 export class QueryEventImpl implements QueryEvent {
@@ -82,4 +87,11 @@ export class QueryEventImpl implements QueryEvent {
       });
     }
   }
+}
+
+// return id in the format 000000..00<blockNum>-000<index> 
+// the reason for such formatting is to be able to efficiently sort events 
+// by ID
+export function formatEventId(blockNumber: number, index: number): string {
+  return `${String(blockNumber).padStart(16, '0')}-${String(index).padStart(6, '0')}`;
 }

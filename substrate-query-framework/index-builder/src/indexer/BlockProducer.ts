@@ -10,12 +10,10 @@ import { numberEnv } from '../utils/env-flags';
 import { ConstantBackOffStrategy } from '../utils/BackOffStategy';
 import { IBlockProducer } from './IBlockProducer';
 import { Service, Inject } from 'typedi';
+import { BLOCK_PRODUCER_FETCH_RETRIES } from './indexer-consts';
 
 
 const DEBUG_TOPIC = 'index-builder:producer';
-
-// by default, retry infinite number of times
-const BLOCK_PRODUCER_FETCH_RETRIES = numberEnv('BLOCK_PRODUCER_FETCH_RETRIES') || -1;
 
 const debug = Debug(DEBUG_TOPIC);
 

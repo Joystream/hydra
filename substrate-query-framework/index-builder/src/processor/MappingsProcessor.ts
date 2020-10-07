@@ -10,7 +10,7 @@ import { logError } from '../utils/errors';
 import { IProcessorState, ProcessorStateHandler } from './ProcessorStateHandler';
 import { EventFilter } from './IProcessorSource';
 import { waitFor } from '../utils/wait-for';
-import { SubstrateEventEntity } from '../entities';
+import { formatEventId } from '../model';
 
 const debug = Debug('index-builder:processor');
 
@@ -110,7 +110,7 @@ export class MappingsProcessor {
           // TODO: we should really subsribe to new indexer heads here and update accordingly
           this.state.lastScannedBlock = this.currentFilter.toBlock;
           // if we haven't found anything matching just take the genesis
-          this.state.lastProcessedEvent = this.state.lastProcessedEvent || SubstrateEventEntity.formatId(0, 0);
+          this.state.lastProcessedEvent = this.state.lastProcessedEvent || formatEventId(0, 0);
           await this.stateHandler.persist(this.state);
         }
 

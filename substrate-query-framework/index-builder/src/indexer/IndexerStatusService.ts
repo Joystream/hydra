@@ -3,7 +3,7 @@ import { getIndexerHead as slowIndexerHead } from '../db/dal';
 import Debug from 'debug';
 import * as IORedis from 'ioredis';
 import { logError } from '../utils/errors';
-import { BlockPayload } from './IndexBuilder';
+import { BlockPayload } from './../model';
 import { stringifyWithTs } from '../utils/stringify';
 import { 
   INDEXER_HEAD_BLOCK, 

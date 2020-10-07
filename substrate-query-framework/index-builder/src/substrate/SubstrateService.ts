@@ -6,14 +6,11 @@ import { ApiPromise } from '@polkadot/api';
 import { ISubstrateService } from '.';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import Debug from 'debug';
-import { numberEnv } from '../utils/env-flags';
 import { retryWithTimeout } from '../utils/wait-for';
 import { logError } from '../utils/errors';
+import { SUBSTRATE_API_CALL_RETRIES, SUBSTRATE_API_TIMEOUT } from '../indexer/indexer-consts';
 
 const debug = Debug('index-builder:producer');
-
-const SUBSTRATE_API_TIMEOUT = numberEnv('SUBSTRATE_API_TIMEOUT') || 1000 * 60 * 5;
-const SUBSTRATE_API_CALL_RETRIES = numberEnv('SUBSTRATE_API_CALL_RETRIES') || 20;
 
 
 export class SubstrateService implements ISubstrateService {
