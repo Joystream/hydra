@@ -140,4 +140,3 @@ TYPE_REGISTER_FUNCTION=<register_type> # name of the function that will called f
 ## Examples
 
 Check out [sample projects](https://github.com/Joystream/joystream/tree/query_node/query-node/examples) for inspiration!
-
