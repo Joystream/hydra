@@ -54,7 +54,7 @@ export class IndexerStatusService implements IStatusService {
     }
     // TODO: move into a separate cache service and cache also events, extrinsics etc
     await this.updateBlockCache(payload); 
-    await this.updateIndexerHead(payload.height);
+    await this.updateIndexerHead();
     await this.updateLastEvents(payload);
 
   }
