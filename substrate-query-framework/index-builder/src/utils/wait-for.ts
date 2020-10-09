@@ -5,7 +5,28 @@ import { logError } from './errors';
 export const POLL_INTERVAL_MS = 100;
 export const DEFAULT_FETCH_TIMEOUT_MS = 500;
 
+
 const debug = Debug('index-builder:util');
+
+/**
+ * Resolves when an async call resolves to true, and rejects if any call rejects.
+ * 
+ * 
+ * @param condition Async condition to be satisfied
+ * @param exit Force exit handle
+ * @param pollInterval 
+ */
+export async function waitForAsync(condition: () => Promise<boolean>, exit?: () => boolean, pollInterval = POLL_INTERVAL_MS): Promise<void> {
+  let cond = await condition(); 
+  while (!cond) {
+    await sleep(pollInterval);
+    cond = await condition();
+    if (exit && exit()) {
+      return;
+    }
+  }
+}
+
 /**
  * Returns a promise which resolves when a certain condition is met
  * 
@@ -13,7 +34,7 @@ const debug = Debug('index-builder:util');
  * @param exit (optional) The promise rejects if exit() returns true
  * @param pollInterval (optimal) The sleep interval
  */
-export async function waitFor(condition: () => boolean, exit?: () => boolean , pollInterval = POLL_INTERVAL_MS): Promise<void> {
+export async function waitFor(condition: () => boolean, exit?: () => boolean, pollInterval = POLL_INTERVAL_MS): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     let timeout: NodeJS.Timeout | undefined = undefined;   
     const checkCondition = () => {

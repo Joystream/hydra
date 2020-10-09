@@ -6,3 +6,6 @@ dist
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# generated with dotenvi
+.env

@@ -1,7 +1,7 @@
 import { ConnectionOptions } from 'typeorm';
 import  { SnakeNamingStrategy } from './SnakeNamingStrategy';
 import { SubstrateEventEntity, SubstrateExtrinsicEntity, ProcessedEventsLogEntity } from '../entities';
-import { CreateSchema } from '../migrations/CreateSchema';
+import { IndexerSchema } from '../migrations/IndexerSchema';
 
 const config: () => ConnectionOptions = () => {
   return {
@@ -12,7 +12,7 @@ const config: () => ConnectionOptions = () => {
     password: process.env.TYPEORM_PASSWORD,
     database: process.env.TYPEORM_DATABASE,
     entities: [ SubstrateEventEntity, SubstrateExtrinsicEntity, ProcessedEventsLogEntity, process.env.TYPEORM_ENTITIES ],
-    migrations: [ CreateSchema ],
+    migrations: [ IndexerSchema ],
     cli: {
         migrationsDir: "migrations"
     },

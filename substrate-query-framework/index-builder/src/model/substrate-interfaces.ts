@@ -1,11 +1,6 @@
-import { Codec } from '@polkadot/types/types';
 import { AnyJson, AnyJsonField } from '../interfaces/json-types'
 import * as BN from 'bn.js';
 
-export interface EventParameters {
-  // TODO how do we reprsent it?
-  [key: string]: Codec;
-}
 
 export interface EventParam {
   type: string;

@@ -1,16 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
+import { 
+  Entity, 
+  PrimaryGeneratedColumn, 
+  Column, 
+  OneToOne, 
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+  VersionColumn } from 'typeorm';
 import { AnyJson } from '../interfaces/json-types';
 import * as BN from 'bn.js';
 import { NumericTransformer } from '../db';
 import { ExtrinsicArg, SubstrateExtrinsic } from '../interfaces';
 import { SubstrateEventEntity } from './SubstrateEventEntity';
+import { AbstractWarthogModel } from './AbstractWarthogModel';
 
 export const EXTRINSIC_TABLE_NAME = 'substrate_extrinsic'
 
 @Entity({
   name: EXTRINSIC_TABLE_NAME
 })
-export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
+export class SubstrateExtrinsicEntity extends AbstractWarthogModel implements SubstrateExtrinsic {
   @PrimaryGeneratedColumn()
   id!: number;       
   
@@ -23,6 +32,7 @@ export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
   @Column({
     type: 'numeric'
   })  
+  @Index()
   blockNumber!: number;    
   
   @Column()     

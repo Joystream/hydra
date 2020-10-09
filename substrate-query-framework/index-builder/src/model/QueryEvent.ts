@@ -1,35 +1,50 @@
 import { EventRecord, Extrinsic } from '@polkadot/types/interfaces';
-import { EventParameters } from '../interfaces';
+import { Codec } from '@polkadot/types/types';
 
+export interface IQueryEvent {
+  eventRecord: EventRecord;
+  blockNumber: number;
+  indexInBlock: number;
+  eventName: string;
+  eventMethod: string;
+  eventParams: EventParameters;
+  extrinsic?: Extrinsic;
+  index: number
+}
 
-export class QueryEvent {
-  readonly event_record: EventRecord;
+export interface EventParameters {
+  // TODO how do we reprsent it?
+  [key: string]: Codec;
+}
 
-  readonly block_number: number;
+export class QueryEvent implements IQueryEvent {
+  readonly eventRecord: EventRecord;
+
+  readonly blockNumber: number;
 
   readonly extrinsic?: Extrinsic;
 
   readonly indexInBlock: number;
 
   constructor(event_record: EventRecord, block_number: number, indexInBlock: number, extrinsic?: Extrinsic) {
-    this.event_record = event_record;
+    this.eventRecord = event_record;
     this.extrinsic = extrinsic;
-    this.block_number = block_number;
+    this.blockNumber = block_number;
     this.indexInBlock = indexInBlock;
   }
 
-  get event_name(): string {
-    const event = this.event_record.event;
+  get eventName(): string {
+    const event = this.eventRecord.event;
 
-    return event.section + '_' + event.method;
+    return `${event.section}.${event.method}`;
   }
 
-  get event_method(): string {
-    return this.event_record.event.method;
+  get eventMethod(): string {
+    return this.eventRecord.event.method;
   }
 
-  get event_params(): EventParameters {
-    const { event } = this.event_record;
+  get eventParams(): EventParameters {
+    const { event } = this.eventRecord;
     const params: EventParameters = {};
 
     // Event data can be Null(polkadot type)
@@ -48,7 +63,7 @@ export class QueryEvent {
 
   log(indent: number, logger: (str: string) => void): void {
     // Extract the phase, event
-    const { event, phase } = this.event_record;
+    const { event, phase } = this.eventRecord;
 
     // Event data can be Null(polkadot type)
     if (!event.data.length) return;
@@ -72,4 +87,11 @@ export class QueryEvent {
       });
     }
   }
+}
+
+// return id in the format 000000..00<blockNum>-000<index> 
+// the reason for such formatting is to be able to efficiently sort events 
+// by ID
+export function formatEventId(blockNumber: number, index: number): string {
+  return `${String(blockNumber).padStart(16, '0')}-${String(index).padStart(6, '0')}`;
 }

@@ -30,6 +30,7 @@ export function fillRequiredWarthogFields<T>(entity: DeepPartial<T>): DeepPartia
   return Object.assign(entity, requiredFields);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createDBConnection(entities: any[] = []): Promise<Connection> {
   //const connectionOptions = await getConnectionOptions();
   const _config = config();

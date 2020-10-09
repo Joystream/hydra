@@ -4,7 +4,6 @@ const debug = Debug('index-builder:processor');
 // get a number from an environment variable 
 export function numberEnv(envVariable: string): number | undefined {
   if (!process.env[envVariable]) {
-    debug(`Env variable ${envVariable} is not set`);
     return undefined;
   }
 

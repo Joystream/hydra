@@ -1,10 +1,17 @@
 // @ts-check
-
 import { ApiPromise, WsProvider /*RuntimeVersion*/ } from '@polkadot/api';
+import { ProviderInterfaceEmitted } from '@polkadot/rpc-provider/types';
 
 import { makeSubstrateService, IndexBuilder } from '..';
 import { IndexerOptions } from '.';
 import Debug from 'debug';
+
+import Container from 'typedi';
+import registry from '../substrate/typeRegistry';
+import typesSpec from '../substrate/typesSpec';
+
+import { RedisRelayer } from '../indexer/RedisRelayer';
+import { RedisClientFactory } from '../redis/RedisClientFactory';
 
 const debug = Debug('index-builder:query-node');
 
@@ -40,14 +47,16 @@ export class QueryNode {
     this._indexBuilder = indexBuilder;
     this._atBlock = atBlock;
 
-    this._websocketProvider.on('error', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    ['error', 'disconnected'].forEach((e) => this._websocketProvider.on(e as ProviderInterfaceEmitted, () => {
       debug(`Disconnected.`)
       if (this.state == QueryNodeState.STARTED) {
-        await this.stop();
+        this.stop();
         throw new Error(`WS provider has been disconnected. Shutting down the node`);
       }
       debug(`Disconnected. Waiting until the node is stopped...`)
     })
+    );
   }
 
   static async create(options: IndexerOptions): Promise<QueryNode> {
@@ -65,12 +74,22 @@ export class QueryNode {
     typeRegistrator ? typeRegistrator() : null;
 
     // Create the API and wait until ready
-    const api = await ApiPromise.create({ provider });
+    const apiPromise = new ApiPromise({ provider, registry, typesSpec });
+    const api = await apiPromise.isReadyOrError;
+
+    debug(`Api is ready`);
 
     const service = makeSubstrateService(api);
 
-    const index_buider = IndexBuilder.create(service);
+    Container.set('SubstrateService', service);
+   
+    const redisURL = options.redisURI || process.env.REDIS_URI;
+    Container.set('RedisClientFactory', new RedisClientFactory(redisURL));
 
+    const index_buider = Container.get<IndexBuilder>(IndexBuilder);
+    // force TypeDI to create it
+    Container.get<RedisRelayer>(RedisRelayer)
+    
     return new QueryNode(provider, api, index_buider, atBlock);
   }
 
@@ -80,18 +99,24 @@ export class QueryNode {
     this._state = QueryNodeState.STARTED;
 
     // Start only the indexer
-    await this._indexBuilder.start(this._atBlock);
+    try {
+      await this._indexBuilder.start(this._atBlock);
+    } finally {
+      // if due tot error, it will bubble up
+      debug(`Stopping the query node`);
+      this.stop();
+    }
     
   }
 
-  async stop(): Promise<void> {
+  stop(): void{
     debug(`Query node state: ${this._state}`);
     if (this._state != QueryNodeState.STARTED) throw new Error('Can only stop once fully started');
 
     this._state = QueryNodeState.STOPPING;
 
-    await this._indexBuilder.stop();
-
+    this._indexBuilder.stop();
+    
     this._state = QueryNodeState.STOPPED;
   }
 

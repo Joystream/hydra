@@ -1,10 +1,20 @@
-import { Entity, Column, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { 
+  Entity, 
+  Column, 
+  JoinColumn, 
+  OneToOne, 
+  PrimaryColumn, 
+  Index, 
+  CreateDateColumn,
+  UpdateDateColumn,
+  VersionColumn } from 'typeorm';
 import { AnyJson, AnyJsonField } from '../interfaces/json-types';
-import { QueryEvent } from '..';
+import { formatEventId, IQueryEvent } from '..';
 import * as BN from 'bn.js';
 import Debug from 'debug';
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity';
 import { EventParam } from '../model/substrate-interfaces'
+import { AbstractWarthogModel } from './AbstractWarthogModel';
 
 const debug = Debug('index-builder:QueryEventEntity');
 
@@ -14,11 +24,13 @@ export const EVENT_TABLE_NAME = 'substrate_event'
 @Entity({
   name: EVENT_TABLE_NAME
 })
-export class SubstrateEventEntity {
+@Index(["blockNumber", "index"], { unique: true })
+export class SubstrateEventEntity extends AbstractWarthogModel {
   @PrimaryColumn()
   id!: string;   
 
   @Column()
+  @Index()
   name!: string;
 
   @Column({
@@ -35,6 +47,7 @@ export class SubstrateEventEntity {
   phase!: AnyJson;
 
   @Column()
+  @Index()
   blockNumber!: number;
 
   @Column()
@@ -53,23 +66,24 @@ export class SubstrateEventEntity {
   @JoinColumn()
   extrinsic?: SubstrateExtrinsicEntity;
 
-  static fromQueryEvent(q: QueryEvent): SubstrateEventEntity {
+
+  static fromQueryEvent(q: IQueryEvent): SubstrateEventEntity {
     const _entity =  new SubstrateEventEntity();
     
-    _entity.blockNumber = q.block_number;
+    _entity.blockNumber = q.blockNumber;
     _entity.index = q.indexInBlock;
-    _entity.id = SubstrateEventEntity.formatId(_entity.blockNumber, _entity.index);
-    _entity.method = q.event_record.event.method || 'NO_METHOD';
-    _entity.section = q.event_record.event.section || 'NO_SECTION';
+    _entity.id = formatEventId(_entity.blockNumber, _entity.index);
+    _entity.method = q.eventRecord.event.method || 'NO_METHOD';
+    _entity.section = q.eventRecord.event.section || 'NO_SECTION';
     _entity.name = `${_entity.section}.${_entity.method}`;
-    _entity.phase = (q.event_record.phase.toJSON() || {}) as AnyJson;
+    _entity.phase = (q.eventRecord.phase.toJSON() || {}) as AnyJson;
     
     _entity.params = [];
 
-    const { event } = q.event_record;
+    const { event } = q.eventRecord;
 
     if (event.data.length) {
-      q.event_record.event.data.forEach((data, index) => {
+      q.eventRecord.event.data.forEach((data, index) => {
         _entity.params.push({
           type: event.typeDef[index].type,
           name: event.typeDef[index].name || event.typeDef[index].displayName || 'NO_NAME',
@@ -83,7 +97,7 @@ export class SubstrateEventEntity {
       const extr = new SubstrateExtrinsicEntity();
       _entity.extrinsic = extr;
       
-      extr.blockNumber = q.block_number;
+      extr.blockNumber = q.blockNumber;
       extr.signature = e.signature.toString();
       extr.signer = e.signer.toString();
       extr.method = e.method.methodName || 'NO_METHOD';
@@ -111,11 +125,5 @@ export class SubstrateEventEntity {
     return _entity;
   }
 
-  // return id in the format 000000..00<blockNum>-000<index> 
-  // the reason for such formatting is to be able to efficiently sort events 
-  // by ID
-  public static formatId(blockNumber: number, index: number): string {
-    return `${String(blockNumber).padStart(16, '0')}-${String(index).padStart(6, '0')}`;
-  }
 }
 

@@ -9,6 +9,8 @@ export * from './node';
 export * from './substrate';
 export * from './db';
 export * from './processor';
+export * from './redis';
+
 
 export {
   BlockProducer,
