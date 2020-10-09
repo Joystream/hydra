@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
   "bin": {
     "hydra-cli": "./bin/run"
@@ -20,6 +20,7 @@
     "cli-ux": "^5.4.9",
     "execa": "^4.0.3",
     "fs-extra": "^9.0.0",
+    "glob": "^7.1.6",
     "gluegun": "^4.3.1",
     "graphql": "^15.0.0",
     "listr": "^0.14.3",
