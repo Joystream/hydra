@@ -12,7 +12,7 @@ export function toPayload(qeb: QueryEventBlock): BlockPayload {
       height: qeb.block_number,
       events: qeb.query_events.map((e) => {
         return {
-          name: e.event_name,
+          name: e.eventName,
           id: formatEventId(qeb.block_number, e.index)
         }
       })

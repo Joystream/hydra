@@ -1,13 +1,13 @@
 import { EventRecord, Extrinsic } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 
-export interface QueryEvent {
-  event_record: EventRecord;
-  block_number: number;
+export interface IQueryEvent {
+  eventRecord: EventRecord;
+  blockNumber: number;
   indexInBlock: number;
-  event_name: string;
-  event_method: string;
-  event_params: EventParameters;
+  eventName: string;
+  eventMethod: string;
+  eventParams: EventParameters;
   extrinsic?: Extrinsic;
   index: number
 }
@@ -17,34 +17,34 @@ export interface EventParameters {
   [key: string]: Codec;
 }
 
-export class QueryEventImpl implements QueryEvent {
-  readonly event_record: EventRecord;
+export class QueryEvent implements IQueryEvent {
+  readonly eventRecord: EventRecord;
 
-  readonly block_number: number;
+  readonly blockNumber: number;
 
   readonly extrinsic?: Extrinsic;
 
   readonly indexInBlock: number;
 
   constructor(event_record: EventRecord, block_number: number, indexInBlock: number, extrinsic?: Extrinsic) {
-    this.event_record = event_record;
+    this.eventRecord = event_record;
     this.extrinsic = extrinsic;
-    this.block_number = block_number;
+    this.blockNumber = block_number;
     this.indexInBlock = indexInBlock;
   }
 
-  get event_name(): string {
-    const event = this.event_record.event;
+  get eventName(): string {
+    const event = this.eventRecord.event;
 
     return `${event.section}.${event.method}`;
   }
 
-  get event_method(): string {
-    return this.event_record.event.method;
+  get eventMethod(): string {
+    return this.eventRecord.event.method;
   }
 
-  get event_params(): EventParameters {
-    const { event } = this.event_record;
+  get eventParams(): EventParameters {
+    const { event } = this.eventRecord;
     const params: EventParameters = {};
 
     // Event data can be Null(polkadot type)
@@ -63,7 +63,7 @@ export class QueryEventImpl implements QueryEvent {
 
   log(indent: number, logger: (str: string) => void): void {
     // Extract the phase, event
-    const { event, phase } = this.event_record;
+    const { event, phase } = this.eventRecord;
 
     // Event data can be Null(polkadot type)
     if (!event.data.length) return;

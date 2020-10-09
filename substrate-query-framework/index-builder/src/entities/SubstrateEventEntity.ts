@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
   VersionColumn } from 'typeorm';
 import { AnyJson, AnyJsonField } from '../interfaces/json-types';
-import { formatEventId, QueryEvent } from '..';
+import { formatEventId, IQueryEvent } from '..';
 import * as BN from 'bn.js';
 import Debug from 'debug';
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity';
@@ -90,23 +90,23 @@ export class SubstrateEventEntity {
   @VersionColumn() 
   version!: number;
 
-  static fromQueryEvent(q: QueryEvent): SubstrateEventEntity {
+  static fromQueryEvent(q: IQueryEvent): SubstrateEventEntity {
     const _entity =  new SubstrateEventEntity();
     
-    _entity.blockNumber = q.block_number;
+    _entity.blockNumber = q.blockNumber;
     _entity.index = q.indexInBlock;
     _entity.id = formatEventId(_entity.blockNumber, _entity.index);
-    _entity.method = q.event_record.event.method || 'NO_METHOD';
-    _entity.section = q.event_record.event.section || 'NO_SECTION';
+    _entity.method = q.eventRecord.event.method || 'NO_METHOD';
+    _entity.section = q.eventRecord.event.section || 'NO_SECTION';
     _entity.name = `${_entity.section}.${_entity.method}`;
-    _entity.phase = (q.event_record.phase.toJSON() || {}) as AnyJson;
+    _entity.phase = (q.eventRecord.phase.toJSON() || {}) as AnyJson;
     
     _entity.params = [];
 
-    const { event } = q.event_record;
+    const { event } = q.eventRecord;
 
     if (event.data.length) {
-      q.event_record.event.data.forEach((data, index) => {
+      q.eventRecord.event.data.forEach((data, index) => {
         _entity.params.push({
           type: event.typeDef[index].type,
           name: event.typeDef[index].name || event.typeDef[index].displayName || 'NO_NAME',
@@ -120,7 +120,7 @@ export class SubstrateEventEntity {
       const extr = new SubstrateExtrinsicEntity();
       _entity.extrinsic = extr;
       
-      extr.blockNumber = q.block_number;
+      extr.blockNumber = q.blockNumber;
       extr.signature = e.signature.toString();
       extr.signer = e.signer.toString();
       extr.method = e.method.methodName || 'NO_METHOD';

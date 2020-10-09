@@ -1,4 +1,4 @@
-import { QueryEventBlock, QueryEvent } from "../../src";
+import { QueryEventBlock, IQueryEvent } from "../../src";
 import { Phase, Event, EventRecord } from '@polkadot/types/interfaces';
 import { BlockPayload } from "../../src/model";
 import { withTs } from "../../src/utils/stringify";
@@ -13,18 +13,18 @@ export function queryEventBlock(block = 0): QueryEventBlock {
   const gen = queryEvent(block);
   return {
     block_number: block,
-    query_events: [gen.next().value as QueryEvent, 
-      gen.next().value as QueryEvent, 
-      gen.next().value as QueryEvent]
+    query_events: [gen.next().value as IQueryEvent, 
+      gen.next().value as IQueryEvent, 
+      gen.next().value as IQueryEvent]
   }
 }
 
-export function * queryEvent(block = 0): Generator<QueryEvent, void, QueryEvent> {
+export function * queryEvent(block = 0): Generator<IQueryEvent, void, IQueryEvent> {
   // TODO: use faker
   let i = 0;
   do {  
     yield {
-          event_record: {
+          eventRecord: {
             phase: {
               toJSON: () => { return {} }
             } as unknown as Phase,
@@ -34,11 +34,11 @@ export function * queryEvent(block = 0): Generator<QueryEvent, void, QueryEvent>
               data: []
             } as unknown as Event
           } as unknown as EventRecord,
-          block_number: block,
+          blockNumber: block,
           indexInBlock: i,
-          event_name: 'fake.event',
-          event_method: 'fake.method',
-          event_params: {},
+          eventName: 'fake.event',
+          eventMethod: 'fake.method',
+          eventParams: {},
           index: i
     }
     i++;
