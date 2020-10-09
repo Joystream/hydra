@@ -12,13 +12,14 @@ import * as BN from 'bn.js';
 import { NumericTransformer } from '../db';
 import { ExtrinsicArg, SubstrateExtrinsic } from '../interfaces';
 import { SubstrateEventEntity } from './SubstrateEventEntity';
+import { AbstractWarthogModel } from './AbstractWarthogModel';
 
 export const EXTRINSIC_TABLE_NAME = 'substrate_extrinsic'
 
 @Entity({
   name: EXTRINSIC_TABLE_NAME
 })
-export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
+export class SubstrateExtrinsicEntity extends AbstractWarthogModel implements SubstrateExtrinsic {
   @PrimaryGeneratedColumn()
   id!: number;       
   
@@ -75,31 +76,5 @@ export class SubstrateExtrinsicEntity implements SubstrateExtrinsic {
 
   @OneToOne(() => SubstrateEventEntity, (event: SubstrateEventEntity) => event.extrinsic) // specify inverse side as a second parameter
   event!: SubstrateEventEntity;
-
-  // Warthog Fields
-  @CreateDateColumn() 
-  createdAt!: Date;
-  
-  @Column({
-    default: 'hydra-indexer'
-  }) 
-  createdById!: string;
-
-  @UpdateDateColumn({ nullable: true })
-  updatedAt?: Date;
-  
-  @Column({ 
-    nullable: true 
-  })
-  updatedById?: string;
-  
-  @Column({ nullable: true })
-  deletedAt?: Date;
-  
-  @Column({ nullable: true })
-  deletedById?: string;
-  
-  @VersionColumn() 
-  version!: number;
   
 }

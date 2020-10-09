@@ -14,6 +14,7 @@ import * as BN from 'bn.js';
 import Debug from 'debug';
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity';
 import { EventParam } from '../model/substrate-interfaces'
+import { AbstractWarthogModel } from './AbstractWarthogModel';
 
 const debug = Debug('index-builder:QueryEventEntity');
 
@@ -24,7 +25,7 @@ export const EVENT_TABLE_NAME = 'substrate_event'
   name: EVENT_TABLE_NAME
 })
 @Index(["blockNumber", "index"], { unique: true })
-export class SubstrateEventEntity {
+export class SubstrateEventEntity extends AbstractWarthogModel {
   @PrimaryColumn()
   id!: string;   
 
@@ -65,30 +66,6 @@ export class SubstrateEventEntity {
   @JoinColumn()
   extrinsic?: SubstrateExtrinsicEntity;
 
-  // Warthog Fields
-  @CreateDateColumn() 
-  createdAt!: Date;
-  @Column({
-    default: 'hydra-indexer'
-  }) 
-  createdById!: string;
-  
-  @UpdateDateColumn({ nullable: true })
-  updatedAt?: Date;
-  
-  @Column({ 
-    nullable: true 
-  })
-  updatedById?: string;
-  
-  @Column({ nullable: true })
-  deletedAt?: Date;
-  
-  @Column({ nullable: true })
-  deletedById?: string;
-  
-  @VersionColumn() 
-  version!: number;
 
   static fromQueryEvent(q: IQueryEvent): SubstrateEventEntity {
     const _entity =  new SubstrateEventEntity();
