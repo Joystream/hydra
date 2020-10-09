@@ -39,7 +39,8 @@ export async function loadState(processorID: string): Promise<ProcessedEventsLog
       processor: processorID
     },
     order: {
-      eventId: 'DESC'
+      eventId: 'DESC',
+      lastScannedBlock: 'DESC'
     }
   });
 }
