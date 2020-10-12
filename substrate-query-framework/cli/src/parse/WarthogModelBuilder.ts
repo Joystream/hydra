@@ -158,7 +158,11 @@ export class WarthogModelBuilder {
       return field;
     });
     debug(`Read and parsed fields: ${JSON.stringify(fields, null, 2)}`);
-    return fields;
+
+    // ---Temporary Solution---
+    // Warthog's BaseModel already has `id` member so we remove id field from object
+    // before generation models
+    return fields.filter(f => f.name !== 'id');
   }
 
   private generateInterfaces() {
