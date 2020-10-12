@@ -17,7 +17,7 @@
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "i-test": "docker-compose -f docker-compose-test.yml up test && yarn post-i-test",
     "post-i-test": "docker-compose -f docker-compose-test.yml down",
-    "i-test-local": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --file ./test/e2e-db/setup-db.ts \"test/e2e-db/**/*.test.ts\"",
+    "i-test-local": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --file ./test/integration/setup-db.ts \"test/integration/**/*.test.ts\"",
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },
   "dependencies": {
