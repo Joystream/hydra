@@ -18,16 +18,19 @@ const debug = Debug('index-builder:helper');
  * @param entity: DeepPartial<T>
  */
 export function fillRequiredWarthogFields<T>(entity: DeepPartial<T>): DeepPartial<T> {
-  // Modifying an existing entity so do not add warthog fields
-  // eslint-disable-next-line no-prototype-builtins
-  if (entity.hasOwnProperty('id')) return entity;
-
-  const requiredFields = {
-    id: shortid.generate(),
-    createdById: shortid.generate(),
-    version: 1,
-  };
-  return Object.assign(entity, requiredFields);
+  //eslint-disable-next-line no-prototype-builtins
+  if (!entity.hasOwnProperty('id')) {
+    Object.assign(entity, { id: shortid.generate() });
+  }
+  //eslint-disable-next-line no-prototype-builtins
+  if (!entity.hasOwnProperty('createdById')) {
+    Object.assign(entity, { createdById: shortid.generate() });
+  }
+  //eslint-disable-next-line no-prototype-builtins
+  if (!entity.hasOwnProperty('version')) {
+    Object.assign(entity, { version: 1 });
+  }
+  return entity;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,18 +42,17 @@ export async function createDBConnection(entities: any[] = []): Promise<Connecti
   return createConnection(_config);
 }
 
-
 export async function doInTransaction<T>(fn: (qn: QueryRunner) => Promise<T>): Promise<T> {
   const queryRunner = getConnection().createQueryRunner();
   try {
     // establish real database connection
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    
+
     const result = await fn(queryRunner);
 
     await queryRunner.commitTransaction();
-    
+
     return result;
   } catch (error) {
     console.error(`Rolling back the transaction due to errors: ${logError(error)}`);
