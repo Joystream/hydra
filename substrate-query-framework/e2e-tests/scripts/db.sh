@@ -9,7 +9,7 @@ command=""
 
 if [[ $CLITAG == "" ]] ;
 then
-    echo "CLITAG is not set. Set the hydra-cli image version to test"
+    echo "CLITAG is not set. Build and set the hydra image tag version to run the tests"
     exit 1
 fi
 
@@ -60,5 +60,5 @@ docker run --network="$network"  \
            --env TYPEORM_PASSWORD=$db_pass \
            --env TYPEORM_HOST=$db_host     \
            --env TYPEORM_PORT=$db_port     \
-           hydra-cli:${CLITAG} \
+           hydra:${CLITAG} \
            sh -c "$command"

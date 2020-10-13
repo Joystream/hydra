@@ -2,8 +2,8 @@ version: "3"
 
 services:
   processor-gql-server:
-    image: hydra-cli:${CLITAG}
-    build: ./../cli
+    image: hydra:${CLITAG}
+    build: ./schema
     restart: unless-stopped
     environment:
       - DB_NAME=processor-db
@@ -18,8 +18,7 @@ services:
     command: ["yarn", "server:start:prod"]
 
   processor:
-    image: hydra-cli:${CLITAG}
-    build: ./../cli
+    image: hydra:${CLITAG}
     restart: unless-stopped
     environment:
       - TYPEORM_DATABASE=processor-db
@@ -35,8 +34,7 @@ services:
     command: ["yarn", "processor:start"]
   
   indexer:
-    image: hydra-cli:${CLITAG}
-    build: ./../cli
+    image: hydra:${CLITAG}
     restart: unless-stopped
     environment:
       - TYPEORM_DATABASE=indexer-db
