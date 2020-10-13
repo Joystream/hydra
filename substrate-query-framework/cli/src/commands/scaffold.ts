@@ -21,6 +21,8 @@ export default class Scaffold extends Command {
       description: 'Substrate WS provider endpoint',
       default: DEFAULT_WS_API_ENDPOINT,
     }),
+    // pass --no-mappings to skip default mappings and schema
+    mappings: flags.boolean({ char: 'm', allowNo: true, description: 'Create schema and mappings', default: true }),
     blockHeight: flags.string({ char: 'b', description: 'Start block height', default: '0' }),
     dbHost: flags.string({ char: 'h', description: 'Database host', default: 'localhost' }),
     dbPort: flags.string({ char: 'p', description: 'Database port', default: '5432' }),
@@ -42,20 +44,18 @@ export default class Scaffold extends Command {
     this.log('Your settings have been saved to .env, feel free to edit');
 
     cli.action.start('Scaffolding');
+    
+    if (flags.mappings) {
+      await this.setupMappings();
+    }
 
-    // TODO: we don't do bootstrapping for now
-    //await fs.ensureDir('bootstrap');
-    // copy sample graphql schema
-    await utils.copyTemplateToCWD('scaffold/schema.graphql', 'schema.graphql');
-
-    await this.setupMappings();
     await this.setupNodeProject();
     await this.setupDocker();
 
     cli.action.stop();
   }
 
-  async dotenvFromFlags(flags_: { [key: string]: string | undefined }): Promise<string> {
+  async dotenvFromFlags(flags_: { [key: string]: string | boolean | undefined }): Promise<string> {
     const template = await fs.readFile(getTemplatePath('scaffold/.env'), 'utf-8');
     return Mustache.render(template, { ...flags_, dbName: flags_.projectName });
   }
@@ -143,6 +143,8 @@ export default class Scaffold extends Command {
 
   // For now, we simply copy the hardcoded templates from the mappings dir
   async setupMappings(): Promise<void> {
+    await utils.copyTemplateToCWD('scaffold/schema.graphql', 'schema.graphql');
+
     await fs.ensureDir('mappings');
     const mappingFiles = glob.sync(path.join(__dirname,'..','/templates/scaffold/mappings/**/*.ts'))
     // TODO: make this generic and move to utils

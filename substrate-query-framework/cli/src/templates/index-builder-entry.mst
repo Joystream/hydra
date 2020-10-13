@@ -100,7 +100,8 @@ async function runProcessor() {
   await node.process({
     atBlock: atBlock && atBlock !== '0' ? Number.parseInt(atBlock) : undefined,
     processingPack: require('../../mappings'),
-    entities: [path.join(__dirname, '../graphql-server/src/modules/**/*.model.ts')]
+    entities: [path.join(__dirname, '../graphql-server/src/modules/**/*.model.ts')],
+    indexerEndpointURL: process.env.INDEXER_ENDPOINT_URL
   });
 }
 
