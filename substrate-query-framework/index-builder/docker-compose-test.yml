@@ -1,32 +1,22 @@
 version: "3"
 
 services:
-  test:
-    image: node:12-alpine
-    working_dir: /indexer-builder
-    environment: 
-      - TYPEORM_HOST=db
-      - DB_HOST=db
-      - PGHOST=db
-      - REDIS_URI=redis://redis:6379/0
-    volumes:
-      - .:/indexer-builder
-    command:
-      sh -c "yarn && yarn build && yarn i-test-local"
-    depends_on: 
-      - redis
-      - db
+  substrate:
+    image: paritytech/substrate-playground-template-node-template:sha-7212614
+    ports:
+      - "9944:9944"
+    command: ["./target/release/node-template", "--dev", "--tmp", "--ws-external"]
   
   redis:
     image: redis:6.0-alpine
     ports:
-      - "6379"
+      - "6379:6379"
 
   db:
     image: postgres:12
     restart: always
     ports:
-      - "5432"
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: test
