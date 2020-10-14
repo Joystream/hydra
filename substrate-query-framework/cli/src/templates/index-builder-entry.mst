@@ -111,13 +111,14 @@ async function runIndexer() {
   await node.index({
     wsProviderURI: process.env.WS_PROVIDER_ENDPOINT_URI || '',
     atBlock: atBlock && atBlock !== '0' ? Number.parseInt(atBlock) : undefined,
+    types: process.env.TYPES_JSON ? require(process.env.TYPES_JSON) as Record<string, Record<string, string>> : {},
     {{#typeRegistrator}}typeRegistrator: {{typeRegistrator}} {{/typeRegistrator}}
   });
 }
 
 async function runMigrations() {
   logger.info(`Running migrations`);
-  await new QueryNodeManager().migrate();
+  await QueryNodeManager.migrate();
   // TODO: here should be TypeORM migrations...
 }
 
