@@ -7,6 +7,7 @@ import { getTemplatePath } from '../utils/utils';
 import Mustache = require('mustache');
 import dotenv = require('dotenv');
 import execa = require('execa');
+import glob = require('glob');
 
 const DEFAULT_WS_API_ENDPOINT = 'wss://kusama-rpc.polkadot.io/';
 
@@ -64,22 +65,10 @@ export default class Scaffold extends Command {
 
     const projectName = (await cli.prompt('Enter your project name', { required: true })) as string;
     ctx = { ...ctx, projectName };
-
-    const wsProviderUrl = (await cli.prompt('Substrate WS provider endpoint', {
-      default: DEFAULT_WS_API_ENDPOINT,
-    })) as string;
-
-    ctx = { ...ctx, wsProviderUrl };
     
-    ctx = await this.promptCustomTypes(ctx);
-
-    const blockHeight = (await cli.prompt('Start block height', { default: '0' })) as string;
-    ctx = { ...ctx, blockHeight };
-
-    if (isNaN(parseInt(blockHeight))) {
-      throw new Error('Starting block height must be an integer');
-    }
-
+    ctx = { ...ctx, ... await this.promptIndexerEnvs(ctx) };
+    ctx = { ...ctx, ... await this.promptProcessorEnvs(ctx) };
+   
     const dbName = (await cli.prompt('Database name', { default: projectName })) as string;
     ctx = { ...ctx, dbName };
     const dbHost = (await cli.prompt('Database host', { default: 'localhost' })) as string;
@@ -90,11 +79,52 @@ export default class Scaffold extends Command {
     ctx = { ...ctx, dbUser };
     const dbPassword = (await cli.prompt('Database user password', { type: 'mask', default: 'postgres' })) as string;
     ctx = { ...ctx, dbPassword };
-    const appPort = (await cli.prompt('GraphQL server port', { default: '4000' })) as string;
-    ctx = { ...ctx, appPort };
+  
     const template = await fs.readFile(getTemplatePath('scaffold/.env'), 'utf-8');
 
     return Mustache.render(template, ctx);
+  }
+
+  async promptProcessorEnvs(ctx: Record<string, string>): Promise<Record<string, string>> {
+    const proceed = await cli.confirm('Are you going to run an mappings processor?')
+    if (!proceed) {
+      return ctx;
+    }
+    const indexerUrl = (await cli.prompt('Provide an indexer GraphQL API endpoint to source events from', {
+      default: 'https://hakusama.joystream.app/graphql',
+    })) as string;
+    ctx = { ...ctx, indexerUrl };
+
+    const appPort = (await cli.prompt('Processor GraphQL server port', { default: '4000' })) as string;
+    ctx = { ...ctx, appPort };
+
+    return ctx;
+  }
+
+  async promptIndexerEnvs(ctx: Record<string, string>): Promise<Record<string, string>> {
+    const proceed = await cli.confirm('Are you going to run an indexer?')
+    if (!proceed) {
+      return ctx;
+    }
+    let _ctx = { ...ctx };
+    const wsProviderUrl = (await cli.prompt('Substrate WS provider endpoint', {
+      default: DEFAULT_WS_API_ENDPOINT,
+    })) as string;
+
+    _ctx = { ..._ctx, wsProviderUrl };
+
+    const blockHeight = (await cli.prompt('What is the block height the indexer should start from?', { default: '0' })) as string;
+    if (isNaN(parseInt(blockHeight))) {
+      throw new Error('Starting block height must be an integer');
+    }
+    _ctx = { ..._ctx, blockHeight };
+
+    const redisUri = (await cli.prompt('Please provide a Redis instance connection string', { default: 'redis://localhost:6379/0' })) as string;
+    _ctx = { ..._ctx, redisUri };
+    
+    _ctx = await this.promptCustomTypes(_ctx);
+
+    return _ctx
   }
 
   async promptCustomTypes(ctx: Record<string, string>): Promise<Record<string, string>> {
@@ -111,11 +141,22 @@ export default class Scaffold extends Command {
     return _ctx;
   }
 
-  // For now, we simply copy the hardcoded templates
+  // For now, we simply copy the hardcoded templates from the mappings dir
   async setupMappings(): Promise<void> {
     await fs.ensureDir('mappings');
-    await utils.copyTemplateToCWD('scaffold/mappings/index.ts', path.join('mappings', 'index.ts'));
-    await utils.copyTemplateToCWD('scaffold/mappings/proposal.ts', path.join('mappings', 'proposal.ts'));
+    const mappingFiles = glob.sync(path.join(__dirname,'..','/templates/scaffold/mappings/**/*.ts'))
+    // TODO: make this generic and move to utils
+    for (const f of mappingFiles) {
+      const pathParts = f.split(path.sep);
+      // remove the trailing parts of the path up to ./scaffold
+      let topDir = pathParts.shift();
+      while (topDir !== "scaffold") {
+        topDir = pathParts.shift();
+      }
+      const targetDir = path.join(...pathParts)
+
+      await utils.copyTemplateToCWD(path.join('scaffold', targetDir), targetDir);
+    }
   }
 
   async setupDocker(): Promise<void> {

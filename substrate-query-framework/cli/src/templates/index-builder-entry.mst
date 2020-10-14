@@ -1,8 +1,8 @@
-import "reflect-metadata";
 import * as dotenv from "dotenv";
 import * as chalk from "chalk";
 import * as figlet from "figlet";
 import * as commander from "commander";
+import * as path from 'path';
 import { configure, getLogger } from "log4js";
 
 {{#typeRegistrator}}
@@ -11,8 +11,6 @@ import { {{typeRegistrator}} } from '{{{packageName}}}';
 
 import {
   QueryNodeManager,
-  BootstrapPack,
-  BootstrapFunc,
   DatabaseManager,
   SubstrateEvent,
 } from '@dzlzv/hydra-indexer-lib/lib';
@@ -21,43 +19,6 @@ import {
 export { DatabaseManager as DB, getLogger, SubstrateEvent };
 
 const logger = getLogger();
-
-function getProcessingPack() {
-  const handlers = require("../../mappings");
-
-  let processingPack: { [key: string]: any } = {};
-
-  Object.keys(handlers)
-    .filter((handler) => handler.startsWith("handle"))
-    .map((handler: string) => {
-      let eventName = handler.replace("handle", "");
-      processingPack[eventName] = handlers[handler];
-    });
-  return processingPack;
-}
-
-function getBootstrapPack() {
-  const bootstrapPack: BootstrapPack = { pack: [] };
-  if (!process.env.BOOTSTRAP_PACK_LOCATION) {
-    // TODO: very basic, we should read form the config file
-    throw new Error(`No boostrap location found. 
-Please set BOOTSTRAP_FILE_LOCATION environment variable`);
-  }
-  let handlers: { [key: string]: BootstrapFunc } = {};
-  try {
-    handlers = require(process.env.BOOTSTRAP_PACK_LOCATION);
-  } catch (e) {
-    throw new Error(
-      `Cannot load bootstrap mappings from ${process.env.BOOTSTRAP_FILE_LOCATION}: ${e}`
-    );
-  }
-
-  Object.keys(handlers)
-    .filter((handler) => handler.startsWith("boot"))
-    .map((handler: string) => bootstrapPack.pack.push(handlers[handler]));
-
-  return bootstrapPack;
-}
 
 const withErrors = (command: (...args: any[]) => Promise<void>) => {
   return async (...args: any[])=> {
@@ -88,11 +49,6 @@ function main(): commander.Command {
     .description("{{projectName}} Indexer");
 
   program
-    .command('bootstrap')
-    .description('Bootstrap the model with boot* handlers')
-    .action(withErrors(withEnvs(runBootstrap)));  
-
-  program
     .command('index')
     .option('-h, --height', 'starting block height')
     .option('-e, --env <file>', '.env file location', '../../.env')
@@ -118,9 +74,6 @@ function main(): commander.Command {
 }
 
 function setUp(opts: any) {
-  if (opts.bootstrap) {
-    process.env.QUERY_NODE_BOOTSTRAP_DB = "true";
-  }
 
   // dotenv config
   dotenv.config(); 
@@ -141,23 +94,13 @@ function setUp(opts: any) {
   }
 }
 
-async function runBootstrap() {
-  const node = new QueryNodeManager();
-  await node.bootstrap({
-    wsProviderURI: process.env.WS_PROVIDER_ENDPOINT_URI || '',
-    processingPack: getBootstrapPack(),
-    {{#typeRegistrator}}typeRegistrator: {{typeRegistrator}} {{/typeRegistrator}}
-  });
-
-  logger.info("Bootstrap done");
-}
-
 async function runProcessor() {
   const node = new QueryNodeManager();
   const atBlock = process.env.BLOCK_HEIGHT;
   await node.process({
     atBlock: atBlock && atBlock !== '0' ? Number.parseInt(atBlock) : undefined,
-    processingPack: getProcessingPack(),
+    processingPack: require('../../mappings'),
+    entities: [path.join(__dirname, '../graphql-server/src/modules/**/*.model.ts')]
   });
 }
 
