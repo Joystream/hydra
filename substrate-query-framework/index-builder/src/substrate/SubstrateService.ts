@@ -19,7 +19,6 @@ import {
   SUBSTRATE_API_TIMEOUT,
 } from '../indexer/indexer-consts'
 import { Inject, Service } from 'typedi'
-import { ProviderInterfaceEmitted } from '@polkadot/rpc-provider/types'
 
 const debug = Debug('index-builder:producer')
 

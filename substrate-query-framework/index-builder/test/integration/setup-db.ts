@@ -2,8 +2,7 @@ import * as dotenv from 'dotenv'
 // we should set env variables before all other imports to avoid config errors or warthog caused by DI
 dotenv.config({ path: './test/.env' })
 import { createDb, dropDb } from '../utils'
-import { QueryNodeManager, QueryNodeState } from '../../src'
-import { before, after } from 'mocha'
+import { QueryNodeManager } from '../../src'
 import { createDBConnection } from '../../src/db/helper'
 import * as Redis from 'ioredis'
 

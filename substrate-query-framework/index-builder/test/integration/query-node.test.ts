@@ -1,9 +1,7 @@
 import { expect } from 'chai'
 import Container from 'typedi'
-import { QueryNode, QueryNodeManager, QueryNodeState } from '../../src'
-import { logError } from '../../src/utils/errors'
-import { sleep, waitFor } from '../../src/utils/wait-for'
-import { clearRedis } from './setup-db'
+import { QueryNode, QueryNodeState } from '../../src'
+import { sleep } from '../../src/utils/wait-for'
 
 describe('QueryNode', () => {
   before(async () => {
@@ -19,12 +17,8 @@ describe('QueryNode', () => {
     expect(node.api, 'Api should be initialized').to.not.be.undefined
     expect(node.indexBuilder, 'IndexBuilder should be initialized').to.not.be
       .undefined
-  })
 
-  it('It should start and stop', async () => {
-    const node = Container.get<QueryNode>('QueryNode')
-
-    Promise.race([node.start(), sleep(100)])
+    await Promise.race([node.start(), sleep(100)])
 
     expect(node.state).to.be.eq(QueryNodeState.STARTED, 'Should be started')
 

@@ -1,8 +1,7 @@
 // @ts-check
 import { ApiPromise, WsProvider /*RuntimeVersion*/ } from '@polkadot/api'
-import { ProviderInterfaceEmitted } from '@polkadot/rpc-provider/types'
 
-import { makeSubstrateService, IndexBuilder } from '..'
+import { IndexBuilder } from '..'
 import { IndexerOptions } from '.'
 import Debug from 'debug'
 
@@ -10,11 +9,8 @@ import Container, { Inject, Service } from 'typedi'
 import registry from '../substrate/typeRegistry'
 import typesSpec from '../substrate/typesSpec'
 
-import { RedisRelayer } from '../indexer/RedisRelayer'
 import { RedisClientFactory } from '../redis/RedisClientFactory'
-import { logError } from '../utils/errors'
 import { waitFor } from '../utils/wait-for'
-import { trimStart } from 'lodash'
 
 const debug = Debug('index-builder:query-node')
 
@@ -43,7 +39,7 @@ export class QueryNode {
   @Inject('IndexerOptions')
   readonly indexerOptions!: IndexerOptions
 
-  private constructor(atBlock?: number) {
+  private constructor() {
     this._state = QueryNodeState.NOT_STARTED
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
@@ -70,7 +66,7 @@ export class QueryNode {
   static async createApi(
     wsProviderURI: string,
     types: Record<string, Record<string, string>> = {}
-  ) {
+  ): Promise<void> {
     const provider = new WsProvider(wsProviderURI)
 
     const names = Object.keys(types)

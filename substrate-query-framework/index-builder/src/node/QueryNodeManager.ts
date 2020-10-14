@@ -1,22 +1,14 @@
-import { QueryNode, QueryNodeState } from '.'
-import { Bootstrapper } from '../bootstrap'
+import { QueryNode } from '.'
 import { MappingsProcessor } from '../processor/MappingsProcessor'
-import {
-  IndexerOptions,
-  BootstrapOptions,
-  ProcessorOptions,
-} from './QueryNodeStartOptions'
+import { IndexerOptions, ProcessorOptions } from './QueryNodeStartOptions'
 import { createDBConnection } from '../db/helper'
 import { Connection, getConnection } from 'typeorm'
 import Debug from 'debug'
-import Container, { Service } from 'typedi'
+import Container from 'typedi'
 import { logError } from '../utils/errors'
-import { RedisClientFactory } from '../redis/RedisClientFactory'
-import { ApiPromise } from '@polkadot/api'
-import { threadId } from 'worker_threads'
-import { waitFor } from '../utils/wait-for'
 import { log } from 'console'
 import { ISubstrateService } from '../substrate'
+import { RedisClientFactory } from '../redis'
 
 const debug = Debug('index-builder:manager')
 
@@ -37,6 +29,7 @@ export class QueryNodeManager {
       }`
     )
     // Hook into application
+    // eslint-disable-next-line
     process.on('exit', () =>
       QueryNodeManager.cleanUp().catch((e) => log(`${logError(e)}`))
     )
@@ -95,9 +88,7 @@ export class QueryNodeManager {
       await Container.get<ISubstrateService>('SubstrateService').stop()
     }
     if (Container.has('RedisClientFactory')) {
-      const clientFactory = Container.get<RedisClientFactory>(
-        'RedisClientFactory'
-      ).stop()
+      Container.get<RedisClientFactory>('RedisClientFactory').stop()
     }
     try {
       const connection = getConnection()

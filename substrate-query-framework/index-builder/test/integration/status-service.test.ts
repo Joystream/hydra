@@ -68,7 +68,8 @@ describe('IndexerStatusService', () => {
   })
 
   afterEach(async () => {
-    await indexBuilder.stop()
+    console.log('Cleaning up')
+    await QueryNodeManager.cleanUp()
   })
 
   it('should properly update indexer heads', async () => {
