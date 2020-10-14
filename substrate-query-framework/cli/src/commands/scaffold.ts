@@ -44,7 +44,7 @@ export default class Scaffold extends Command {
     this.log('Your settings have been saved to .env, feel free to edit');
 
     cli.action.start('Scaffolding');
-    
+
     if (flags.mappings) {
       await this.setupMappings();
     }
@@ -65,10 +65,10 @@ export default class Scaffold extends Command {
 
     const projectName = (await cli.prompt('Enter your project name', { required: true })) as string;
     ctx = { ...ctx, projectName };
-    
-    ctx = { ...ctx, ... await this.promptIndexerEnvs(ctx) };
-    ctx = { ...ctx, ... await this.promptProcessorEnvs(ctx) };
-   
+
+    ctx = { ...ctx, ...(await this.promptIndexerEnvs(ctx)) };
+    ctx = { ...ctx, ...(await this.promptProcessorEnvs(ctx)) };
+
     const dbName = (await cli.prompt('Database name', { default: projectName })) as string;
     ctx = { ...ctx, dbName };
     const dbHost = (await cli.prompt('Database host', { default: 'localhost' })) as string;
@@ -79,14 +79,14 @@ export default class Scaffold extends Command {
     ctx = { ...ctx, dbUser };
     const dbPassword = (await cli.prompt('Database user password', { type: 'mask', default: 'postgres' })) as string;
     ctx = { ...ctx, dbPassword };
-  
+
     const template = await fs.readFile(getTemplatePath('scaffold/.env'), 'utf-8');
 
     return Mustache.render(template, ctx);
   }
 
   async promptProcessorEnvs(ctx: Record<string, string>): Promise<Record<string, string>> {
-    const proceed = await cli.confirm('Are you going to run an mappings processor?')
+    const proceed = await cli.confirm('Are you going to run an mappings processor?');
     if (!proceed) {
       return ctx;
     }
@@ -102,7 +102,7 @@ export default class Scaffold extends Command {
   }
 
   async promptIndexerEnvs(ctx: Record<string, string>): Promise<Record<string, string>> {
-    const proceed = await cli.confirm('Are you going to run an indexer?')
+    const proceed = await cli.confirm('Are you going to run an indexer?');
     if (!proceed) {
       return ctx;
     }
@@ -113,31 +113,35 @@ export default class Scaffold extends Command {
 
     _ctx = { ..._ctx, wsProviderUrl };
 
-    const blockHeight = (await cli.prompt('What is the block height the indexer should start from?', { default: '0' })) as string;
+    const blockHeight = (await cli.prompt('What is the block height the indexer should start from?', {
+      default: '0',
+    })) as string;
     if (isNaN(parseInt(blockHeight))) {
       throw new Error('Starting block height must be an integer');
     }
     _ctx = { ..._ctx, blockHeight };
 
-    const redisUri = (await cli.prompt('Please provide a Redis instance connection string', { default: 'redis://localhost:6379/0' })) as string;
+    const redisUri = (await cli.prompt('Please provide a Redis instance connection string', {
+      default: 'redis://localhost:6379/0',
+    })) as string;
     _ctx = { ..._ctx, redisUri };
-    
+
     _ctx = await this.promptCustomTypes(_ctx);
 
-    return _ctx
+    return _ctx;
   }
 
   async promptCustomTypes(ctx: Record<string, string>): Promise<Record<string, string>> {
-    const proceed = await cli.confirm('Do you have a custom type library?')
+    const proceed = await cli.confirm('Do you have a custom types?');
     if (!proceed) {
       return ctx;
     }
-    const typeLib = (await cli.prompt('Please provide type library', { default: '@polkadot/types' })) as string;
-    let _ctx: Record<string, string> = { ...ctx, typeLib };
-    const typeVer = (await cli.prompt('Please provide library version')) as string;
-    _ctx = { ..._ctx, typeVer };
-    const typeFun = (await cli.prompt('What is the function name for type registration ')) as string;
-    _ctx = { ..._ctx, typeFun };
+    const typesJSON = (await cli.prompt(
+      'Please provide path to type definitions in JSON format relative to ./generated/indexer',
+      { default: '../../typedefs.json' }
+    )) as string;
+    let _ctx: Record<string, string> = { ...ctx, typesJSON };
+
     return _ctx;
   }
 
@@ -146,16 +150,16 @@ export default class Scaffold extends Command {
     await utils.copyTemplateToCWD('scaffold/schema.graphql', 'schema.graphql');
 
     await fs.ensureDir('mappings');
-    const mappingFiles = glob.sync(path.join(__dirname,'..','/templates/scaffold/mappings/**/*.ts'))
+    const mappingFiles = glob.sync(path.join(__dirname, '..', '/templates/scaffold/mappings/**/*.ts'));
     // TODO: make this generic and move to utils
     for (const f of mappingFiles) {
       const pathParts = f.split(path.sep);
       // remove the trailing parts of the path up to ./scaffold
       let topDir = pathParts.shift();
-      while (topDir !== "scaffold") {
+      while (topDir !== 'scaffold') {
         topDir = pathParts.shift();
       }
-      const targetDir = path.join(...pathParts)
+      const targetDir = path.join(...pathParts);
 
       await utils.copyTemplateToCWD(path.join('scaffold', targetDir), targetDir);
     }
