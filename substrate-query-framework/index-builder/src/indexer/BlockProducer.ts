@@ -65,13 +65,16 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
   }
 
   async stop(): Promise<void> {
-    if (!this._started) throw new Error(`Cannot stop when not already started.`);
-
+    if (!this._started) {
+      debug('Block producer is not started')
+      return
+    }
+    
     // THIS IS VERY CRUDE, NEED TO MANAGE LOTS OF STUFF HERE!
     if (this._newHeadsUnsubscriber) {
       (await this._newHeadsUnsubscriber)();
     }
-    
+    debug('Block producer has been stopped')
     this._started = false;
   }
 
