@@ -13,10 +13,12 @@ describe('ModelRenderer', () => {
   let warthogModel: WarthogModel;
   let modelTemplate: string;
   let enumCtxProvider: EnumContextProvider;
+  let resolverTemplate: string;
 
   before(() => {
     // set timestamp in the context to make the output predictable
     modelTemplate = fs.readFileSync('./src/templates/entities/model.ts.mst', 'utf-8');
+    resolverTemplate = fs.readFileSync('./src/templates/entities/resolver.ts.mst', 'utf-8');
   });
 
   beforeEach(() => {
@@ -329,5 +331,24 @@ describe('ModelRenderer', () => {
       expect(rendered).to.include(
         `dbValue !== undefined && dbValue !== null && dbValue.length > 0 ? new BN(dbValue, 10) : undefined`
       );
+  });
+
+  it('Should add required object definations for Pagination', () => {
+    const model = fromStringSchema(`
+    type Member @entity {
+      id: ID!
+      handle: String!
+    }
+    `);
+
+    generator = new ModelRenderer(model, model.lookupEntity('Member'), enumCtxProvider);
+    const rendered = generator.render(resolverTemplate);
+
+    expect(rendered).to.include(`MemberEdge`);
+    expect(rendered).to.include(`MemberConnection`);
+    expect(rendered).to.include(`ConnectionPageInputOptions`);
+    expect(rendered).to.include(`MemberConnectionWhereArgs`);
+    expect(rendered).to.include(`memberConnection`);
+    expect(rendered).to.include(`findConnection<MemberWhereInput>`);
   });
 });
