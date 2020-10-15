@@ -1,5 +1,10 @@
 # Changelog of major updates
 
+## 0.0.16-alpha
+
+- Indexer supports for custom substrate types
+- Substrate API stability improvements 
+
 ## 0.0.15-alpha.2
 
 - Reworked indexer head updates by IndexerStatusService to make it more stable against Redis outages. 
