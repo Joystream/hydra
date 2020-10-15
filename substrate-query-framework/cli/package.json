@@ -1,12 +1,12 @@
 {
   "name": "@dzlzv/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
   "bin": {
     "hydra-cli": "./bin/run"
   },
-  "bugs": "https://github.com/joystream/joystream/joystream-query-node/cli/issues",
+  "bugs": "https://github.com/Joystream/hydra/issues",
   "dependencies": {
     "@oclif/command": "^1.5.20",
     "@oclif/config": "^1",
@@ -63,7 +63,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/joystream/joystream/query-node/substrate-query-framework/cli",
+  "homepage": "https://www.joystream.org/hydra/",
   "keywords": [
     "oclif"
   ],
@@ -77,7 +77,7 @@
       "@oclif/errors"
     ]
   },
-  "repository": "git@github.com:Joystream/joystream.git",
+  "repository": "git@github.com:Joystream/hydra.git",
   "scripts": {
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "postpack": "rm -f oclif.manifest.json",

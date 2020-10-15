@@ -132,12 +132,12 @@ export default class Scaffold extends Command {
   }
 
   async promptCustomTypes(ctx: Record<string, string>): Promise<Record<string, string>> {
-    const proceed = await cli.confirm('Do you have a custom types?');
+    const proceed = await cli.confirm('Are there any non-standard types or modules in the substrate runtime?');
     if (!proceed) {
       return ctx;
     }
     const typesJSON = (await cli.prompt(
-      'Please provide path to type definitions in JSON format relative to ./generated/indexer',
+      'Please provide the localtion of the type definitions JSON, relative to ./generated/indexer',
       { default: '../../typedefs.json' }
     )) as string;
     let _ctx: Record<string, string> = { ...ctx, typesJSON };
