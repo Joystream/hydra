@@ -4,7 +4,8 @@ RUN mkdir -p /home/node/index-server && chown -R node:node /home/node/index-serv
 COPY --chown=node:node . /home/node/index-server/
 
 WORKDIR /home/node/index-server
-RUN yarn install
+RUN yarn
+RUN yarn codegen
+RUN yarn build:prod
 
-ENTRYPOINT ["yarn"]
-CMD ["start:dev"]
+CMD ["yarn", "start:prod"]

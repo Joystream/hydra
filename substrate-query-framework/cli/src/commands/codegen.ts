@@ -119,6 +119,8 @@ export default class Codegen extends Command {
             : `${process.env.TYPE_REGISTER_PACKAGE_NAME}`;
           await execa('yarn', ['add', `${lib}`]);
         }
+        const indexerLib = process.env.INDEXER_LIB || '@dzlzv/hydra-indexer-lib';
+        await execa('yarn', ['add', `${indexerLib}`]);
       },
     };
 

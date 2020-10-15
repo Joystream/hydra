@@ -34,7 +34,6 @@ export async function clearRedis(): Promise<void> {
   }
   const redis = new Redis(redisURL);
   await redis.flushall();
-
   await redis.quit();
 }
 

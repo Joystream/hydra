@@ -1,31 +1,17 @@
 FROM node:12-alpine 
 
-ARG NAME=hydra
-
 RUN mkdir -p /home/hydra-cli && chown -R node:node /home/hydra-cli
+RUN mkdir -p /home/hydra && chown -R node:node /home/hydra
+
 COPY --chown=node:node . /home/hydra-cli
 
 WORKDIR /home/hydra-cli
 RUN yarn && yarn build
 RUN yarn link
 
-RUN mkdir $NAME
-WORKDIR /home/hydra-cli/$NAME
+WORKDIR /home/hydra
 
-RUN hydra-cli scaffold -n $NAME
-RUN yarn codegen:all
+RUN hydra-cli scaffold -n hydra --no-mappings
 
-RUN yarn global add typescript
-RUN yarn global add ts-node
 
-RUN yarn install
-
-WORKDIR /home/hydra-cli/$NAME/generated/graphql-server
-RUN yarn install
-
-WORKDIR /home/hydra-cli/$NAME/generated/graphql-server
-RUN yarn install
-
-WORKDIR /home/hydra-cli/$NAME
-
-CMD ["yarn", "scaffold", "-n", "$NAME"]
+CMD ["yarn", "codegen:all"]
