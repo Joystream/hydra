@@ -81,7 +81,7 @@ $ yarn db:migrate
 ```
 to create the database and set up the db schemas \(if the database already exists, skip the first one\). 
 
-## Setting up and indexer
+## Setting up the indexer
 
 To run a self-hosted indexer, we need to set the indexer itself and the an GraphQL gateway which will expose for querying raw events and extrinsics from the chain. The setup requires botha a redis and a db instance and thus is more convenient to run with a docker-compose file:
 
@@ -102,7 +102,7 @@ If everything set up correctly, it should be possible to inspect the gateway at 
 
 ## Running the processor
 
-When the indexer gateway is available (either run locally or hosted elsewhere), the processor can be run againt it:
+When the indexer gateway is available (either locally or hosted elsewhere), the processor can be run againt it:
 
 ```
 $ docker-compose up -d processor
