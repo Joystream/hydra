@@ -13,7 +13,7 @@ import {
 } from 'type-graphql';
 import { Inject } from 'typedi';
 import { Min } from 'class-validator'
-import { Fields, StandardDeleteResponse, UserId, PageInfo } from 'warthog';
+import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields } from 'warthog';
 
 import {
   {{className}}CreateInput,
@@ -100,9 +100,7 @@ export class {{className}}Resolver {
     @Args() { where, orderBy, ...pageOptions }: {{className}}ConnectionWhereArgs,
     @RawFields() fields: Record<string, any>
   ): Promise<{{className}}Connection> {
-    if (fields.edges && fields.edges?.node && fields.edges?.node?.params) {
-      fields.edges.node.params = {} // treat params as a scalar
-    }
+    
     let result: any = {
       totalCount: 0,
       edges: [],

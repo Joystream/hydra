@@ -12,6 +12,8 @@ import Debug from 'debug';
 import { SourcesGenerator } from '../generate/SourcesGenerator';
 import Listr = require('listr');
 
+const FALLBACK_WARTHOG_LIB = 'https://github.com/metmirr/warthog/releases/download/v2.19/warthog-v2.19.tgz';
+
 const debug = Debug('qnode-cli:warthog-wrapper');
 
 export default class WarthogWrapper {
@@ -117,7 +119,6 @@ export default class WarthogWrapper {
 
     // Temporary tslib fix
     const pkgFile = JSON.parse(fs.readFileSync('package.json', 'utf8')) as Record<string, Record<string, unknown>>;
-    pkgFile.resolutions['tslib'] = '1.11.2';
     pkgFile.scripts['db:sync'] = 'SYNC=true WARTHOG_DB_SYNCHRONIZE=true ts-node --type-check src/index.ts';
 
     // Fix ts-node-dev error
@@ -125,7 +126,7 @@ export default class WarthogWrapper {
 
     // Node does not run the compiled code, so we use ts-node in production...
     pkgFile.scripts['start:prod'] = 'WARTHOG_ENV=production yarn dotenv:generate && ts-node src/index.ts';
-
+    pkgFile.dependencies['warthog'] = this.getWarthogDependecy();
     fs.writeFileSync('package.json', JSON.stringify(pkgFile, null, 2));
 
     //this.command.log('Installing graphql-server dependencies...');
@@ -138,6 +139,13 @@ export default class WarthogWrapper {
   async createDB(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await run(['db:create']);
+  }
+
+  getWarthogDependecy(): string {
+    /* eslint-disable */
+    const warthogPackageJson = require('warthog/package.json') as Record<string, unknown>;
+    // if there is a special 'hydra' property, use it as depenency, otherwise use hardcoded fallback
+    return (warthogPackageJson.hydra || FALLBACK_WARTHOG_LIB) as string;
   }
 
   /**
