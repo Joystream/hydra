@@ -6,6 +6,5 @@ COPY --chown=node:node . /home/node/index-server/
 WORKDIR /home/node/index-server
 RUN yarn
 RUN yarn codegen
-RUN yarn build:prod
 
-CMD ["yarn", "start:prod"]
+CMD ["yarn", "bootstrap:prod"]

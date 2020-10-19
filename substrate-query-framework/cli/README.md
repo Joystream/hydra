@@ -16,6 +16,16 @@ codegen   Generate a ready to run graphql server and block indexer
 preview   Preview the output schema served by the GraphQL server
 ```
 
+## Architecture overview
+
+A Hydra query node ingests substrate events in a multi-step pipeline which looks as follows:
+```
+Substrate Chain => Hydra Indexer => Indexer GraphQL gateway => Hydra Processor => Database => Query Node GraphQL endnpoint 
+```
+
+For popular chains the processor may connect to a publicly available Indexer endpoint (such as https://hakusama.joystream.app/graphql for Kusama), otherwise a self-hosted indexer should be run.
+
+
 ## Using Hydra CLI
 
 Using `npx`:
@@ -55,7 +65,7 @@ and answer the prompts. The scaffolder will generate the following files:
 └── schema.graphql
 ```
 
-By defualt the scaffolder generates mappings and a schema describing Kusama Treasury proposals. Generate the indexer and the server:
+By default the scaffolder generates mappings and a schema tracking Kusama transfers. Generate the indexer and the server:
 
 ```bash
 $ hydra-cli codegen
@@ -63,14 +73,14 @@ $ hydra-cli codegen
 
 The indexer and server files will be generated in `./generated/indexer` and `./generated/graphql-server` respectively.
 
-In order to run them, a Postges database should be up and running and accept connections. The credentials should be provided in `.env` file. By default, the scaffolder generates a database service `docker-compose.yml` with the credentials provided. Run
+In order to run them, a Postgres database should be up and running and accept connections. The credentials may be provided in `.env` file. By default, the scaffolder generates a database service `docker-compose.yml` with the same credentials via environment variables. Run
 
 ```bash
-$ yarn db:start
-$ yarn db:bootstrap
+$ yarn db:up
+$ yarn db:migrate
 ```
 
-to create the database and set up the schema \(if the database already exists, skip the first one\).
+to create the database and set up the db schemas \(if the database already exists, skip the first one\). 
 
 Now spin up the server and the indexer:
 
@@ -79,7 +89,7 @@ $ yarn indexer:start
 ```
 
 ```bash
-$ yarn server:start:dev
+$ yarn server:start:prod
 ```
 
 ### Generate Graphql Server and Block Indexer
