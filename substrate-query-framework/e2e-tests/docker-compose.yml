@@ -27,7 +27,7 @@ services:
       - TYPEORM_HOST=db
       - TYPEORM_PORT=5432
       - INDEXER_ENDPOINT_URL=http://indexer-api-server:4000/graphql
-      - PROCESSOR_POLL_INTERVAL=100 # refresh every second 
+      - PROCESSOR_POLL_INTERVAL=300 # refresh every second 
       - DEBUG= index-builder:*
     depends_on:
       - indexer-api-server
@@ -42,9 +42,10 @@ services:
       - TYPEORM_PASSWORD=postgres
       - TYPEORM_HOST=db
       - TYPEORM_PORT=5432
+      - NEW_BLOCK_TIMEOUT_SEC=150000
       - WS_PROVIDER_ENDPOINT_URI=ws://substrate:9944/
       - REDIS_URI=redis://redis:6379/0
-      - DEBUG= index-builder:*
+      - DEBUG=*
     command: ["yarn", "indexer:start"] 
     depends_on:
       - substrate

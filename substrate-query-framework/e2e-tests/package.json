@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "cd schema && docker build . -t hydra:${CLITAG:-latest}",
+    "build": "cd schema && docker build . -t hydra:${CLITAG:-latest} --no-cache",
     "db:migrate": "sh ./scripts/db.sh --db-name indexer-db --db-host db up  && sh ./scripts/db.sh --db-name processor-db --db-host db up",
     "db:drop": "sh ./scripts/db.sh --db-name indexer-db drop && sh ./scripts/db.sh --db-name processor-db drop",
     "db:up": "docker-compose up -d db",
@@ -15,7 +15,7 @@
     "reset": "yarn db:reset && yarn redis:reset",
     "pre-e2e-test": "CLITAG=${CLITAG:-latest} yarn db:setup && CLITAG=${CLITAG:-latest} docker-compose up -d",
     "post-e2e-test": "CLITAG=${CLITAG:-latest} docker-compose down",
-    "e2e-test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --file ./test/e2e/setup-e2e.ts \"test/e2e/**/*.test.ts\""
+    "e2e-test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --exit --file ./test/e2e/setup-e2e.ts \"test/e2e/**/*.test.ts\""
   },
   "dependencies": {
     "@dzlzv/hydra-indexer-lib": "^0.0.15-alpha.2",

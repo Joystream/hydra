@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request'
 import Container from 'typedi'
 
 const FIND_TRANSFER_BY_VALUE = `
-query FindTransferByValue($value: BigInt, $block: Int) {
+query FindTransferByValue($value: String, $block: Int) {
 	transfers(where: { value_eq: $value, block_eq: $block }) {
         value
         to
