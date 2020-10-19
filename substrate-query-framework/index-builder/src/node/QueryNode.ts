@@ -60,7 +60,7 @@ export class QueryNode {
 
     const redisURL = options.redisURI || process.env.REDIS_URI
     Container.set('RedisClientFactory', new RedisClientFactory(redisURL))
-    Container.get<RedisRelayer>('RedisRelayer')
+    Container.set('RedisRelayer', new RedisRelayer())
     return Container.get<QueryNode>('QueryNode')
   }
 
