@@ -3,6 +3,7 @@ FROM joystream/hydra-cli
 COPY schema.graphql /home/hydra
 COPY ./mappings /home/hydra/mappings
 COPY .env /home/hydra/.env
+ADD *.json /home/hydra/
 
 RUN yarn codegen:all
 
