@@ -17,7 +17,7 @@ export default class Scaffold extends Command {
   static flags = {
     projectName: flags.string({ char: 'n', description: 'Project name' }),
     wsProviderUrl: flags.string({
-      char: 'n',
+      char: 'w',
       description: 'Substrate WS provider endpoint',
       default: DEFAULT_WS_API_ENDPOINT,
     }),
