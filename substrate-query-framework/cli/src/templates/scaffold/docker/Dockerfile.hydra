@@ -1,4 +1,5 @@
-FROM joystream/hydra-cli
+ARG HYDRA_CLI_VERSION=latest
+FROM joystream/hydra-cli:${HYDRA_CLI_VERSION}
 
 COPY schema.graphql /home/hydra
 COPY ./mappings /home/hydra/mappings
