@@ -10,6 +10,7 @@ import execa = require('execa');
 import glob = require('glob');
 
 const DEFAULT_WS_API_ENDPOINT = 'wss://kusama-rpc.polkadot.io/';
+const DEFAULT_KUSAMA_INDEXER = 'https://kusama-indexer.joystream.app/graphql';
 
 export default class Scaffold extends Command {
   static description = `Starter kit: generates a directory layout and a sample schema file`;
@@ -91,7 +92,7 @@ export default class Scaffold extends Command {
       return ctx;
     }
     const indexerUrl = (await cli.prompt('Provide an indexer GraphQL API endpoint to source events from', {
-      default: 'https://hakusama.joystream.app/graphql',
+      default: DEFAULT_KUSAMA_INDEXER,
     })) as string;
     ctx = { ...ctx, indexerUrl };
 
