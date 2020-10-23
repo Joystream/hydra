@@ -65,7 +65,34 @@ and answer the prompts. The scaffolder will generate the following files:
 └── schema.graphql
 ```
 
-By default the scaffolder generates mappings and a schema tracking Kusama transfers. Generate the indexer and the server:
+By default the scaffolder generates mappings and a schema tracking Kusama transfers. 
+
+## Dockerized quickstart
+
+The easiest way to get the whole Hydra stack working is to build a `hydra-kit` Docker image. It is a one-size-fits-all tool to run
+a database migration, the indexer and the processor. 
+
+First, build `hydra-kit`:
+```bash
+$ yarn docker:build
+```
+
+Let's start the db and run the migrations. `hydra-kit` will connect to the network running the database container created by docker-compose.
+```bash
+$ yarn docker:db:up
+$ yarn docker:db:migration
+```
+
+Now everything is ready to run the whole stack locally:
+```
+$ yarn docker:up
+```
+
+After some warm-up time, the query node will be available at `localhost:8080` and the indexer gateway playground at `localhost:4000`
+
+## Local setup
+
+Generate the indexer and the server:
 
 ```bash
 $ hydra-cli codegen

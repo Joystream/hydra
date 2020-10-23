@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.0.16
+
+- Fixed duplicate flags in the scaffold
+- New docker targets for migrating the db from a docker container
+
 ## 0.0.15
 
 - Updated docker-compose and docker templates
