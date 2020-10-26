@@ -9,7 +9,10 @@ import { waitFor, retry, withTimeout } from '../utils/wait-for'
 import { ConstantBackOffStrategy } from '../utils/BackOffStategy'
 import { IBlockProducer } from './IBlockProducer'
 import { Service, Inject } from 'typedi'
-import { BLOCK_PRODUCER_FETCH_RETRIES, NEW_BLOCK_TIMEOUT_MS } from './indexer-consts'
+import {
+  BLOCK_PRODUCER_FETCH_RETRIES,
+  NEW_BLOCK_TIMEOUT_MS,
+} from './indexer-consts'
 
 const DEBUG_TOPIC = 'index-builder:producer'
 
@@ -75,7 +78,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
 
     // THIS IS VERY CRUDE, NEED TO MANAGE LOTS OF STUFF HERE!
     if (this._newHeadsUnsubscriber) {
-      ;(await this._newHeadsUnsubscriber)()
+      (await this._newHeadsUnsubscriber)()
     }
     debug('Block producer has been stopped')
     this._started = false

@@ -9,7 +9,6 @@ import {
 import { AnyJson, AnyJsonField } from '../interfaces/json-types'
 import { formatEventId, IQueryEvent } from '..'
 import * as BN from 'bn.js'
-import Debug from 'debug'
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity'
 import { EventParam } from '../model/substrate-interfaces'
 import { AbstractWarthogModel } from './AbstractWarthogModel'

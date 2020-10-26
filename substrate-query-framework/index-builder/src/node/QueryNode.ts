@@ -76,7 +76,7 @@ export class QueryNode {
     names.length && debug(`Injected types: ${names.join(', ')}`)
 
     // Create the API and wait until ready
-    const api = retry(
+    const api = await retry(
       () =>
         new ApiPromise({ provider, registry, types, typesSpec }).isReadyOrError,
       SUBSTRATE_API_CALL_RETRIES

@@ -1,8 +1,12 @@
 # Changelog of major updates
 
+## 0.0.17-alpha
+
+- Bugfixes and stability improvements
+
 ## 0.0.16-alpha
 
-- Indexer supports for custom substrate types
+- Indexer supports custom substrate types
 - Substrate API stability improvements 
 
 ## 0.0.15-alpha.2

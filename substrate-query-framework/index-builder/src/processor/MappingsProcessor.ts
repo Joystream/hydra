@@ -1,7 +1,6 @@
 import { makeDatabaseManager, SubstrateEvent } from '..'
 import Debug from 'debug'
 import { doInTransaction } from '../db/helper'
-import { numberEnv } from '../utils/env-flags'
 import { ProcessorOptions } from '../node'
 import { Inject, Service } from 'typedi'
 import { IProcessorSource, GraphQLSource, HandlerLookupService } from '.'
