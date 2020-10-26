@@ -10,7 +10,8 @@ import registry from '../substrate/typeRegistry'
 import typesSpec from '../substrate/typesSpec'
 
 import { RedisClientFactory } from '../redis/RedisClientFactory'
-import { waitFor } from '../utils/wait-for'
+import { retry, waitFor } from '../utils/wait-for'
+import { SUBSTRATE_API_CALL_RETRIES } from '../indexer/indexer-consts'
 
 const debug = Debug('index-builder:query-node')
 
@@ -74,8 +75,11 @@ export class QueryNode {
     names.length && debug(`Injected types: ${names.join(', ')}`)
 
     // Create the API and wait until ready
-    const apiPromise = new ApiPromise({ provider, registry, types, typesSpec })
-    const api = await apiPromise.isReadyOrError
+    const api = retry(
+      () =>
+        new ApiPromise({ provider, registry, types, typesSpec }).isReadyOrError,
+      SUBSTRATE_API_CALL_RETRIES
+    )
 
     debug(`Api is ready`)
 
