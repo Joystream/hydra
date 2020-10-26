@@ -75,6 +75,10 @@ export class MappingsProcessor {
     }
 
     this._started = true
+    await waitFor(() => {
+      debug(`Waiting for the indexer head to be initialized`)
+      return this.indexerHead >= 0
+    })
     await this.processingLoop()
   }
 

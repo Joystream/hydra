@@ -19,7 +19,7 @@ export class IndexerStatusService {
   async currentIndexerHead(): Promise<number> {
     const head = await this.redisClient.get(INDEXER_HEAD_BLOCK)
     if (head == null) {
-      throw new Error(`Current indexer head block is not yet published`)
+      return -1
     }
     return Number.parseInt(head as string)
   }
