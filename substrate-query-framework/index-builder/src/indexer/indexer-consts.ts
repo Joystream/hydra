@@ -22,4 +22,5 @@ export const SUBSTRATE_API_CALL_RETRIES =
 // If the block producer does not recieve a new block within this time limit,
 // panic and thow an error. This is needed to prevent the situation when the
 // API is disconnected yet no error is thrown, with the block producer stuck in the waiting loop
-export const NEW_BLOCK_TIMEOUT_SEC = 60 * 5 // 5 minutes
+export const NEW_BLOCK_TIMEOUT_MS =
+  numberEnv('NEW_BLOCK_TIMEOUT_MS') || 60 * 10 * 1000 // 10 minutes

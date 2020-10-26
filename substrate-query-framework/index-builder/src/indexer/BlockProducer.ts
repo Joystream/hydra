@@ -9,7 +9,7 @@ import { waitFor, retry, withTimeout } from '../utils/wait-for'
 import { ConstantBackOffStrategy } from '../utils/BackOffStategy'
 import { IBlockProducer } from './IBlockProducer'
 import { Service, Inject } from 'typedi'
-import { BLOCK_PRODUCER_FETCH_RETRIES, NEW_BLOCK_TIMEOUT_SEC } from './indexer-consts'
+import { BLOCK_PRODUCER_FETCH_RETRIES, NEW_BLOCK_TIMEOUT_MS } from './indexer-consts'
 
 const DEBUG_TOPIC = 'index-builder:producer'
 
@@ -164,8 +164,8 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
         //exit condition
         () => !this._started
       ),
-      `Timed out: no block has been produced within last ${NEW_BLOCK_TIMEOUT_SEC} seconds`,
-      NEW_BLOCK_TIMEOUT_SEC
+      `Timed out: no block has been produced within last ${NEW_BLOCK_TIMEOUT_MS} seconds`,
+      NEW_BLOCK_TIMEOUT_MS
     )
   }
 

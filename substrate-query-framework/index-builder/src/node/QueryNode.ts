@@ -12,6 +12,7 @@ import typesSpec from '../substrate/typesSpec'
 import { RedisClientFactory } from '../redis/RedisClientFactory'
 import { retry, waitFor } from '../utils/wait-for'
 import { SUBSTRATE_API_CALL_RETRIES } from '../indexer/indexer-consts'
+import { RedisRelayer } from '../indexer/RedisRelayer'
 
 const debug = Debug('index-builder:query-node')
 
@@ -60,7 +61,7 @@ export class QueryNode {
 
     const redisURL = options.redisURI || process.env.REDIS_URI
     Container.set('RedisClientFactory', new RedisClientFactory(redisURL))
-
+    Container.set('RedisRelayer', new RedisRelayer())
     return Container.get<QueryNode>('QueryNode')
   }
 
