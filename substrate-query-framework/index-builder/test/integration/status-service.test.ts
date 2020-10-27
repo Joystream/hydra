@@ -14,11 +14,14 @@ import { RedisClientFactory } from '../../src/redis/RedisClientFactory'
 import { blockPayload, queryEventBlock } from '../fixtures/mock-factory'
 import { EVENT_TOTAL } from '../../src/indexer/redis-keys'
 import { clearRedis, resetDb } from './setup-db'
+import { EventEmitter } from 'events'
 
 const debug = Debug('index-builder:status-service-test')
 const FINAL_CHAIN_HEIGHT = 7
 
-class MockBlockProducer implements IBlockProducer<QueryEventBlock> {
+class MockBlockProducer
+  extends EventEmitter
+  implements IBlockProducer<QueryEventBlock> {
   private height = 0
 
   async fetchBlock(height: number): Promise<QueryEventBlock> {
