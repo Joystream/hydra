@@ -27,9 +27,15 @@ function addOne2One(rel: EntityRelationship): void {
   const { field, relatedField } = rel
 
   rel.field.relation = makeRelation('oto', field.type, relatedField.name)
-  rel.field.relation.joinColumn = true
-
   rel.relatedField.relation = makeRelation('oto', relatedField.type, field.name)
+
+  // Decide to hold relationship on which side, joincolumn is the side that relation
+  // will live
+  if (rel.field.derivedFrom) {
+    rel.relatedField.relation.joinColumn = true
+  } else {
+    rel.field.relation.joinColumn = true
+  }
 }
 
 // Typeorm requires to have ManyToOne field on the related object if the relation is OneToMany
