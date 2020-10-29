@@ -15,7 +15,11 @@ services:
   
   # Run after Run after `yarn codegen:server` and `yarn docker:server:build`
   graphql-server:
-    image: hydra-graphql-server:latest
+    image: hydra-graphql-server
+    restart: unless-stopped
+    build: 
+      dockerfile: docker/Dockerfile.hydra
+      context: ./
     env_file:
       - .env
     environment:
@@ -24,16 +28,65 @@ services:
       - "8080:${GRAPHQL_SERVER_PORT}"
     depends_on: 
       - db
-    command: >
-      sh -c "yarn run config && yarn start:dev"
+    command: ["yarn", "server:start:prod"]
+
+
+  processor:
+    image: hydra-indexer
+    restart: unless-stopped
+    build: 
+      dockerfile: docker/Dockerfile.hydra
+      context: ./
+    env_file:
+      - .env
+    environment:
+      - INDEXER_ENDPOINT_URL=http://indexer-api-gateway:4000/graphql
+      - DB_HOST=db
+      - TYPEORM_HOST=db
+      - DEBUG= index-builder:*
+    depends_on:
+      - indexer-api-gateway
+    command: ["yarn", "processor:start"]
   
   # Run after `yarn codegen:indexer` and `yarn docker:indexer:build`
   indexer:
-    image: hydra-indexer:latest
+    image: hydra-indexer
+    restart: unless-stopped
+    build: 
+      dockerfile: docker/Dockerfile.hydra
+      context: ./
     env_file:
       - .env 
     environment:
       - TYPEORM_HOST=db
+      - INDEXER_WORKERS=5
+      - PROCESSOR_POLL_INTERVAL=1000 # refresh every second 
+      - REDIS_URI=redis://redis:6379/0
       - DEBUG=index-builder:*
     depends_on: 
       - db
+    command: ["yarn", "indexer:start"] 
+  
+  indexer-api-gateway:
+    image: joystream/hydra-indexer-gateway:latest
+    restart: unless-stopped
+    environment:
+      - WARTHOG_STARTER_DB_DATABASE=${DB_NAME}
+      - WARTHOG_STARTER_DB_HOST=db 
+      - WARTHOG_STARTER_DB_PASSWORD=${DB_PASS}
+      - WARTHOG_STARTER_DB_PORT=${DB_PORT}
+      - WARTHOG_STARTER_DB_USERNAME=${DB_USER}
+      - WARTHOG_STARTER_REDIS_URI=redis://redis:6379/0 
+      - PORT=4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - redis
+      - db
+      - indexer
+    
+  redis:
+    image: redis:6.0-alpine
+    restart: always
+    ports:
+      - "6379:6379"

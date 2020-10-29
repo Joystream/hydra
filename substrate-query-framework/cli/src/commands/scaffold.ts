@@ -140,9 +140,7 @@ export default class Scaffold extends Command {
       'Please provide the localtion of the type definitions JSON, relative to ./generated/indexer',
       { default: '../../typedefs.json' }
     )) as string;
-    let _ctx: Record<string, string> = { ...ctx, typesJSON };
-
-    return _ctx;
+    return { ...ctx, typesJSON };
   }
 
   // For now, we simply copy the hardcoded templates from the mappings dir
@@ -169,8 +167,7 @@ export default class Scaffold extends Command {
     await fs.ensureDir('docker');
     await utils.copyTemplateToCWD('scaffold/docker-compose.yml', 'docker-compose.yml');
 
-    await utils.copyTemplateToCWD('scaffold/docker/Dockerfile.indexer', path.join('docker', 'Dockerfile.indexer'));
-    await utils.copyTemplateToCWD('scaffold/docker/Dockerfile.server', path.join('docker', 'Dockerfile.server'));
+    await utils.copyTemplateToCWD('scaffold/docker/Dockerfile.hydra', path.join('docker', 'Dockerfile.hydra'));
 
     await utils.copyTemplateToCWD('scaffold/.dockerignore', '.dockerignore');
   }

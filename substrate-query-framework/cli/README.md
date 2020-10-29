@@ -16,6 +16,16 @@ codegen   Generate a ready to run graphql server and block indexer
 preview   Preview the output schema served by the GraphQL server
 ```
 
+## Architecture overview
+
+A Hydra query node ingests substrate events in a multi-step pipeline which looks as follows:
+```
+Substrate Chain => Hydra Indexer => Indexer GraphQL gateway => Hydra Processor => Database => Query Node GraphQL endnpoint 
+```
+
+For popular chains the processor may connect to a publicly available Indexer endpoint (such as https://hakusama.joystream.app/graphql for Kusama), otherwise a self-hosted indexer should be run.
+
+
 ## Using Hydra CLI
 
 Using `npx`:
@@ -55,7 +65,7 @@ and answer the prompts. The scaffolder will generate the following files:
 └── schema.graphql
 ```
 
-By defualt the scaffolder generates mappings and a schema describing Kusama Treasury proposals. Generate the indexer and the server:
+By default the scaffolder generates mappings and a schema tracking Kusama transfers. Generate the indexer and the server:
 
 ```bash
 $ hydra-cli codegen
@@ -63,78 +73,47 @@ $ hydra-cli codegen
 
 The indexer and server files will be generated in `./generated/indexer` and `./generated/graphql-server` respectively.
 
-In order to run them, a Postges database should be up and running and accept connections. The credentials should be provided in `.env` file. By default, the scaffolder generates a database service `docker-compose.yml` with the credentials provided. Run
+In order to run them, a Postgres database should be up and running and accept connections. The credentials may be provided in `.env` file. By default, the scaffolder generates a database service `docker-compose.yml` with the same credentials via environment variables. Run
 
 ```bash
-$ yarn db:start
-$ yarn db:bootstrap
+$ yarn db:up
+$ yarn db:migrate
 ```
+to create the database and set up the db schemas \(if the database already exists, skip the first one\). 
 
-to create the database and set up the schema \(if the database already exists, skip the first one\).
+## Setting up the indexer
 
-Now spin up the server and the indexer:
+To run a self-hosted indexer, we need to set the indexer itself and the an GraphQL gateway which will expose for querying raw events and extrinsics from the chain. The setup requires botha a redis and a db instance and thus is more convenient to run with a docker-compose file:
 
 ```bash
-$ yarn indexer:start
+$ docker-compose up -d redis
+```
+Now build and run the indexer:
+```
+$ docker-compose build indexer && docker-compose up -d indexer
 ```
 
-```bash
-$ yarn server:start:dev
+To run the indexer gateway, simply pull the image and run the service:
+```
+$ docker-compose up -d indexer-api-gateway
 ```
 
-### Generate Graphql Server and Block Indexer
+If everything set up correctly, it should be possible to inspect the gateway at `http://localhost:4000/graphql`
 
-Hydra Cli creates a folder named `generated` and puts everthing inside it.
+## Running the processor
 
-```bash
-$ hydra-cli codegen
+When the indexer gateway is available (either locally or hosted elsewhere), the processor can be run againt it:
+
+```
+$ docker-compose up -d processor
 ```
 
-Make sure `package.json` is in you cwd. Start graphql server with a GraphQL playground:
+## Running the query node endpoint
 
-```bash
-$ yarn server:start:dev
+Finally, run the query node endpoint:
+
 ```
-
-Start block indexer:
-
-```bash
-$ yarn indexer:start
-```
-
-## Prerequisites
-
-Hydra CLI generates a grapqh server and a substrate block indexer.
-
-* Graphql server uses warthog underneath. Hydra generates `model/resolver/service` from the schema that you define in the current working directory \(cwd\) in a file named `schema.graphql`. For a guide on how to write a schema, follow the [docs](https://app.gitbook.com/@dzhelezov/s/hydra-docs/v/query_node_spec/query-node/docs).
-* Block indexer consumes produced blocks from a substrate based chain. Before running code generation make sure you have `.env` file inside the cwd, and `mappings` directory with `index.ts`. All mapping functions should be exported
-* Which must have variables below with appropriate values:
-
-```text
-# Project name
-PROJECT_NAME=test
-
-# Substrate endpoint to source events from
-WS_PROVIDER_ENDPOINT_URI=
-# block height to start the indexer from
-BLOCK_HEIGHT=0
-
-# DB config to create a database (use db tools only for development!)
-DB_NAME=test
-DB_USER=postgres
-DB_PASS=postgres
-DB_HOST=localhost
-DB_PORT=5432
-
-# GraphQL server HOST and PORT
-GRAPHQL_SERVER_PORT=4000
-GRAPHQL_SERVER_HOST=localhost
-WARTHOG_APP_PORT=4000
-WARTHOG_APP_HOST=localhost
-
-WS_PROVIDER_ENDPOINT_URI=<provider>    # e.g ws://localhost:9944
-TYPE_REGISTER_PACKAGE_NAME=<packname>  # name of the package to import TYPE_REGISTER_FUNCTION
-TYPE_REGISTER_FUNCTION=<register_type> # name of the function that will called for type registration
+$ docker-compose up -d graphql-server
 ```
 
 ## Examples

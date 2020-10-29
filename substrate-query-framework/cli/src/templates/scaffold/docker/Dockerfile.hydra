@@ -1,0 +1,9 @@
+FROM joystream/hydra-cli
+
+COPY schema.graphql /home/hydra
+COPY ./mappings /home/hydra/mappings
+COPY .env /home/hydra/.env
+
+RUN yarn codegen:all
+
+WORKDIR /home/hydra

@@ -6,7 +6,7 @@ export const BLOCK_CACHE_TTL_SEC = numberEnv('BLOCK_CACHE_TTL_SEC') || 60 * 60
 export const INDEXER_HEAD_TTL_SEC = numberEnv('INDEXER_HEAD_TTL_SEC') || 60 * 15
 
 // Number of indexer workers
-export const WORKERS_NUMBER = numberEnv('INDEXER_WORKERS') || 50
+export const WORKERS_NUMBER = numberEnv('INDEXER_WORKERS') || 5
 
 // Number of time the worker tries to fetch a block
 export const BLOCK_PRODUCER_FETCH_RETRIES =

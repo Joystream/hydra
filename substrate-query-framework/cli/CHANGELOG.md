@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.15
+
+- Updated docker-compose and docker templates
+
 ## 0.0.14
 
 - Custom types support via type definition files
