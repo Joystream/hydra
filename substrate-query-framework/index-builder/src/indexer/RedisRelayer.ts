@@ -14,7 +14,7 @@ const debug = Debug('index-builder:redis-relayer')
  *  The main reason for it is to decouple most of the core classes from the
  *  Redis infrastructure
  **/
-@Service()
+@Service('RedisRelayer')
 export class RedisRelayer {
   private redisPub: IORedis.Redis
   private indexBuilder!: IndexBuilder

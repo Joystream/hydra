@@ -1,5 +1,5 @@
 # build hydra-cli first in ../cli 
-FROM hydra-cli:0.0.14
+FROM hydra-cli:0.0.14.1
 
 COPY schema.graphql /home/hydra
 COPY ./mappings /home/hydra/mappings
