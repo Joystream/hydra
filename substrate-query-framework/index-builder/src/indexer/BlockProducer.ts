@@ -9,14 +9,20 @@ import { waitFor, retry, withTimeout } from '../utils/wait-for'
 import { ConstantBackOffStrategy } from '../utils/BackOffStategy'
 import { IBlockProducer } from './IBlockProducer'
 import { Service, Inject } from 'typedi'
-import { BLOCK_PRODUCER_FETCH_RETRIES, NEW_BLOCK_TIMEOUT_MS } from './indexer-consts'
+import {
+  BLOCK_PRODUCER_FETCH_RETRIES,
+  NEW_BLOCK_TIMEOUT_MS,
+} from './indexer-consts'
+import { EventEmitter } from 'typeorm/platform/PlatformTools'
 
 const DEBUG_TOPIC = 'index-builder:producer'
 
 const debug = Debug(DEBUG_TOPIC)
 
 @Service('BlockProducer')
-export class BlockProducer implements IBlockProducer<QueryEventBlock> {
+export class BlockProducer
+  extends EventEmitter
+  implements IBlockProducer<QueryEventBlock> {
   private _started: boolean
 
   private _newHeadsUnsubscriber: UnsubscribePromise | undefined
@@ -29,6 +35,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
   private readonly substrateService!: ISubstrateService
 
   constructor() {
+    super()
     this._started = false
     this._newHeadsUnsubscriber = undefined
 
@@ -75,7 +82,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
 
     // THIS IS VERY CRUDE, NEED TO MANAGE LOTS OF STUFF HERE!
     if (this._newHeadsUnsubscriber) {
-      ;(await this._newHeadsUnsubscriber)()
+      (await this._newHeadsUnsubscriber)()
     }
     debug('Block producer has been stopped')
     this._started = false
@@ -85,7 +92,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
     assert(this._started, 'Has to be started to process new heads.')
 
     this._chainHeight = header.number.toNumber()
-
+    this.emit('CHAIN_HEIGHT', this._chainHeight)
     debug(`New block found at height #${this._chainHeight.toString()}`)
   }
 
@@ -151,7 +158,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
     )
 
     const eventBlock = new QueryEventBlock(height, blockEvents)
-    //this.emit('QueryEventBlock', query_block);
+    // this.emit('QueryEventBlock', query_block);
     debug(`Produced query event block.`)
     return eventBlock
   }
@@ -161,7 +168,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
       waitFor(
         // when to resolve
         () => this._blockToProduceNext <= this._chainHeight,
-        //exit condition
+        // exit condition
         () => !this._started
       ),
       `Timed out: no block has been produced within last ${NEW_BLOCK_TIMEOUT_MS} seconds`,

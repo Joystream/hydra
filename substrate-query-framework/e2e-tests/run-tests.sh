@@ -3,6 +3,9 @@ function cleanup()
     yarn post-e2e-test
 }
 
+docker build ../cli -t hydra-cli:latest --no-cache
+docker build ./schema -t hydra:latest
+docker build ../index-server -t indexer-api-server:latest
 # setup db's
 yarn pre-e2e-test
 

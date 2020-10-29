@@ -52,7 +52,7 @@ services:
       - redis
     
   indexer-api-server:
-    image: indexer-api-gateway
+    image: indexer-api-gateway:latest
     restart: unless-stopped
     environment:
       - WARTHOG_STARTER_DB_DATABASE=indexer-db

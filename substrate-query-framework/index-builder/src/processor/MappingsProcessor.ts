@@ -1,7 +1,6 @@
 import { makeDatabaseManager, SubstrateEvent } from '..'
 import Debug from 'debug'
 import { doInTransaction } from '../db/helper'
-import { numberEnv } from '../utils/env-flags'
 import { ProcessorOptions } from '../node'
 import { Inject, Service } from 'typedi'
 import { IProcessorSource, GraphQLSource, HandlerLookupService } from '.'
@@ -75,6 +74,10 @@ export class MappingsProcessor {
     }
 
     this._started = true
+    await waitFor(() => {
+      debug(`Waiting for the indexer head to be initialized`)
+      return this.indexerHead >= 0
+    })
     await this.processingLoop()
   }
 
