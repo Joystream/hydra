@@ -30,10 +30,6 @@ export class QueryNode {
   // State of the node,
   private _state: QueryNodeState
 
-  // API instance for talking to Substrate full node.
-  @Inject('ApiPromise')
-  readonly api!: ApiPromise
-
   // Query index building node.
   @Inject('IndexBuilder')
   readonly indexBuilder!: IndexBuilder
@@ -85,6 +81,8 @@ export class QueryNode {
     debug(`Api is ready`)
 
     Container.set('ApiPromise', api)
+
+    debug(`Api is set: ${JSON.stringify(api, null, 2)}`)
   }
 
   async start(): Promise<void> {
