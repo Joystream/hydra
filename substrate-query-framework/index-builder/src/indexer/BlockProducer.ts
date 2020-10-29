@@ -95,7 +95,7 @@ export class BlockProducer
     assert(this._started, 'Has to be started to process new heads.')
 
     this._chainHeight = header.number.toNumber()
-    this.emit('NEW_CHAIN_HEIGHT', this._chainHeight)
+    this.emit(NEW_CHAIN_HEIGHT_EVENT, this._chainHeight)
     debug(`New block found at height #${this._chainHeight.toString()}`)
   }
 
@@ -161,7 +161,7 @@ export class BlockProducer
     )
 
     const eventBlock = new QueryEventBlock(height, blockEvents)
-    //this.emit('QueryEventBlock', query_block);
+    // this.emit('QueryEventBlock', query_block);
     debug(`Produced query event block.`)
     return eventBlock
   }
@@ -171,7 +171,7 @@ export class BlockProducer
       waitFor(
         // when to resolve
         () => this._blockToProduceNext <= this._chainHeight,
-        //exit condition
+        // exit condition
         () => !this._started
       ),
       `Timed out: no block has been produced within last ${NEW_BLOCK_TIMEOUT_MS} seconds`,

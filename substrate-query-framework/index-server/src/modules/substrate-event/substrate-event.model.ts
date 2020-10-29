@@ -24,8 +24,8 @@ export class EventParam {
   @Field()
   name?: string
 
-  @Field(() => GraphQLJSON)
-  value!: AnyJsonField
+  @Field(() => GraphQLJSON, { nullable: true })
+  value?: AnyJsonField
 }
 
 @Model({ db: { name: 'substrate_event' } })
