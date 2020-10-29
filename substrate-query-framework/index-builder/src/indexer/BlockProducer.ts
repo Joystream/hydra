@@ -13,11 +13,13 @@ import {
   BLOCK_PRODUCER_FETCH_RETRIES,
   NEW_BLOCK_TIMEOUT_MS,
 } from './indexer-consts'
-import { EventEmitter } from 'typeorm/platform/PlatformTools'
+import { EventEmitter } from 'events'
 
 const DEBUG_TOPIC = 'index-builder:producer'
 
 const debug = Debug(DEBUG_TOPIC)
+
+export const NEW_CHAIN_HEIGHT_EVENT = 'NEW_CHAIN_HEIGHT'
 
 @Service('BlockProducer')
 export class BlockProducer
@@ -82,7 +84,8 @@ export class BlockProducer
 
     // THIS IS VERY CRUDE, NEED TO MANAGE LOTS OF STUFF HERE!
     if (this._newHeadsUnsubscriber) {
-      (await this._newHeadsUnsubscriber)()
+      // eslint-disable-next-line
+      ;(await this._newHeadsUnsubscriber)()
     }
     debug('Block producer has been stopped')
     this._started = false
@@ -92,7 +95,7 @@ export class BlockProducer
     assert(this._started, 'Has to be started to process new heads.')
 
     this._chainHeight = header.number.toNumber()
-    this.emit('CHAIN_HEIGHT', this._chainHeight)
+    this.emit(NEW_CHAIN_HEIGHT_EVENT, this._chainHeight)
     debug(`New block found at height #${this._chainHeight.toString()}`)
   }
 

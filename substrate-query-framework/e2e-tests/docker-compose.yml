@@ -15,6 +15,8 @@ services:
       - GRAPHQL_SERVER_PORT=4000
     ports:
       - "4000:4000"
+    depends_on:
+      - processor
     command: ["yarn", "server:start:prod"]
 
   processor:
@@ -28,7 +30,7 @@ services:
       - TYPEORM_PORT=5432
       - INDEXER_ENDPOINT_URL=http://indexer-api-server:4000/graphql
       - PROCESSOR_POLL_INTERVAL=300 # refresh every second 
-      - DEBUG= index-builder:*
+      - DEBUG=index-builder:*
     depends_on:
       - indexer-api-server
     command: ["yarn", "processor:start"]
@@ -45,7 +47,7 @@ services:
       - NEW_BLOCK_TIMEOUT_SEC=150000
       - WS_PROVIDER_ENDPOINT_URI=ws://substrate:9944/
       - REDIS_URI=redis://redis:6379/0
-      - DEBUG=*
+      - DEBUG=index-builder:*
     command: ["yarn", "indexer:start"] 
     depends_on:
       - substrate
@@ -62,6 +64,7 @@ services:
       - WARTHOG_STARTER_DB_USERNAME=postgres 
       - WARTHOG_STARTER_REDIS_URI=redis://redis:6379/0 
       - PORT=4000
+      - DEBUG=index-server:*
     ports:
       - "4001:4000"
     depends_on:

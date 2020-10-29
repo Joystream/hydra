@@ -1,9 +1,9 @@
-import Container, { Service } from 'typedi'
+import Container, { Inject, Service } from 'typedi'
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
 import { logError } from '../utils/errors'
-import { BlockPayload } from './../model'
+import { BlockPayload, QueryEventBlock } from './../model'
 import { stringifyWithTs } from '../utils/stringify'
 import {
   INDEXER_HEAD_BLOCK,
@@ -13,10 +13,12 @@ import {
   EVENT_LAST,
   EVENT_TOTAL,
   BLOCK_CACHE_PREFIX,
+  INDEXER_STATUS,
 } from './redis-keys'
 import { IStatusService } from './IStatusService'
 import { RedisClientFactory } from '../redis/RedisClientFactory'
 import { BLOCK_CACHE_TTL_SEC, INDEXER_HEAD_TTL_SEC } from './indexer-consts'
+import { IBlockProducer, NEW_CHAIN_HEIGHT_EVENT } from '.'
 
 const debug = Debug('index-builder:status-server')
 
@@ -45,6 +47,14 @@ export class IndexerStatusService implements IStatusService {
         throw new Error(`Error connecting to Redis: ${logError(e)}`)
       })
     })
+
+    const producer = Container.get<IBlockProducer<QueryEventBlock>>(
+      'BlockProducer'
+    )
+    // eslint-disable-next-line
+    producer.on(NEW_CHAIN_HEIGHT_EVENT, async (height) => {
+      await this.redisClient.hset(INDEXER_STATUS, 'CHAIN_HEIGHT', height)
+    })
   }
 
   async onBlockComplete(payload: BlockPayload): Promise<void> {
@@ -52,10 +62,21 @@ export class IndexerStatusService implements IStatusService {
       debug(`Ignoring ${payload.height}: already processed`)
       return
     }
+
     // TODO: move into a separate cache service and cache also events, extrinsics etc
     await this.updateBlockCache(payload)
     await this.updateIndexerHead()
     await this.updateLastEvents(payload)
+    await this.updateCompleteMetrics(payload.height)
+  }
+
+  async updateCompleteMetrics(height: number): Promise<void> {
+    await this.redisClient.hset(INDEXER_STATUS, 'LAST_COMPLETE', height)
+    const max = await this.redisClient.hget(INDEXER_STATUS, 'MAX_COMPLETE')
+
+    if ((max === null) || Number.parseInt(max) < height) {
+      await this.redisClient.hset(INDEXER_STATUS, 'MAX_COMPLETE', height)
+    }
   }
 
   async onNewMessage(channel: string, message: string): Promise<void> {
@@ -98,6 +119,8 @@ export class IndexerStatusService implements IStatusService {
       INDEXER_NEW_HEAD_CHANNEL,
       stringifyWithTs({ height })
     )
+    await this.redisClient.hset(INDEXER_STATUS, 'HEAD', height)
+
     debug(`Updated the indexer head to ${height}`)
   }
 
