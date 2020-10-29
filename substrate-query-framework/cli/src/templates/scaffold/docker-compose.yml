@@ -13,9 +13,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
   
-  # Run after Run after `yarn codegen:server` and `yarn docker:server:build`
   graphql-server:
-    image: hydra-graphql-server
+    image: hydra-kit:latest
     restart: unless-stopped
     build: 
       dockerfile: docker/Dockerfile.hydra
@@ -32,7 +31,7 @@ services:
 
 
   processor:
-    image: hydra-indexer
+    image: hydra-kit:latest
     restart: unless-stopped
     build: 
       dockerfile: docker/Dockerfile.hydra
@@ -48,9 +47,8 @@ services:
       - indexer-api-gateway
     command: ["yarn", "processor:start"]
   
-  # Run after `yarn codegen:indexer` and `yarn docker:indexer:build`
   indexer:
-    image: hydra-indexer
+    image: hydra-kit:latest
     restart: unless-stopped
     build: 
       dockerfile: docker/Dockerfile.hydra
