@@ -1,5 +1,12 @@
 # Changelog of major updates
 
+## 0.0.18-alpha
+
+- IndexerStatusService adds additional data into Redis:
+  - Last comepleted block
+  - Max completeted block
+  - Substrate chain height
+
 ## 0.0.17-alpha
 
 - Bugfixes and stability improvements

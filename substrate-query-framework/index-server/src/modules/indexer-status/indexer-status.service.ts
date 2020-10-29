@@ -37,11 +37,30 @@ export class IndexerStatusService {
 
     const status = new IndexerStatus()
 
-    status.head = result ? Number.parseInt(result['HEAD']) : -1
-    status.chainHeight = result ? Number.parseInt(result['CHAIN_HEIGHT']) : -1
-    status.lastComplete = result ? Number.parseInt(result['LAST_COMPLETE']) : -1
-    status.maxComplete = result ? Number.parseInt(result['MAX_COMPLETE']) : -1
+    status.head = this.getNumberOrDefault(result, 'HEAD')
+    status.chainHeight = this.getNumberOrDefault(result, 'CHAIN_HEIGHT')
+    status.lastComplete = this.getNumberOrDefault(result, 'LAST_COMPLETE')
+    status.maxComplete = this.getNumberOrDefault(result, 'MAX_COMPLETE')
 
     return status
+  }
+
+  getNumberOrDefault(
+    obj: Record<string, string>,
+    hash: string,
+    def: number = -1
+  ): number {
+    if (obj === null || obj === undefined) {
+      return def
+    }
+    if (
+      obj[hash] === null ||
+      obj[hash] === undefined ||
+      obj[hash].length == 0
+    ) {
+      return def
+    }
+    const val = Number.parseInt(obj[hash])
+    return Number.isFinite(val) ? val : def
   }
 }
