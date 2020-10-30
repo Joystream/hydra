@@ -10,10 +10,11 @@ import { {{typeRegistrator}} } from '{{{packageName}}}';
 {{/typeRegistrator}}
 
 import {
-  QueryNodeManager,
-  DatabaseManager,
-  SubstrateEvent,
+  QueryNodeManager
 } from '@dzlzv/hydra-indexer-lib/lib';
+
+import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import { SubstrateEvent } from '@dzlzv/hydra-common'
 
 // Mappings use!
 export { DatabaseManager as DB, getLogger, SubstrateEvent };
