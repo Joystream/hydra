@@ -18,6 +18,7 @@
     "e2e-test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --exit --file ./test/e2e/setup-e2e.ts \"test/e2e/**/*.test.ts\""
   },
   "dependencies": {
+    "@dzlzv/hydra-common": "^0.0.2",
     "@dzlzv/hydra-indexer-lib": "^0.0.15-alpha.2",
     "@polkadot/api": "^2.1.1",
     "typedi": "^0.8.0"
