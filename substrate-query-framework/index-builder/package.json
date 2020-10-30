@@ -70,6 +70,7 @@
   },
   "husky": {
     "hooks": {
+      "pre-commit": "yarn i-test",
       "pre-push": "yarn lint"
     }
   },

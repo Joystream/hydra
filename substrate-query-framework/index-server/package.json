@@ -38,27 +38,7 @@
     "test": "DEBUG= jest --verbose --coverage",
     "test:watch": "DEBUG= jest --watch"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn run config:dev && tsc -p ./tsconfig.json"
-    }
-  },
-  "lint-staged": {
-    "linters": {
-      "*.ts": [
-        "eslint --fix",
-        "prettier --write",
-        "git add"
-      ],
-      "*.{js,json}": [
-        "prettier --write",
-        "git add"
-      ]
-    },
-    "ignore": [
-      "**/generated/*"
-    ]
-  },
+
   "dependencies": {
     "@dzlzv/bn-typeorm": "^0.0.1",
     "@dzlzv/hydra-common": "^0.0.2",

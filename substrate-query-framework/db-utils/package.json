@@ -1,8 +1,12 @@
 {
   "name": "@dzlzv/hydra-db-utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Hydra Database tools",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
   "license": "MIT",
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
