@@ -5,8 +5,12 @@ import * as assert from 'assert'
 
 import Debug from 'debug'
 import { UnsubscribePromise } from '@polkadot/api/types'
-import { waitFor, retry, withTimeout } from '../utils/wait-for'
-import { ConstantBackOffStrategy } from '../utils/BackOffStategy'
+import {
+  waitFor,
+  retry,
+  withTimeout,
+  ConstantBackOffStrategy,
+} from '@dzlzv/hydra-common'
 import { IBlockProducer } from './IBlockProducer'
 import { Service, Inject } from 'typedi'
 import {

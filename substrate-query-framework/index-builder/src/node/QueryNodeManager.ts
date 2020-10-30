@@ -1,14 +1,14 @@
 import { QueryNode } from '.'
 import { MappingsProcessor } from '../processor/MappingsProcessor'
 import { IndexerOptions, ProcessorOptions } from './QueryNodeStartOptions'
-import { createDBConnection } from '../db/helper'
+import { createDBConnection } from '../db/dal'
 import { Connection, getConnection } from 'typeorm'
 import Debug from 'debug'
 import Container from 'typedi'
-import { logError } from '../utils/errors'
+import { logError } from '@dzlzv/hydra-common'
 import { log } from 'console'
 import { ISubstrateService } from '../substrate'
-import { RedisClientFactory } from '../redis'
+import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 
 const debug = Debug('index-builder:manager')
 

@@ -1,4 +1,4 @@
-import { numberEnv } from '../utils/env-flags'
+import { numberEnv } from '@dzlzv/hydra-common'
 
 // keep one hour of blocks by default
 export const BLOCK_CACHE_TTL_SEC = numberEnv('BLOCK_CACHE_TTL_SEC') || 60 * 60

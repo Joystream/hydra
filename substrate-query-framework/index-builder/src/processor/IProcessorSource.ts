@@ -1,6 +1,5 @@
-import { SubstrateEvent } from '../model';
-import { EventEmitter } from 'typeorm/platform/PlatformTools';
-
+import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { EventEmitter } from 'events'
 
 /**
  * Filter for fetching events
@@ -12,14 +11,13 @@ export interface EventFilter {
   afterID?: string
   names: string[]
   fromBlock: number
-  toBlock: number 
+  toBlock: number
 }
 
 export interface IProcessorSource extends EventEmitter {
-  
-  nextBatch(filter: EventFilter, limit: number): Promise<SubstrateEvent[]>;
+  nextBatch(filter: EventFilter, limit: number): Promise<SubstrateEvent[]>
 
-  indexerHead(): Promise<number>;
+  indexerHead(): Promise<number>
 
-  subscribe(events: string[]): Promise<void>;
+  subscribe(events: string[]): Promise<void>
 }

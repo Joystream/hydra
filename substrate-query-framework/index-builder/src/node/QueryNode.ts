@@ -9,8 +9,8 @@ import Container, { Inject, Service } from 'typedi'
 import registry from '../substrate/typeRegistry'
 import typesSpec from '../substrate/typesSpec'
 
-import { RedisClientFactory } from '../redis/RedisClientFactory'
-import { retry, waitFor } from '../utils/wait-for'
+import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
+import { retry, waitFor } from '@dzlzv/hydra-common'
 import { SUBSTRATE_API_CALL_RETRIES } from '../indexer/indexer-consts'
 import { RedisRelayer } from '../indexer/RedisRelayer'
 

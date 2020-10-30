@@ -3,7 +3,7 @@ import { QueryEventBlock } from '../model'
 import * as _ from 'lodash'
 
 import Debug from 'debug'
-import { doInTransaction } from '../db/helper'
+import { doInTransaction } from '@dzlzv/hydra-db-utils'
 import { PooledExecutor } from './PooledExecutor'
 import { SubstrateEventEntity } from '../entities'
 import { Inject, Service } from 'typedi'
@@ -14,6 +14,7 @@ import { EventEmitter } from 'events'
 import { IStatusService } from './IStatusService'
 import { WORKERS_NUMBER } from './indexer-consts'
 import { toPayload } from '../model/BlockPayload'
+import { QueryRunner } from 'typeorm'
 
 const debug = Debug('index-builder:indexer')
 
@@ -111,7 +112,7 @@ export class IndexBuilder extends EventEmitter {
       `Read ${queryEventsBlock.query_events.length} events; saving in ${batches.length} batches`
     )
 
-    await doInTransaction(async (queryRunner) => {
+    await doInTransaction(async (queryRunner: QueryRunner) => {
       debug(`Saving event entities`)
 
       let saved = 0

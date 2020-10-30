@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Container from 'typedi'
 import { QueryNode, QueryNodeState } from '../../src'
-import { sleep } from '../../src/utils/wait-for'
+import { sleep } from '@dzlzv/hydra-common'
 
 describe('QueryNode', () => {
   before(async () => {
@@ -14,7 +14,6 @@ describe('QueryNode', () => {
   it('Should initialize the indexer', async () => {
     const node = Container.get<QueryNode>('QueryNode')
 
-    expect(node.api, 'Api should be initialized').to.not.be.undefined
     expect(node.indexBuilder, 'IndexBuilder should be initialized').to.not.be
       .undefined
 

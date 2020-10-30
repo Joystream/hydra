@@ -5,10 +5,9 @@ import {
   OneToOne,
   Index,
 } from 'typeorm'
-import { AnyJson } from '../interfaces/json-types'
+import { AnyJson, ExtrinsicArg, SubstrateExtrinsic } from '@dzlzv/hydra-common'
 import * as BN from 'bn.js'
-import { NumericTransformer } from '../db'
-import { ExtrinsicArg, SubstrateExtrinsic } from '../interfaces'
+import { NumericTransformer } from '@dzlzv/bn-typeorm'
 import { SubstrateEventEntity } from './SubstrateEventEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
 

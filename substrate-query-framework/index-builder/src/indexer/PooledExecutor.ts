@@ -1,4 +1,4 @@
-// This is a modified version of 
+// This is a modified version of
 // https://github.com/rodrigogs/promise-pool/blob/master/index.js
 // h/t @rodrigogs
 
@@ -41,55 +41,53 @@
  * will begin to stop after finishing the current processor. This can be an async function.
  * @returns {Promise<void>}
  */
-import Debug from 'debug';
-import { logError } from '../utils/errors';
-const debug = Debug('index-builder:pooled-executor');
-
+import Debug from 'debug'
+import { logError } from '@dzlzv/hydra-common'
+const debug = Debug('index-builder:pooled-executor')
 
 export class PooledExecutor<T, R, N> {
-  
-  constructor(public readonly concurrency: number, 
+  constructor(
+    public readonly concurrency: number,
     public readonly generator: AsyncGenerator<T, R, N>,
-    public readonly processor: (v: T | R) => Promise<void> ) {
-  }
+    public readonly processor: (v: T | R) => Promise<void>
+  ) {}
 
   public async run(killer?: () => boolean): Promise<void> {
-    const queue = Array(this.concurrency).fill(null);
+    const queue = Array(this.concurrency).fill(null)
 
-    let stop = false;
+    let stop = false
     const poller = async () => {
       do {
-        let next = undefined;
+        let next = undefined
         try {
-          next = await this.generator.next();
+          next = await this.generator.next()
         } catch (e) {
-          debug(`Error getting next generator value`);
-          throw new Error(`Error getting next generator value, ${logError(e)}`);
+          debug(`Error getting next generator value`)
+          throw new Error(`Error getting next generator value, ${logError(e)}`)
         }
         if (next == undefined || next.done === true) {
-          debug('Generator is done, exiting');
-          break;
+          debug('Generator is done, exiting')
+          break
         }
 
         try {
           // do the acutal work on the grabbed value
-          await this.processor(next.value);
+          await this.processor(next.value)
         } catch (e) {
-          debug(`Error during execution`);
-          throw new Error(`One of the workers have failed, stopping the pool. ${logError(e)}`);
-        } 
+          debug(`Error during execution`)
+          throw new Error(
+            `One of the workers have failed, stopping the pool. ${logError(e)}`
+          )
+        }
 
         if (killer && killer()) {
-          debug(`Stopping the executor`);
-          stop = true;
+          debug(`Stopping the executor`)
+          stop = true
         }
-      } while (!stop);
-    };
+      } while (!stop)
+    }
 
     // stop when any of the workers die
-    await Promise.all(queue.map(poller));
+    await Promise.all(queue.map(poller))
   }
 }
-
-
-

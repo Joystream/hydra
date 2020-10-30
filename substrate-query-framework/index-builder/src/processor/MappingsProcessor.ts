@@ -1,14 +1,12 @@
-import { makeDatabaseManager, SubstrateEvent } from '..'
 import Debug from 'debug'
-import { doInTransaction } from '../db/helper'
+import { makeDatabaseManager, doInTransaction } from '@dzlzv/hydra-db-utils'
 import { ProcessorOptions } from '../node'
 import { Inject, Service } from 'typedi'
 import { IProcessorSource, GraphQLSource, HandlerLookupService } from '.'
 import { QueryRunner } from 'typeorm'
-import { logError } from '../utils/errors'
+import { logError, waitFor, SubstrateEvent } from '@dzlzv/hydra-common'
 import { IProcessorState, ProcessorStateHandler } from './ProcessorStateHandler'
 import { EventFilter } from './IProcessorSource'
-import { waitFor } from '../utils/wait-for'
 import { formatEventId } from '../model'
 import {
   BATCH_SIZE,

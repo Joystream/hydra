@@ -3,9 +3,8 @@ import { BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL } from './redis-keys'
 import { IndexBuilder } from './IndexBuilder'
 import IORedis = require('ioredis')
 import Debug from 'debug'
-import { stringifyWithTs } from '../utils/stringify'
-import { logError } from '../utils/errors'
-import { RedisClientFactory } from '../redis/RedisClientFactory'
+import { stringifyWithTs, logError } from '@dzlzv/hydra-common'
+import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 
 const debug = Debug('index-builder:redis-relayer')
 

@@ -1,9 +1,5 @@
 import { QueryEventProcessingPack } from '../model'
-import { BootstrapPack } from '../bootstrap'
-export type QueryNodeStartUpOptions =
-  | IndexerOptions
-  | ProcessorOptions
-  | BootstrapOptions
+export type QueryNodeStartUpOptions = IndexerOptions | ProcessorOptions
 
 export interface IndexerOptions {
   atBlock?: number
@@ -22,11 +18,4 @@ export interface ProcessorOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entities?: any[]
   indexerEndpointURL?: string
-}
-
-export interface BootstrapOptions {
-  atBlock?: number
-  typeRegistrator?: () => void
-  wsProviderURI: string
-  processingPack: BootstrapPack
 }

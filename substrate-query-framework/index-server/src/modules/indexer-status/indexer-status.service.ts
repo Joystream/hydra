@@ -1,13 +1,13 @@
 import { Container, Service } from 'typedi'
 import * as IORedis from 'ioredis'
-import { RedisClientFactory } from '@dzlzv/hydra-indexer-lib/lib'
-import { INDEXER_HEAD_BLOCK } from '@dzlzv/hydra-indexer-lib/lib/indexer'
+import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 import { IndexerStatus } from './indexer-status.resolver'
 import Debug from 'debug'
 
 const debug = Debug('index-server:indexer-status-service')
 
 const INDEXER_STATUS_KEY = 'hydra:indexer:status'
+const INDEXER_HEAD_BLOCK = 'hydra:indexer:head'
 
 @Service('IndexerStatusService')
 export class IndexerStatusService {

@@ -1,6 +1,6 @@
 import Container from 'typedi'
 import { Config } from 'warthog'
-import { RedisClientFactory } from '@dzlzv/hydra-indexer-lib/lib'
+import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 import Debug from 'debug'
 const debug = Debug('index-server:index')
 /**
@@ -28,5 +28,5 @@ function initRedisFactory() {
 
 function shutdownRedisFactory() {
   const redisFactory = Container.get<RedisClientFactory>('RedisClientFactory')
-  redisFactory.closeAll()
+  redisFactory.stop()
 }

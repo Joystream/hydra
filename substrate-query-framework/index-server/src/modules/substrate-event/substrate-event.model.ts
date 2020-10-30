@@ -10,10 +10,7 @@ import {
 import { SubstrateExtrinsic } from '../substrate-extrinsic/substrate-extrinsic.model'
 import { Column, OneToOne, JoinColumn } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
-import {
-  AnyJson,
-  AnyJsonField,
-} from '@dzlzv/hydra-indexer-lib/lib/interfaces/json-types'
+import { AnyJson, AnyJsonField } from '@dzlzv/hydra-common'
 import { GraphQLJSON } from 'graphql-type-json'
 
 @ObjectType()
@@ -55,14 +52,10 @@ export class SubstrateEvent extends BaseModel {
   @WarthogField('json', { nullable: true })
   params?: EventParam[]
 
-  @OneToOne(
-    () => SubstrateExtrinsic,
-    (e: SubstrateExtrinsic) => e.event,
-    {
-      cascade: true,
-      nullable: true,
-    }
-  )
+  @OneToOne(() => SubstrateExtrinsic, (e: SubstrateExtrinsic) => e.event, {
+    cascade: true,
+    nullable: true,
+  })
   @Field(() => SubstrateExtrinsic, { nullable: true })
   @JoinColumn()
   extrinsic?: SubstrateExtrinsic

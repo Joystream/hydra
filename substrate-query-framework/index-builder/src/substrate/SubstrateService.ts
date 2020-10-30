@@ -12,12 +12,13 @@ import { ApiPromise } from '@polkadot/api'
 import { ISubstrateService } from '.'
 import { UnsubscribePromise } from '@polkadot/api/types'
 import Debug from 'debug'
-import { retryWithTimeout } from '../utils/wait-for'
-import { logError } from '../utils/errors'
+import { retryWithTimeout, logError } from '@dzlzv/hydra-common'
+
 import {
   SUBSTRATE_API_CALL_RETRIES,
   SUBSTRATE_API_TIMEOUT,
 } from '../indexer/indexer-consts'
+
 import { Inject, Service } from 'typedi'
 
 const debug = Debug('index-builder:producer')

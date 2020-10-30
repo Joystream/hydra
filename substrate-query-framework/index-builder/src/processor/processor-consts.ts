@@ -1,4 +1,4 @@
-import { numberEnv } from '../utils/env-flags'
+import { numberEnv } from '@dzlzv/hydra-common'
 
 export const DEFAULT_PROCESSOR_NAME = 'hydra'
 

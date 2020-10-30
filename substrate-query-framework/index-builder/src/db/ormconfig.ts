@@ -1,7 +1,11 @@
-import { ConnectionOptions } from 'typeorm';
-import  { SnakeNamingStrategy } from './SnakeNamingStrategy';
-import { SubstrateEventEntity, SubstrateExtrinsicEntity, ProcessedEventsLogEntity } from '../entities';
-import { IndexerSchema } from '../migrations/IndexerSchema';
+import { ConnectionOptions } from 'typeorm'
+import { SnakeNamingStrategy } from '@dzlzv/hydra-db-utils'
+import {
+  SubstrateEventEntity,
+  SubstrateExtrinsicEntity,
+  ProcessedEventsLogEntity,
+} from '../entities'
+import { IndexerSchema } from '../migrations/IndexerSchema'
 
 const config: () => ConnectionOptions = () => {
   return {
@@ -11,14 +15,19 @@ const config: () => ConnectionOptions = () => {
     username: process.env.TYPEORM_USERNAME,
     password: process.env.TYPEORM_PASSWORD,
     database: process.env.TYPEORM_DATABASE,
-    entities: [ SubstrateEventEntity, SubstrateExtrinsicEntity, ProcessedEventsLogEntity, process.env.TYPEORM_ENTITIES ],
-    migrations: [ IndexerSchema ],
+    entities: [
+      SubstrateEventEntity,
+      SubstrateExtrinsicEntity,
+      ProcessedEventsLogEntity,
+      process.env.TYPEORM_ENTITIES,
+    ],
+    migrations: [IndexerSchema],
     cli: {
-        migrationsDir: "migrations"
+      migrationsDir: 'migrations',
     },
-    logging: (process.env.TYPEORM_LOGGING === 'true'),
-    namingStrategy: new SnakeNamingStrategy()
-  } as ConnectionOptions;
+    logging: process.env.TYPEORM_LOGGING === 'true',
+    namingStrategy: new SnakeNamingStrategy(),
+  } as ConnectionOptions
 }
 
-export default config;
+export default config

@@ -11,9 +11,9 @@ import {
 import { Field } from 'type-graphql'
 import { SubstrateEvent } from '../substrate-event/substrate-event.model'
 import * as BN from 'bn.js'
-import { NumericTransformer } from '@dzlzv/hydra-indexer-lib/lib/db/transformers'
+import { NumericTransformer } from '@dzlzv/bn-typeorm'
+import { GraphQLBigNumber } from '../../types/bn-graphql'
 import { OneToOne, Column } from 'typeorm'
-import { GraphQLBigNumber } from '../../types/scalars'
 
 export interface ExtrinsicArg {
   type: string
@@ -64,9 +64,6 @@ export class SubstrateExtrinsic extends BaseModel {
   @BooleanField()
   isSigned!: boolean
 
-  @OneToOne(
-    () => SubstrateEvent,
-    (event: SubstrateEvent) => event.extrinsic
-  ) // specify inverse side as a second parameter
+  @OneToOne(() => SubstrateEvent, (event: SubstrateEvent) => event.extrinsic) // specify inverse side as a second parameter
   event!: SubstrateEvent
 }

@@ -6,11 +6,10 @@ import {
   PrimaryColumn,
   Index,
 } from 'typeorm'
-import { AnyJson, AnyJsonField } from '../interfaces/json-types'
+import { AnyJson, AnyJsonField, EventParam } from '@dzlzv/hydra-common'
 import { formatEventId, IQueryEvent } from '..'
 import * as BN from 'bn.js'
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity'
-import { EventParam } from '../model/substrate-interfaces'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
 
 export const EVENT_TABLE_NAME = 'substrate_event'

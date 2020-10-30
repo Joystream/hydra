@@ -2,9 +2,8 @@ import Container, { Inject, Service } from 'typedi'
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
-import { logError } from '../utils/errors'
+import { logError, stringifyWithTs } from '@dzlzv/hydra-common'
 import { BlockPayload, QueryEventBlock } from './../model'
-import { stringifyWithTs } from '../utils/stringify'
 import {
   INDEXER_HEAD_BLOCK,
   INDEXER_NEW_HEAD_CHANNEL,
@@ -16,7 +15,7 @@ import {
   INDEXER_STATUS,
 } from './redis-keys'
 import { IStatusService } from './IStatusService'
-import { RedisClientFactory } from '../redis/RedisClientFactory'
+import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 import { BLOCK_CACHE_TTL_SEC, INDEXER_HEAD_TTL_SEC } from './indexer-consts'
 import { IBlockProducer, NEW_CHAIN_HEIGHT_EVENT } from '.'
 
@@ -74,7 +73,7 @@ export class IndexerStatusService implements IStatusService {
     await this.redisClient.hset(INDEXER_STATUS, 'LAST_COMPLETE', height)
     const max = await this.redisClient.hget(INDEXER_STATUS, 'MAX_COMPLETE')
 
-    if ((max === null) || Number.parseInt(max) < height) {
+    if (max === null || Number.parseInt(max) < height) {
       await this.redisClient.hset(INDEXER_STATUS, 'MAX_COMPLETE', height)
     }
   }
