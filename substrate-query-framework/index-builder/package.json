@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-indexer-lib",
   "description": "Block index builder for substrate based chains",
-  "version": "0.0.18-alpha.2",
+  "version": "0.0.18-legacy.1_26_1",
   "main": "index.js",
   "license": "MIT",
   "repository": "git@github.com:Joystream/joystream.git",
@@ -21,7 +21,7 @@
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },
   "dependencies": {
-    "@polkadot/api": "^2.1.1",
+    "@polkadot/api": "^1.26.1",
     "@types/ioredis": "^4.17.4",
     "@types/lodash": "^4.14.161",
     "@types/shortid": "^0.0.29",
