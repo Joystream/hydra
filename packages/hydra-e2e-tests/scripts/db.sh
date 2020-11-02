@@ -4,7 +4,7 @@ db_pass=postgres
 db_host=localhost
 db_port=5432
 db_name=test
-network=e2e-tests_default
+network=hydra-e2e-tests_default
 command=""
 
 if [[ $CLITAG == "" ]] ;

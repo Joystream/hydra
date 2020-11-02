@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: './test/.env' })
 import { createDb, dropDb } from '../utils'
 import { QueryNodeManager } from '../../src'
-import { createDBConnection } from '../../src/db/helper'
+import { createDBConnection } from '../../src/db/dal'
 import * as Redis from 'ioredis'
 
 export async function resetDb(): Promise<void> {

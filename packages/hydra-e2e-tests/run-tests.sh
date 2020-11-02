@@ -8,9 +8,9 @@ set -e
 trap cleanup ERR EXIT SIGINT SIGTERM
 
 docker build ../index-builder -t index-builder:latest 
-docker build ../cli -t hydra-cli:latest 
+docker build ../hydra-cli -t hydra-cli:latest 
 docker build ./schema -t hydra:latest
-docker build ../index-server -t indexer-api-gateway:latest
+docker build ../hydra-indexer-gateway -t indexer-api-gateway:latest
 # setup db's
 yarn pre-e2e-test
 
@@ -30,4 +30,4 @@ until $(curl -s --head  --request GET http://localhost:4001/graphql | grep "400"
 done 
 
 # run the actual tests
-yarn e2e-test
+yarn e2e-test-local

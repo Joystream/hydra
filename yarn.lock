@@ -347,25 +347,6 @@
   dependencies:
     bn.js "^5.1.3"
 
-"@dzlzv/hydra-indexer-lib@^0.0.15-alpha.2":
-  version "0.0.15-alpha.2"
-  resolved "https://registry.yarnpkg.com/@dzlzv/hydra-indexer-lib/-/hydra-indexer-lib-0.0.15-alpha.2.tgz#e635db70113e3118db755ddde56947c8ef87c20a"
-  integrity sha512-kGAu/B2T060J+iJBN86F7dSlB7N1wsVqSZjOMeFQr+wvbPE8RC8v6PnP7nXEbjNt1H0U0MEokj6vlMkkH0IIow==
-  dependencies:
-    "@polkadot/api" "^2.1.1"
-    "@types/ioredis" "^4.17.4"
-    "@types/lodash" "^4.14.161"
-    "@types/shortid" "^0.0.29"
-    debug "^4.1.1"
-    graphql "15"
-    graphql-request "^3.1.0"
-    ioredis "^4.17.3"
-    lodash "^4.17.20"
-    reflect-metadata "^0.1.13"
-    shortid "^2.2.15"
-    typedi "^0.8.0"
-    typeorm "^0.2.25"
-
 "@eslint/eslintrc@^0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-0.2.1.tgz#f72069c330461a06684d119384435e12a5d76e3c"
@@ -5337,7 +5318,7 @@ graphql-redis-subscriptions@^2.3.1:
   optionalDependencies:
     ioredis "^4.17.3"
 
-graphql-request@^3.1.0:
+graphql-request@^3.1.0, graphql-request@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-3.3.0.tgz#1b9003f34b73cd40d691803d2d422fde5c713af3"
   integrity sha512-NHj65WSIUh8j7TBYgzWU0fqvLfxrqFDrLG8nZUh+IREZw50ljR6JXlXRkr52/fL/46wpItiQNLDrG+UZI+KmzA==
@@ -11375,9 +11356,9 @@ warthog@^2.19.0:
     typeorm-typedi-extensions "^0.2.3"
     typescript "^3.9.7"
 
-"warthog@https://github.com/metmirr/warthog/releases/download/v2.19/warthog-v2.19.tgz":
-  version "0.0.0-development"
-  resolved "https://github.com/metmirr/warthog/releases/download/v2.19/warthog-v2.19.tgz#c07246553b2d0fc9fb087bdcc17994e06051a2c4"
+"warthog@https://github.com/metmirr/warthog/releases/download/v2.20.0/warthog-v2.20.0.tgz":
+  version "2.20.0"
+  resolved "https://github.com/metmirr/warthog/releases/download/v2.20.0/warthog-v2.20.0.tgz#c655c7da3279b958d8fd6549be30d9eb811d48c7"
   dependencies:
     "@types/app-root-path" "^1.2.4"
     "@types/bn.js" "^4.11.6"

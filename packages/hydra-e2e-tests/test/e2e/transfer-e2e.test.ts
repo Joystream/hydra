@@ -1,8 +1,7 @@
 import { expect } from 'chai'
 import {
-  sleep,
   waitForAsync,
-} from '@dzlzv/hydra-indexer-lib/lib/utils/wait-for'
+} from '@dzlzv/hydra-common'
 import { indexerHead } from './api/indexer-api'
 import { findTransfersByValue } from './api/processor-api'
 import { transfer } from './api/substrate-api'

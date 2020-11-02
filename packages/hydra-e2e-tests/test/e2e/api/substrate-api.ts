@@ -3,8 +3,8 @@ import testKeyring from '@polkadot/keyring/testing'
 import { Hash } from '@polkadot/types/interfaces'
 import Container from 'typedi'
 import { waitFor } from '@dzlzv/hydra-common'
-import registry from '@dzlzv/hydra-indexer-lib/lib/substrate/typeRegistry'
-import typesSpec from '@dzlzv/hydra-indexer-lib/lib/substrate/typesSpec'
+import registry from '../../substrate-types/typeRegistry'
+import typesSpec from '../../substrate-types/typesSpec'
 
 export async function transfer(
   from: string,
