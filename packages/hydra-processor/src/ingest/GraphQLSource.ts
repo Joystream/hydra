@@ -1,6 +1,6 @@
-import { IProcessorSource, EventFilter } from '.'
+import { IProcessorSource, EventFilter } from './'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
-import { ProcessorOptions } from '../node'
+import { ProcessorOptions } from '../start'
 import { GraphQLClient } from 'graphql-request'
 import { Inject } from 'typedi'
 import Debug from 'debug'

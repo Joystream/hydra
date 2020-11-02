@@ -1,13 +1,14 @@
 import Debug from 'debug'
 import { makeDatabaseManager, doInTransaction } from '@dzlzv/hydra-db-utils'
-import { ProcessorOptions } from '../node'
+import { ProcessorOptions } from '../start'
 import { Inject, Service } from 'typedi'
-import { IProcessorSource, GraphQLSource, HandlerLookupService } from '.'
+import { IProcessorSource, GraphQLSource } from '../ingest'
+import { HandlerLookupService } from './HandlerLookupService'
 import { QueryRunner } from 'typeorm'
 import { logError, waitFor, SubstrateEvent } from '@dzlzv/hydra-common'
-import { IProcessorState, ProcessorStateHandler } from './ProcessorStateHandler'
-import { EventFilter } from './IProcessorSource'
-import { formatEventId } from '../model'
+import { IProcessorState, ProcessorStateHandler } from '../state'
+import { EventFilter } from '../ingest'
+import { formatEventId } from '@dzlzv/hydra-common'
 import {
   BATCH_SIZE,
   BLOCK_WINDOW,

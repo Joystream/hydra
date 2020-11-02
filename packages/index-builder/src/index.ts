@@ -6,6 +6,5 @@ export * from './model'
 export * from './node'
 export * from './substrate'
 export * from './db'
-export * from './processor'
 
 export { BlockProducer, IndexBuilder }

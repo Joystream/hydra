@@ -120,7 +120,7 @@ export default class Codegen extends Command {
           await execa('yarn', ['add', `${lib}`]);
         }
         const indexerLib = process.env.INDEXER_LIB || '@dzlzv/hydra-indexer-lib';
-        await execa('yarn', ['add', `${indexerLib}`, '@dzlzv/hydra-db-utils', '@dzlzv/hydra-common']);
+        await execa('yarn', ['add', `${indexerLib}`, '@dzlzv/hydra-db-utils', '@dzlzv/hydra-common', '@dzlzv/hydra-processor']);
       },
     };
 

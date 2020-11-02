@@ -5,4 +5,5 @@
     "editor.formatOnSave": true,   
   },
   "prettier.printWidth": 250,
+  "javascript.implicitProjectConfig.experimentalDecorators": true
 }

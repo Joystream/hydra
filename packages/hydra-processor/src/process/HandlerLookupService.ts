@@ -1,6 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { QueryEventProcessingPack, EventHandlerFunc } from '../model';
-import { ProcessorOptions } from '../node';
+import { ProcessorOptions, QueryEventProcessingPack, EventHandlerFunc  } from '../start';
 import Debug from 'debug';
 // Get the even name from the mapper name. By default, we assume the handlers
 // are of the form <section>_<method> which is translated into the canonical event name of the 

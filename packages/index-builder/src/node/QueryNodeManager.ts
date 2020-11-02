@@ -1,6 +1,5 @@
 import { QueryNode } from '.'
-import { MappingsProcessor } from '../processor/MappingsProcessor'
-import { IndexerOptions, ProcessorOptions } from './QueryNodeStartOptions'
+import { IndexerOptions } from './QueryNodeStartOptions'
 import { createDBConnection } from '../db/dal'
 import { Connection, getConnection } from 'typeorm'
 import Debug from 'debug'
@@ -52,19 +51,6 @@ export class QueryNodeManager {
       debug('Trying to stop the query node')
       await QueryNodeManager.cleanUp()
     }
-  }
-
-  /**
-   * Starts the mappings processor
-   *
-   * @param options options passed to create the mappings
-   */
-  async process(options: ProcessorOptions): Promise<void> {
-    const extraEntities = options.entities ? options.entities : []
-    await createDBConnection(extraEntities)
-
-    const processor = new MappingsProcessor(options)
-    await processor.start()
   }
 
   /**

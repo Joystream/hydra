@@ -13,6 +13,7 @@ import {
   QueryNodeManager
 } from '@dzlzv/hydra-indexer-lib/lib';
 
+import { ProcessorRunner } from '@dzlzv/hydra-processor'
 import { DatabaseManager } from '@dzlzv/hydra-db-utils'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 
@@ -96,7 +97,7 @@ function setUp(opts: any) {
 }
 
 async function runProcessor() {
-  const node = new QueryNodeManager();
+  const node = new ProcessorRunner();
   const atBlock = process.env.BLOCK_HEIGHT;
   await node.process({
     atBlock: atBlock && atBlock !== '0' ? Number.parseInt(atBlock) : undefined,
