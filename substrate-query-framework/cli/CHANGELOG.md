@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.17
+
+- Update wartog version to 2.20.0
+
 ## 0.0.16
 
 - Fixed duplicate flags in the scaffold
