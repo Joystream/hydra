@@ -17,7 +17,7 @@ import {
   MINIMUM_BLOCKS_AHEAD,
   PROCESSOR_POLL_INTERVAL,
 } from './processor-consts'
-import { EventEmitter } from 'typeorm/platform/PlatformTools'
+import { EventEmitter } from 'events'
 
 const debug = Debug('index-builder:processor')
 
@@ -160,5 +160,9 @@ export class MappingsProcessor extends EventEmitter {
       })
       this.emit('PROCESSED_EVENT', event)
     }
+  }
+
+  get name(): string {
+    return this._name
   }
 }

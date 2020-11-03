@@ -1,4 +1,4 @@
-import Container, { Inject, Service } from 'typedi'
+import Container, { Service } from 'typedi'
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
@@ -74,7 +74,7 @@ export class IndexerStatusService implements IStatusService {
     await this.redisClient.hset(INDEXER_STATUS, 'LAST_COMPLETE', height)
     const max = await this.redisClient.hget(INDEXER_STATUS, 'MAX_COMPLETE')
 
-    if ((max === null) || Number.parseInt(max) < height) {
+    if (max === null || Number.parseInt(max) < height) {
       await this.redisClient.hset(INDEXER_STATUS, 'MAX_COMPLETE', height)
     }
   }

@@ -1,11 +1,16 @@
-import { Gauge, Counter, collectDefaultMetrics } from 'prom-client'
+import { Gauge, collectDefaultMetrics } from 'prom-client'
 import Container from 'typedi'
-import { QueryEvent } from '../model'
+import { SubstrateEvent } from '../model'
 import { MappingsProcessor } from '../processor'
 import {
   IProcessorState,
   IProcessorStateHandler,
 } from '../processor/ProcessorStateHandler'
+import { logError } from '../utils/errors'
+import Debug from 'debug'
+import { countProcessedEvents } from '../db'
+
+const debug = Debug('index-builder:processor-prom-client')
 
 export class ProcessorPromClient {
   protected stateHandler: IProcessorStateHandler
@@ -16,9 +21,10 @@ export class ProcessorPromClient {
     help: 'Last block the processor has scanned for events',
   })
 
-  protected processedEvents = new Counter({
+  protected processedEvents = new Gauge({
     name: 'hydra_processor_processed_events_cnt',
     help: 'total number of processed events',
+    labelNames: ['name'],
   })
 
   constructor() {
@@ -29,12 +35,22 @@ export class ProcessorPromClient {
 
     this.processor = Container.get<MappingsProcessor>('MappingsProcessor')
 
-    this.stateHandler.on('STATE_CHANGE', (state: IProcessorState) => {
-      this.lastScannedBlock.set(state.lastScannedBlock)
-    })
+    this.initValues()
+      .then(() => {
+        this.stateHandler.on('STATE_CHANGE', (state: IProcessorState) => {
+          this.lastScannedBlock.set(state.lastScannedBlock)
+        })
 
-    this.processor.on('PROCESSED_EVENT', (event: QueryEvent) => {
-      this.processedEvents.inc()
-    })
+        this.processor.on('PROCESSED_EVENT', (event: SubstrateEvent) => {
+          this.processedEvents.inc()
+          this.processedEvents.inc({ name: event.name })
+        })
+      })
+      .catch((e) => debug(`Error initializing the values: ${logError(e)}`))
+  }
+
+  private async initValues(): Promise<void> {
+    const totalEvents = await countProcessedEvents(this.processor.name)
+    this.processedEvents.set(totalEvents)
   }
 }
