@@ -9,6 +9,8 @@ import { logError } from '../utils/errors'
 import { log } from 'console'
 import { ISubstrateService } from '../substrate'
 import { RedisClientFactory } from '../redis'
+import { startPromEndpoint } from '../prometheus/server'
+import { ProcessorPromClient } from '../prometheus/ProcessorPromClient'
 
 const debug = Debug('index-builder:manager')
 
@@ -63,7 +65,16 @@ export class QueryNodeManager {
     const extraEntities = options.entities ? options.entities : []
     await createDBConnection(extraEntities)
 
+    Container.set('ProcessorOptions', options)
+
     const processor = new MappingsProcessor(options)
+    Container.set('MappingsProcessor', processor)
+    try {
+      new ProcessorPromClient()
+      startPromEndpoint()
+    } catch (e) {
+      console.error(`Can't start Prometheus endpoint: ${logError(e)}`)
+    }
     await processor.start()
   }
 

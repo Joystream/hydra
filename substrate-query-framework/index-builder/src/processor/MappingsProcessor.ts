@@ -17,11 +17,12 @@ import {
   MINIMUM_BLOCKS_AHEAD,
   PROCESSOR_POLL_INTERVAL,
 } from './processor-consts'
+import { EventEmitter } from 'typeorm/platform/PlatformTools'
 
 const debug = Debug('index-builder:processor')
 
 @Service('MappingsProcessor')
-export class MappingsProcessor {
+export class MappingsProcessor extends EventEmitter {
   //private _lastEventIndex: string | undefined;
   private state!: IProcessorState
   private _started = false
@@ -40,6 +41,7 @@ export class MappingsProcessor {
       options.name || DEFAULT_PROCESSOR_NAME
     )
   ) {
+    super()
     // TODO: uncomment this block when eventSource will emit
     // this.eventsSource.on('NewIndexerHead', (h: number) => {
     //   debug(`New Indexer Head: ${h}`)
@@ -156,6 +158,7 @@ export class MappingsProcessor {
 
         debug(`Event ${event.id} done`)
       })
+      this.emit('PROCESSED_EVENT', event)
     }
   }
 }
