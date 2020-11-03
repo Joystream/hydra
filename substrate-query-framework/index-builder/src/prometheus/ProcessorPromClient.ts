@@ -1,6 +1,6 @@
-import { Gauge, Counter, collectDefaultMetrics } from 'prom-client'
+import { Gauge, collectDefaultMetrics } from 'prom-client'
 import Container from 'typedi'
-import { QueryEvent, SubstrateEvent } from '../model'
+import { SubstrateEvent } from '../model'
 import { MappingsProcessor } from '../processor'
 import {
   IProcessorState,

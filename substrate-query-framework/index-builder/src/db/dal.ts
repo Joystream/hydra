@@ -1,4 +1,4 @@
-import { QueryRunner, getRepository, createQueryBuilder } from 'typeorm'
+import { QueryRunner, getRepository } from 'typeorm'
 import { EVENT_TABLE_NAME } from '../entities/SubstrateEventEntity'
 import { doInTransaction } from './helper'
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
@@ -56,6 +56,7 @@ export async function loadState(
 export async function countProcessedEvents(
   processorID: string
 ): Promise<number> {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { cnt } = await getRepository(ProcessedEventsLogEntity)
     .createQueryBuilder('events')
     .select('COUNT(DISTINCT(events.event_id))', 'cnt')

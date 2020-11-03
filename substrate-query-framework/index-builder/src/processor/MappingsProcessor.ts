@@ -162,7 +162,7 @@ export class MappingsProcessor extends EventEmitter {
     }
   }
 
-  get name() {
+  get name(): string {
     return this._name
   }
 }

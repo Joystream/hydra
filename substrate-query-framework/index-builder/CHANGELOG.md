@@ -1,5 +1,9 @@
 # Changelog of major updates
 
+## 0.0.19-alpha
+
+- Add Prometheus Client for the processor
+
 ## 0.0.18-alpha
 
 - IndexerStatusService adds additional data into Redis:

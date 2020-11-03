@@ -1,21 +1,21 @@
 import * as express from 'express'
 import { register, validateMetricName } from 'prom-client'
 
-export function startPromEndpoint() {
+export function startPromEndpoint(): void {
   const server = express()
 
   // Setup server to Prometheus scrapes:
 
-  server.get('/metrics', async (req, res) => {
+  server.get('/metrics', (req, res) => {
     try {
       res.set('Content-Type', register.contentType)
-      res.end(await register.metrics())
+      res.end(register.metrics())
     } catch (ex) {
       res.status(500).end(ex)
     }
   })
 
-  server.get('/metrics/:metricName', async (req, res) => {
+  server.get('/metrics/:metricName', (req, res) => {
     try {
       res.set('Content-Type', register.contentType)
       if (
@@ -24,7 +24,7 @@ export function startPromEndpoint() {
       ) {
         res.status(400).end('No requested metric found')
       }
-      res.end(await register.getSingleMetricAsString(req.params.metricName))
+      res.end(register.getSingleMetricAsString(req.params.metricName))
     } catch (ex) {
       res.status(500).end(ex)
     }
