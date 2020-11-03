@@ -161,4 +161,8 @@ export class MappingsProcessor extends EventEmitter {
       this.emit('PROCESSED_EVENT', event)
     }
   }
+
+  get name() {
+    return this._name
+  }
 }
