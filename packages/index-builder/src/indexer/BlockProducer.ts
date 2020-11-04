@@ -71,7 +71,7 @@ export class BlockProducer
     //
     this._newHeadsUnsubscriber = this.substrateService.subscribeNewHeads(
       (header) => {
-        this._OnNewHeads(header)
+        this._onNewHeads(header)
       }
     )
 
@@ -95,7 +95,7 @@ export class BlockProducer
     this._started = false
   }
 
-  private _OnNewHeads(header: Header) {
+  private _onNewHeads(header: Header) {
     assert(this._started, 'Has to be started to process new heads.')
 
     this._chainHeight = header.number.toNumber()

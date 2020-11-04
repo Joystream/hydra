@@ -1,4 +1,4 @@
-import Container, { Inject, Service } from 'typedi'
+import Container, { Service } from 'typedi'
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'

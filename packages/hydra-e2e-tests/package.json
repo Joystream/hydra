@@ -5,6 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
     "build": "tsc --build tsconfig.json && cd ./schema && docker build . -t hydra:${CLITAG:-latest} --no-cache",
     "db:migrate": "sh ./scripts/db.sh --db-name indexer-db --db-host db up  && sh ./scripts/db.sh --db-name processor-db --db-host db up",
     "db:drop": "sh ./scripts/db.sh --db-name indexer-db drop && sh ./scripts/db.sh --db-name processor-db drop",

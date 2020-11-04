@@ -1,28 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm'
 
 @Entity({
-  name: 'processed_events_log'
+  name: 'processed_events_log',
 })
 export class ProcessedEventsLogEntity {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number
 
-  // Processor name, e.g. 'hydra-tutorial' 
+  // Processor name, e.g. 'hydra-tutorial'
   @Column()
-  processor!: string;
+  processor!: string
 
   // the indexed event reference
   @Column()
   @Index()
-  eventId!: string;
+  eventId!: string
 
   // last block the processor has scanned
   @Column()
-  lastScannedBlock!: number;
+  lastScannedBlock!: number
 
   // When the event is added to the database
   @Column('timestamp without time zone', {
     default: () => 'now()',
   })
-  updatedAt!: Date;
+  updatedAt!: Date
 }

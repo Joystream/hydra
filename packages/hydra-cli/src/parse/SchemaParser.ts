@@ -79,6 +79,7 @@ export class GraphQLSchemaParser {
     DIRECTIVES.map(d => (preamble += d.preamble + '\n'));
     return preamble;
   }
+
   /**
    * Read GrapqhQL schema and build a schema from it
    */
@@ -137,8 +138,6 @@ export class GraphQLSchemaParser {
     if (objDefinationNode.fields) return [...objDefinationNode.fields];
     return [];
   }
-
-  
 
   /**
    * Returns GraphQL object type definations

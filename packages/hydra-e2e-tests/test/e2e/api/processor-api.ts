@@ -20,8 +20,8 @@ export interface Transfer {
 }
 
 export async function findTransfersByValue(
-  value: Number,
-  block: Number
+  value: number,
+  block: number
 ): Promise<Transfer[]> {
   const graphClient = Container.get<GraphQLClient>('ProcessorClient')
 

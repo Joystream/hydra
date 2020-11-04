@@ -11,5 +11,5 @@ export interface ObjectType {
   // Description of the field will be shown in GrapqQL API
   description?: string;
   isInterface?: boolean;
-  interfaces?: ObjectType[]; //interface names
+  interfaces?: ObjectType[]; // interface names
 }

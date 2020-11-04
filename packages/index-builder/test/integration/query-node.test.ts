@@ -14,8 +14,10 @@ describe('QueryNode', () => {
   it('Should initialize the indexer', async () => {
     const node = Container.get<QueryNode>('QueryNode')
 
-    expect(node.indexBuilder, 'IndexBuilder should be initialized').to.not.be
-      .undefined
+    expect(node.indexBuilder).not.to.be.eq(
+      undefined,
+      'IndexBuilder should be initialized'
+    )
 
     await Promise.race([node.start(), sleep(100)])
 

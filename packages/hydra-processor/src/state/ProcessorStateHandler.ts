@@ -1,11 +1,11 @@
 import { loadState } from '../db/dal'
 import Debug from 'debug'
-import assert = require('assert')
 import { ProcessedEventsLogEntity } from '../entities'
 import { getRepository } from 'typeorm'
 import { Service } from 'typedi'
 import { IProcessorStateHandler } from './IProcessorStateHandler'
 import { IProcessorState } from './IProcessorState'
+import assert = require('assert')
 
 const debug = Debug('index-builder:processor-state-handler')
 

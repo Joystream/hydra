@@ -1,4 +1,4 @@
-import { IProcessorState } from "./IProcessorState";
+import { IProcessorState } from './IProcessorState'
 
 export interface IProcessorStateHandler {
   persist(state: IProcessorState): Promise<void>

@@ -88,10 +88,10 @@ export function buildFieldContext(f: Field, entity: ObjectType): GeneratorContex
 
 export function withFieldTypeGuardProps(f: Field): GeneratorContext {
   const is: GeneratorContext = {};
-  is['array'] = f.isArray();
-  is['scalar'] = f.isScalar();
-  is['enum'] = f.isEnum();
-  is['union'] = f.isUnion();
+  is.array = f.isArray();
+  is.scalar = f.isScalar();
+  is.enum = f.isEnum();
+  is.union = f.isUnion();
 
   ['mto', 'oto', 'otm', 'mtm'].map(s => (is[s] = f.relation?.type === s));
   return {

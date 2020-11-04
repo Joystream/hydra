@@ -1,7 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
-import execa = require('execa');
 
 import Command from '@oclif/command';
 import { run } from 'warthog/dist/cli/cli';
@@ -10,6 +9,7 @@ import { WarthogModelBuilder } from './../parse/WarthogModelBuilder';
 import { getTemplatePath } from '../utils/utils';
 import Debug from 'debug';
 import { SourcesGenerator } from '../generate/SourcesGenerator';
+import execa = require('execa');
 import Listr = require('listr');
 
 const FALLBACK_WARTHOG_LIB = 'https://github.com/metmirr/warthog/releases/download/v2.19/warthog-v2.19.tgz';
@@ -99,9 +99,8 @@ export default class WarthogWrapper {
 
   async newProject(projectName = 'query_node'): Promise<void> {
     const consoleFn = console.log;
-    console.log = () => {
-      return;
-    };
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    console.log = () => {};
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await run(['new', `${projectName}`]);
     console.log = consoleFn;
@@ -126,14 +125,14 @@ export default class WarthogWrapper {
 
     // Node does not run the compiled code, so we use ts-node in production...
     pkgFile.scripts['start:prod'] = 'WARTHOG_ENV=production yarn dotenv:generate && ts-node src/index.ts';
-    pkgFile.dependencies['warthog'] = this.getWarthogDependecy();
+    pkgFile.dependencies.warthog = this.getWarthogDependecy();
     fs.writeFileSync('package.json', JSON.stringify(pkgFile, null, 2));
 
-    //this.command.log('Installing graphql-server dependencies...');
+    // this.command.log('Installing graphql-server dependencies...');
     await execa('yarn', ['add', 'lodash']); // add lodash dep
     await execa('yarn', ['install']);
 
-    //this.command.log('done...');
+    // this.command.log('done...');
   }
 
   async createDB(): Promise<void> {

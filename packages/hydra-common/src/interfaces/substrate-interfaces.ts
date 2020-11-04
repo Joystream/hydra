@@ -37,9 +37,12 @@ export interface SubstrateExtrinsic {
   tip: BN
 }
 
-// return id in the format 000000..00<blockNum>-000<index> 
-// the reason for such formatting is to be able to efficiently sort events 
+// return id in the format 000000..00<blockNum>-000<index>
+// the reason for such formatting is to be able to efficiently sort events
 // by ID
 export function formatEventId(blockNumber: number, index: number): string {
-  return `${String(blockNumber).padStart(16, '0')}-${String(index).padStart(6, '0')}`;
+  return `${String(blockNumber).padStart(16, '0')}-${String(index).padStart(
+    6,
+    '0'
+  )}`
 }

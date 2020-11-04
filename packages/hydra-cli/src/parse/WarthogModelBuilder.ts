@@ -80,11 +80,11 @@ export class WarthogModelBuilder {
    */
   private isEntity(o: TypeDefinitionNode): boolean {
     const entityDirective = o.directives?.find(d => d.name.value === ENTITY_DIRECTIVE);
-    return entityDirective ? true : false;
+    return !!entityDirective;
   }
 
   private isVariant(o: TypeDefinitionNode): boolean {
-    if (o.directives == undefined) {
+    if (o.directives === undefined) {
       return false;
     }
 
@@ -93,7 +93,7 @@ export class WarthogModelBuilder {
 
   private isUnique(field: FieldDefinitionNode): boolean {
     const entityDirective = field.directives?.find(d => d.name.value === UNIQUE_DIRECTIVE);
-    return entityDirective ? true : false;
+    return !!entityDirective;
   }
 
   /**

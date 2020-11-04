@@ -59,14 +59,14 @@ export class Field {
   }
 
   isRelationType(): boolean {
-    return this.relation ? true : false;
+    return !!this.relation;
   }
 
   isEnum(): boolean {
-    return this.modelType == ModelType.ENUM;
+    return this.modelType === ModelType.ENUM;
   }
 
   isUnion(): boolean {
-    return this.modelType == ModelType.UNION;
+    return this.modelType === ModelType.UNION;
   }
 }

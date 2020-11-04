@@ -103,8 +103,8 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
       extr.meta = (e.meta.toJSON() || {}) as AnyJson
       extr.hash = e.hash.toString()
       extr.isSigned = e.isSigned
-      ;(extr.tip = new BN(e.tip.toString())),
-        (extr.versionInfo = e.version.toString())
+      extr.tip = new BN(e.tip.toString())
+      extr.versionInfo = e.version.toString()
       extr.nonce = e.nonce.toNumber()
       extr.era = (e.era.toJSON() || {}) as AnyJson
 
@@ -118,7 +118,7 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
         })
       })
     }
-    //debug(`Event entity: ${JSON.stringify(_entity, null, 2)}`);
+    // debug(`Event entity: ${JSON.stringify(_entity, null, 2)}`);
 
     return _entity
   }

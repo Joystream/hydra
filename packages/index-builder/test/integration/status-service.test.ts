@@ -1,7 +1,4 @@
 import * as dotenv from 'dotenv'
-// we should set env variables before all other imports to
-// avoid config errors or warthog caused by DI
-dotenv.config({ path: './test/.env' })
 import { expect } from 'chai'
 import { describe } from 'mocha'
 import { IndexBuilder, QueryEventBlock, QueryNodeManager } from '../../src'
@@ -15,6 +12,9 @@ import { blockPayload, queryEventBlock } from '../fixtures/mock-factory'
 import { EVENT_TOTAL } from '../../src/indexer/redis-keys'
 import { clearRedis, resetDb } from './setup-db'
 import { EventEmitter } from 'events'
+// we should set env variables before all other imports to
+// avoid config errors or warthog caused by DI
+dotenv.config({ path: './test/.env' })
 
 const debug = Debug('index-builder:status-service-test')
 const FINAL_CHAIN_HEIGHT = 7
@@ -98,7 +98,7 @@ describe('IndexerStatusService', () => {
     await waitForAsync(
       async () => {
         const head = await statusService.getIndexerHead()
-        return head == FINAL_CHAIN_HEIGHT
+        return head === FINAL_CHAIN_HEIGHT
       },
       undefined,
       300

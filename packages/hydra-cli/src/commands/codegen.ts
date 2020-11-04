@@ -6,13 +6,13 @@ import { readFileSync } from 'fs-extra';
 import { Command, flags } from '@oclif/command';
 
 import cli from 'cli-ux';
-import execa = require('execa');
 
 import { createDir, getTemplatePath, createFile } from '../utils/utils';
 import { formatWithPrettier } from '../helpers/formatter';
 import WarthogWrapper from '../helpers/WarthogWrapper';
 import { getTypeormConfig } from '../helpers/db';
 import { upperFirst } from 'lodash';
+import execa = require('execa');
 import Listr = require('listr');
 
 export default class Codegen extends Command {
@@ -120,7 +120,13 @@ export default class Codegen extends Command {
           await execa('yarn', ['add', `${lib}`]);
         }
         const indexerLib = process.env.INDEXER_LIB || '@dzlzv/hydra-indexer-lib';
-        await execa('yarn', ['add', `${indexerLib}`, '@dzlzv/hydra-db-utils', '@dzlzv/hydra-common', '@dzlzv/hydra-processor']);
+        await execa('yarn', [
+          'add',
+          `${indexerLib}`,
+          '@dzlzv/hydra-db-utils',
+          '@dzlzv/hydra-common',
+          '@dzlzv/hydra-processor',
+        ]);
       },
     };
 

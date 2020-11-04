@@ -1,5 +1,5 @@
 // @ts-check
-import { ApiPromise, WsProvider /*RuntimeVersion*/ } from '@polkadot/api'
+import { ApiPromise, WsProvider /* RuntimeVersion */ } from '@polkadot/api'
 
 import { IndexBuilder } from '..'
 import { IndexerOptions } from '.'
@@ -86,7 +86,7 @@ export class QueryNode {
   }
 
   async start(): Promise<void> {
-    if (this._state != QueryNodeState.NOT_STARTED)
+    if (this._state !== QueryNodeState.NOT_STARTED)
       throw new Error('Starting requires ')
 
     this._state = QueryNodeState.STARTED
@@ -113,7 +113,7 @@ export class QueryNode {
 
     await this.indexBuilder.stop()
 
-    await waitFor(() => this.state == QueryNodeState.STOPPED)
+    await waitFor(() => this.state === QueryNodeState.STOPPED)
   }
 
   get state(): QueryNodeState {

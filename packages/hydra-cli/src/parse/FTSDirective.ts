@@ -21,9 +21,7 @@ export class FTSDirective implements SchemaDirective {
     const path = cloneDeep(_path);
 
     if (path.length < 3) {
-      throw new Error(
-        'The path should contain at least a type and field definition nodes'
-      );
+      throw new Error('The path should contain at least a type and field definition nodes');
     }
     const dirNode = path.pop();
     if (dirNode?.kind !== 'Directive') {
@@ -37,16 +35,14 @@ export class FTSDirective implements SchemaDirective {
     if (fieldNode.type.kind === 'NonNullType') {
       type = fieldNode.type.type;
     }
-    if (type.kind == 'ListType') {
+    if (type.kind === 'ListType') {
       throw new Error('Only single named types are supported');
     }
     if (type.kind !== 'NamedType') {
       throw new Error('Only single named types are supported');
     }
     if (type.name.value !== 'String') {
-      throw new Error(
-        `Only string types can be annotaed ${FULL_TEXT_SEARCHABLE_DIRECTIVE}`
-      );
+      throw new Error(`Only string types can be annotaed ${FULL_TEXT_SEARCHABLE_DIRECTIVE}`);
     }
   }
 
@@ -72,19 +68,15 @@ export class FTSDirective implements SchemaDirective {
    */
   private _checkFullTextSearchDirective(d: DirectiveNode): string {
     if (!d.arguments) {
-      throw new Error(
-        `@${FULL_TEXT_SEARCHABLE_DIRECTIVE} should have a query argument`
-      );
+      throw new Error(`@${FULL_TEXT_SEARCHABLE_DIRECTIVE} should have a query argument`);
     }
 
     const qarg: ArgumentNode[] = d.arguments.filter(
-      (arg) => arg.name.value === `query` && arg.value.kind === `StringValue`
+      arg => arg.name.value === `query` && arg.value.kind === `StringValue`
     );
 
     if (qarg.length !== 1) {
-      throw new Error(
-        `@${FULL_TEXT_SEARCHABLE_DIRECTIVE} should have a single query argument with a sting value`
-      );
+      throw new Error(`@${FULL_TEXT_SEARCHABLE_DIRECTIVE} should have a single query argument with a sting value`);
     }
     return (qarg[0].value as StringValueNode).value;
   }
