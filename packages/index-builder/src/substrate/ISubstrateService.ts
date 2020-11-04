@@ -24,8 +24,8 @@ export interface ISubstrateService {
   getBlock(hash?: Hash | Uint8Array | string): Promise<SignedBlock>
   // Cut down from at: (hash: Hash | Uint8Array | string, ...args: Parameters<F>) => PromiseOrObs<ApiType, ObsInnerType<ReturnType<F>>>;
   eventsAt(hash: Hash | Uint8Array | string): Promise<EventRecord[] & Codec>
-  //eventsRange()
-  //events()
+  // eventsRange()
+  // events()
   stop(): Promise<void>
 }
 

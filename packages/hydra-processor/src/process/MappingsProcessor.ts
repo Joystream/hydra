@@ -2,13 +2,17 @@ import Debug from 'debug'
 import { makeDatabaseManager, doInTransaction } from '@dzlzv/hydra-db-utils'
 import { ProcessorOptions } from '../start'
 import { Inject, Service } from 'typedi'
-import { IProcessorSource, GraphQLSource } from '../ingest'
+import { IProcessorSource, GraphQLSource, EventFilter } from '../ingest'
 import { HandlerLookupService } from './HandlerLookupService'
 import { QueryRunner } from 'typeorm'
-import { logError, waitFor, SubstrateEvent } from '@dzlzv/hydra-common'
+import {
+  logError,
+  waitFor,
+  SubstrateEvent,
+  formatEventId,
+} from '@dzlzv/hydra-common'
 import { IProcessorState, ProcessorStateHandler } from '../state'
-import { EventFilter } from '../ingest'
-import { formatEventId } from '@dzlzv/hydra-common'
+
 import {
   BATCH_SIZE,
   BLOCK_WINDOW,
@@ -21,7 +25,7 @@ const debug = Debug('index-builder:processor')
 
 @Service('MappingsProcessor')
 export class MappingsProcessor {
-  //private _lastEventIndex: string | undefined;
+  // private _lastEventIndex: string | undefined;
   private state!: IProcessorState
   private _started = false
   private currentFilter!: EventFilter
@@ -105,7 +109,7 @@ export class MappingsProcessor {
     )
     this.currentFilter.afterID = this.state.lastProcessedEvent
 
-    //debug(`Next filter: ${JSON.stringify(this.currentFilter, null, 2)}`);
+    // debug(`Next filter: ${JSON.stringify(this.currentFilter, null, 2)}`);
     return this.currentFilter
   }
 
@@ -137,8 +141,8 @@ export class MappingsProcessor {
     debug(`The processor has been stopped`)
   }
 
-  async processEventBlock(query_event_block: SubstrateEvent[]): Promise<void> {
-    for (const event of query_event_block) {
+  async processEventBlock(queryEventBlock: SubstrateEvent[]): Promise<void> {
+    for (const event of queryEventBlock) {
       await doInTransaction(async (queryRunner: QueryRunner) => {
         debug(`Processing event ${event.name}, 
           id: ${event.id}`)

@@ -48,7 +48,7 @@ export class IndexerStatusService {
   getNumberOrDefault(
     obj: Record<string, string>,
     hash: string,
-    def: number = -1
+    def = -1
   ): number {
     if (obj === null || obj === undefined) {
       return def
@@ -56,7 +56,7 @@ export class IndexerStatusService {
     if (
       obj[hash] === null ||
       obj[hash] === undefined ||
-      obj[hash].length == 0
+      obj[hash].length === 0
     ) {
       return def
     }

@@ -9,11 +9,11 @@ export interface BlockPayload {
 
 export function toPayload(qeb: QueryEventBlock): BlockPayload {
   return (withTs({
-    height: qeb.block_number,
-    events: qeb.query_events.map((e) => {
+    height: qeb.blockNumber,
+    events: qeb.queryEvents.map((e) => {
       return {
         name: e.eventName,
-        id: formatEventId(qeb.block_number, e.index),
+        id: formatEventId(qeb.blockNumber, e.index),
       }
     }),
   }) as unknown) as BlockPayload

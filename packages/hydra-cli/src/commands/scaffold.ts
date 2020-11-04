@@ -56,9 +56,9 @@ export default class Scaffold extends Command {
     cli.action.stop();
   }
 
-  async dotenvFromFlags(flags_: { [key: string]: string | boolean | undefined }): Promise<string> {
+  async dotenvFromFlags(flags: { [key: string]: string | boolean | undefined }): Promise<string> {
     const template = await fs.readFile(getTemplatePath('scaffold/.env'), 'utf-8');
-    return Mustache.render(template, { ...flags_, dbName: flags_.projectName });
+    return Mustache.render(template, { ...flags, dbName: flags.projectName });
   }
 
   async promptDotEnv(): Promise<string> {
@@ -107,12 +107,12 @@ export default class Scaffold extends Command {
     if (!proceed) {
       return ctx;
     }
-    let _ctx = { ...ctx };
+    ctx = { ...ctx };
     const wsProviderUrl = (await cli.prompt('Substrate WS provider endpoint', {
       default: DEFAULT_WS_API_ENDPOINT,
     })) as string;
 
-    _ctx = { ..._ctx, wsProviderUrl };
+    ctx = { ...ctx, wsProviderUrl };
 
     const blockHeight = (await cli.prompt('What is the block height the indexer should start from?', {
       default: '0',
@@ -120,16 +120,16 @@ export default class Scaffold extends Command {
     if (isNaN(parseInt(blockHeight))) {
       throw new Error('Starting block height must be an integer');
     }
-    _ctx = { ..._ctx, blockHeight };
+    ctx = { ...ctx, blockHeight };
 
     const redisUri = (await cli.prompt('Please provide a Redis instance connection string', {
       default: 'redis://localhost:6379/0',
     })) as string;
-    _ctx = { ..._ctx, redisUri };
+    ctx = { ...ctx, redisUri };
 
-    _ctx = await this.promptCustomTypes(_ctx);
+    ctx = await this.promptCustomTypes(ctx);
 
-    return _ctx;
+    return ctx;
   }
 
   async promptCustomTypes(ctx: Record<string, string>): Promise<Record<string, string>> {

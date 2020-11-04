@@ -1,8 +1,4 @@
-import {
-  getRepository,
-  Connection,
-  createConnection,
-} from 'typeorm'
+import { getRepository, Connection, createConnection } from 'typeorm'
 
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 import Debug from 'debug'
@@ -14,7 +10,7 @@ const debug = Debug('index-builder:helper')
 export async function createDBConnection(
   entities: any[] = []
 ): Promise<Connection> {
-  //const connectionOptions = await getConnectionOptions();
+  // const connectionOptions = await getConnectionOptions();
   const _config = config()
   entities.map((e) => _config.entities?.push(e))
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)

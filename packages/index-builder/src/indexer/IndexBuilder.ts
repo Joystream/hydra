@@ -107,9 +107,9 @@ export class IndexBuilder extends EventEmitter {
   }
 
   async transformAndPersist(queryEventsBlock: QueryEventBlock): Promise<void> {
-    const batches = _.chunk(queryEventsBlock.query_events, 100)
+    const batches = _.chunk(queryEventsBlock.queryEvents, 100)
     debug(
-      `Read ${queryEventsBlock.query_events.length} events; saving in ${batches.length} batches`
+      `Read ${queryEventsBlock.queryEvents.length} events; saving in ${batches.length} batches`
     )
 
     await doInTransaction(async (queryRunner: QueryRunner) => {

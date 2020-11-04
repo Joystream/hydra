@@ -1,2 +1,2 @@
-export * from './ISubstrateService';
-export * from './SubstrateService';
+export * from './ISubstrateService'
+export * from './SubstrateService'

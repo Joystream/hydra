@@ -88,9 +88,9 @@ export class ModelRenderer extends AbstractRenderer {
       if (ct === 'numeric' || ct === 'decimal') ct = 'numeric';
       has[ct] = true;
     }
-    has['array'] = this.objType.fields.some(f => f.isArray());
-    has['enum'] = this.objType.fields.some(f => f.isEnum());
-    has['union'] = this.objType.fields.some(f => f.isUnion());
+    has.array = this.objType.fields.some(f => f.isArray());
+    has.enum = this.objType.fields.some(f => f.isEnum());
+    has.union = this.objType.fields.some(f => f.isUnion());
 
     debug(`ObjectType has: ${JSON.stringify(has, null, 2)}`);
 
@@ -142,7 +142,10 @@ export class ModelRenderer extends AbstractRenderer {
     }
     const imports = Array.from(fieldResolverImports.values());
     // If there is at least one field resolver then add typeorm to imports
-    imports.length ? imports.push(`import { getConnection } from 'typeorm';`) : null;
+    if (imports.length) {
+      imports.push(`import { getConnection } from 'typeorm';`);
+    }
+
     return {
       fieldResolvers,
       fieldResolverImports: imports,
@@ -151,7 +154,7 @@ export class ModelRenderer extends AbstractRenderer {
 
   transform(): GeneratorContext {
     return {
-      ...this.context, //this.getGeneratedFolderRelativePath(objType.name),
+      ...this.context, // this.getGeneratedFolderRelativePath(objType.name),
       ...this.withFields(),
       ...this.withEnums(),
       ...this.withInterfaces(),

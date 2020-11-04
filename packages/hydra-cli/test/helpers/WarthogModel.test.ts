@@ -179,6 +179,6 @@ describe('WarthogModel', () => {
       status: Poor!
     }`);
 
-    expect(model.lookupEntity('MyEntity').fields[0].isUnion(), 'Should have a single field of union type').to.be.true;
+    expect(model.lookupEntity('MyEntity').fields[0].isUnion()).eq(true, 'Should have a single field of union type');
   });
 });

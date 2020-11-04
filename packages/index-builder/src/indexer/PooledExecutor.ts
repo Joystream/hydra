@@ -58,14 +58,14 @@ export class PooledExecutor<T, R, N> {
     let stop = false
     const poller = async () => {
       do {
-        let next = undefined
+        let next
         try {
           next = await this.generator.next()
         } catch (e) {
           debug(`Error getting next generator value`)
           throw new Error(`Error getting next generator value, ${logError(e)}`)
         }
-        if (next == undefined || next.done === true) {
+        if (next === undefined || next.done === true) {
           debug('Generator is done, exiting')
           break
         }

@@ -12,5 +12,4 @@ export class EnumRenderer extends AbstractRenderer {
       enums,
     };
   }
-
 }

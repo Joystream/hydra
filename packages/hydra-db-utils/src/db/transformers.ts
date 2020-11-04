@@ -8,6 +8,7 @@ export class NumericTransformer implements ValueTransformer {
   to(value: BN): string | null {
     return value ? value.toString(10) : null
   }
+
   /**
    * Used to unmarshal data when reading from the database.
    */

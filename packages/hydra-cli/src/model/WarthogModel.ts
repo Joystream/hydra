@@ -3,6 +3,8 @@ import Debug from 'debug';
 import { validateVariantField } from './validate';
 import { availableTypes } from './ScalarTypes';
 
+import { ObjectType, Field, FTSQuery } from '.';
+
 const debug = Debug('qnode-cli:model');
 
 export enum ModelType {
@@ -13,8 +15,6 @@ export enum ModelType {
   INTERFACE,
   SCALAR,
 }
-
-import { ObjectType, Field, FTSQuery } from '.';
 
 export class WarthogModel {
   private _entities: ObjectType[];
@@ -81,6 +81,7 @@ export class WarthogModel {
   addEnum(_enum: GraphQLEnumType): void {
     this._enums.push(_enum);
   }
+
   /**
    * Add emply full text search query with the given name
    *
@@ -192,7 +193,9 @@ export class WarthogModel {
    * @param interfaceName Name of the interface
    */
   getSubclasses(interfaceName: string): ObjectType[] {
-    return this._entities.filter(t => t.interfaces && t.interfaces.length > 0 && t.interfaces[0].name == interfaceName);
+    return this._entities.filter(
+      t => t.interfaces && t.interfaces.length > 0 && t.interfaces[0].name === interfaceName
+    );
   }
 
   /**

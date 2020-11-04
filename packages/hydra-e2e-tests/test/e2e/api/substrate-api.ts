@@ -10,7 +10,7 @@ export async function transfer(
   from: string,
   to: string,
   amount: number
-): Promise<Number> {
+): Promise<number> {
   const api = Container.get<ApiPromise>('ApiPromise')
   // Create a extrinsic, transferring randomAmount units to Bob.
   const transfer = api.tx.balances.transfer(to, amount)
@@ -30,14 +30,14 @@ export async function transfer(
     await waitFor(() => blockHash !== undefined),
   ])
 
-  if (blockHash == undefined) {
+  if (blockHash === undefined) {
     throw new Error('The transfer was not finalized')
   }
   console.log(`Finalized at hash ${blockHash.toHuman()}`)
   return await getBlockHeight(blockHash)
 }
 
-export async function getBlockHeight(hash: Hash): Promise<Number> {
+export async function getBlockHeight(hash: Hash): Promise<number> {
   const api = Container.get<ApiPromise>('ApiPromise')
   const signedBlock = await api.rpc.chain.getBlock(hash)
   return signedBlock.block.header.number.toNumber()

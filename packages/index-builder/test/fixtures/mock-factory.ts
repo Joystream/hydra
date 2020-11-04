@@ -12,8 +12,8 @@ export function blockPayload(height: number): BlockPayload {
 export function queryEventBlock(block = 0): QueryEventBlock {
   const gen = queryEvent(block)
   return {
-    block_number: block,
-    query_events: [
+    blockNumber: block,
+    queryEvents: [
       gen.next().value as IQueryEvent,
       gen.next().value as IQueryEvent,
       gen.next().value as IQueryEvent,

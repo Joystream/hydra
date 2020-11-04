@@ -1,10 +1,10 @@
 import * as dotenv from 'dotenv'
-// we should set env variables before all other imports to avoid config errors or warthog caused by DI
-dotenv.config({ path: './test/.env' })
 import { createDb, dropDb } from '../utils'
 import { QueryNodeManager } from '../../src'
 import { createDBConnection } from '../../src/db/dal'
 import * as Redis from 'ioredis'
+// we should set env variables before all other imports to avoid config errors or warthog caused by DI
+dotenv.config({ path: './test/.env' })
 
 export async function resetDb(): Promise<void> {
   try {
@@ -15,7 +15,7 @@ export async function resetDb(): Promise<void> {
   try {
     await setupDb()
   } catch (e) {
-    //ignore;
+    // ignore;
   }
 }
 
