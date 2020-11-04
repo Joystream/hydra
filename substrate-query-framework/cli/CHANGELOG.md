@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.18
+
+- Fix entity relation resolvers for the genrated GraphQL server
+
 ## 0.0.17
 
 - Update wartog version to 2.20.0
