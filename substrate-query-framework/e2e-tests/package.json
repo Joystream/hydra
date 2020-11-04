@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "build": "cd schema && docker build . -t hydra:${CLITAG:-latest} --no-cache",
-    "db:migrate": "sh ./scripts/db.sh --db-name indexer-db --db-host db up  && sh ./scripts/db.sh --db-name processor-db --db-host db up",
-    "db:drop": "sh ./scripts/db.sh --db-name indexer-db drop && sh ./scripts/db.sh --db-name processor-db drop",
+    "db:migrate": "bash ./scripts/db.sh --db-name indexer-db --db-host db up  && bash ./scripts/db.sh --db-name processor-db --db-host db up",
+    "db:drop": "bash ./scripts/db.sh --db-name indexer-db drop && bash ./scripts/db.sh --db-name processor-db drop",
     "db:up": "docker-compose up -d db",
     "db:setup": "CLITAG=${CLITAG:-latest} yarn db:up && CLITAG=${CLITAG:-latest} yarn db:migrate",
     "redis:reset": "docker-compose up -d redis && docker-compose exec redis redis-cli FLUSHALL",

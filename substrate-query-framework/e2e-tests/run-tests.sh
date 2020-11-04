@@ -1,7 +1,13 @@
-function cleanup()
+#!/bin/bash
+
+cleanup()
 {
     yarn post-e2e-test
 }
+
+set -e
+# clean up
+trap cleanup ERR EXIT SIGINT SIGTERM
 
 docker build ../index-builder -t index-builder:latest 
 docker build ../cli -t hydra-cli:latest 
@@ -29,6 +35,3 @@ done
 
 # run the actual tests
 yarn e2e-test
-
-# clean up
-trap cleanup EXIT
