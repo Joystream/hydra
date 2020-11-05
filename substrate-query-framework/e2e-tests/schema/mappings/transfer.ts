@@ -1,6 +1,6 @@
 import { SubstrateEvent, DB } from '../generated/indexer';
 import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model';
-import * as BN from 'bn.js';
+import BN from 'bn.js'
 
 export async function balances_Transfer(db: DB, event: SubstrateEvent) {
   const [from, to, value] = event.params;
