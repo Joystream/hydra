@@ -4,6 +4,9 @@ RUN mkdir -p /home/node/index-server && chown -R node:node /home/node/index-serv
 COPY --chown=node:node . /home/node/index-server/
 
 WORKDIR /home/node/index-server
-RUN yarn && yarn codegen && yarn build
+ENV WARTHOG_ENV development
+RUN yarn 
+RUN yarn dotenvi -s ${WARTHOG_ENV:-development}
+RUN yarn codegen && yarn build
 
 CMD ["yarn", "start:prod"]
