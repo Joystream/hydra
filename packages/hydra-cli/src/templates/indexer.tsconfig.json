@@ -12,7 +12,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "inlineSources": false,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
-    "build": "tsc --build tsconfig.json && cd ./schema && docker build . -t hydra:${CLITAG:-latest} --no-cache",
-    "db:migrate": "sh ./scripts/db.sh --db-name indexer-db --db-host db up  && sh ./scripts/db.sh --db-name processor-db --db-host db up",
-    "db:drop": "sh ./scripts/db.sh --db-name indexer-db drop && sh ./scripts/db.sh --db-name processor-db drop",
+    "build": "tsc --build tsconfig.json && cd schema && docker build . -t hydra:${CLITAG:-latest} --no-cache",
+    "db:migrate": "bash ./scripts/db.sh --db-name indexer-db --db-host db up  && bash ./scripts/db.sh --db-name processor-db --db-host db up",
+    "db:drop": "bash ./scripts/db.sh --db-name indexer-db drop && bash ./scripts/db.sh --db-name processor-db drop",
     "db:up": "docker-compose up -d db",
     "db:setup": "CLITAG=${CLITAG:-latest} yarn db:up && CLITAG=${CLITAG:-latest} yarn db:migrate",
     "redis:reset": "docker-compose up -d redis && docker-compose exec redis redis-cli FLUSHALL",
@@ -17,7 +17,7 @@
     "pre-e2e-test": "CLITAG=${CLITAG:-latest} yarn db:setup && CLITAG=${CLITAG:-latest} docker-compose up -d",
     "post-e2e-test": "CLITAG=${CLITAG:-latest} docker-compose down",
     "e2e-test-local": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --exit --file ./test/e2e/setup-e2e.ts \"test/e2e/**/*.test.ts\"",
-    "e2e-test": "sh -x run-tests.sh"
+    "e2e-test": "bash run-tests.sh"
   },
   "dependencies": {
     "@dzlzv/hydra-common": "^0.0.2",
