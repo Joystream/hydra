@@ -1,0 +1,19 @@
+name: hydra-e2e-tests
+on: [pull_request]
+  
+jobs:
+  run_e2e_tests:
+    name: run Hydra e2e tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: run e2e tests
+        run: |
+          yarn && yarn e2e-test
+ 

@@ -107,6 +107,7 @@ export default class WarthogWrapper {
 
     // Override warthog's index.ts file for custom naming strategy
     fs.copyFileSync(getTemplatePath('graphql-server.index.mst'), path.resolve(process.cwd(), 'src/index.ts'));
+    fs.copyFileSync(getTemplatePath(`graphql-server.tsconfig.json`), path.resolve(process.cwd(), 'tsconfig.json'));
 
     await this.updateDotenv();
   }

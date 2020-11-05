@@ -1,4 +1,5 @@
 #!/bin/bash
+
 db_user=postgres
 db_pass=postgres
 db_host=localhost
@@ -7,7 +8,7 @@ db_name=test
 network=hydra-e2e-tests_default
 command=""
 
-if [[ $CLITAG == "" ]] ;
+if [ "$CLITAG" = "" ] ;
 then
     echo "CLITAG is not set. Build and set the hydra image tag version to run the tests"
     exit 1
@@ -41,7 +42,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [[ $command == "" ]] ;
+if [ "$command" = "" ] ;
 then
     echo "Command must be defined"
     exit 1

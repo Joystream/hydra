@@ -118,13 +118,13 @@ describe('ModelRenderer', () => {
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`);
 
     expect(rendered).to.include(`import { Author } from '../author/author.model`, `Should render imports`);
-    //   expect(rendered).to.include(
-    //     `@ManyToOne(() => Author, (param: Author) => param.posts, {
-    //   skipGraphQLField: true,
-    // })`,
-    //     'Should render MTO decorator'
-    //   ); // nullable: true is not includered?
-    //   expect(rendered).to.include(`author!: Author;`, 'Should render required referenced field');
+    expect(rendered).to.include(
+      `@ManyToOne(() => Author, (param: Author) => param.postauthor, {
+    skipGraphQLField: true,
+  })`,
+      'Should render MTO decorator'
+    ); // nullable: true is not includered?
+    expect(rendered).to.include(`author!: Author;`, 'Should render required referenced field');
   });
 
   it('should renderer array types', function () {

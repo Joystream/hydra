@@ -1,6 +1,12 @@
-function cleanup()
+#!/bin/bash
+
+cleanup()
 {
-    yarn post-e2e-test
+  (echo "## Processor Logs ##" && docker logs e2e-tests_processor_1 --tail 50) || :
+  (echo "## Processor Server Logs ##" && docker logs e2e-tests_processor-gql-server_1 --tail 50) || :  
+  (echo "## Indexer Logs ##" && docker logs e2e-tests_indexer_1 --tail 50) || :  
+  (echo "## Indexer API Server ##" && docker logs e2e-tests_indexer-api-server_1 --tail 50) || :  
+  yarn post-e2e-test
 }
 
 set -e

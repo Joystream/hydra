@@ -1,0 +1,19 @@
+name: hydra-unit-tests
+on: [push, pull_request]
+  
+jobs:
+  run_unit_tests:
+    name: run Hydra unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: run unit tests
+        run: |
+          yarn && yarn workspace @dzlzv/hydra-cli test
+ 
