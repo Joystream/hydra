@@ -1,9 +1,9 @@
-name: hydra-e2e-tests
-on: [pull_request]
+name: hydra-unit-tests
+on: [push, pull_request]
   
 jobs:
-  run_e2e_tests:
-    name: run Hydra e2e tests
+  run_unit_tests:
+    name: run Hydra unit tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -13,8 +13,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: run e2e tests
+      - name: run unit tests
         run: |
-          cd ./substrate-query-framework/e2e-tests
-          yarn && bash run-tests.sh
+          cd ./substrate-query-framework/cli
+          yarn && yarn test
  
