@@ -7,6 +7,7 @@ import { Command, flags } from '@oclif/command';
 
 import cli from 'cli-ux';
 import execa = require('execa');
+import Debug from 'debug';
 
 import { createDir, getTemplatePath, createFile } from '../utils/utils';
 import { formatWithPrettier } from '../helpers/formatter';
@@ -14,6 +15,8 @@ import WarthogWrapper from '../helpers/WarthogWrapper';
 import { getTypeormConfig } from '../helpers/db';
 import { upperFirst } from 'lodash';
 import Listr = require('listr');
+
+const debug = Debug('qnode-cli:codegen');
 
 export default class Codegen extends Command {
   static description = 'Code generator';
@@ -27,13 +30,19 @@ export default class Codegen extends Command {
     graphql: flags.boolean({ char: 'g', allowNo: true, description: 'Generate GraphQL server', default: true }),
 
     dbschema: flags.boolean({ char: 'd', description: 'Create the DB schema (use with caution!)', default: false }),
+    // pass --no-install to skip the `yarn install` steps
+    install: flags.boolean({ allowNo: true, description: 'Install dependencies', default: true }),
   };
+
+  private parsedFlags!: Record<string, boolean | string>;
 
   async run(): Promise<void> {
     dotenv.config();
 
     const { flags } = this.parse(Codegen);
-
+    this.parsedFlags = flags;
+    this.parsedFlags.install = this.parsedFlags.install && process.env.HYDRA_NO_DEPS_INSTALL !== 'true';
+    debug(`Parsed flags: ${JSON.stringify(this.parsedFlags, null, 2)}`);
     const generatedFolderPath = path.resolve(process.cwd(), Codegen.generatedFolderName);
 
     createDir(generatedFolderPath);
@@ -67,7 +76,7 @@ export default class Codegen extends Command {
     process.chdir(warthogProjectPath);
 
     const warthogWrapper = new WarthogWrapper(this, schemaPath);
-    await warthogWrapper.run();
+    await warthogWrapper.run(this.parsedFlags);
 
     if (syncdb) {
       await warthogWrapper.generateDB();
@@ -112,7 +121,13 @@ export default class Codegen extends Command {
     const installDeps = {
       title: 'Install dependencies for the Indexer',
       task: async () => {
-        await execa('yarn', ['install']);
+        if (this.parsedFlags.install !== true) {
+          this.warn('Skipping yarn install for the indexer');
+          return;
+        }
+
+        debug('Installing indexer dependencies');
+
         if (process.env.TYPE_REGISTER_PACKAGE_NAME) {
           const lib = process.env.TYPE_REGISTER_PACKAGE_VERSION
             ? `${process.env.TYPE_REGISTER_PACKAGE_NAME}@${process.env.TYPE_REGISTER_PACKAGE_VERSION}`
@@ -121,6 +136,7 @@ export default class Codegen extends Command {
         }
         const indexerLib = process.env.INDEXER_LIB || '@dzlzv/hydra-indexer-lib';
         await execa('yarn', ['add', `${indexerLib}`]);
+        await execa('yarn', ['install']);
       },
     };
 
