@@ -3,10 +3,43 @@
   "description": "CLI tool for building a Hydra query node",
   "version": "0.1.0",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
+  "license": "MIT",
   "bin": {
     "hydra-cli": "./bin/run"
   },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "types": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "oclif": {
+    "commands": "./lib/src/commands",
+    "bin": "hydra-cli",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/errors"
+    ]
+  },
+  "repository": "git@github.com:Joystream/hydra.git",
   "bugs": "https://github.com/Joystream/hydra/issues",
+  "homepage": "https://www.joystream.org/hydra/",
+  "keywords": [
+    "oclif"
+  ],
+  "scripts": {
+    "build": "rm -rf lib && tsc --build tsconfig.json",
+    "postpack": "rm -f oclif.manifest.json",
+    "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
+    "prepack": "rm -rf lib && tsc -b && cp -R ./src/templates ./lib/src/templates && oclif-dev manifest && oclif-dev readme",
+    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif-dev readme && git add README.md"
+  },
   "dependencies": {
     "@oclif/command": "^1.5.20",
     "@oclif/config": "^1",
@@ -31,6 +64,9 @@
     "warthog": "https://github.com/metmirr/warthog/releases/download/v2.20.0/warthog-v2.20.0.tgz"
   },
   "devDependencies": {
+    "@dzlzv/hydra-common": "^0.0.3",
+    "@dzlzv/hydra-db-utils": "^0.0.2",
+    "@dzlzv/hydra-processor": "^0.0.5",
     "@oclif/dev-cli": "^1",
     "@oclif/test": "^1",
     "@types/chai": "^4",
@@ -53,42 +89,6 @@
     "temp": "^0.9.1",
     "ts-node": "^8",
     "typescript": "^3.9.3"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/bin",
-    "/lib",
-    "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
-  ],
-  "homepage": "https://www.joystream.org/hydra/",
-  "keywords": [
-    "oclif"
-  ],
-  "license": "MIT",
-  "main": "lib/index.js",
-  "oclif": {
-    "commands": "./lib/src/commands",
-    "bin": "hydra-cli",
-    "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/errors"
-    ]
-  },
-  "repository": "git@github.com:Joystream/hydra.git",
-  "scripts": {
-    "build": "rm -rf lib && tsc --build tsconfig.json",
-    "postpack": "rm -f oclif.manifest.json",
-    "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
-    "prepack": "rm -rf lib && tsc -b && cp -R ./src/templates ./lib/src/templates && oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
-  },
-  "types": "lib/index.d.ts",
-  "resolutions": {
-    "tslib": "1.11.2"
   },
   "husky": {
     "hooks": {

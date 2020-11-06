@@ -1,5 +1,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import Debug from 'debug';
+
+const debug = Debug('hydra-cli:utils');
 
 export function createDir(path: string, del = false, recursive = false): void {
   if (!fs.existsSync(path)) {
@@ -42,4 +45,19 @@ export function getTemplatePath(template: string): string {
  */
 export async function copyTemplateToCWD(templateName: string, fileName: string): Promise<void> {
   await fs.copyFile(getTemplatePath(templateName), path.join(process.cwd(), fileName));
+}
+
+/**
+ * resolve a package version by resolving package.json
+ *
+ * @param pkgName dependency to loockup
+ */
+export function resolvePackageVersion(pkgName: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const pkgJson = require(`${pkgName}/package.json`) as Record<string, unknown>;
+  debug(`Resolved: ${JSON.stringify(pkgJson)}`);
+  if (!pkgJson.version) {
+    throw new Error(`Can't resolve ${pkgName} version based on ${pkgName}/package.json`);
+  }
+  return pkgJson.version as string;
 }

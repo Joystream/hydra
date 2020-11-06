@@ -33,11 +33,11 @@ const withEnvs = (command: () => Promise<void>) => {
 };
 
 function main(): commander.Command {
-  console.log(chalk.green(figlet.textSync("Test-Indexer")));
+  console.log(chalk.green(figlet.textSync("{{{projectName}}} Hydra Processor")));
   const program = new commander.Command();
   const version = require("./package.json").version;
 
-  program.version(version).description("Test Indexer");
+  program.version(version).description("{{{projectName}}} Hydra Processor");
 
   program
     .command("process")

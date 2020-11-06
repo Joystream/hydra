@@ -7,11 +7,11 @@ import { Command, flags } from '@oclif/command';
 
 import cli from 'cli-ux';
 
-import { createDir, getTemplatePath, createFile } from '../utils/utils';
+import { createDir, getTemplatePath, createFile, resolvePackageVersion } from '../utils/utils';
 import { formatWithPrettier } from '../helpers/formatter';
 import WarthogWrapper from '../helpers/WarthogWrapper';
 import { getTypeormConfig } from '../helpers/db';
-import { upperFirst } from 'lodash';
+import { kebabCase, upperFirst } from '../generate/utils';
 import execa = require('execa');
 import Listr = require('listr');
 
@@ -22,7 +22,7 @@ export default class Codegen extends Command {
   static flags = {
     schema: flags.string({ char: 's', description: 'Schema path', default: '../../schema.graphql' }),
     // pass --no-indexer to skip indexer generation
-    indexer: flags.boolean({ char: 'i', allowNo: true, description: 'Generate Indexer', default: true }),
+    indexer: flags.boolean({ char: 'i', allowNo: true, description: 'Generate Hydra Processor', default: true }),
     // pass --no-graphql to skip graphql generation
     graphql: flags.boolean({ char: 'g', allowNo: true, description: 'Generate GraphQL server', default: true }),
 
@@ -50,7 +50,7 @@ export default class Codegen extends Command {
 
     // Create block indexer
     if (flags.indexer) {
-      cli.action.start('Generating the Indexer');
+      cli.action.start('Generating Hydra Processor');
       await this.createBlockIndexer();
       cli.action.stop();
     }
@@ -91,14 +91,19 @@ export default class Codegen extends Command {
       task: async () => {
         let indexFileContent = readFileSync(getTemplatePath('index-builder-entry.mst'), 'utf8');
         indexFileContent = Mustache.render(indexFileContent, {
-          packageName: process.env.TYPE_REGISTER_PACKAGE_NAME,
-          typeRegistrator: process.env.TYPE_REGISTER_FUNCTION,
           projectName: upperFirst(process.env.PROJECT_NAME),
         });
         createFile(path.resolve('index.ts'), formatWithPrettier(indexFileContent));
 
-        // Create package.json
-        await fs.copyFile(getTemplatePath('indexer.package.json'), path.resolve(process.cwd(), 'package.json'));
+        let pkgJsonContent = readFileSync(getTemplatePath('indexer.package.json'), 'utf8');
+        pkgJsonContent = Mustache.render(pkgJsonContent, {
+          hydraCommon: resolvePackageVersion('@dzlzv/hydra-common'),
+          hydraDbUtils: resolvePackageVersion('@dzlzv/hydra-db-utils'),
+          hydraProcessor: resolvePackageVersion('@dzlzv/hydra-processor'),
+          pkgName: kebabCase(process.env.PROJECT_NAME),
+          projectName: upperFirst(process.env.PROJECT_NAME),
+        });
+        createFile(path.resolve('package.json'), formatWithPrettier(pkgJsonContent, { parser: 'json' }));
 
         // Create .env file for typeorm database connection
         await fs.writeFile('.env', getTypeormConfig());
@@ -110,11 +115,11 @@ export default class Codegen extends Command {
     // Create index.ts file
 
     const installDeps = {
-      title: 'Install dependencies for the Indexer',
+      title: 'Install dependencies for Hydra Processor',
       task: async () => {
         await execa('yarn', ['install']);
 
-        await execa('yarn', ['add', '@dzlzv/hydra-db-utils', '@dzlzv/hydra-common', '@dzlzv/hydra-processor']);
+        // await execa('yarn', ['add', '@dzlzv/hydra-db-utils', '@dzlzv/hydra-common', '@dzlzv/hydra-processor']);
       },
     };
 
