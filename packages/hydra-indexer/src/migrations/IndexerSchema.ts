@@ -5,12 +5,6 @@ export class IndexerSchema implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `CREATE TABLE "processed_events_log" ("id" SERIAL NOT NULL, "processor" character varying NOT NULL, "event_id" character varying NOT NULL, "last_scanned_block" integer NOT NULL, "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_2d074516252c7a3090ddc44b9a5" PRIMARY KEY ("id"))`
-    )
-    await queryRunner.query(
-      `CREATE INDEX "IDX_1038d15b8a821947029f3a7d4e" ON "processed_events_log" ("event_id") `
-    )
-    await queryRunner.query(
       `CREATE TABLE "substrate_extrinsic" ("id" SERIAL NOT NULL, "tip" numeric NOT NULL, "block_number" numeric NOT NULL, "version_info" character varying NOT NULL, "meta" jsonb NOT NULL, "method" character varying NOT NULL, "section" character varying NOT NULL, "args" jsonb NOT NULL, "signer" character varying NOT NULL, "signature" character varying NOT NULL, "nonce" integer NOT NULL, "era" jsonb NOT NULL, "hash" character varying NOT NULL, "is_signed" boolean NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "created_by_id" character varying NOT NULL DEFAULT 'hydra-indexer', "updated_at" TIMESTAMP DEFAULT now(), "updated_by_id" character varying, "deleted_at" TIMESTAMP, "deleted_by_id" character varying, "version" integer NOT NULL, CONSTRAINT "PK_a4c7ce64007d5d29f412c071373" PRIMARY KEY ("id"))`
     )
     await queryRunner.query(
@@ -43,7 +37,5 @@ export class IndexerSchema implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "substrate_event"`)
     await queryRunner.query(`DROP INDEX "IDX_2edcefa903e8eedd4c6478ddc5"`)
     await queryRunner.query(`DROP TABLE "substrate_extrinsic"`)
-    await queryRunner.query(`DROP INDEX "IDX_1038d15b8a821947029f3a7d4e"`)
-    await queryRunner.query(`DROP TABLE "processed_events_log"`)
   }
 }

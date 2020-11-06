@@ -47,7 +47,7 @@ export class ProcessorRunner {
   static async migrate(): Promise<void> {
     let connection: Connection | undefined
     try {
-      connection = await getConnection()
+      connection = await createDBConnection()
       if (connection) await connection.runMigrations()
     } finally {
       if (connection) await connection.close()

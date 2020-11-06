@@ -19,6 +19,7 @@
   "dependencies": {
     "@dzlzv/hydra-common": "^0.0.3",
     "bn.js": "^5.1.3",
+    "graphql-request": "^3.3.0",
     "typedi": "^0.8.0"
   },
   "devDependencies": {

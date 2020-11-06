@@ -113,20 +113,8 @@ export default class Codegen extends Command {
       title: 'Install dependencies for the Indexer',
       task: async () => {
         await execa('yarn', ['install']);
-        if (process.env.TYPE_REGISTER_PACKAGE_NAME) {
-          const lib = process.env.TYPE_REGISTER_PACKAGE_VERSION
-            ? `${process.env.TYPE_REGISTER_PACKAGE_NAME}@${process.env.TYPE_REGISTER_PACKAGE_VERSION}`
-            : `${process.env.TYPE_REGISTER_PACKAGE_NAME}`;
-          await execa('yarn', ['add', `${lib}`]);
-        }
-        const indexerLib = process.env.INDEXER_LIB || '@dzlzv/hydra-indexer-lib';
-        await execa('yarn', [
-          'add',
-          `${indexerLib}`,
-          '@dzlzv/hydra-db-utils',
-          '@dzlzv/hydra-common',
-          '@dzlzv/hydra-processor',
-        ]);
+
+        await execa('yarn', ['add', '@dzlzv/hydra-db-utils', '@dzlzv/hydra-common', '@dzlzv/hydra-processor']);
       },
     };
 
