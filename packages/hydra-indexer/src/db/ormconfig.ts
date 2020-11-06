@@ -10,22 +10,20 @@ import { IndexerSchema } from '../migrations/IndexerSchema'
 const config: () => ConnectionOptions = () => {
   return {
     type: 'postgres',
-    host: process.env.TYPEORM_HOST,
-    port: parseInt(process.env.TYPEORM_PORT || '5432', 10),
-    username: process.env.TYPEORM_USERNAME,
-    password: process.env.TYPEORM_PASSWORD,
-    database: process.env.TYPEORM_DATABASE,
-    entities: [
-      SubstrateEventEntity,
-      SubstrateExtrinsicEntity,
-      ProcessedEventsLogEntity,
-      process.env.TYPEORM_ENTITIES,
-    ],
+    host: process.env.TYPEORM_HOST || process.env.DB_HOST,
+    port: parseInt(
+      process.env.TYPEORM_PORT || process.env.DB_PORT || '5432',
+      10
+    ),
+    username: process.env.TYPEORM_USERNAME || process.env.DB_USER,
+    password: process.env.TYPEORM_PASSWORD || process.env.DB_PASS,
+    database: process.env.TYPEORM_DATABASE || process.env.DB_NAME,
+    entities: [SubstrateEventEntity, SubstrateExtrinsicEntity],
     migrations: [IndexerSchema],
     cli: {
       migrationsDir: 'migrations',
     },
-    logging: process.env.TYPEORM_LOGGING === 'true',
+    logging: process.env.TYPEORM_LOGGING || 'error',
     namingStrategy: new SnakeNamingStrategy(),
   } as ConnectionOptions
 }

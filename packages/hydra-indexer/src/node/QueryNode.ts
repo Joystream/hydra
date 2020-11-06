@@ -48,7 +48,6 @@ export class QueryNode {
     // Its pretty ugly, but the registrtion appears to be
     // accessing some sort of global state, and has to be done after
     // the provider is created.
-
     Container.set('IndexerOptions', options)
 
     const { wsProviderURI, types } = options

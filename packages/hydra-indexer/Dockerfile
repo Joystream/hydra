@@ -1,10 +1,16 @@
 FROM node:12-alpine
 
-RUN mkdir -p /home/hydra-indexer-builder && chown -R node:node /home/hydra-indexer-builder
-COPY --chown=node:node . /home/hydra-indexer-builder
+# TODO: optimize this
+#
+RUN mkdir -p /home/hydra-indexer && chown -R node:node /home/hydra-indexer
 
-WORKDIR /home/hydra-indexer-builder
+COPY --chown=node:node . /home/hydra-indexer
+
+WORKDIR /home/hydra-indexer
 
 RUN yarn && yarn build
 
 RUN yarn pack --filename index-builder.tgz
+
+ENTRYPOINT ["yarn"]
+CMD ["start:prod"]
