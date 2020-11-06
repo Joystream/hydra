@@ -1,10 +1,12 @@
 import { MappingsProcessor } from '../process/MappingsProcessor'
 import { ProcessorOptions } from './ProcessorOptions'
-import { Connection, getConnection } from 'typeorm'
+import { Connection } from 'typeorm'
 import Debug from 'debug'
 import { logError } from '@dzlzv/hydra-common'
 import { log } from 'console'
 import { createDBConnection } from '../db/dal'
+import Container from 'typedi'
+import { ProcessorPromClient, startPromEndpoint } from '../prometheus'
 
 const debug = Debug('index-builder:manager')
 
@@ -37,7 +39,17 @@ export class ProcessorRunner {
     const extraEntities = options.entities ? options.entities : []
     await createDBConnection(extraEntities)
 
+    Container.set('ProcessorOptions', options)
+
     const processor = new MappingsProcessor(options)
+    Container.set('MappingsProcessor', processor)
+    try {
+      const promClient = new ProcessorPromClient()
+      promClient.init()
+      startPromEndpoint()
+    } catch (e) {
+      console.error(`Can't start Prometheus endpoint: ${logError(e)}`)
+    }
     await processor.start()
   }
 

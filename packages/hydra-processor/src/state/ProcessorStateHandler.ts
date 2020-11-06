@@ -1,17 +1,24 @@
 import { loadState } from '../db/dal'
-import Debug from 'debug'
 import { ProcessedEventsLogEntity } from '../entities'
 import { getRepository } from 'typeorm'
-import { Service } from 'typedi'
+import Container, { Service } from 'typedi'
 import { IProcessorStateHandler } from './IProcessorStateHandler'
+import { EventEmitter } from 'events'
 import { IProcessorState } from './IProcessorState'
+import Debug from 'debug'
+
 import assert = require('assert')
 
 const debug = Debug('index-builder:processor-state-handler')
 
 @Service('ProcessorStateHander')
-export class ProcessorStateHandler implements IProcessorStateHandler {
-  constructor(public readonly processorID = 'hydra-processor') {}
+export class ProcessorStateHandler
+  extends EventEmitter
+  implements IProcessorStateHandler {
+  constructor(public readonly processorID = 'hydra-processor') {
+    super()
+    Container.set('ProcessorStateHandler', this)
+  }
 
   async persist(state: IProcessorState): Promise<void> {
     assert(state.lastProcessedEvent, 'Cannot persist undefined event ID')
@@ -21,6 +28,7 @@ export class ProcessorStateHandler implements IProcessorStateHandler {
     processed.lastScannedBlock = state.lastScannedBlock
 
     await getRepository('ProcessedEventsLogEntity').save(processed)
+    this.emit('STATE_CHANGE', state)
   }
 
   async init(atBlock = 0): Promise<IProcessorState> {
@@ -45,9 +53,13 @@ export class ProcessorStateHandler implements IProcessorStateHandler {
       }
     }
 
-    return {
+    const state = {
       lastScannedBlock: atBlock,
       lastProcessedEvent: undefined,
     }
+
+    this.emit('STATE_CHANGE', state)
+
+    return state
   }
 }

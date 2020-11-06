@@ -35,3 +35,23 @@ export async function loadState(
     },
   })
 }
+
+/**
+ * Get last event processed by the given mappings processor
+ *
+ * @param processorID Name of the processor
+ */
+export async function countProcessedEvents(
+  processorID: string
+): Promise<number> {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { cnt } = await getRepository(ProcessedEventsLogEntity)
+    .createQueryBuilder('events')
+    .select('COUNT(DISTINCT(events.event_id))', 'cnt')
+    .where({ processor: processorID })
+    .getRawOne()
+
+  debug(`Total events count ${String(cnt)}`)
+
+  return Number.parseInt(cnt) || 0
+}

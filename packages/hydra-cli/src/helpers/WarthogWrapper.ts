@@ -21,6 +21,8 @@ export default class WarthogWrapper {
   private readonly schemaPath: string;
   private readonly schemaResolvedPath: string;
 
+  private flags: Record<string, boolean | string> = {};
+
   constructor(command: Command, schemaPath: string) {
     this.command = command;
     this.schemaPath = schemaPath;
@@ -30,8 +32,10 @@ export default class WarthogWrapper {
     }
   }
 
-  async run(): Promise<void> {
+  async run(flags: Record<string, boolean | string> = {}): Promise<void> {
     // Order of calling functions is important!!!
+    this.flags = flags;
+    debug(`Passed flags: ${JSON.stringify(this.flags, null, 2)}`);
     const tasks = new Listr([
       {
         title: 'Set up a new Warthog project',
@@ -40,19 +44,40 @@ export default class WarthogWrapper {
         },
       },
       {
-        title: 'Install GraphQL server dependencies',
+        title: 'Prepare project files',
+        task: () => {
+          this.prepareProjectFiles();
+        },
+      },
+      {
+        title: 'Install dependencies',
+        skip: () => {
+          if (this.flags.install !== true) {
+            return 'Skipping: either --no-install flag has been passed or the HYDRA_NO_DEPS_INSTALL environment variable is set to';
+          }
+        },
         task: async () => {
-          await this.installDependencies();
+          await this.installDependecies();
         },
       },
       {
         title: 'Generate server sources',
+        skip: () => {
+          if (this.flags.install !== true) {
+            return 'Skipping: dependencies are not installed';
+          }
+        },
         task: () => {
           this.generateWarthogSources();
         },
       },
       {
         title: 'Warthog codegen',
+        skip: () => {
+          if (this.flags.install !== true) {
+            return 'Skipping: dependencies are not installed';
+          }
+        },
         task: async () => {
           await this.codegen();
         },
@@ -92,7 +117,8 @@ export default class WarthogWrapper {
   async generateAPIPreview(): Promise<void> {
     // Order of calling functions is important!!!
     await this.newProject();
-    await this.installDependencies();
+    this.prepareProjectFiles();
+    await this.installDependecies();
     this.generateWarthogSources();
     await this.codegen();
   }
@@ -112,12 +138,11 @@ export default class WarthogWrapper {
     await this.updateDotenv();
   }
 
-  async installDependencies(): Promise<void> {
+  prepareProjectFiles(): void {
     if (!fs.existsSync('package.json')) {
-      this.command.error('Could not found package.json file in the current working directory');
+      this.command.error('Could not find package.json file in the current working directory');
     }
 
-    // Temporary tslib fix
     const pkgFile = JSON.parse(fs.readFileSync('package.json', 'utf8')) as Record<string, Record<string, unknown>>;
     pkgFile.scripts['db:sync'] = 'SYNC=true WARTHOG_DB_SYNCHRONIZE=true ts-node --type-check src/index.ts';
 
@@ -126,14 +151,14 @@ export default class WarthogWrapper {
 
     // Node does not run the compiled code, so we use ts-node in production...
     pkgFile.scripts['start:prod'] = 'WARTHOG_ENV=production yarn dotenv:generate && ts-node src/index.ts';
-    pkgFile.dependencies.warthog = this.getWarthogDependecy();
+    pkgFile.dependencies.warthog = this.getWarthogDependency();
     fs.writeFileSync('package.json', JSON.stringify(pkgFile, null, 2));
+  }
 
-    // this.command.log('Installing graphql-server dependencies...');
+  async installDependecies(): Promise<void> {
+    debug('Installing the dependencies');
     await execa('yarn', ['add', 'lodash']); // add lodash dep
     await execa('yarn', ['install']);
-
-    // this.command.log('done...');
   }
 
   async createDB(): Promise<void> {
@@ -141,7 +166,7 @@ export default class WarthogWrapper {
     await run(['db:create']);
   }
 
-  getWarthogDependecy(): string {
+  getWarthogDependency(): string {
     /* eslint-disable */
     const warthogPackageJson = require('warthog/package.json') as Record<string, unknown>;
     debug(`Warthog package json: ${JSON.stringify(warthogPackageJson, null, 2)}`);

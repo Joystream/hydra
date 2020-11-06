@@ -6,6 +6,7 @@ import { readFileSync } from 'fs-extra';
 import { Command, flags } from '@oclif/command';
 
 import cli from 'cli-ux';
+import Debug from 'debug';
 
 import { createDir, getTemplatePath, createFile, resolvePackageVersion } from '../utils/utils';
 import { formatWithPrettier } from '../helpers/formatter';
@@ -13,7 +14,10 @@ import WarthogWrapper from '../helpers/WarthogWrapper';
 import { getTypeormConfig } from '../helpers/db';
 import { kebabCase, upperFirst } from '../generate/utils';
 import execa = require('execa');
+import execa = require('execa');
 import Listr = require('listr');
+
+const debug = Debug('qnode-cli:codegen');
 
 export default class Codegen extends Command {
   static description = 'Code generator';
@@ -27,13 +31,19 @@ export default class Codegen extends Command {
     graphql: flags.boolean({ char: 'g', allowNo: true, description: 'Generate GraphQL server', default: true }),
 
     dbschema: flags.boolean({ char: 'd', description: 'Create the DB schema (use with caution!)', default: false }),
+    // pass --no-install to skip the `yarn install` steps
+    install: flags.boolean({ allowNo: true, description: 'Install dependencies', default: true }),
   };
+
+  private parsedFlags!: Record<string, boolean | string>;
 
   async run(): Promise<void> {
     dotenv.config();
 
     const { flags } = this.parse(Codegen);
-
+    this.parsedFlags = flags;
+    this.parsedFlags.install = this.parsedFlags.install && process.env.HYDRA_NO_DEPS_INSTALL !== 'true';
+    debug(`Parsed flags: ${JSON.stringify(this.parsedFlags, null, 2)}`);
     const generatedFolderPath = path.resolve(process.cwd(), Codegen.generatedFolderName);
 
     createDir(generatedFolderPath);
@@ -67,7 +77,7 @@ export default class Codegen extends Command {
     process.chdir(warthogProjectPath);
 
     const warthogWrapper = new WarthogWrapper(this, schemaPath);
-    await warthogWrapper.run();
+    await warthogWrapper.run(this.parsedFlags);
 
     if (syncdb) {
       await warthogWrapper.generateDB();
@@ -116,10 +126,13 @@ export default class Codegen extends Command {
 
     const installDeps = {
       title: 'Install dependencies for Hydra Processor',
+      skip: () => {
+        if (this.parsedFlags.install !== true) {
+          return 'Skipping: either --no-install flag has been passed or the HYDRA_NO_DEPS_INSTALL environment variable is set to';
+        }
+      },
       task: async () => {
         await execa('yarn', ['install']);
-
-        // await execa('yarn', ['add', '@dzlzv/hydra-db-utils', '@dzlzv/hydra-common', '@dzlzv/hydra-processor']);
       },
     };
 
