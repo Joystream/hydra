@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+**/generated
+**/*.md
+**/lib
+**/.nyc_output
+./docs
+./gitbook
+./github
+./vscode
+./packages/hydra-e2e-tests/** 
+Dockerfile

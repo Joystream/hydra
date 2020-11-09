@@ -340,13 +340,6 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@dzlzv/hydra-common@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@dzlzv/hydra-common/-/hydra-common-0.0.1.tgz#e6dbffad93745627bce11eb6bd7ee8f407ab9cfd"
-  integrity sha512-wTFvBSb4Rq0YqSFE2gTLsJAPt2Iw0wUPQbVmXUXSUwJ/pCzihqLdgf0RlWjzTZXIctuHWHzcYbrseoGhiy4gpQ==
-  dependencies:
-    bn.js "^5.1.3"
-
 "@dzlzv/hydra-common@^0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@dzlzv/hydra-common/-/hydra-common-0.0.2.tgz#91f31d9cd5b770f71105da3e58521cc92ad19643"
@@ -5445,7 +5438,7 @@ graphql-upload@^8.0.2:
     http-errors "^1.7.3"
     object-path "^0.11.4"
 
-graphql@*, graphql@15, graphql@^15.0.0, graphql@^15.1.0, graphql@^15.3.0:
+graphql@*, graphql@15, graphql@^15.0.0, graphql@^15.1.0, graphql@^15.3.0, graphql@^15.4.0:
   version "15.4.0"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.4.0.tgz#e459dea1150da5a106486ba7276518b5295a4347"
   integrity sha512-EB3zgGchcabbsU9cFe1j+yxdzKQKAbGUWRb13DsrsMN1yyfmmIq+2+L5MqVWcDCE4V89R5AyUOi7sMOGxdsYtA==
@@ -10087,7 +10080,7 @@ shellwords@^0.1.1:
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
   integrity sha512-vFwSUfQvqybiICwZY5+DAWIPLKsWO31Q91JSKl3UYv+K5c2QRPzn0qzec6QPu1Qc9eHYItiP3NdJqNVqetYAww==
 
-shortid@^2.2.15:
+shortid@^2.2.15, shortid@^2.2.16:
   version "2.2.16"
   resolved "https://registry.yarnpkg.com/shortid/-/shortid-2.2.16.tgz#b742b8f0cb96406fd391c76bfc18a67a57fe5608"
   integrity sha512-Ugt+GIZqvGXCIItnsL+lvFJOiN7RYqlGy7QE41O3YC1xbNSeDGIRO7xg2JJXIAj1cAGnOeC1r7/T9pgrtQbv4g==

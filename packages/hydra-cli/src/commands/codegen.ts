@@ -14,7 +14,6 @@ import WarthogWrapper from '../helpers/WarthogWrapper';
 import { getTypeormConfig } from '../helpers/db';
 import { kebabCase, upperFirst } from '../generate/utils';
 import execa = require('execa');
-import execa = require('execa');
 import Listr = require('listr');
 
 const debug = Debug('qnode-cli:codegen');
@@ -26,7 +25,7 @@ export default class Codegen extends Command {
   static flags = {
     schema: flags.string({ char: 's', description: 'Schema path', default: '../../schema.graphql' }),
     // pass --no-indexer to skip indexer generation
-    indexer: flags.boolean({ char: 'i', allowNo: true, description: 'Generate Hydra Processor', default: true }),
+    processor: flags.boolean({ char: 'i', allowNo: true, description: 'Generate Hydra Processor', default: true }),
     // pass --no-graphql to skip graphql generation
     graphql: flags.boolean({ char: 'g', allowNo: true, description: 'Generate GraphQL server', default: true }),
 
@@ -58,10 +57,10 @@ export default class Codegen extends Command {
       cli.action.stop();
     }
 
-    // Create block indexer
-    if (flags.indexer) {
+    // Create Hydra processor
+    if (flags.processor) {
       cli.action.start('Generating Hydra Processor');
-      await this.createBlockIndexer();
+      await this.createProcessor();
       cli.action.stop();
     }
   }
@@ -86,12 +85,12 @@ export default class Codegen extends Command {
     process.chdir(goBackDir);
   }
 
-  async createBlockIndexer(): Promise<void> {
+  async createProcessor(): Promise<void> {
     // Take process where back at the end of the function execution
     const goBackDir = process.cwd();
 
     // Block indexer folder path
-    const indexerPath = path.resolve(goBackDir, 'indexer');
+    const indexerPath = path.resolve(goBackDir, 'hydra-processor');
 
     createDir(indexerPath);
     process.chdir(indexerPath);

@@ -21,8 +21,8 @@ const withErrors = (command: (...args: any[]) => Promise<void>) => {
   }
 }
 
-const withEnvs = (command: (opts: any) => Promise<void>) => {
-  return async (opts: any) => {
+const withEnvs = (command: (opts: Record<string, string>) => Promise<void>) => {
+  return async (opts: Record<string, string>) => {
     setUp(opts)
     await command(opts)
   }
@@ -55,7 +55,7 @@ function main(): commander.Command {
   return program
 }
 
-function setUp(opts: any) {
+function setUp(opts: Record<string, string>) {
   // dotenv config
   dotenv.config()
   dotenv.config({ path: opts.env })
@@ -66,7 +66,7 @@ function setUp(opts: any) {
     process.env.BLOCK_HEIGHT = '0'
   }
 
-  //log4js config
+  // log4js config
   if (opts.logging) {
     configure(opts.logging)
   } else {

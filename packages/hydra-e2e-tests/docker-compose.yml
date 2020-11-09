@@ -2,7 +2,7 @@ version: "3"
 
 services:
   processor-gql-server:
-    image: hydra:${CLITAG}
+    image: hydra:latest
     build: ./schema
     restart: unless-stopped
     environment:
@@ -16,45 +16,55 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - processor
+      - hydra-processor
     command: ["yarn", "server:start:prod"]
 
-  processor:
-    image: hydra:${CLITAG}
+  hydra-processor:
+    image: hydra:latest
     restart: unless-stopped
     environment:
+      - DB_NAME=processor-db
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
       - TYPEORM_DATABASE=processor-db
       - TYPEORM_USERNAME=postgres
       - TYPEORM_PASSWORD=postgres
+      - GRAPHQL_SERVER_HOST=localhost 
+      - GRAPHQL_SERVER_PORT=4000  
       - TYPEORM_HOST=db
       - TYPEORM_PORT=5432
-      - INDEXER_ENDPOINT_URL=http://indexer-api-server:4000/graphql
+      - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:4000/graphql
       - PROCESSOR_POLL_INTERVAL=300 # refresh every second 
       - DEBUG=index-builder:*
     depends_on:
-      - indexer-api-server
-    command: ["yarn", "processor:start"]
+      - hydra-indexer-gateway
+    command: >
+      sh -c "yarn configure && yarn db:migrate && yarn processor:start"
   
-  indexer:
-    image: hydra:${CLITAG}
+  hydra-indexer:
+    image: hydra-indexer:latest
     restart: unless-stopped
     environment:
-      - TYPEORM_DATABASE=indexer-db
-      - TYPEORM_USERNAME=postgres
-      - TYPEORM_PASSWORD=postgres
-      - TYPEORM_HOST=db
-      - TYPEORM_PORT=5432
+      - DB_NAME=indexer-db
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
       - NEW_BLOCK_TIMEOUT_SEC=150000
       - WS_PROVIDER_ENDPOINT_URI=ws://substrate:9944/
       - REDIS_URI=redis://redis:6379/0
       - DEBUG=index-builder:*
-    command: ["yarn", "indexer:start"] 
+    command: > 
+      sh -c "yarn db:bootstrap && yarn start:prod" 
     depends_on:
       - substrate
       - redis
+      - db
     
-  indexer-api-server:
-    image: indexer-api-gateway:latest
+  hydra-indexer-gateway:
+    image: hydra-indexer-gateway:latest
     restart: unless-stopped
     environment:
       - WARTHOG_STARTER_DB_DATABASE=indexer-db

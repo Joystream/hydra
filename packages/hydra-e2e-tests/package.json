@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
-    "build": "tsc --build tsconfig.json && cd schema && docker build . -t hydra:${CLITAG:-latest} --no-cache",
+    "build": "tsc --build tsconfig.json",
+    "docker:build": "docker build ./schema -t hydra:${CLITAG:-latest} --no-cache",
     "db:migrate": "bash ./scripts/db.sh --db-name indexer-db --db-host db up  && bash ./scripts/db.sh --db-name processor-db --db-host db up",
     "db:drop": "bash ./scripts/db.sh --db-name indexer-db drop && bash ./scripts/db.sh --db-name processor-db drop",
     "db:up": "docker-compose up -d db",
@@ -20,7 +21,7 @@
     "e2e-test": "bash run-tests.sh"
   },
   "dependencies": {
-    "@dzlzv/hydra-common": "^0.0.2",
+    "@dzlzv/hydra-common": "^0.0.3",
     "@polkadot/api": "^2.1.1",
     "graphql-request": "^3.3.0",
     "typedi": "^0.8.0"

@@ -12,5 +12,4 @@ RUN yarn && yarn build
 
 RUN yarn pack --filename index-builder.tgz
 
-ENTRYPOINT ["yarn"]
-CMD ["start:prod"]
+CMD ["yarn", "start:prod"]
