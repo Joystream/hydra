@@ -51,6 +51,7 @@
     "typeorm": "^0.2.25"
   },
   "devDependencies": {
+    "@joystream/eslint-config": "^1.0.0",
     "@joystream/prettier-config": "^1.0.0",
     "@polkadot/ts": "^0.3.14",
     "@types/bn.js": "^4.11.6",

@@ -15,7 +15,7 @@ const withErrors = (command: (...args: any[]) => Promise<void>) => {
     try {
       await command(...args)
     } catch (e) {
-      console.log(chalk.red(e.stack))
+      console.log(chalk.red((e as Error).stack))
       process.exit(1)
     }
   }
@@ -84,7 +84,8 @@ async function runIndexer(opts: Record<string, unknown>) {
     (process.env.TYPES_JSON || opts.typedefs || '') as string
   )
   const types = typesPath
-    ? (require(typesPath) as Record<string, Record<string, string>>)
+    ? // eslint-disable-next-line @typescript-eslint/no-var-requires
+      (require(typesPath) as Record<string, Record<string, string>>)
     : {}
 
   const wsProviderURI = (process.env.WS_PROVIDER_ENDPOINT_URI ||

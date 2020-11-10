@@ -1,15 +1,9 @@
 module.exports = {
-    extends: [
-		"eslint:recommended",
-		"plugin:@typescript-eslint/eslint-recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:@typescript-eslint/recommended-requiring-type-checking"
-	],
-	parser: "@typescript-eslint/parser",
-	parserOptions: {
-				project: './eslint.tsconfig.json',
-        tsconfigRootDir: __dirname,
-        //debugLevel: true
-	},
-	plugins: ["@typescript-eslint"]
+  extends: [
+    "@joystream/eslint-config"
+  ],
+  rules: {
+    "no-useless-constructor": "off",
+    "@typescript-eslint/naming-convention": "warn"
+  }
 }
