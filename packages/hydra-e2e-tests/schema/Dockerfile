@@ -10,13 +10,15 @@ RUN yarn install
 RUN yarn link
 
 WORKDIR /home/hydra
+COPY --from=hydra-builder:latest /home/hydra/packages/hydra-cli/hydra-cli.tgz .
+
 RUN yarn link @dzlzv/hydra-cli
-RUN hydra-cli scaffold -n hydra --no-mappings
+RUN export HYDRA_CLI_VERSION=file:/home/hydra/hydra-cli.tgz && hydra-cli scaffold -n hydra --no-mappings
 
 COPY schema.graphql /home/hydra
 COPY ./mappings /home/hydra/mappings
 
-RUN yarn codegen:all 
+RUN hydra-cli codegen
 
 WORKDIR /home/hydra/generated/hydra-processor
 

@@ -22,7 +22,7 @@
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\" --exclude \"test/integration/**\"",
     "db:create": "createdbjs --user=${DB_USER} --password=${DB_PASS} --host=${DB_HOST} --port=${DB_PORT} ${DB_NAME}",
     "db:drop": "dropdbjs --user=${DB_USER} --password=${DB_PASS} --host=${DB_HOST} --port=${DB_PORT} ${DB_NAME}",
-    "db:migrate": "ts-node src/run.ts migrate",
+    "db:migrate": "node ./lib/run.js migrate",
     "db:bootstrap": "yarn db:create ; yarn db:migrate",
     "start:dev": "DEBUG=${DEBUG} ts-node src/run.ts index",
     "start:prod": "DEBUG=${DEBUG} node ./lib/run.js index"

@@ -41,7 +41,7 @@ services:
     depends_on:
       - hydra-indexer-gateway
     command: >
-      sh -c "yarn configure && yarn db:migrate && yarn processor:start"
+      sh -c "yarn configure && yarn db:prepare && yarn db:migrate && yarn processor:start"
   
   hydra-indexer:
     image: hydra-indexer:latest
@@ -80,8 +80,7 @@ services:
     depends_on:
       - redis
       - db
-    command: ["yarn", "bootstrap:prod"]
-
+    
     
   substrate:
     image: paritytech/substrate-playground-template-node-template:sha-7212614

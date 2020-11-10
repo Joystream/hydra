@@ -34,3 +34,4 @@ RUN yarn workspace @dzlzv/hydra-processor pack --filename hydra-processor.tgz
 ADD --chown=node:node ./packages/hydra-cli ./packages/hydra-cli
 RUN yarn workspace @dzlzv/hydra-cli install 
 RUN yarn workspace @dzlzv/hydra-cli build 
+RUN yarn workspace @dzlzv/hydra-cli pack --filename hydra-cli.tgz

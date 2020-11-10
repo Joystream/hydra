@@ -1,11 +1,8 @@
-ARG HYDRA_CLI_VERSION=latest
-FROM joystream/hydra-cli:${HYDRA_CLI_VERSION}
+FROM node:12-alpine
 
-COPY schema.graphql /home/hydra
-COPY ./mappings /home/hydra/mappings
-COPY .env /home/hydra/.env
-ADD *.json /home/hydra/
+COPY schema.graphql .
+COPY ./mappings ./mappings
+COPY .env .
+ADD *.json .
 
-RUN yarn codegen:all
-
-WORKDIR /home/hydra
+RUN yarn && yarn codegen:all
