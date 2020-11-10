@@ -180,6 +180,10 @@ export default class Scaffold extends Command {
       path.join(process.cwd(), 'package.json'),
       Mustache.render(template, {
         projectName: process.env.PROJECT_NAME,
+        hydraVersion: utils.resolvePackageVersion('@dzlzv/hydra-cli'),
+        hydraCommonVersion: utils.resolvePackageVersion('@dzlzv/hydra-common'),
+        hydraDbUtilsVersion: utils.resolvePackageVersion('@dzlzv/hydra-db-utils'),
+        hydraProcessorVersion: utils.resolvePackageVersion('@dzlzv/hydra-processor'),
       })
     );
 
