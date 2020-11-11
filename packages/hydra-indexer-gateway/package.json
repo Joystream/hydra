@@ -1,0 +1,88 @@
+{
+  "name": "@dzlzv/hydra-indexer-gateway",
+  "version": "0.0.0",
+  "description": "Generated Warthog Project",
+  "license": "MIT",
+  "scripts": {
+    "docker:build": "docker build . -t joystream/hydra-indexer-gateway:${TAG:-latest}",
+    "docker:push": "docker push joystream/hydra-indexer-gateway:${TAG:-latest}",
+    "docker:publish": "yarn docker:build && yarn docker:push",
+    "bootstrap": "yarn bootstrap:dev",
+    "bootstrap:dev": "yarn && yarn build:dev && yarn db:drop && yarn db:create && yarn db:migrate && yarn db:seed",
+    "bootstrap:prod": "yarn && yarn build:prod && yarn start:prod",
+    "//": "This is the default command run in CI, so it should point to Prod and also create Prod config",
+    "build": "yarn build:prod",
+    "build:prod": "WARTHOG_ENV=production yarn run config && yarn compile",
+    "build:dev": "yarn run config:dev && yarn codegen && yarn compile",
+    "check:code": "tsc --noEmit && yarn lint && prettier ./{src,test,tools}/**/*.ts --write",
+    "clean": "yarn db:drop && rm -rf ./node_modules ./generated ./dist",
+    "codegen": "warthog codegen",
+    "config": "WARTHOG_ENV=$NODE_ENV yarn dotenv:generate",
+    "config:dev": "WARTHOG_ENV=development:build yarn dotenv:generate",
+    "compile": "rm -rf ./dist && yarn tsc",
+    "deploy": "heroku git:remote -a warthog-starter && git push heroku main && WARTHOG_ENV=production yarn dotenv:generate && warthog db:migrate",
+    "dotenv:generate": "dotenvi -s ${WARTHOG_ENV:-development}",
+    "db:create": "warthog db:create",
+    "db:drop": "warthog db:drop",
+    "db:migrate:generate": "warthog db:migrate:generate --name",
+    "db:migrate": "warthog db:migrate",
+    "db:seed": "ts-node tools/seed.ts",
+    "lint": "eslint './+(src|test|tools)/**/*.{js,ts}' ",
+    "list:users": "ts-node ./tools/list-users.ts",
+    "playground": "warthog playground",
+    "prettier": "prettier ./{src,test,tools}/**/*.ts --write",
+    "start": "yarn start:prod",
+    "start:dev": "DEBUG=$DEBUG ts-node-dev src/index.ts",
+    "start:dev:watch": "nodemon -e ts,graphql -x ts-node --type-check src/index.ts",
+    "start:prod": "WARTHOG_ENV=production yarn dotenv:generate && node dist/src/index.js",
+    "test": "DEBUG= jest --verbose --coverage",
+    "test:watch": "DEBUG= jest --watch"
+  },
+
+  "dependencies": {
+    "@dzlzv/bn-typeorm": "^0.0.1",
+    "@dzlzv/hydra-common": "^0.0.2",
+    "@dzlzv/hydra-db-utils": "^0.0.2",
+    "@types/ioredis": "^4.17.4",
+    "bn.js": "^5.1.3",
+    "dotenv": "^8.2.0",
+    "graphql-parse-resolve-info": "^4.9.0",
+    "graphql-redis-subscriptions": "^2.3.1",
+    "graphql-type-json": "^0.3.2",
+    "ioredis": "^4.17.3",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.26",
+    "warthog": "^2.19.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^4.11.6",
+    "@types/ioredis": "^4.17.4",
+    "@types/jest": "^24.0.23",
+    "dotenvi": "^0.9.0",
+    "eslint": "^7.9.0",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^9.0.0",
+    "ts-node-dev": "^1.0.0-pre.63",
+    "typescript": "^3.9.7"
+  },
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.test.json"
+      }
+    },
+    "transform": {
+      ".ts": "ts-jest"
+    },
+    "testRegex": "\\.test\\.ts$",
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "\\.test\\.ts$"
+    ]
+  }
+}

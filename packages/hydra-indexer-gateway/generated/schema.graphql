@@ -1,0 +1,415 @@
+interface BaseGraphQLObject {
+  id: ID!
+  createdAt: DateTime!
+  createdById: String!
+  updatedAt: DateTime
+  updatedById: String
+  deletedAt: DateTime
+  deletedById: String
+  version: Int!
+}
+
+type BaseModel implements BaseGraphQLObject {
+  id: ID!
+  createdAt: DateTime!
+  createdById: String!
+  updatedAt: DateTime
+  updatedById: String
+  deletedAt: DateTime
+  deletedById: String
+  version: Int!
+}
+
+type BaseModelUUID implements BaseGraphQLObject {
+  id: ID!
+  createdAt: DateTime!
+  createdById: String!
+  updatedAt: DateTime
+  updatedById: String
+  deletedAt: DateTime
+  deletedById: String
+  version: Int!
+}
+
+input BaseWhereInput {
+  id_eq: String
+  id_in: [String!]
+  createdAt_eq: String
+  createdAt_lt: String
+  createdAt_lte: String
+  createdAt_gt: String
+  createdAt_gte: String
+  createdById_eq: String
+  updatedAt_eq: String
+  updatedAt_lt: String
+  updatedAt_lte: String
+  updatedAt_gt: String
+  updatedAt_gte: String
+  updatedById_eq: String
+  deletedAt_all: Boolean
+  deletedAt_eq: String
+  deletedAt_lt: String
+  deletedAt_lte: String
+  deletedAt_gt: String
+  deletedAt_gte: String
+  deletedById_eq: String
+}
+
+"""GraphQL representation of BigNumber"""
+scalar BigNumber
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+interface DeleteResponse {
+  id: ID!
+}
+
+type EventParam {
+  type: String!
+  name: String!
+  value: JSON
+}
+
+type IndexerHead {
+  height: Float!
+  events: [String!]
+}
+
+type IndexerStatus {
+  head: Int!
+  lastComplete: Int!
+  maxComplete: Int!
+  chainHeight: Int!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type Query {
+  indexerStatus: IndexerStatus!
+  eventsConnection(first: Int, after: String, last: Int, before: String, where: SubstrateEventWhereInput, orderBy: [SubstrateEventOrderByInput!]): SubstrateEventConnection!
+  substrateEventsAfter(afterID: ID, limit: Int, where: SubstrateEventWhereInput): [SubstrateEvent!]!
+  substrateEvents(offset: Int, limit: Int = 50, where: SubstrateEventWhereInput, orderBy: SubstrateEventOrderByInput): [SubstrateEvent!]!
+  substrateEvent(where: SubstrateEventWhereUniqueInput!): SubstrateEvent!
+  substrateExtrinsics(offset: Int, limit: Int = 50, where: SubstrateExtrinsicWhereInput, orderBy: SubstrateExtrinsicOrderByInput): [SubstrateExtrinsic!]!
+  substrateExtrinsic(where: SubstrateExtrinsicWhereUniqueInput!): SubstrateExtrinsic!
+}
+
+type StandardDeleteResponse {
+  id: ID!
+}
+
+type SubstrateEvent implements BaseGraphQLObject {
+  id: ID!
+  createdAt: DateTime!
+  createdById: String!
+  updatedAt: DateTime
+  updatedById: String
+  deletedAt: DateTime
+  deletedById: String
+  version: Int!
+  name: String!
+  section: String
+  method: String!
+  phase: JSONObject!
+  blockNumber: Int!
+  index: Int!
+  params: [EventParam!]
+  extrinsic: SubstrateExtrinsic
+}
+
+type SubstrateEventConnection {
+  totalCount: Int!
+  edges: [SubstrateEventEdge!]!
+  pageInfo: PageInfo!
+}
+
+input SubstrateEventCreateInput {
+  name: String!
+  section: String
+  method: String!
+  phase: JSONObject!
+  blockNumber: Float!
+  index: Float!
+  params: JSONObject
+}
+
+type SubstrateEventEdge {
+  node: SubstrateEvent!
+  cursor: String!
+}
+
+enum SubstrateEventOrderByInput {
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+  name_ASC
+  name_DESC
+  section_ASC
+  section_DESC
+  method_ASC
+  method_DESC
+  blockNumber_ASC
+  blockNumber_DESC
+  index_ASC
+  index_DESC
+}
+
+input SubstrateEventUpdateInput {
+  name: String
+  section: String
+  method: String
+  phase: JSONObject
+  blockNumber: Float
+  index: Float
+  params: JSONObject
+}
+
+input SubstrateEventWhereInput {
+  id_eq: ID
+  id_in: [ID!]
+  createdAt_eq: DateTime
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  createdById_eq: ID
+  createdById_in: [ID!]
+  updatedAt_eq: DateTime
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  updatedById_eq: ID
+  updatedById_in: [ID!]
+  deletedAt_all: Boolean
+  deletedAt_eq: DateTime
+  deletedAt_lt: DateTime
+  deletedAt_lte: DateTime
+  deletedAt_gt: DateTime
+  deletedAt_gte: DateTime
+  deletedById_eq: ID
+  deletedById_in: [ID!]
+  name_eq: String
+  name_contains: String
+  name_startsWith: String
+  name_endsWith: String
+  name_in: [String!]
+  section_eq: String
+  section_contains: String
+  section_startsWith: String
+  section_endsWith: String
+  section_in: [String!]
+  method_eq: String
+  method_contains: String
+  method_startsWith: String
+  method_endsWith: String
+  method_in: [String!]
+  phase_json: JSONObject
+  blockNumber_eq: Int
+  blockNumber_gt: Int
+  blockNumber_gte: Int
+  blockNumber_lt: Int
+  blockNumber_lte: Int
+  blockNumber_in: [Int!]
+  index_eq: Int
+  index_gt: Int
+  index_gte: Int
+  index_lt: Int
+  index_lte: Int
+  index_in: [Int!]
+  params_json: JSONObject
+}
+
+input SubstrateEventWhereUniqueInput {
+  id: ID!
+}
+
+type SubstrateExtrinsic implements BaseGraphQLObject {
+  id: ID!
+  createdAt: DateTime!
+  createdById: String!
+  updatedAt: DateTime
+  updatedById: String
+  deletedAt: DateTime
+  deletedById: String
+  version: Int!
+  tip: BigNumber!
+  blockNumber: Int!
+  versionInfo: String!
+  meta: JSONObject!
+  method: String!
+  section: String!
+  args: [JSONObject!]!
+  signer: String!
+  signature: String!
+  nonce: Int!
+  era: JSONObject!
+  hash: String!
+  isSigned: Boolean!
+}
+
+input SubstrateExtrinsicCreateInput {
+  tip: Float!
+  blockNumber: Float!
+  versionInfo: String!
+  meta: JSONObject!
+  method: String!
+  section: String!
+  args: JSONObject!
+  signer: String!
+  signature: String!
+  nonce: Float!
+  era: JSONObject!
+  hash: String!
+  isSigned: Boolean!
+}
+
+enum SubstrateExtrinsicOrderByInput {
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+  tip_ASC
+  tip_DESC
+  blockNumber_ASC
+  blockNumber_DESC
+  versionInfo_ASC
+  versionInfo_DESC
+  method_ASC
+  method_DESC
+  section_ASC
+  section_DESC
+  signer_ASC
+  signer_DESC
+  signature_ASC
+  signature_DESC
+  nonce_ASC
+  nonce_DESC
+  hash_ASC
+  hash_DESC
+  isSigned_ASC
+  isSigned_DESC
+}
+
+input SubstrateExtrinsicUpdateInput {
+  tip: Float
+  blockNumber: Float
+  versionInfo: String
+  meta: JSONObject
+  method: String
+  section: String
+  args: JSONObject
+  signer: String
+  signature: String
+  nonce: Float
+  era: JSONObject
+  hash: String
+  isSigned: Boolean
+}
+
+input SubstrateExtrinsicWhereInput {
+  id_eq: ID
+  id_in: [ID!]
+  createdAt_eq: DateTime
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  createdById_eq: ID
+  createdById_in: [ID!]
+  updatedAt_eq: DateTime
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  updatedById_eq: ID
+  updatedById_in: [ID!]
+  deletedAt_all: Boolean
+  deletedAt_eq: DateTime
+  deletedAt_lt: DateTime
+  deletedAt_lte: DateTime
+  deletedAt_gt: DateTime
+  deletedAt_gte: DateTime
+  deletedById_eq: ID
+  deletedById_in: [ID!]
+  tip_eq: Float
+  tip_gt: Float
+  tip_gte: Float
+  tip_lt: Float
+  tip_lte: Float
+  tip_in: [Float!]
+  blockNumber_eq: Int
+  blockNumber_gt: Int
+  blockNumber_gte: Int
+  blockNumber_lt: Int
+  blockNumber_lte: Int
+  blockNumber_in: [Int!]
+  versionInfo_eq: String
+  versionInfo_contains: String
+  versionInfo_startsWith: String
+  versionInfo_endsWith: String
+  versionInfo_in: [String!]
+  meta_json: JSONObject
+  method_eq: String
+  method_contains: String
+  method_startsWith: String
+  method_endsWith: String
+  method_in: [String!]
+  section_eq: String
+  section_contains: String
+  section_startsWith: String
+  section_endsWith: String
+  section_in: [String!]
+  args_json: JSONObject
+  signer_eq: String
+  signer_contains: String
+  signer_startsWith: String
+  signer_endsWith: String
+  signer_in: [String!]
+  signature_eq: String
+  signature_contains: String
+  signature_startsWith: String
+  signature_endsWith: String
+  signature_in: [String!]
+  nonce_eq: Int
+  nonce_gt: Int
+  nonce_gte: Int
+  nonce_lt: Int
+  nonce_lte: Int
+  nonce_in: [Int!]
+  era_json: JSONObject
+  hash_eq: String
+  hash_contains: String
+  hash_startsWith: String
+  hash_endsWith: String
+  hash_in: [String!]
+  isSigned_eq: Boolean
+  isSigned_in: [Boolean!]
+}
+
+input SubstrateExtrinsicWhereUniqueInput {
+  id: ID!
+}

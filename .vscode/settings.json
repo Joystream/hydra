@@ -1,8 +1,23 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  
   "[typescript]": {
     "editor.formatOnPaste": true,
-    "editor.formatOnSave": true,   
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
   },
+  
+  "[javascript]": {
+    "editor.tabSize": 2
+  },
+  
+  "[json]": {
+    "editor.tabSize": 2
+  },
+  
+  // This one forces the tab to be **space**
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
   "prettier.printWidth": 250,
+  "javascript.implicitProjectConfig.experimentalDecorators": true
 }
