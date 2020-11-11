@@ -6,9 +6,8 @@ RUN mkdir -p /home/hydra-indexer-builder
 WORKDIR /home/hydra-indexer-builder
 
 COPY src ./src
-COPY *.json .
-COPY *.js .
-COPY *.rc .
+COPY *.json ./
+COPY *.js ./
 
 
 RUN yarn 

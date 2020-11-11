@@ -3,6 +3,7 @@ module.exports = {
     "@joystream/eslint-config"
   ],
   rules: {
-    "no-useless-constructor": "off"
+    "no-useless-constructor": "off",
+    "prettier/prettier": "off"
   }
 }

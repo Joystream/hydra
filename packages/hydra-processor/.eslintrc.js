@@ -5,6 +5,7 @@ module.exports = {
   rules: {
     "no-useless-constructor": "off",
     "@typescript-eslint/naming-convention": "warn",
-    "@typescript-eslint/no-empty-function": "warn"
+    "@typescript-eslint/no-empty-function": "warn",
+    "prettier/prettier": "off"
   }
 }
