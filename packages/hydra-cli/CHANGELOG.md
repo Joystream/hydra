@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.1.1
+
+Major upgrade
+
+- Hydra Indexer is run as an independent docker image
+- Changed docker-compose and processor templates
+- Updated migrations workflow 
+
 ## 0.0.19
 
 - Support of ES-style imports in mappings (via `esModuleInterop:true`)
