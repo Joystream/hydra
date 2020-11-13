@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.20
+
+- bugfixes: #113, #115
+
 ## 0.0.19
 
 - Support of ES-style imports in mappings (via `esModuleInterop:true`)
