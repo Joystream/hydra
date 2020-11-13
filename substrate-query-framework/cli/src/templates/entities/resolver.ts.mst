@@ -131,10 +131,10 @@ export class {{className}}Resolver {
     @FieldResolver(() => {{returnTypeFunc}})
     async {{fieldName}}(@Root() {{rootArgName}}: {{rootArgType}}): {{{returnType}}} {
       const result = await getConnection().getRepository({{rootArgType}}).findOne({{rootArgName}}.id, { relations: ['{{fieldName}}'] })
-      if (!result || !result.{{fieldName}}) {
-        throw new Error('Unable to find result for {{rootArgType}}.{{fieldName}}');
+      if (result && result.{{fieldName}} !== undefined) {
+        return result.{{fieldName}};
       }
-      return result.{{fieldName}};
+      return null;
     }
   {{/fieldResolvers}}
 }
