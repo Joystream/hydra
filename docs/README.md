@@ -2,15 +2,11 @@
 description: 'Introducing Hydra, a GraphQL query node for substrate chains'
 ---
 
-# Overview
+## Bird-eye overview
 
-![A query node builder for Substrate chains](../.gitbook/assets/hydra-logo-horizontallockup.svg)
+Hydra has two principal components: Hydra Indexer and Hydra Processor.  Hydra Indexer ingests raw data from a substrate chain. Hydra Processor is responsible for transforming the raw data into domain-level entities as defined in `schema.graphl` and  the event handlers, both provided by the user. `hydra-cli` provides additional scaffolding and codegen tooling for running and developing a Hydra Processor tailored for the provided schema file.
 
-Hydra is inspired by [TheGraph](http://thegraph.com/) protocol but targets Substrate chains.‌
-
-Hydra is a query node for Substrate-based blockchains. A query node ingests data from a substrate chain and provides rich, domain-specific, and highly customizable access to the blockchain data, far beyond the scope of direct RPC calls. For example, expired [Kusama Treasury](https://wiki.polkadot.network/docs/en/learn-treasury) spending [proposals](https://kusama.subscan.io/event?module=Treasury&event=Proposed) are pruned from the state of the[ Kusama blockchain](https://polkascan.io/kusama), so querying, say, one-year-old proposals becomes problematic. Indeed, one has to track the evolution of the state by sequentially applying the Treasury events and extrinsics in each historical block.
-
-That's where Hydra gets you covered. Define your data model and the Hydra indexer will get it in sync with the chain. On top of that, you get a batteries-included GraphQL server with comprehensive filtering, pagination, and even full-text search capabilities.
+![Hydra Indexer \(top\) and Hydra Processor \(bottom\) data flows](../.gitbook/assets/hydra-diagram.png)
 
 ## What's next?
 
