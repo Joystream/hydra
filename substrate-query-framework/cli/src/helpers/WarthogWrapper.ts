@@ -21,6 +21,8 @@ export default class WarthogWrapper {
   private readonly schemaPath: string;
   private readonly schemaResolvedPath: string;
 
+  private flags: Record<string, boolean | string> = {}
+
   constructor(command: Command, schemaPath: string) {
     this.command = command;
     this.schemaPath = schemaPath;
@@ -30,8 +32,10 @@ export default class WarthogWrapper {
     }
   }
 
-  async run(): Promise<void> {
+  async run(flags: Record<string, boolean | string> = {}): Promise<void> {
     // Order of calling functions is important!!!
+    this.flags = flags;
+    debug(`Passed flags: ${JSON.stringify(this.flags, null, 2)}`);
     const tasks = new Listr([
       {
         title: 'Set up a new Warthog project',
@@ -108,13 +112,14 @@ export default class WarthogWrapper {
 
     // Override warthog's index.ts file for custom naming strategy
     fs.copyFileSync(getTemplatePath('graphql-server.index.mst'), path.resolve(process.cwd(), 'src/index.ts'));
+    fs.copyFileSync(getTemplatePath(`graphql-server.tsconfig.json`), path.resolve(process.cwd(), 'tsconfig.json'));
 
     await this.updateDotenv();
   }
 
   async installDependencies(): Promise<void> {
     if (!fs.existsSync('package.json')) {
-      this.command.error('Could not found package.json file in the current working directory');
+      this.command.error('Could not find package.json file in the current working directory');
     }
 
     // Temporary tslib fix
@@ -129,11 +134,14 @@ export default class WarthogWrapper {
     pkgFile.dependencies['warthog'] = this.getWarthogDependecy();
     fs.writeFileSync('package.json', JSON.stringify(pkgFile, null, 2));
 
-    //this.command.log('Installing graphql-server dependencies...');
-    await execa('yarn', ['add', 'lodash']); // add lodash dep
-    await execa('yarn', ['install']);
-
-    //this.command.log('done...');
+    
+    if (this.flags.install === true) {
+      debug('Installing the dependencies');
+      await execa('yarn', ['add', 'lodash']); // add lodash dep
+      await execa('yarn', ['install']);
+    } else {
+      this.command.warn(`Skipping 'yarn install'`);
+    }
   }
 
   async createDB(): Promise<void> {

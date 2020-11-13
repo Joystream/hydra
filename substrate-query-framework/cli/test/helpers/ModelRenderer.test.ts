@@ -119,7 +119,7 @@ describe('ModelRenderer', () => {
 
     expect(rendered).to.include(`import { Author } from '../author/author.model`, `Should render imports`);
     expect(rendered).to.include(
-      `@ManyToOne(() => Author, (param: Author) => param.posts, {
+      `@ManyToOne(() => Author, (param: Author) => param.postauthor, {
     skipGraphQLField: true,
   })`,
       'Should render MTO decorator'

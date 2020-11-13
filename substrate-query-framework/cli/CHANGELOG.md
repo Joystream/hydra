@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.0.19
+
+- Support of ES-style imports in mappings (via `esModuleInterop:true`)
+- Add `--no-install` flag to `hydra-cli codegen` to skip dependecies installation
+
+## 0.0.18
+
+- Fix entity relation resolvers for the genrated GraphQL server
+
 ## 0.0.17
 
 - Update wartog version to 2.20.0
