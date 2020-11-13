@@ -73,5 +73,5 @@ export function generateEntityImport(entityName: string): string {
 }
 
 export function generateResolverReturnType(type: string, isList: boolean): string {
-  return `Promise<${type}${isList ? '[]' : ''}>`;
+  return `Promise<${type}${isList ? '[]' : ''} | null>`;
 }
