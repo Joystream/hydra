@@ -9,8 +9,10 @@ import {
   ObjectType,
   Field,
   Int,
-  ArgsType
+  ArgsType,
+  Info
 } from 'type-graphql';
+import graphqlFields from 'graphql-fields';
 import { Inject } from 'typedi';
 import { Min } from 'class-validator'
 import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields } from 'warthog';
@@ -98,9 +100,11 @@ export class {{className}}Resolver {
   @Query(() => {{className}}Connection)
   async {{camelName}}Connection(
     @Args() { where, orderBy, ...pageOptions }: {{className}}ConnectionWhereArgs,
-    @RawFields() fields: Record<string, any>
+    @Info() info: any
   ): Promise<{{className}}Connection> {
     
+    const rawFields = graphqlFields(info, {}, { excludedFields: ['__typename'] });
+
     let result: any = {
       totalCount: 0,
       edges: [],
@@ -116,7 +120,7 @@ export class {{className}}Resolver {
         where,
         orderBy,
         pageOptions,
-        fields
+        rawFields
       );
     } catch (err) {
       console.log(err);
