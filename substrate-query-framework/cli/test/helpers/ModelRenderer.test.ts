@@ -348,7 +348,28 @@ describe('ModelRenderer', () => {
     expect(rendered).to.include(`MemberConnection`);
     expect(rendered).to.include(`ConnectionPageInputOptions`);
     expect(rendered).to.include(`MemberConnectionWhereArgs`);
-    expect(rendered).to.include(`memberConnection`);
+    expect(rendered).to.include(`membersConnection`);
     expect(rendered).to.include(`findConnection<MemberWhereInput>`);
+  });
+
+  it('Should properly pluralize connection naming for camelCased names', () => {
+    const model = fromStringSchema(`
+    type VideoCategory @entity {
+      id: ID!
+    }
+
+    type Video @entity {
+      id: ID!
+    }
+    `);
+
+    generator = new ModelRenderer(model, model.lookupEntity('VideoCategory'), enumCtxProvider);
+    const rendered = generator.render(resolverTemplate);
+    expect(rendered).to.include(`videoCategoriesConnection`);
+    expect(rendered).to.include(`async videoCategories`);
+
+    generator = new ModelRenderer(model, model.lookupEntity('Video'), enumCtxProvider);
+    expect(generator.render(resolverTemplate)).to.include(`videosConnection`);
+    expect(generator.render(resolverTemplate)).to.include(`async videos`);
   });
 });

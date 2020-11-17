@@ -98,7 +98,7 @@ export class {{className}}Resolver {
   }
 
   @Query(() => {{className}}Connection)
-  async {{camelName}}Connection(
+  async {{camelNamePlural}}Connection(
     @Args() { where, orderBy, ...pageOptions }: {{className}}ConnectionWhereArgs,
     @Info() info: any
   ): Promise<{{className}}Connection> {
