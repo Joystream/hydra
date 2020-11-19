@@ -2,6 +2,7 @@ import { upperFirst, kebabCase, camelCase, snakeCase } from 'lodash';
 import { GeneratorContext } from './SourcesGenerator';
 import { ObjectType, Field } from '../model';
 import _ from 'lodash';
+import pluralize from 'pluralize';
 
 export { upperFirst, kebabCase, camelCase };
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -18,7 +19,7 @@ export function pascalCase(str: string): string {
 }
 
 export function camelPlural(str: string): string {
-  return `${camelCase(str)}s`;
+  return camelCase(pluralize(str));
 }
 
 export function names(name: string): { [key: string]: string } {
