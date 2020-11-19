@@ -119,13 +119,33 @@ describe('ModelRenderer', () => {
 
     expect(rendered).to.include(`import { Author } from '../author/author.model`, `Should render imports`);
     expect(rendered).to.include(
-      `@ManyToOne(() => Author, (param: Author) => param.postauthor, {
-    skipGraphQLField: true,
-  })`,
+      `@ManyToOne(() => Author, (param: Author) => param.postauthor, { skipGraphQLField: true })`,
       'Should render MTO decorator'
     ); // nullable: true is not includered?
     expect(rendered).to.include(`author!: Author;`, 'Should render required referenced field');
   });
+
+  it('should add nullable option mto decorator', function () {
+    const model = fromStringSchema(`
+    type Channel @entity {
+      handle: String!
+      language: Language
+    }
+    
+    type Language @entity {
+      code: String!
+      name: String!
+    }`)
+
+    generator = new ModelRenderer(model, model.lookupEntity('Channel'), enumCtxProvider)
+    const rendered = generator.render(modelTemplate)
+    debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
+
+    expect(rendered).to.include(
+      `@ManyToOne(() => Language, (param: Language) => param.channellanguage, { skipGraphQLField: true, nullable: true })`,
+      'Should render MTO decorator with nullable option'
+    )
+  })
 
   it('should renderer array types', function () {
     const model = fromStringSchema(`
