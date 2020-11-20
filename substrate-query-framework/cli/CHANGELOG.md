@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.22
+
+- Add unique entity queries
+
 ## 0.0.21
 
 - Proper pluralization for GraphQL schema queries (#112)
