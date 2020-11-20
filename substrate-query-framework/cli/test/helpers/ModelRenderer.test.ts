@@ -392,4 +392,19 @@ describe('ModelRenderer', () => {
     expect(generator.render(resolverTemplate)).to.include(`videosConnection`);
     expect(generator.render(resolverTemplate)).to.include(`async videos`);
   });
+
+  it('Should add querying a single entity query', () => {
+    const model = fromStringSchema(`
+    type Channel @entity {
+      id: ID!
+      handle: String!
+    }`);
+
+    generator = new ModelRenderer(model, model.lookupEntity('Channel'), enumCtxProvider);
+    const rendered = generator.render(resolverTemplate);
+
+    expect(rendered).to.include(`Query(() => Channel, { nullable: true })`);
+    expect(rendered).to.include(`async channel(@Arg('where') where: ChannelWhereUniqueInput): Promise<Channel | null>`);
+    expect(rendered).to.include(`findOne<ChannelWhereUniqueInput>`);
+  });
 });

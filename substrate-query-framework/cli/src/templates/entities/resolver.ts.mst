@@ -97,6 +97,16 @@ export class {{className}}Resolver {
     return this.service.find<{{className}}WhereInput>(where, orderBy, limit, offset, fields);
   }
 
+  @Query(() => {{className}}, { nullable: true })
+  async {{camelName}}(@Arg('where') where: {{className}}WhereUniqueInput): Promise<{{className}} | null> {
+    try {
+      return await this.service.findOne<{{className}}WhereUniqueInput>(where);
+    } catch (error) {
+      if (error.message.includes('Unable to find')) return null;
+      throw error;
+    }
+  }
+
   @Query(() => {{className}}Connection)
   async {{camelNamePlural}}Connection(
     @Args() { where, orderBy, ...pageOptions }: {{className}}ConnectionWhereArgs,
