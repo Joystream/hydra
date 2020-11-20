@@ -78,7 +78,7 @@ Similar to TheGraph design
 | **extrinsic** | optional *String* | The extrinsic that caused the event. If present, only the events emitted by the specified extrinsics will be handled by the handler. Must have a fully qualified name in the form
 `<section>.<method>(type1,type2,...,)`|
 | **handler** | *String* | The name of an exported function in the mapping script that should handle the specified event. |
-| **virtual** | optional *Boolean* | If the event to be handled is _virtual_, that is, emitted by an extrinsic handler or a block handler rather than the runtime |
+| **virtual** | optional *Boolean* | If the event to be handled is _virtual_, that is, emitted by an extrinsic handler than by the chain |
 
 #### 1.3.2.3 ExtrinsicHandler
 
