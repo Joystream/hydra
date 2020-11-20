@@ -75,7 +75,7 @@ Similar to TheGraph design
 | Field | Type | Description |
 | --- | --- | --- |
 | **event** | *String* | An identifier for an event that will be handled in the mapping script. It must be in the form `<module>.<method>(type1,type2,...,)` as defined in the metadata file. For example, `balances.DustLost(AccountId,Balance)`. The declared types should be available via globally defined `typeRegistry`. |
-| **extrinsic** | optional *String* | The extrinsic that caused the event. If present, only the events emitted by the specified extrinsics will be handled by the handler. Must have a fully qualified name in the form
+| **extrinsic** | optional *String* | The extrinsic that caused the event. If present, only events emitted by the specified extrinsics will be handled by the handler. Must have a fully qualified name in the form
 `<section>.<method>(type1,type2,...,)`|
 | **handler** | *String* | The name of an exported function in the mapping script that should handle the specified event. |
 | **virtual** | optional *Boolean* | If the event to be handled is _virtual_, that is, emitted by an extrinsic handler than by the chain |
@@ -84,10 +84,11 @@ Similar to TheGraph design
 
 | Field | Type | Description |
 | --- | --- | --- |
-| **function** | *String* | An identifier for a function that will be handled in the mapping script in the form `<section>.<method>(name1: type1, name2: type2,...,)`. Example: `utility.batch(calls: Vec<Call>)`|
+| **extrinsic** | *String* | An identifier for a function that will be handled in the mapping script in the form `<section>.<method>(name1: type1, name2: type2,...,)`. Example: `utility.batch(calls: Vec<Call>)`|
 | **filter** | optional *String* | An open_CRUD string specifying additional filtering to be applied, i.e. `calls[0].args.max_additional_gt > 10000`. The detailed syntax to be documented elsewhere and is subject to change.  |
 | **handler** | *String* | The name of an exported function in the mapping script that should handle the specified event. |
-| **emits** | list of *String* | A list of virtual events the handler _may_ emit, in the form ``|
+| **emits** | list of *String* | A list of virtual events the handler _may_ emit |
+| **exports** | list of *String* | Extra types exported by the handler |
 
 #### 1.3.2.4 BlockHandler
 
