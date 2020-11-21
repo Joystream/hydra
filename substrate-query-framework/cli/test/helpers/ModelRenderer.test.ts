@@ -405,6 +405,6 @@ describe('ModelRenderer', () => {
 
     expect(rendered).to.include(`Query(() => Channel, { nullable: true })`);
     expect(rendered).to.include(`async channel(@Arg('where') where: ChannelWhereUniqueInput): Promise<Channel | null>`);
-    expect(rendered).to.include(`findOne<ChannelWhereUniqueInput>`);
+    expect(rendered).to.include(`this.service.manager.findOne(Channel, where)`);
   });
 });

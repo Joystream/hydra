@@ -99,12 +99,8 @@ export class {{className}}Resolver {
 
   @Query(() => {{className}}, { nullable: true })
   async {{camelName}}(@Arg('where') where: {{className}}WhereUniqueInput): Promise<{{className}} | null> {
-    try {
-      return await this.service.findOne<{{className}}WhereUniqueInput>(where);
-    } catch (error) {
-      if (error.message.includes('Unable to find')) return null;
-      throw error;
-    }
+    const result = await this.service.manager.findOne({{className}}, where);
+    return result !== undefined ? result : null;
   }
 
   @Query(() => {{className}}Connection)
