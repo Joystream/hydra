@@ -1,90 +1,93 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as dotenv from 'dotenv';
+import * as fs from 'fs-extra'
+import * as path from 'path'
+import * as dotenv from 'dotenv'
 
-import Command from '@oclif/command';
-import { run } from 'warthog/dist/cli/cli';
+import Command from '@oclif/command'
+import { run } from 'warthog/dist/cli/cli'
 
-import { WarthogModelBuilder } from './../parse/WarthogModelBuilder';
-import { getTemplatePath } from '../utils/utils';
-import Debug from 'debug';
-import { SourcesGenerator } from '../generate/SourcesGenerator';
-import execa = require('execa');
-import Listr = require('listr');
+import { WarthogModelBuilder } from './../parse/WarthogModelBuilder'
+import { getTemplatePath } from '../utils/utils'
+import Debug from 'debug'
+import { SourcesGenerator } from '../generate/SourcesGenerator'
+import execa = require('execa')
+import Listr = require('listr')
 
-const FALLBACK_WARTHOG_LIB = 'https://github.com/metmirr/warthog/releases/download/v2.19/warthog-v2.19.tgz';
+const FALLBACK_WARTHOG_LIB =
+  'https://github.com/metmirr/warthog/releases/download/v2.19/warthog-v2.19.tgz'
 
-const debug = Debug('qnode-cli:warthog-wrapper');
+const debug = Debug('qnode-cli:warthog-wrapper')
 
 export default class WarthogWrapper {
-  private readonly command: Command;
-  private readonly schemaPath: string;
-  private readonly schemaResolvedPath: string;
+  private readonly command: Command
+  private readonly schemaPath: string
+  private readonly schemaResolvedPath: string
 
-  private flags: Record<string, boolean | string> = {};
+  private flags: Record<string, boolean | string> = {}
 
   constructor(command: Command, schemaPath: string) {
-    this.command = command;
-    this.schemaPath = schemaPath;
-    this.schemaResolvedPath = path.resolve(process.cwd(), this.schemaPath);
+    this.command = command
+    this.schemaPath = schemaPath
+    this.schemaResolvedPath = path.resolve(process.cwd(), this.schemaPath)
     if (!fs.existsSync(this.schemaResolvedPath)) {
-      throw new Error(`Cannot open the schema file ${this.schemaResolvedPath}. Check if it exists.`);
+      throw new Error(
+        `Cannot open the schema file ${this.schemaResolvedPath}. Check if it exists.`
+      )
     }
   }
 
   async run(flags: Record<string, boolean | string> = {}): Promise<void> {
     // Order of calling functions is important!!!
-    this.flags = flags;
-    debug(`Passed flags: ${JSON.stringify(this.flags, null, 2)}`);
+    this.flags = flags
+    debug(`Passed flags: ${JSON.stringify(this.flags, null, 2)}`)
     const tasks = new Listr([
       {
         title: 'Set up a new Warthog project',
         task: async () => {
-          await this.newProject();
+          await this.newProject()
         },
       },
       {
         title: 'Prepare project files',
         task: () => {
-          this.prepareProjectFiles();
+          this.prepareProjectFiles()
         },
       },
       {
         title: 'Install dependencies',
         skip: () => {
           if (this.flags.install !== true) {
-            return 'Skipping: either --no-install flag has been passed or the HYDRA_NO_DEPS_INSTALL environment variable is set to';
+            return 'Skipping: either --no-install flag has been passed or the HYDRA_NO_DEPS_INSTALL environment variable is set to'
           }
         },
         task: async () => {
-          await this.installDependecies();
+          await this.installDependecies()
         },
       },
       {
         title: 'Generate server sources',
         skip: () => {
           if (this.flags.install !== true) {
-            return 'Skipping: dependencies are not installed';
+            return 'Skipping: dependencies are not installed'
           }
         },
         task: () => {
-          this.generateWarthogSources();
+          this.generateWarthogSources()
         },
       },
       {
         title: 'Warthog codegen',
         skip: () => {
           if (this.flags.install !== true) {
-            return 'Skipping: dependencies are not installed';
+            return 'Skipping: dependencies are not installed'
           }
         },
         task: async () => {
-          await this.codegen();
+          await this.codegen()
         },
       },
-    ]);
+    ])
 
-    await tasks.run();
+    await tasks.run()
   }
 
   async generateDB(): Promise<void> {
@@ -93,77 +96,91 @@ export default class WarthogWrapper {
         title: 'Create database',
         task: async () => {
           if (!process.env.DB_NAME) {
-            throw new Error('DB_NAME env variable is not set, check that .env file exists');
+            throw new Error(
+              'DB_NAME env variable is not set, check that .env file exists'
+            )
           }
-          await this.createDB();
+          await this.createDB()
         },
       },
       {
         title: 'Generate migrations',
         task: async () => {
-          await this.createMigrations();
+          await this.createMigrations()
         },
       },
       {
         title: 'Run migrations',
         task: async () => {
-          await this.runMigrations();
+          await this.runMigrations()
         },
       },
-    ]);
-    await tasks.run();
+    ])
+    await tasks.run()
   }
 
   async generateAPIPreview(): Promise<void> {
     // Order of calling functions is important!!!
-    await this.newProject();
-    this.prepareProjectFiles();
-    await this.installDependecies();
-    this.generateWarthogSources();
-    await this.codegen();
+    await this.newProject()
+    this.prepareProjectFiles()
+    await this.installDependecies()
+    this.generateWarthogSources()
+    await this.codegen()
   }
 
   async newProject(projectName = 'query_node'): Promise<void> {
-    const consoleFn = console.log;
+    const consoleFn = console.log
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    console.log = () => {};
+    console.log = () => {}
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await run(['new', `${projectName}`]);
-    console.log = consoleFn;
+    await run(['new', `${projectName}`])
+    console.log = consoleFn
 
     // Override warthog's index.ts file for custom naming strategy
-    fs.copyFileSync(getTemplatePath('graphql-server.index.mst'), path.resolve(process.cwd(), 'src/index.ts'));
-    fs.copyFileSync(getTemplatePath(`graphql-server.tsconfig.json`), path.resolve(process.cwd(), 'tsconfig.json'));
+    fs.copyFileSync(
+      getTemplatePath('graphql-server.index.mst'),
+      path.resolve(process.cwd(), 'src/index.ts')
+    )
+    fs.copyFileSync(
+      getTemplatePath(`graphql-server.tsconfig.json`),
+      path.resolve(process.cwd(), 'tsconfig.json')
+    )
 
-    await this.updateDotenv();
+    await this.updateDotenv()
   }
 
   prepareProjectFiles(): void {
     if (!fs.existsSync('package.json')) {
-      this.command.error('Could not find package.json file in the current working directory');
+      this.command.error(
+        'Could not find package.json file in the current working directory'
+      )
     }
 
-    const pkgFile = JSON.parse(fs.readFileSync('package.json', 'utf8')) as Record<string, Record<string, unknown>>;
-    pkgFile.scripts['db:sync'] = 'SYNC=true WARTHOG_DB_SYNCHRONIZE=true ts-node --type-check src/index.ts';
+    const pkgFile = JSON.parse(
+      fs.readFileSync('package.json', 'utf8')
+    ) as Record<string, Record<string, unknown>>
+    pkgFile.scripts['db:sync'] =
+      'SYNC=true WARTHOG_DB_SYNCHRONIZE=true ts-node --type-check src/index.ts'
 
     // Fix ts-node-dev error
-    pkgFile.scripts['start:dev'] = 'ts-node --type-check src/index.ts';
+    pkgFile.scripts['start:dev'] = 'ts-node --type-check src/index.ts'
 
     // Node does not run the compiled code, so we use ts-node in production...
-    pkgFile.scripts['start:prod'] = 'WARTHOG_ENV=production yarn dotenv:generate && ts-node src/index.ts';
-    pkgFile.dependencies.warthog = this.getWarthogDependency();
-    fs.writeFileSync('package.json', JSON.stringify(pkgFile, null, 2));
+    pkgFile.scripts['start:prod'] =
+      'WARTHOG_ENV=production yarn dotenv:generate && ts-node src/index.ts'
+    pkgFile.dependencies.warthog = this.getWarthogDependency()
+    fs.writeFileSync('package.json', JSON.stringify(pkgFile, null, 2))
   }
 
   async installDependecies(): Promise<void> {
-    debug('Installing the dependencies');
-    await execa('yarn', ['add', 'lodash']); // add lodash dep
-    await execa('yarn', ['install']);
+    debug('Installing the dependencies')
+    await execa('yarn', ['add', 'lodash']) // add lodash dep
+    await execa('yarn', ['install'])
   }
 
   async createDB(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await run(['db:create']);
+    await run(['db:create'])
   }
 
   getWarthogDependency(): string {

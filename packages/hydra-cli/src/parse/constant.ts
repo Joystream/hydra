@@ -3,10 +3,10 @@
  * Add additional scalar types and directives to the schema
  */
 
-export const ENTITY_DIRECTIVE = 'entity';
-export const UNIQUE_DIRECTIVE = 'unique';
-export const VARIANT_DIRECTIVE = 'variant';
-export const DERIVED_FROM_DIRECTIVE = `derivedFrom`;
+export const ENTITY_DIRECTIVE = 'entity'
+export const UNIQUE_DIRECTIVE = 'unique'
+export const VARIANT_DIRECTIVE = 'variant'
+export const DERIVED_FROM_DIRECTIVE = `derivedFrom`
 
 export const SCHEMA_DEFINITIONS_PREAMBLE = `
 directive @${VARIANT_DIRECTIVE} on OBJECT # varaint types
@@ -20,4 +20,4 @@ scalar ID                    # Id scalar type
 type Query {
     _dummy: String           # empty queries are not allowed
 }
-`;
+`

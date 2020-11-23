@@ -1,5 +1,5 @@
 export interface ScalarType {
-  [name: string]: string;
+  [name: string]: string
 }
 
 // Supported built-in scalar types and corressponding warthog type
@@ -13,4 +13,4 @@ export const availableTypes: ScalarType = {
   BigInt: 'numeric',
   BigDecimal: 'decimal',
   Bytes: 'bytes',
-};
+}
