@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "GraphQL server and Substrate indexer. Generated with \u2665 by Hydra-CLI",
   "scripts": {
-    "test": "yarn clean && yarn codegen:all",
+    "build": "yarn clean && yarn codegen:all",
     "clean": "rm -rf ./generated",
     "lint": "echo \"Skippinng\"",
     "processor:start": "(cd ./generated/hydra-processor && yarn && DEBUG=${DEBUG} yarn start)",
