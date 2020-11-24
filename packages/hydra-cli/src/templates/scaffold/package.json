@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf ./generated",
-    "processor:start": "(cd ./generated/hydra-processor && yarn && DEBUG=${DEBUG} yarn start:processor)",
+    "processor:start": "(cd ./generated/hydra-processor && yarn && DEBUG=${DEBUG} yarn start)",
     "server:start:dev": "(cd ./generated/graphql-server && yarn start:dev)",
     "server:start:prod": "(cd ./generated/graphql-server && yarn start:prod)",
     "configure": "(cd ./generated/graphql-server && yarn config:dev)",
@@ -31,9 +31,9 @@
     "bn.js": "^5.1.2"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "{{{hydraVersion}}}",
-    "@dzlzv/hydra-common": "{{{hydraCommonVersion}}}",
-    "@dzlzv/hydra-db-utils": "{{{hydraDbUtilsVersion}}}",
-    "@dzlzv/hydra-processor": "{{{hydraProcessorVersion}}}"
+    "@dzlzv/hydra-cli": "^{{{hydraVersion}}}",
+    "@dzlzv/hydra-common": "^{{{hydraCommonVersion}}}",
+    "@dzlzv/hydra-db-utils": "^{{{hydraDbUtilsVersion}}}",
+    "@dzlzv/hydra-processor": "^{{{hydraProcessorVersion}}}"
   }
 }

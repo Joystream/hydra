@@ -1,27 +1,20 @@
-import * as dotenv from 'dotenv'
-import * as fs from 'fs-extra'
 import { createConnection, getConnection } from 'typeorm'
-
-import { getTemplatePath } from '../utils/utils'
 
 /**
  * Update typeorms' .env config file with top level .env file
  */
 export function getTypeormConfig(): string {
-  const envConfig = dotenv.parse(
-    fs.readFileSync(getTemplatePath('dotenv-ormconfig.mst'))
-  )
+  const envConfig = {} as Record<string, unknown>
 
-  envConfig.TYPEORM_DATABASE = process.env.DB_NAME || envConfig.TYPEORM_DATABASE
-  envConfig.TYPEORM_USERNAME = process.env.DB_USER || envConfig.TYPEORM_USERNAME
-  envConfig.TYPEORM_PASSWORD = process.env.DB_PASS || envConfig.TYPEORM_PASSWORD
-  envConfig.TYPEORM_HOST = process.env.DB_HOST || envConfig.TYPEORM_HOST
-  envConfig.TYPEORM_PORT = process.env.DB_PORT || envConfig.TYPEORM_PORT
+  envConfig.TYPEORM_DATABASE = process.env.DB_NAME
+  envConfig.TYPEORM_USERNAME = process.env.DB_USER
+  envConfig.TYPEORM_PASSWORD = process.env.DB_PASS
+  envConfig.TYPEORM_HOST = process.env.DB_HOST
+  envConfig.TYPEORM_PORT = process.env.DB_PORT
 
-  const newEnvConfig = Object.keys(envConfig)
+  return Object.keys(envConfig)
     .map((key) => `${key}=${envConfig[key]}`)
     .join('\n')
-  return newEnvConfig
 }
 
 export async function resetLastProcessedEvent(): Promise<void> {

@@ -1,14 +1,13 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
-
-import Command from '@oclif/command'
 import { run } from 'warthog/dist/cli/cli'
 
 import { WarthogModelBuilder } from './../parse/WarthogModelBuilder'
 import { getTemplatePath } from '../utils/utils'
 import Debug from 'debug'
 import { SourcesGenerator } from '../generate/SourcesGenerator'
+import { CodegenFlags } from '../commands/codegen'
 import execa = require('execa')
 import Listr = require('listr')
 
@@ -18,16 +17,14 @@ const FALLBACK_WARTHOG_LIB =
 const debug = Debug('qnode-cli:warthog-wrapper')
 
 export default class WarthogWrapper {
-  private readonly command: Command
-  private readonly schemaPath: string
+  // private readonly schemaPath: string
   private readonly schemaResolvedPath: string
 
-  private flags: Record<string, boolean | string> = {}
-
-  constructor(command: Command, schemaPath: string) {
-    this.command = command
-    this.schemaPath = schemaPath
-    this.schemaResolvedPath = path.resolve(process.cwd(), this.schemaPath)
+  constructor(readonly flags: CodegenFlags) {
+    this.schemaResolvedPath = path.resolve(
+      process.cwd(),
+      this.flags.schema as string
+    )
     if (!fs.existsSync(this.schemaResolvedPath)) {
       throw new Error(
         `Cannot open the schema file ${this.schemaResolvedPath}. Check if it exists.`
@@ -35,9 +32,8 @@ export default class WarthogWrapper {
     }
   }
 
-  async run(flags: Record<string, boolean | string> = {}): Promise<void> {
+  async run(): Promise<void> {
     // Order of calling functions is important!!!
-    this.flags = flags
     debug(`Passed flags: ${JSON.stringify(this.flags, null, 2)}`)
     const tasks = new Listr([
       {
@@ -138,11 +134,11 @@ export default class WarthogWrapper {
 
     // Override warthog's index.ts file for custom naming strategy
     fs.copyFileSync(
-      getTemplatePath('graphql-server.index.mst'),
+      getTemplatePath('graphql-server/graphql-server.index.mst'),
       path.resolve(process.cwd(), 'src/index.ts')
     )
     fs.copyFileSync(
-      getTemplatePath(`graphql-server.tsconfig.json`),
+      getTemplatePath(`graphql-server/graphql-server.tsconfig.json`),
       path.resolve(process.cwd(), 'tsconfig.json')
     )
 
@@ -151,7 +147,7 @@ export default class WarthogWrapper {
 
   prepareProjectFiles(): void {
     if (!fs.existsSync('package.json')) {
-      this.command.error(
+      throw new Error(
         'Could not find package.json file in the current working directory'
       )
     }
@@ -185,10 +181,15 @@ export default class WarthogWrapper {
 
   getWarthogDependency(): string {
     /* eslint-disable */
-    const warthogPackageJson = require('warthog/package.json') as Record<string, unknown>;
-    debug(`Warthog package json: ${JSON.stringify(warthogPackageJson, null, 2)}`);
+    const warthogPackageJson = require('warthog/package.json') as Record<
+      string,
+      unknown
+    >
+    debug(
+      `Warthog package json: ${JSON.stringify(warthogPackageJson, null, 2)}`
+    )
     // if there is a special 'hydra' property, use it as depenency, otherwise use hardcoded fallback
-    return (warthogPackageJson.hydra || FALLBACK_WARTHOG_LIB) as string;
+    return (warthogPackageJson.hydra || FALLBACK_WARTHOG_LIB) as string
   }
 
   /**
@@ -197,45 +198,55 @@ export default class WarthogWrapper {
    *   - Fulltext search queries (migration/resolver/service)
    */
   generateWarthogSources(): void {
-    const modelBuilder = new WarthogModelBuilder(this.schemaResolvedPath);
-    const model = modelBuilder.buildWarthogModel();
+    const modelBuilder = new WarthogModelBuilder(this.schemaResolvedPath)
+    const model = modelBuilder.buildWarthogModel()
 
-    const sourcesGenerator = new SourcesGenerator(model);
-    sourcesGenerator.generate();
+    const sourcesGenerator = new SourcesGenerator(model)
+    sourcesGenerator.generate()
   }
 
   async codegen(): Promise<void> {
-    await execa('yarn', ['warthog', 'codegen']);
-    await execa('yarn', ['dotenv:generate']);
+    await execa('yarn', ['warthog', 'codegen'])
+    await execa('yarn', ['dotenv:generate'])
   }
 
   async createMigrations(): Promise<void> {
-    await execa('yarn', ['db:sync']);
+    await execa('yarn', ['db:sync'])
   }
 
   async runMigrations(): Promise<void> {
-    debug('performing migrations');
-    await execa('yarn', ['db:migrate']);
+    debug('performing migrations')
+    await execa('yarn', ['db:migrate'])
   }
 
   async updateDotenv(): Promise<void> {
     // copy dotnenvi env.yml file
-    debug('Creating graphql-server/env.yml');
-    await fs.copyFile(getTemplatePath('warthog.env.yml'), path.resolve(process.cwd(), 'env.yml'));
-    const envConfig = dotenv.parse(fs.readFileSync('.env'));
+    debug('Creating graphql-server/env.yml')
+    await fs.copyFile(
+      getTemplatePath('graphql-server/warthog.env.yml'),
+      path.resolve(process.cwd(), 'env.yml')
+    )
+    const envConfig = dotenv.parse(fs.readFileSync('.env'))
 
     // Override DB_NAME, PORT, ...
-    envConfig['WARTHOG_DB_DATABASE'] = process.env.DB_NAME || envConfig['WARTHOG_DB_DATABASE'];
-    envConfig['WARTHOG_DB_USERNAME'] = process.env.DB_USER || envConfig['WARTHOG_DB_USERNAME'];
-    envConfig['WARTHOG_DB_PASSWORD'] = process.env.DB_PASS || envConfig['WARTHOG_DB_PASSWORD'];
-    envConfig['WARTHOG_DB_HOST'] = process.env.DB_HOST || envConfig['WARTHOG_DB_HOST'];
-    envConfig['WARTHOG_DB_PORT'] = process.env.DB_PORT || envConfig['WARTHOG_DB_PORT'];
-    envConfig['WARTHOG_APP_PORT'] = process.env.GRAPHQL_SERVER_PORT || envConfig['WARTHOG_APP_PORT'];
-    envConfig['WARTHOG_APP_HOST'] = process.env.GRAPHQL_SERVER_HOST || envConfig['WARTHOG_APP_HOST'];
+    envConfig['WARTHOG_DB_DATABASE'] =
+      process.env.DB_NAME || envConfig['WARTHOG_DB_DATABASE']
+    envConfig['WARTHOG_DB_USERNAME'] =
+      process.env.DB_USER || envConfig['WARTHOG_DB_USERNAME']
+    envConfig['WARTHOG_DB_PASSWORD'] =
+      process.env.DB_PASS || envConfig['WARTHOG_DB_PASSWORD']
+    envConfig['WARTHOG_DB_HOST'] =
+      process.env.DB_HOST || envConfig['WARTHOG_DB_HOST']
+    envConfig['WARTHOG_DB_PORT'] =
+      process.env.DB_PORT || envConfig['WARTHOG_DB_PORT']
+    envConfig['WARTHOG_APP_PORT'] =
+      process.env.GRAPHQL_SERVER_PORT || envConfig['WARTHOG_APP_PORT']
+    envConfig['WARTHOG_APP_HOST'] =
+      process.env.GRAPHQL_SERVER_HOST || envConfig['WARTHOG_APP_HOST']
 
     const newEnvConfig = Object.keys(envConfig)
-      .map(key => `${key}=${envConfig[key]}`)
-      .join('\n');
-    await fs.writeFile('.env', newEnvConfig);
+      .map((key) => `${key}=${envConfig[key]}`)
+      .join('\n')
+    await fs.writeFile('.env', newEnvConfig)
   }
 }
