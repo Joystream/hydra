@@ -1,7 +1,7 @@
 import * as path from 'path'
-import WarthogWrapper from '../helpers/WarthogWrapper'
+import WarthogWrapper from './WarthogWrapper'
 import { createDir } from '../utils/utils'
-import { CodegenFlags } from './codegen'
+import { CodegenFlags } from '../commands/codegen'
 
 export default async function createGraphQLServer(
   flags: CodegenFlags

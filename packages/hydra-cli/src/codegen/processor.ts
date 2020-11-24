@@ -10,8 +10,8 @@ import {
   readModuleFile,
   resolvePackageVersion,
 } from '../utils/utils'
-import { CodegenFlags } from './codegen'
-import { getTypeormConfig } from '../helpers/db'
+import { CodegenFlags } from '../commands/codegen'
+import { getTypeormConfig } from './torm-config'
 
 export async function createProcessor({
   install,

@@ -3,7 +3,7 @@ import { createDir } from '../utils/utils'
 import * as path from 'path'
 import * as fs from 'fs-extra'
 import Codegen, { CodegenFlags } from './codegen'
-import WarthogWrapper from '../helpers/WarthogWrapper'
+import WarthogWrapper from '../codegen/WarthogWrapper'
 import * as dotenv from 'dotenv'
 
 export default class Preview extends Command {

@@ -31,7 +31,7 @@
     "bn.js": "^5.1.2"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "^{{{hydraVersion}}}",
+    "@dzlzv/hydra-cli": "{{{hydraVersion}}}",
     "@dzlzv/hydra-common": "^{{{hydraCommonVersion}}}",
     "@dzlzv/hydra-db-utils": "^{{{hydraDbUtilsVersion}}}",
     "@dzlzv/hydra-processor": "^{{{hydraProcessorVersion}}}"

@@ -6,8 +6,8 @@ import cli from 'cli-ux'
 import Debug from 'debug'
 
 import { createDir } from '../utils/utils'
-import { createProcessor } from './processor'
-import createGraphQLServer from './graphql-server'
+import { createProcessor } from '../codegen/processor'
+import createGraphQLServer from '../codegen/graphql-server'
 
 const debug = Debug('qnode-cli:codegen')
 

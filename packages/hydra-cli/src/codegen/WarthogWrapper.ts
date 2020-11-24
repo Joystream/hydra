@@ -3,7 +3,7 @@ import * as path from 'path'
 import * as dotenv from 'dotenv'
 import { run } from 'warthog/dist/cli/cli'
 
-import { WarthogModelBuilder } from './../parse/WarthogModelBuilder'
+import { WarthogModelBuilder } from '../parse/WarthogModelBuilder'
 import { getTemplatePath } from '../utils/utils'
 import Debug from 'debug'
 import { SourcesGenerator } from '../generate/SourcesGenerator'
