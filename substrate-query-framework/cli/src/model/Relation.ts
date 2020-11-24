@@ -13,6 +13,8 @@ export interface Relation {
   // Column type
   columnType: string
 
+  nullable: boolean
+
   // Table that will hold relation id (foreign key)
   joinColumn?: boolean
 
@@ -32,15 +34,12 @@ export interface FieldResolver {
   returnType: string
 }
 
-export function makeRelation(
-  type: string,
-  columnType: string,
-  relatedTsProp: string
-): Relation {
+export function makeRelation(type: string, columnType: string, relatedTsProp: string, nullable: boolean): Relation {
   return {
     type,
     columnType,
     relatedTsProp,
+    nullable,
   }
 }
 

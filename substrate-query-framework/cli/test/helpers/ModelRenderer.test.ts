@@ -119,13 +119,33 @@ describe('ModelRenderer', () => {
 
     expect(rendered).to.include(`import { Author } from '../author/author.model`, `Should render imports`);
     expect(rendered).to.include(
-      `@ManyToOne(() => Author, (param: Author) => param.postauthor, {
-    skipGraphQLField: true,
-  })`,
+      `@ManyToOne(() => Author, (param: Author) => param.postauthor, { skipGraphQLField: true })`,
       'Should render MTO decorator'
     ); // nullable: true is not includered?
     expect(rendered).to.include(`author!: Author;`, 'Should render required referenced field');
   });
+
+  it('should add nullable option mto decorator', function () {
+    const model = fromStringSchema(`
+    type Channel @entity {
+      handle: String!
+      language: Language
+    }
+    
+    type Language @entity {
+      code: String!
+      name: String!
+    }`)
+
+    generator = new ModelRenderer(model, model.lookupEntity('Channel'), enumCtxProvider)
+    const rendered = generator.render(modelTemplate)
+    debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
+
+    expect(rendered).to.include(
+      `@ManyToOne(() => Language, (param: Language) => param.channellanguage, { skipGraphQLField: true, nullable: true })`,
+      'Should render MTO decorator with nullable option'
+    )
+  })
 
   it('should renderer array types', function () {
     const model = fromStringSchema(`
@@ -348,7 +368,45 @@ describe('ModelRenderer', () => {
     expect(rendered).to.include(`MemberConnection`);
     expect(rendered).to.include(`ConnectionPageInputOptions`);
     expect(rendered).to.include(`MemberConnectionWhereArgs`);
-    expect(rendered).to.include(`memberConnection`);
+    expect(rendered).to.include(`membersConnection`);
     expect(rendered).to.include(`findConnection<MemberWhereInput>`);
+  });
+
+  it('Should properly pluralize connection naming for camelCased names', () => {
+    const model = fromStringSchema(`
+    type VideoCategory @entity {
+      id: ID!
+    }
+
+    type Video @entity {
+      id: ID!
+    }
+    `);
+
+    generator = new ModelRenderer(model, model.lookupEntity('VideoCategory'), enumCtxProvider);
+    const rendered = generator.render(resolverTemplate);
+    expect(rendered).to.include(`videoCategoriesConnection`);
+    expect(rendered).to.include(`async videoCategories`);
+
+    generator = new ModelRenderer(model, model.lookupEntity('Video'), enumCtxProvider);
+    expect(generator.render(resolverTemplate)).to.include(`videosConnection`);
+    expect(generator.render(resolverTemplate)).to.include(`async videos`);
+  });
+
+  it('Should add querying a single entity query', () => {
+    const model = fromStringSchema(`
+    type Channel @entity {
+      id: ID!
+      handle: String!
+    }`);
+
+    generator = new ModelRenderer(model, model.lookupEntity('Channel'), enumCtxProvider);
+    const rendered = generator.render(resolverTemplate);
+
+    expect(rendered).to.include(`Query(() => Channel, { nullable: true })`);
+    expect(rendered).to.include(
+      `async channel(@Arg('where') where: ChannelWhereUniqueInput, @Fields() fields: string[]): Promise<Channel | null>`
+    );
+    expect(rendered).to.include(`this.service.find(where, undefined, 1, 0, fields)`);
   });
 });

@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "0.0.19",
+  "version": "0.0.23",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
   "bin": {
     "hydra-cli": "./bin/run"
@@ -26,15 +26,17 @@
     "listr": "^0.14.3",
     "lodash": "^4.17.15",
     "mustache": "^4.0.1",
+    "pluralize": "^8.0.0",
     "tslib": "1.11.2",
     "typeorm-model-generator": "^0.4.2",
-    "warthog": "https://github.com/metmirr/warthog/releases/download/v2.20.0/warthog-v2.20.0.tgz"
+    "warthog": "https://github.com/metmirr/warthog/releases/download/v2.22.0/warthog-v2.22.0.tgz"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1",
     "@oclif/test": "^1",
     "@types/chai": "^4",
     "@types/mocha": "^7.0.2",
+    "@types/pluralize": "^0.0.29",
     "@types/temp": "^0.8.34",
     "@types/tmp": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^3.0.2",

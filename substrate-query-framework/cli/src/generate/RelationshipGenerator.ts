@@ -1,10 +1,4 @@
-import {
-  WarthogModel,
-  Field,
-  ObjectType,
-  EntityRelationship,
-  RelationType,
-} from '../model'
+import { WarthogModel, Field, ObjectType, EntityRelationship, RelationType } from '../model'
 
 import { relations } from '../helpers/relations'
 
@@ -38,14 +32,8 @@ export class RelationshipGenerator {
     this.visited.add(`${field.name}:${relatedField.name}`)
   }
 
-  listFieldWithDerivedFromDirective(
-    entity: ObjectType,
-    relatedEntity: ObjectType,
-    field: Field
-  ): boolean {
-    const relatedField = relatedEntity.fields.find(
-      (f) => field.derivedFrom && field.derivedFrom.argument === f.name
-    )
+  listFieldWithDerivedFromDirective(entity: ObjectType, relatedEntity: ObjectType, field: Field): boolean {
+    const relatedField = relatedEntity.fields.find(f => field.derivedFrom && field.derivedFrom.argument === f.name)
     if (!relatedField) {
       throw Error(
         `Incorrect relationship detected. A field like 'someField: [${entity.name}]' must exists on ${relatedEntity.name}`
@@ -54,33 +42,14 @@ export class RelationshipGenerator {
     if (this.visited.has(`${field.name}:${relatedField.name}`)) false
 
     relatedField.isList
-      ? this.createRelationship(
-          entity,
-          relatedEntity,
-          field,
-          relatedField,
-          RelationType.MTM
-        )
-      : this.createRelationship(
-          entity,
-          relatedEntity,
-          field,
-          relatedField,
-          RelationType.OTM
-        )
+      ? this.createRelationship(entity, relatedEntity, field, relatedField, RelationType.MTM)
+      : this.createRelationship(entity, relatedEntity, field, relatedField, RelationType.OTM)
     return true
   }
 
-  listFieldWithoutDerivedFromDirective(
-    entity: ObjectType,
-    relatedEntity: ObjectType,
-    field: Field
-  ): boolean {
+  listFieldWithoutDerivedFromDirective(entity: ObjectType, relatedEntity: ObjectType, field: Field): boolean {
     const relatedField = relatedEntity.fields.find(
-      (f) =>
-        f.type === entity.name &&
-        f.derivedFrom &&
-        f.derivedFrom.argument === field.name
+      f => f.type === entity.name && f.derivedFrom && f.derivedFrom.argument === field.name
     )
     if (relatedField === undefined) {
       throw Error(
@@ -88,27 +57,13 @@ export class RelationshipGenerator {
       )
     }
     if (this.visited.has(`${field.name}:${relatedField.name}`)) return false
-    this.createRelationship(
-      entity,
-      relatedEntity,
-      field,
-      relatedField,
-      RelationType.MTM
-    )
+    this.createRelationship(entity, relatedEntity, field, relatedField, RelationType.MTM)
     return true
   }
 
-  fieldWithDerivedFromDirective(
-    entity: ObjectType,
-    relatedEntity: ObjectType,
-    field: Field
-  ): boolean {
+  fieldWithDerivedFromDirective(entity: ObjectType, relatedEntity: ObjectType, field: Field): boolean {
     const relatedField = relatedEntity.fields.find(
-      (f) =>
-        f.type === entity.name &&
-        f.name === field.derivedFrom?.argument &&
-        !field.isList &&
-        !f.derivedFrom
+      f => f.type === entity.name && f.name === field.derivedFrom?.argument && !field.isList && !f.derivedFrom
     )
     if (relatedField === undefined) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -118,72 +73,33 @@ export class RelationshipGenerator {
       )
     }
     if (this.visited.has(`${field.name}:${relatedField.name}`)) return false
-    this.createRelationship(
-      entity,
-      relatedEntity,
-      field,
-      relatedField,
-      RelationType.OTO
-    )
+    this.createRelationship(entity, relatedEntity, field, relatedField, RelationType.OTO)
     return true
   }
 
-  fieldWithoutDerivedFromDirective(
-    entity: ObjectType,
-    relatedEntity: ObjectType,
-    field: Field
-  ): boolean {
+  fieldWithoutDerivedFromDirective(entity: ObjectType, relatedEntity: ObjectType, field: Field): boolean {
     // Get all the related fields
-    const relatedFields = relatedEntity.fields.filter(
-      (f) => f.type === entity.name
-    )
+    const relatedFields = relatedEntity.fields.filter(f => f.type === entity.name)
     // No fields found build OneToMany relationship
     if (relatedFields.length === 0) {
       const relatedField = relations.createAdditionalField(entity, field)
       if (this.visited.has(`${field.name}:${relatedField.name}`)) return false
-      this.createRelationship(
-        entity,
-        relatedEntity,
-        field,
-        relatedField,
-        RelationType.OTM
-      )
+      this.createRelationship(entity, relatedEntity, field, relatedField, RelationType.OTM)
       return true
     }
 
-    const relatedField = relatedFields.find(
-      (f) =>
-        f.derivedFrom !== undefined && f.derivedFrom?.argument === field.name
-    )
+    const relatedField = relatedFields.find(f => f.derivedFrom !== undefined && f.derivedFrom?.argument === field.name)
     if (relatedField === undefined) {
       const relatedField = relations.createAdditionalField(entity, field)
       if (this.visited.has(`${field.name}:${relatedField.name}`)) return false
-      this.createRelationship(
-        entity,
-        relatedEntity,
-        field,
-        relatedField,
-        RelationType.OTM
-      )
+      this.createRelationship(entity, relatedEntity, field, relatedField, RelationType.OTM)
       return true
     }
 
     if (this.visited.has(`${field.name}:${relatedField.name}`)) return false
     relatedField.isList
-      ? this.createRelationship(
-          entity,
-          relatedEntity,
-          field,
-          relatedField,
-          RelationType.OTM
-        )
-      : this.createRelationship(
-          entity,
-          relatedEntity,
-          field,
-          relatedField,
-          RelationType.OTO
-        )
+      ? this.createRelationship(entity, relatedEntity, field, relatedField, RelationType.OTM)
+      : this.createRelationship(entity, relatedEntity, field, relatedField, RelationType.OTO)
     return true
   }
 
@@ -212,13 +128,13 @@ export class RelationshipGenerator {
       if (r.type !== 'otm') continue
 
       const entity = this.model.lookupEntity(r.relatedEntityName)
-      const field = entity.fields.find((f) => f.name === r.relatedField.name)
+      const field = entity.fields.find(f => f.name === r.relatedField.name)
       if (field === undefined) entity.fields.push(r.relatedField)
     }
   }
 
   buildRelationships(): void {
-    const entityNames = this.model.entities.map((t) => t.name)
+    const entityNames = this.model.entities.map(t => t.name)
 
     for (const entity of this.model.entities) {
       for (const field of entity.fields) {
@@ -230,37 +146,19 @@ export class RelationshipGenerator {
         const { isList, derivedFrom } = field
 
         if (isList && derivedFrom === undefined) {
-          if (
-            !this.listFieldWithoutDerivedFromDirective(
-              entity,
-              relatedEntity,
-              field
-            )
-          )
-            continue
+          if (!this.listFieldWithoutDerivedFromDirective(entity, relatedEntity, field)) continue
         }
 
         if (isList && derivedFrom !== undefined) {
-          if (
-            !this.listFieldWithDerivedFromDirective(
-              entity,
-              relatedEntity,
-              field
-            )
-          )
-            continue
+          if (!this.listFieldWithDerivedFromDirective(entity, relatedEntity, field)) continue
         }
 
         if (!isList && derivedFrom === undefined) {
-          if (
-            !this.fieldWithoutDerivedFromDirective(entity, relatedEntity, field)
-          )
-            continue
+          if (!this.fieldWithoutDerivedFromDirective(entity, relatedEntity, field)) continue
         }
 
         if (!isList && derivedFrom !== undefined) {
-          if (!this.fieldWithDerivedFromDirective(entity, relatedEntity, field))
-            continue
+          if (!this.fieldWithDerivedFromDirective(entity, relatedEntity, field)) continue
         }
       }
     }

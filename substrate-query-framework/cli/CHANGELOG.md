@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 0.0.23
+
+- bugfix: fields resolution in findOne queries
+
+## 0.0.22
+
+- Add unique entity queries
+
+## 0.0.21
+
+- Proper pluralization for GraphQL schema queries (#112)
+- Nullability support for relationships
+
+## 0.0.20
+
+- bugfixes: #113, #115
+
 ## 0.0.19
 
 - Support of ES-style imports in mappings (via `esModuleInterop:true`)
@@ -7,11 +24,11 @@
 
 ## 0.0.18
 
-- Fix entity relation resolvers for the genrated GraphQL server
+- Fix entity relation resolvers for the generated GraphQL server
 
 ## 0.0.17
 
-- Update wartog version to 2.20.0
+- Update warthog version to 2.20.0
 
 ## 0.0.16
 
