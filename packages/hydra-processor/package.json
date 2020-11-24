@@ -11,9 +11,9 @@
   "license": "MIT",
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
-    "prepack": "rm -rf lib && tsc -b && cp ./src/run.ts.mst ./lib",
-    "build": "rm -rf lib && tsc --build tsconfig.json",
-    "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
+    "prepack": "rm -rf lib && tsc -b && cp -R ./templates ./lib",
+    "build": "rm -rf lib && tsc --build tsconfig.json && cp -R ./templates ./lib",
+    "lint": "eslint . --cache --ext .ts",
     "test": "echo 'No tests' && exit 1"
   },
   "dependencies": {

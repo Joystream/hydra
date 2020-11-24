@@ -12,8 +12,7 @@ import assert = require('assert')
 const debug = Debug('index-builder:processor-state-handler')
 
 @Service('ProcessorStateHander')
-export class ProcessorStateHandler
-  extends EventEmitter
+export class ProcessorStateHandler extends EventEmitter
   implements IProcessorStateHandler {
   constructor(public readonly processorID = 'hydra-processor') {
     super()

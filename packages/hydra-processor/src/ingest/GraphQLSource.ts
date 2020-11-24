@@ -59,6 +59,7 @@ export class GraphQLSource extends EventEmitter implements IProcessorSource {
   }
 
   // TODO: implement
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   subscribe(events: string[]): Promise<void> {
     throw new Error('Method not implemented.')
   }
