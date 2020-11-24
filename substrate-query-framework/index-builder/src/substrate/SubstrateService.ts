@@ -48,9 +48,9 @@ export class SubstrateService implements ISubstrateService {
     )
   }
 
-  subscribeNewHeads(v: Callback<Header>): UnsubscribePromise {
+  subscribeFinalizedHeads(v: Callback<Header>): UnsubscribePromise {
     return this._retryWithBackoff(
-      () => this.api.rpc.chain.subscribeNewHeads(v),
+      () => this.api.rpc.chain.subscribeFinalizedHeads(v),
       `Subscribing to new heads`
     )
   }
