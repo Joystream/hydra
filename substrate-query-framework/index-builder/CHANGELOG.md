@@ -1,5 +1,9 @@
 # Changelog of major updates
 
+## 0.0.20-
+
+- bugfix: the indexer subscribes only for finalized heads
+
 ## 0.0.19-alpha
 
 - Add Prometheus Client for the processor
