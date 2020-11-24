@@ -18,7 +18,7 @@ describe('End-to-end tests', () => {
     console.log(`Transfer of ${amount} schmeks done at height ${blockHeight}`)
     // wait until the indexer indexes the block
     await waitForAsync(
-      async () => (await indexerHead()) > blockHeight.valueOf() + 5
+      async () => (await indexerHead()) > blockHeight.valueOf() + 3
     )
     console.log(`Indexer processed block ${blockHeight}`)
     const transfers = await findTransfersByValue(amount, blockHeight)
