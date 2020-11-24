@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
   "license": "MIT",
   "bin": {
@@ -35,7 +35,7 @@
   "scripts": {
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "postpack": "rm -f oclif.manifest.json",
-    "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
+    "lint": "eslint . --cache --ext .ts",
     "prepack": "rm -rf lib && tsc -b && cp -R ./src/templates ./lib/src/templates && oclif-dev manifest && oclif-dev readme",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
@@ -59,9 +59,10 @@
     "listr": "^0.14.3",
     "lodash": "^4.17.15",
     "mustache": "^4.0.1",
+    "pluralize": "^8.0.0",
     "tslib": "1.11.2",
     "typeorm-model-generator": "^0.4.2",
-    "warthog": "https://github.com/metmirr/warthog/releases/download/v2.20.0/warthog-v2.20.0.tgz"
+    "warthog": "https://github.com/metmirr/warthog/releases/download/v2.22.0/warthog-v2.22.0.tgz"
   },
   "devDependencies": {
     "@dzlzv/hydra-common": "^0.0.3",
@@ -71,6 +72,7 @@
     "@oclif/test": "^1",
     "@types/chai": "^4",
     "@types/mocha": "^7.0.2",
+    "@types/pluralize": "^0.0.29",
     "@types/temp": "^0.8.34",
     "@types/tmp": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^3.0.2",

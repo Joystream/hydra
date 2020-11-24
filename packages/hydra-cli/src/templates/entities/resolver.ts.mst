@@ -9,8 +9,10 @@ import {
   ObjectType,
   Field,
   Int,
-  ArgsType
+  ArgsType,
+  Info
 } from 'type-graphql';
+import graphqlFields from 'graphql-fields';
 import { Inject } from 'typedi';
 import { Min } from 'class-validator'
 import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields } from 'warthog';
@@ -95,12 +97,23 @@ export class {{className}}Resolver {
     return this.service.find<{{className}}WhereInput>(where, orderBy, limit, offset, fields);
   }
 
+  @Query(() => {{className}}, { nullable: true })
+  async {{camelName}}(
+    @Arg('where') where: {{className}}WhereUniqueInput,
+    @Fields() fields: string[]
+  ): Promise<{{className}} | null> {
+    const result = await this.service.find(where, undefined, 1, 0, fields);
+    return result && result.length >= 1 ? result[0] : null;
+  }
+
   @Query(() => {{className}}Connection)
-  async {{camelName}}Connection(
+  async {{camelNamePlural}}Connection(
     @Args() { where, orderBy, ...pageOptions }: {{className}}ConnectionWhereArgs,
-    @RawFields() fields: Record<string, any>
+    @Info() info: any
   ): Promise<{{className}}Connection> {
     
+    const rawFields = graphqlFields(info, {}, { excludedFields: ['__typename'] });
+
     let result: any = {
       totalCount: 0,
       edges: [],
@@ -116,7 +129,7 @@ export class {{className}}Resolver {
         where,
         orderBy,
         pageOptions,
-        fields
+        rawFields
       );
     } catch (err) {
       console.log(err);
@@ -131,10 +144,10 @@ export class {{className}}Resolver {
     @FieldResolver(() => {{returnTypeFunc}})
     async {{fieldName}}(@Root() {{rootArgName}}: {{rootArgType}}): {{{returnType}}} {
       const result = await getConnection().getRepository({{rootArgType}}).findOne({{rootArgName}}.id, { relations: ['{{fieldName}}'] })
-      if (!result || !result.{{fieldName}}) {
-        throw new Error('Unable to find result for {{rootArgType}}.{{fieldName}}');
+      if (result && result.{{fieldName}} !== undefined) {
+        return result.{{fieldName}};
       }
-      return result.{{fieldName}};
+      return null;
     }
   {{/fieldResolvers}}
 }

@@ -15,11 +15,11 @@ Major upgrade
 
 ## 0.0.18
 
-- Fix entity relation resolvers for the genrated GraphQL server
+- Fix entity relation resolvers for the generated GraphQL server
 
 ## 0.0.17
 
-- Update wartog version to 2.20.0
+- Update warthog version to 2.20.0
 
 ## 0.0.16
 

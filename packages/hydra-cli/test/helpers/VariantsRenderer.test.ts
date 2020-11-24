@@ -1,15 +1,18 @@
-import { fromStringSchema } from './model';
-import { expect } from 'chai';
-import { VariantsRenderer } from '../../src/generate/VariantsRenderer';
-import * as fs from 'fs-extra';
+import { fromStringSchema } from './model'
+import { expect } from 'chai'
+import { VariantsRenderer } from '../../src/generate/VariantsRenderer'
+import * as fs from 'fs-extra'
 
 describe('VariantsRenderer', () => {
-  let variantsTemplate: string;
+  let variantsTemplate: string
 
   before(() => {
     // set timestamp in the context to make the output predictable
-    variantsTemplate = fs.readFileSync('./src/templates/variants/variants.mst', 'utf-8');
-  });
+    variantsTemplate = fs.readFileSync(
+      './src/templates/variants/variants.mst',
+      'utf-8'
+    )
+  })
 
   it('Should render union types', () => {
     const model = fromStringSchema(`
@@ -25,15 +28,21 @@ describe('VariantsRenderer', () => {
     
     type MyEntity @entity {
       status: Poor!
-    }`);
+    }`)
 
-    const gen = new VariantsRenderer(model);
-    const rendered = gen.render(variantsTemplate);
+    const gen = new VariantsRenderer(model)
+    const rendered = gen.render(variantsTemplate)
 
-    expect(rendered).include('export const Poor = createUnionType', 'Should create a union type');
-    expect(rendered).include('types: () => [HappyPoor, Miserable]', 'Should join types');
-    expect(rendered).include('mother!: typeof Poor', 'Should define field');
-  });
+    expect(rendered).include(
+      'export const Poor = createUnionType',
+      'Should create a union type'
+    )
+    expect(rendered).include(
+      'types: () => [HappyPoor, Miserable]',
+      'Should join types'
+    )
+    expect(rendered).include('mother!: typeof Poor', 'Should define field')
+  })
 
   it('Should import enums', () => {
     const model = fromStringSchema(`
@@ -49,11 +58,14 @@ describe('VariantsRenderer', () => {
     
     type MiddleClass @variant {
       generation: GeN_ERa_TION
-    }`);
+    }`)
 
-    const gen = new VariantsRenderer(model);
-    const rendered = gen.render(variantsTemplate);
+    const gen = new VariantsRenderer(model)
+    const rendered = gen.render(variantsTemplate)
 
-    expect(rendered).include(`import { GeN_ERa_TION } from '../enums/enums'`, 'Should import enums');
-  });
-});
+    expect(rendered).include(
+      `import { GeN_ERa_TION } from '../enums/enums'`,
+      'Should import enums'
+    )
+  })
+})

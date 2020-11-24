@@ -1,35 +1,53 @@
-import { createModel, threadObjType, postObjType, fromStringSchema } from './model';
-import { expect } from 'chai';
-import { WarthogModel } from '../../src/model';
-import { ModelType } from '../../src/model/WarthogModel';
+import {
+  createModel,
+  threadObjType,
+  postObjType,
+  fromStringSchema,
+} from './model'
+import { expect } from 'chai'
+import { WarthogModel } from '../../src/model'
+import { ModelType } from '../../src/model/WarthogModel'
 
 describe('WarthogModel', () => {
-  let warthogModel: WarthogModel;
+  let warthogModel: WarthogModel
 
   beforeEach(() => {
-    warthogModel = createModel();
-  });
+    warthogModel = createModel()
+  })
 
   it('Should lookup entities', () => {
-    expect(warthogModel.lookupEntity('Thread')).eq(threadObjType, 'Should find Thread type');
-    expect(warthogModel.lookupEntity('Post')).eq(postObjType, 'Should find Post type');
+    expect(warthogModel.lookupEntity('Thread')).eq(
+      threadObjType,
+      'Should find Thread type'
+    )
+    expect(warthogModel.lookupEntity('Post')).eq(
+      postObjType,
+      'Should find Post type'
+    )
 
-    expect(() => warthogModel.lookupEntity('NoSuchType')).throw('NoSuchType is undefined');
-  });
+    expect(() => warthogModel.lookupEntity('NoSuchType')).throw(
+      'NoSuchType is undefined'
+    )
+  })
 
   it('Should lookup fields', () => {
-    const field = warthogModel.lookupField('Thread', 'initial_body_text');
-    expect(field.type).equals('String', 'Should lookup the field');
+    const field = warthogModel.lookupField('Thread', 'initial_body_text')
+    expect(field.type).equals('String', 'Should lookup the field')
 
-    expect(() => warthogModel.lookupField('Thread', 'noexistent')).throw('No field');
-  });
+    expect(() => warthogModel.lookupField('Thread', 'noexistent')).throw(
+      'No field'
+    )
+  })
 
   it('Should add queries', () => {
-    warthogModel.addQueryClause('test', 'initial_body_text', 'Thread');
-    warthogModel.addQueryClause('test', 'initial_body_text', 'Post');
-    expect(warthogModel.ftsQueries).length(1, 'Should add a query');
-    expect(warthogModel.ftsQueries[0].clauses).length(2, 'Should add two clauses');
-  });
+    warthogModel.addQueryClause('test', 'initial_body_text', 'Thread')
+    warthogModel.addQueryClause('test', 'initial_body_text', 'Post')
+    expect(warthogModel.ftsQueries).length(1, 'Should add a query')
+    expect(warthogModel.ftsQueries[0].clauses).length(
+      2,
+      'Should add two clauses'
+    )
+  })
 
   it('Should add enums', () => {
     const model = fromStringSchema(`
@@ -41,28 +59,40 @@ describe('WarthogModel', () => {
         
         type Movie @entity {
             episode: Episode
-        }`);
-    expect(model.enums).length(1, 'Should add an enum');
-    expect(model.lookupEnum('Episode').name).eq('Episode', 'Should lookup by name');
-  });
+        }`)
+    expect(model.enums).length(1, 'Should add an enum')
+    expect(model.lookupEnum('Episode').name).eq(
+      'Episode',
+      'Should lookup by name'
+    )
+  })
 
   it('Should add interfaces', () => {
     const model = fromStringSchema(`
         interface IEntity @entity {
             f: String
-        }`);
-    expect(model.interfaces).length(1, 'Should add an interface');
-    expect(model.lookupInterface('IEntity').name).eq('IEntity', 'Should lookup by name');
-    expect(model.lookupInterface('IEntity').isInterface).eq(true, 'Should be an interface');
-  });
+        }`)
+    expect(model.interfaces).length(1, 'Should add an interface')
+    expect(model.lookupInterface('IEntity').name).eq(
+      'IEntity',
+      'Should lookup by name'
+    )
+    expect(model.lookupInterface('IEntity').isInterface).eq(
+      true,
+      'Should be an interface'
+    )
+  })
 
   it('Should should ignore interfaces without @entity', () => {
     const model = fromStringSchema(`
         interface IEntity {
             f: String
-        }`);
-    expect(model.interfaces).length(0, 'Should skip the non-annotated interface');
-  });
+        }`)
+    expect(model.interfaces).length(
+      0,
+      'Should skip the non-annotated interface'
+    )
+  })
 
   it('Should add interfaces to entities', () => {
     const model = fromStringSchema(`
@@ -72,9 +102,12 @@ describe('WarthogModel', () => {
         type A implements IEntity @entity {
             field1: String
             field2: String
-        }`);
-    expect(model.lookupEntity('A').interfaces).length(1, 'Should register the implemented interface');
-  });
+        }`)
+    expect(model.lookupEntity('A').interfaces).length(
+      1,
+      'Should register the implemented interface'
+    )
+  })
 
   it('Should lookup types', () => {
     const model = fromStringSchema(`
@@ -99,17 +132,38 @@ describe('WarthogModel', () => {
     interface MyInterface @entity {
       xxx: String!
     }
-    `);
-    expect(model.lookupType('MyEntity')).eq(ModelType.ENTITY, 'Should detect entities');
-    expect(model.lookupType('HappyPoor')).eq(ModelType.VARIANT, 'Should detect variants');
-    expect(model.lookupType('MyEnum')).eq(ModelType.ENUM, 'Should detect enums');
-    expect(model.lookupType('MyInterface')).eq(ModelType.INTERFACE, 'Should detect intefaces');
-    expect(model.lookupType('Poor')).eq(ModelType.UNION, 'Should detect unions');
-    expect(model.lookupType('String')).eq(ModelType.SCALAR, 'Should detect String as a scalar');
-    expect(model.lookupType('Boolean')).eq(ModelType.SCALAR, 'Should detect Boolean as a scalar');
-    expect(model.lookupType('BigInt')).eq(ModelType.SCALAR, 'Should detect BigInt as a scalar');
-    expect(model.lookupType('Bytes')).eq(ModelType.SCALAR, 'Should detect Bytes as a scalar');
-  });
+    `)
+    expect(model.lookupType('MyEntity')).eq(
+      ModelType.ENTITY,
+      'Should detect entities'
+    )
+    expect(model.lookupType('HappyPoor')).eq(
+      ModelType.VARIANT,
+      'Should detect variants'
+    )
+    expect(model.lookupType('MyEnum')).eq(ModelType.ENUM, 'Should detect enums')
+    expect(model.lookupType('MyInterface')).eq(
+      ModelType.INTERFACE,
+      'Should detect intefaces'
+    )
+    expect(model.lookupType('Poor')).eq(ModelType.UNION, 'Should detect unions')
+    expect(model.lookupType('String')).eq(
+      ModelType.SCALAR,
+      'Should detect String as a scalar'
+    )
+    expect(model.lookupType('Boolean')).eq(
+      ModelType.SCALAR,
+      'Should detect Boolean as a scalar'
+    )
+    expect(model.lookupType('BigInt')).eq(
+      ModelType.SCALAR,
+      'Should detect BigInt as a scalar'
+    )
+    expect(model.lookupType('Bytes')).eq(
+      ModelType.SCALAR,
+      'Should detect Bytes as a scalar'
+    )
+  })
 
   it('Should add variants and unions', () => {
     const model = fromStringSchema(`
@@ -121,11 +175,14 @@ describe('WarthogModel', () => {
     
     type Miserable @variant {
       hates: String!
-    }`);
-    expect(model.lookupUnion('Poor').name).eq('Poor', 'Should look up a union');
-    expect(model.lookupUnion('Poor').types).length(2, 'Should find two variant types');
-    expect(model.variants).length(2, 'Should find two variant types');
-  });
+    }`)
+    expect(model.lookupUnion('Poor').name).eq('Poor', 'Should look up a union')
+    expect(model.lookupUnion('Poor').types).length(
+      2,
+      'Should find two variant types'
+    )
+    expect(model.variants).length(2, 'Should find two variant types')
+  })
 
   it('Should throw on non-variant union', () => {
     expect(() =>
@@ -139,8 +196,11 @@ describe('WarthogModel', () => {
     type Miserable @entity {
       hates: String!
     }`)
-    ).throw('Variant Miserable is undefined', 'Unions should allow only @variant types');
-  });
+    ).throw(
+      'Variant Miserable is undefined',
+      'Unions should allow only @variant types'
+    )
+  })
 
   // TODO: Not yet implemented!
   //
@@ -177,8 +237,11 @@ describe('WarthogModel', () => {
     
     type MyEntity @entity {
       status: Poor!
-    }`);
+    }`)
 
-    expect(model.lookupEntity('MyEntity').fields[0].isUnion()).eq(true, 'Should have a single field of union type');
-  });
-});
+    expect(model.lookupEntity('MyEntity').fields[0].isUnion()).eq(
+      true,
+      'Should have a single field of union type'
+    )
+  })
+})

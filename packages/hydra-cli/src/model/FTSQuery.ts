@@ -1,4 +1,4 @@
-import { ObjectType, Field } from '.';
+import { ObjectType, Field } from '.'
 
 /**
  * FTSQueryClause represents a single entity/field which
@@ -7,8 +7,8 @@ import { ObjectType, Field } from '.';
  * The clauses are concatenated and stored in a separated db view;
  */
 export interface FTSQueryClause {
-  entity: ObjectType;
-  field: Field;
+  entity: ObjectType
+  field: Field
 }
 
 /**
@@ -16,6 +16,6 @@ export interface FTSQueryClause {
  *  fields in GraphGL  decorated FTSDirective directive
  */
 export interface FTSQuery {
-  name: string;
-  clauses: FTSQueryClause[];
+  name: string
+  clauses: FTSQueryClause[]
 }

@@ -1,7 +1,7 @@
-import { GeneratorContext } from './SourcesGenerator';
-import { Field, ObjectType } from '../model';
-import * as util from './utils';
-import { withRelativePathForEnum } from './enum-context';
+import { GeneratorContext } from './SourcesGenerator'
+import { Field, ObjectType } from '../model'
+import * as util from './utils'
+import { withRelativePathForEnum } from './enum-context'
 
 export const TYPE_FIELDS: { [key: string]: { [key: string]: string } } = {
   bool: {
@@ -60,7 +60,7 @@ export const TYPE_FIELDS: { [key: string]: { [key: string]: string } } = {
     decorator: 'BytesField',
     tsType: 'Buffer',
   },
-};
+}
 
 const graphQLFieldTypes: { [key: string]: string } = {
   bool: 'boolean',
@@ -70,9 +70,12 @@ const graphQLFieldTypes: { [key: string]: string } = {
   date: 'date',
   numeric: 'numeric',
   decimal: 'numeric',
-};
+}
 
-export function buildFieldContext(f: Field, entity: ObjectType): GeneratorContext {
+export function buildFieldContext(
+  f: Field,
+  entity: ObjectType
+): GeneratorContext {
   return {
     ...withFieldTypeGuardProps(f),
     ...withRequired(f),
@@ -83,105 +86,110 @@ export function buildFieldContext(f: Field, entity: ObjectType): GeneratorContex
     ...withDerivedNames(f, entity),
     ...withDescription(f),
     ...withTransformer(f),
-  };
+  }
 }
 
 export function withFieldTypeGuardProps(f: Field): GeneratorContext {
-  const is: GeneratorContext = {};
-  is.array = f.isArray();
-  is.scalar = f.isScalar();
-  is.enum = f.isEnum();
-  is.union = f.isUnion();
-
-  ['mto', 'oto', 'otm', 'mtm'].map(s => (is[s] = f.relation?.type === s));
+  const is: GeneratorContext = {}
+  is.array = f.isArray()
+  is.scalar = f.isScalar()
+  is.enum = f.isEnum()
+  is.union = f.isUnion()
+  ;['mto', 'oto', 'otm', 'mtm'].map((s) => (is[s] = f.relation?.type === s))
   return {
     is: is,
-  };
+  }
 }
 
 export function withRequired(f: Field): GeneratorContext {
   return {
     required: !f.nullable,
-  };
+  }
 }
 
 export function withDescription(f: Field): GeneratorContext {
   return {
     description: f.description,
-  };
+  }
 }
 
 export function withUnique(f: Field): GeneratorContext {
   return {
     unique: f.unique,
-  };
+  }
 }
 
 export function withTsTypeAndDecorator(f: Field): GeneratorContext {
-  const fieldType = f.columnType();
+  const fieldType = f.columnType()
   if (TYPE_FIELDS[fieldType]) {
     return {
       ...TYPE_FIELDS[fieldType],
-    };
+    }
   }
 
   return {
     tsType: f.type,
-  };
+  }
 }
 
 export function withArrayCustomFieldConfig(f: Field): GeneratorContext {
   if (!f.isArray()) {
-    return {};
+    return {}
   }
-  const type = f.columnType();
-  const apiType = graphQLFieldTypes[type];
+  const type = f.columnType()
+  const apiType = graphQLFieldTypes[type]
 
-  let dbType = apiType;
+  let dbType = apiType
   if (dbType === 'string') {
-    dbType = 'text'; // postgres doesnt have 'string'
+    dbType = 'text' // postgres doesnt have 'string'
   } else if (dbType === 'float') {
-    dbType = 'decimal'; // postgres doesnt have 'float'
+    dbType = 'decimal' // postgres doesnt have 'float'
   }
 
   return {
     dbType,
     apiType,
-  };
+  }
 }
 
-export function withDerivedNames(f: Field, entity: ObjectType): GeneratorContext {
+export function withDerivedNames(
+  f: Field,
+  entity: ObjectType
+): GeneratorContext {
   return {
     ...util.names(f.name),
     relFieldName: util.camelCase(entity.name),
     relFieldNamePlural: util.camelPlural(entity.name),
-  };
+  }
 }
 
 export function withImport(f: Field): GeneratorContext {
   if (!f.isEnum()) {
-    return {};
+    return {}
   }
   return {
     className: f.type,
     ...withRelativePathForEnum(),
-  };
+  }
 }
 
 export function withRelation(f: Field): GeneratorContext {
   return {
     relation: f.relation,
-  };
+  }
 }
 
 export function withTransformer(f: Field): GeneratorContext {
-  if (TYPE_FIELDS[f.columnType()] && TYPE_FIELDS[f.columnType()].tsType === 'BN') {
+  if (
+    TYPE_FIELDS[f.columnType()] &&
+    TYPE_FIELDS[f.columnType()].tsType === 'BN'
+  ) {
     return {
       transformer: `{
         to: (entityValue: BN) => (entityValue !== undefined) ? entityValue.toString(10) : null,
         from: (dbValue: string) => dbValue !== undefined && dbValue !== null && dbValue.length > 0 ? new BN(dbValue, 10): undefined,
       }`,
-    };
+    }
   }
-  return {};
+  return {}
 }
