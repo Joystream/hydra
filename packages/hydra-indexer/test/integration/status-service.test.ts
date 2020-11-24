@@ -19,8 +19,7 @@ dotenv.config({ path: './test/.env' })
 const debug = Debug('index-builder:status-service-test')
 const FINAL_CHAIN_HEIGHT = 7
 
-class MockBlockProducer
-  extends EventEmitter
+class MockBlockProducer extends EventEmitter
   implements IBlockProducer<QueryEventBlock> {
   private height = 0
 
