@@ -12,19 +12,22 @@ import {
   InterfaceTypeDefinitionNode,
   GraphQLUnionType,
   GraphQLNamedType,
-} from 'graphql';
-import * as fs from 'fs-extra';
-import Debug from 'debug';
-import { cloneDeep } from 'lodash';
-import { SCHEMA_DEFINITIONS_PREAMBLE } from './constant';
-import { SchemaDirective } from './SchemaDirective';
-import { FTSDirective } from './FTSDirective';
+} from 'graphql'
+import * as fs from 'fs-extra'
+import Debug from 'debug'
+import { cloneDeep } from 'lodash'
+import { SCHEMA_DEFINITIONS_PREAMBLE } from './constant'
+import { SchemaDirective } from './SchemaDirective'
+import { FTSDirective } from './FTSDirective'
 
-const debug = Debug('qnode-cli:schema-parser');
+const debug = Debug('qnode-cli:schema-parser')
 
-export const DIRECTIVES: SchemaDirective[] = [new FTSDirective()];
+export const DIRECTIVES: SchemaDirective[] = [new FTSDirective()]
 
-export type SchemaNode = ObjectTypeDefinitionNode | FieldDefinitionNode | DirectiveNode;
+export type SchemaNode =
+  | ObjectTypeDefinitionNode
+  | FieldDefinitionNode
+  | DirectiveNode
 
 export interface Visitor {
   /**
@@ -36,7 +39,7 @@ export interface Visitor {
    *
    * @param path: DFS path in the schema tree ending at the directive node of interest
    */
-  visit: (path: SchemaNode[]) => void;
+  visit: (path: SchemaNode[]) => void
 }
 
 export interface Visitors {
@@ -46,7 +49,7 @@ export interface Visitors {
    * During a DFS traversal of the AST tree if a directive node
    * name matches the key in the directives map, the corresponding visitor is called
    */
-  directives: { [name: string]: Visitor };
+  directives: { [name: string]: Visitor }
 }
 
 /**
@@ -55,95 +58,110 @@ export interface Visitors {
  */
 export class GraphQLSchemaParser {
   // GraphQL shchema
-  schema: GraphQLSchema;
+  schema: GraphQLSchema
   // List of the object types defined in schema
-  private _objectTypeDefinations: ObjectTypeDefinitionNode[];
-  private namedTypes: GraphQLNamedType[];
+  private _objectTypeDefinations: ObjectTypeDefinitionNode[]
+  private namedTypes: GraphQLNamedType[]
 
   constructor(schemaPath: string) {
     if (!fs.existsSync(schemaPath)) {
-      throw new Error('Schema not found');
+      throw new Error('Schema not found')
     }
-    const contents = fs.readFileSync(schemaPath, 'utf8');
-    this.schema = GraphQLSchemaParser.buildSchema(contents);
+    const contents = fs.readFileSync(schemaPath, 'utf8')
+    this.schema = GraphQLSchemaParser.buildSchema(contents)
     this.namedTypes = [
       ...Object.values(this.schema.getTypeMap()).filter(
-        t => !t.name.startsWith('__') // filter out auxiliarry GraphQL types;
+        (t) => !t.name.startsWith('__') // filter out auxiliarry GraphQL types;
       ),
-    ];
-    this._objectTypeDefinations = GraphQLSchemaParser.createObjectTypeDefinations(this.schema);
+    ]
+    this._objectTypeDefinations = GraphQLSchemaParser.createObjectTypeDefinations(
+      this.schema
+    )
   }
 
   private static buildPreamble(): string {
-    let preamble = SCHEMA_DEFINITIONS_PREAMBLE;
-    DIRECTIVES.map(d => (preamble += d.preamble + '\n'));
-    return preamble;
+    let preamble = SCHEMA_DEFINITIONS_PREAMBLE
+    DIRECTIVES.map((d) => (preamble += d.preamble + '\n'))
+    return preamble
   }
 
   /**
    * Read GrapqhQL schema and build a schema from it
    */
   static buildSchema(contents: string): GraphQLSchema {
-    const schema = GraphQLSchemaParser.buildPreamble().concat(contents);
-    const ast = parse(schema);
+    const schema = GraphQLSchemaParser.buildPreamble().concat(contents)
+    const ast = parse(schema)
     // in order to build AST with undeclared directive, we need to
     // switch off SDL validation
-    const schemaAST = buildASTSchema(ast);
+    const schemaAST = buildASTSchema(ast)
 
-    const errors = validateSchema(schemaAST);
+    const errors = validateSchema(schemaAST)
 
     if (errors.length > 0) {
       // There are errors
-      let errorMsg = `Schema is not valid. Please fix the following errors: \n`;
-      errors.forEach(e => (errorMsg += `\t ${e.name}: ${e.message}\n`));
-      debug(errorMsg);
-      throw new Error(errorMsg);
+      let errorMsg = `Schema is not valid. Please fix the following errors: \n`
+      errors.forEach((e) => (errorMsg += `\t ${e.name}: ${e.message}\n`))
+      debug(errorMsg)
+      throw new Error(errorMsg)
     }
 
-    return schemaAST;
+    return schemaAST
   }
 
   getEnumTypes(): GraphQLEnumType[] {
-    return [...this.namedTypes.filter(t => t instanceof GraphQLEnumType)] as GraphQLEnumType[];
+    return [
+      ...this.namedTypes.filter((t) => t instanceof GraphQLEnumType),
+    ] as GraphQLEnumType[]
   }
 
   getInterfaceTypes(): GraphQLInterfaceType[] {
-    return [...this.namedTypes.filter(t => t instanceof GraphQLInterfaceType)] as GraphQLInterfaceType[];
+    return [
+      ...this.namedTypes.filter((t) => t instanceof GraphQLInterfaceType),
+    ] as GraphQLInterfaceType[]
   }
 
   getUnionTypes(): GraphQLUnionType[] {
-    return [...this.namedTypes.filter(t => t instanceof GraphQLUnionType)] as GraphQLUnionType[];
+    return [
+      ...this.namedTypes.filter((t) => t instanceof GraphQLUnionType),
+    ] as GraphQLUnionType[]
   }
 
   /**
    * Get object type definations from the schema. Build-in and scalar types are excluded.
    */
-  static createObjectTypeDefinations(schema: GraphQLSchema): ObjectTypeDefinitionNode[] {
+  static createObjectTypeDefinations(
+    schema: GraphQLSchema
+  ): ObjectTypeDefinitionNode[] {
     return [
       ...Object.values(schema.getTypeMap())
         // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
-        .filter(t => !t.name.match(/^__/) && !t.name.match(/Query/)) // skip the top-level Query type
+        .filter((t) => !t.name.match(/^__/) && !t.name.match(/Query/)) // skip the top-level Query type
         .sort((a, b) => (a.name > b.name ? 1 : -1))
-        .map(t => t.astNode),
+        .map((t) => t.astNode),
     ]
       .filter(Boolean) // Remove undefineds and nulls
-      .filter(typeDefinationNode => typeDefinationNode?.kind === 'ObjectTypeDefinition') as ObjectTypeDefinitionNode[];
+      .filter(
+        (typeDefinationNode) =>
+          typeDefinationNode?.kind === 'ObjectTypeDefinition'
+      ) as ObjectTypeDefinitionNode[]
   }
 
   /**
    * Returns fields for a given GraphQL object
    * @param objDefinationNode ObjectTypeDefinitionNode
    */
-  getFields(objDefinationNode: ObjectTypeDefinitionNode | InterfaceTypeDefinitionNode): FieldDefinitionNode[] {
-    if (objDefinationNode.fields) return [...objDefinationNode.fields];
-    return [];
+  getFields(
+    objDefinationNode: ObjectTypeDefinitionNode | InterfaceTypeDefinitionNode
+  ): FieldDefinitionNode[] {
+    if (objDefinationNode.fields) return [...objDefinationNode.fields]
+    return []
   }
 
   /**
    * Returns GraphQL object type definations
    */
   getObjectDefinations(): ObjectTypeDefinitionNode[] {
-    return this._objectTypeDefinations;
+    return this._objectTypeDefinations
   }
 
   /**
@@ -151,23 +169,27 @@ export class GraphQLSchemaParser {
    */
   dfsTraversal(visitors: Visitors): void {
     // we traverse starting from each definition
-    this._objectTypeDefinations.map(objType => {
-      const path: SchemaNode[] = [];
+    this._objectTypeDefinations.map((objType) => {
+      const path: SchemaNode[] = []
       visit(objType, {
-        enter: node => {
-          if (node.kind !== 'Directive' && node.kind !== 'ObjectTypeDefinition' && node.kind !== 'FieldDefinition') {
+        enter: (node) => {
+          if (
+            node.kind !== 'Directive' &&
+            node.kind !== 'ObjectTypeDefinition' &&
+            node.kind !== 'FieldDefinition'
+          ) {
             // skip non-definition fields;
-            return false;
+            return false
           }
-          path.push(node);
+          path.push(node)
           if (node.kind === 'Directive') {
             if (node.name.value in visitors.directives) {
-              visitors.directives[node.name.value].visit(cloneDeep(path));
+              visitors.directives[node.name.value].visit(cloneDeep(path))
             }
           }
         },
         leave: () => path.pop(),
-      });
-    });
+      })
+    })
   }
 }

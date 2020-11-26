@@ -1615,6 +1615,11 @@
     "@types/node" "*"
     "@types/pg-types" "*"
 
+"@types/pluralize@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/pluralize/-/pluralize-0.0.29.tgz#6ffa33ed1fc8813c469b859681d09707eb40d03c"
+  integrity sha512-BYOID+l2Aco2nBik+iYS4SZX0Lf20KPILP5RGmM1IgzdwNdTs0eebiFriOPcej1sX9mLnSoiNte5zcFxssgpGA==
+
 "@types/prettier@^1.18.3":
   version "1.19.1"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-1.19.1.tgz#33509849f8e679e4add158959fdb086440e9553f"
@@ -11560,9 +11565,9 @@ warthog@^2.19.0:
     typeorm-typedi-extensions "^0.2.3"
     typescript "^3.9.7"
 
-"warthog@https://github.com/metmirr/warthog/releases/download/v2.20.0/warthog-v2.20.0.tgz":
-  version "2.20.0"
-  resolved "https://github.com/metmirr/warthog/releases/download/v2.20.0/warthog-v2.20.0.tgz#c655c7da3279b958d8fd6549be30d9eb811d48c7"
+"warthog@https://github.com/metmirr/warthog/releases/download/v2.22.0/warthog-v2.22.0.tgz":
+  version "2.22.0"
+  resolved "https://github.com/metmirr/warthog/releases/download/v2.22.0/warthog-v2.22.0.tgz#33162a65e2897c79f9b5c6c214565e85685108d3"
   dependencies:
     "@types/app-root-path" "^1.2.4"
     "@types/bn.js" "^4.11.6"

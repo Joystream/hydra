@@ -14,4 +14,4 @@ export const fieldTypes: { [key: string]: { [key: string]: string } } = {
   string: {
     tsType: 'string',
   },
-};
+}
