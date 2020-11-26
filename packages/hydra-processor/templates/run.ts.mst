@@ -37,9 +37,9 @@ const withEnvs = (command: (...args: any[]) => Promise<void>) => {
 function main(): commander.Command {
   console.log(chalk.green(figlet.textSync('Hydra-Processor')))
   const program = new commander.Command()
-  const version = require('./package.json').version
+  //const version = require('package.json').version
 
-  program.version(version).description('Hydra Processor')
+  //program.version(version).description('Hydra Processor')
 
   program
     .command('run')
