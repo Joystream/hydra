@@ -28,7 +28,7 @@ Similar to TheGraph design
 | **schema**   | [*Schema*](#12-schema) | The GraphQL schema of this subgraph.|
 | **description**   | *String* | An optional description of the subgraph's purpose. |
 | **repository**   | *String* | An optional link to where the subgraph lives. |
-| **dataSources**| [*Data Source Spec*](#13-data-source)| Each data source spec defines the data that will be ingested as well as the transformation logic to derive the state of the subgraph's entities based on the source data.|
+| **dataSource**| [*Data Source Spec*](#13-data-source)| Each data source spec defines the data that will be ingested as well as the transformation logic to derive the state of the subgraph's entities based on the source data.|
 
 ### 1.2 Schema
 
@@ -46,41 +46,32 @@ Similar to TheGraph design
 | **source** | [*HydraIndexerSource*](#131-hydraindexersource) | The source data for ingestion. |
 | **mapping** | [*Mapping*](#132-mapping) | The transformation logic applied to the data prior to being indexed. |
 
-#### 1.3.1 Hydra Indexer Source
+#### 1.3.1 Mapping
 
-| Field | Type | Description |
-| --- | --- | --- |
-| **endpoint** | *String* | The endpoint for the Hydra Indexer gateway providing the data. |
-| **startBlock** | optional *BigInt* | The block to start processing this data source from. |
-| **endBlock** | optional *BigInt* | The block at which the processor stops and exits. |
-
-#### 1.3.2 Mapping
-
-##### 1.3.2.1 Substrate Mapping
+##### 1.3.1.1 Substrate Mapping
 
 | Field | Type | Description |
 | --- | --- | --- |
 | **kind** | *String* | Must be "substrate/events" for Substrate Events Mapping. |
 | **apiVersion** | *String* | Semver string of the version of the Mappings API that will be used by the mapping script. |
 | **language** | *String* | The language of the runtime for the Mapping API. For now only *typescript*. |
-| **entities** | *[String]* | A list of entities that will be ingested as part of this mapping. Must correspond to names of entities in the GraphQL IDL. |
 | **types** | *String* path to a file with definitions | A typescript file exporting the types and interfaces satisfying the event and extrinsic signatures in the handler definitions. Typically, the file reexports the standard polkadot types together with custom files |
-| **eventHandlers** | optional *EventHandler* | Handlers for specific events, which will be defined in the mapping script. |
+| **virtualEventHandlers** | optional *EventHandler* | Handlers for specific virtual events, which must be exported in the mapping script. |
+| **eventHandlers** | optional *EventHandler* | Handlers for specific virtual events, which must be exported in the mapping script. |
 | **extrinsicHandlers** | optional *ExtrinsicHandler* | A list of functions that will trigger a handler on `system.ExtrinsicSuccess` event with the extrinsic data. |
 | **blockHandlers** | optional *BlockHandler* | Defines block filters and handlers to process matching blocks. |
 | **file** | [*Path*] | The path of the mapping script exporting the mapping functions. |
 
-#### 1.3.2.2 EventHandler
+#### 1.3.1.2 EventHandler
 
 | Field | Type | Description |
 | --- | --- | --- |
-| **event** | *String* | An identifier for an event that will be handled in the mapping script. It must be in the form `<module>.<method>(type1,type2,...,)` as defined in the metadata file. For example, `balances.DustLost(AccountId,Balance)`. The declared types should be available via globally defined `typeRegistry`. |
+| **event** | *String* | An identifier for an event that will be handled in the mapping script. It must be in the form `<module>.<method>(type1,type2,...,)` as defined in the metadata file. For example, `balances.DustLost(AccountId,Balance)`. The declared types and interfaces should be importable from `./generated/types.ts`. |
 | **extrinsic** | optional *String* | The extrinsic that caused the event. If present, only events emitted by the specified extrinsics will be handled by the handler. Must have a fully qualified name in the form
 `<section>.<method>(type1,type2,...,)`|
 | **handler** | *String* | The name of an exported function in the mapping script that should handle the specified event. |
-| **virtual** | optional *Boolean* | If the event to be handled is _virtual_, that is, emitted by an extrinsic handler than by the chain |
 
-#### 1.3.2.3 ExtrinsicHandler
+#### 1.3.1.3 ExtrinsicHandler
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -90,11 +81,12 @@ Similar to TheGraph design
 | **emits** | list of *String* | A list of virtual events the handler _may_ emit |
 | **exports** | list of *String* | Extra types exported by the handler |
 
-#### 1.3.2.4 BlockHandler
+#### 1.3.1.4 BlockHandler
 
 | Field | Type | Description |
 | --- | --- | --- |
-| **handler** | *String* | The name of an exported function in the mapping script that should handle the specified event. |
+| **onInitialize** | optional *String* | The name of an exported function in the mapping script that is called before any events in the blocks are processed |
+| **onFinalize** | optional *String* | The name of an exported function that is called when all the events in the block are processed |
 | **filter** | optional *String* | The name of the filter that will be applied to decide on which blocks will trigger the mapping. If none is supplied, the handler will be called on every block. The detailed syntax to be documented elsewhere and is subject to change. |
 
 ## Compatibility
