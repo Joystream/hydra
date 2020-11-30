@@ -69,7 +69,7 @@ export class BlockProducer
     }
 
     //
-    this._newHeadsUnsubscriber = this.substrateService.subscribeNewHeads(
+    this._newHeadsUnsubscriber = this.substrateService.subscribeFinalizedHeads(
       (header) => {
         this._onNewHeads(header)
       }

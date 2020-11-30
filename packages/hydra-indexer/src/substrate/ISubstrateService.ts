@@ -17,7 +17,7 @@ import { SubstrateService } from './SubstrateService'
 export interface ISubstrateService {
   getFinalizedHead(): Promise<Hash>
   getHeader(hash?: Hash | Uint8Array | string): Promise<Header>
-  subscribeNewHeads(v: Callback<Header>): UnsubscribePromise
+  subscribeFinalizedHeads(v: Callback<Header>): UnsubscribePromise
   getBlockHash(
     blockNumber?: BlockNumber | Uint8Array | number | string
   ): Promise<Hash>
