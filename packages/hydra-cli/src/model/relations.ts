@@ -1,4 +1,4 @@
-import { EntityRelationship, Field, makeRelation, ObjectType } from '../model'
+import { EntityRelationship, Field, makeRelation, ObjectType } from '.'
 import {
   generateJoinColumnName,
   generateJoinTableName,

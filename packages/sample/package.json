@@ -1,11 +1,11 @@
 {
-  "name": "{{{projectName}}}",
+  "name": "sample",
   "version": "1.0.0",
   "description": "GraphQL server and Substrate indexer. Generated with \u2665 by Hydra-CLI",
   "scripts": {
     "build": "yarn clean && yarn codegen:all",
-    "lint": "echo \"Skippinng\"",
     "clean": "rm -rf ./generated",
+    "lint": "echo \"Skippinng\"",
     "processor:start": "(cd ./generated/hydra-processor && yarn && DEBUG=${DEBUG} yarn start)",
     "server:start:dev": "(cd ./generated/graphql-server && yarn start:dev)",
     "server:start:prod": "(cd ./generated/graphql-server && yarn start:prod)",
@@ -32,9 +32,9 @@
     "bn.js": "^5.1.2"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "{{{hydraVersion}}}",
-    "@dzlzv/hydra-common": "^{{{hydraCommonVersion}}}",
-    "@dzlzv/hydra-db-utils": "^{{{hydraDbUtilsVersion}}}",
-    "@dzlzv/hydra-processor": "^{{{hydraProcessorVersion}}}"
+    "@dzlzv/hydra-cli": "^0.1.2",
+    "@dzlzv/hydra-common": "^0.0.3",
+    "@dzlzv/hydra-db-utils": "^0.0.2",
+    "@dzlzv/hydra-processor": "^0.0.5"
   }
 }

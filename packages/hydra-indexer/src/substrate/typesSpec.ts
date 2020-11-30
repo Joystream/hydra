@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 // TODO: add more typeSpecs for well-known chains?
 export default {
   'node-template': {

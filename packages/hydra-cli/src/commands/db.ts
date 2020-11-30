@@ -1,7 +1,5 @@
 import { Command, flags } from '@oclif/command'
 
-import { resetLastProcessedEvent } from '../helpers/db'
-
 export default class DB extends Command {
   static description = 'Typeorm commands'
 
@@ -18,7 +16,7 @@ export default class DB extends Command {
 
     if (flags.reset) {
       this.log('Resetting the last processed event...')
-      await resetLastProcessedEvent()
+      throw new Error('Not supported')
       this.log('Done...')
     }
   }

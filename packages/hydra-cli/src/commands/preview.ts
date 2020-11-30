@@ -2,8 +2,8 @@ import { Command, flags } from '@oclif/command'
 import { createDir } from '../utils/utils'
 import * as path from 'path'
 import * as fs from 'fs-extra'
-import Codegen from './codegen'
-import WarthogWrapper from '../helpers/WarthogWrapper'
+import Codegen, { CodegenFlags } from './codegen'
+import WarthogWrapper from '../codegen/WarthogWrapper'
 import * as dotenv from 'dotenv'
 
 export default class Preview extends Command {
@@ -31,24 +31,24 @@ export default class Preview extends Command {
 
     // Change directory to generated
     process.chdir(generatedFolderPath)
-    await this.generateAPIPreview(
-      flags.schema,
+    await this.generateAPIPreview({
+      ...flags,
       generatedFolderPath,
-      isGeneratedFolderPathExists
-    )
+      isGeneratedFolderPathExists,
+    })
   }
 
-  async generateAPIPreview(
-    schemaPath: string,
-    generatedFolderPath: string,
-    isExists: boolean
-  ): Promise<void> {
+  async generateAPIPreview({
+    schema,
+    generatedFolderPath,
+    isGeneratedFolderPathExists,
+  }): Promise<void> {
     const warthogProjectPath = path.resolve(process.cwd(), 'api-preview')
 
     createDir(warthogProjectPath)
     process.chdir(warthogProjectPath)
 
-    await new WarthogWrapper(this, schemaPath).run()
+    await new WarthogWrapper({ schema } as CodegenFlags).run()
 
     fs.copyFileSync(
       path.resolve(
@@ -59,7 +59,7 @@ export default class Preview extends Command {
       path.resolve('../../apipreview.graphql')
     )
     // if 'generated' folder was already there dont delete it otherwise delete
-    if (!isExists) {
+    if (!isGeneratedFolderPathExists) {
       this.log('Removing unused files...')
       fs.removeSync(generatedFolderPath)
       this.log('Generated API Preview file -> apipreview.graphql')

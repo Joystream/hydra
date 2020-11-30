@@ -6,7 +6,7 @@ import {
   RelationType,
 } from '../model'
 
-import { relations } from '../helpers/relations'
+import { relations } from '../model/relations'
 
 export class RelationshipGenerator {
   model: WarthogModel

@@ -5,8 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start:processor": "DEBUG=${DEBUG} ts-node index.ts process",
-    "start:indexer": "DEBUG=${DEBUG} ts-node index.ts index",
+    "start": "DEBUG=${DEBUG:-index-builder:*} ts-node index.ts run",
     "db:migrate": "DEBUG=${DEBUG} TYPEORM_LOGGING=true ts-node index.ts migrate"
   },
   "dependencies": {

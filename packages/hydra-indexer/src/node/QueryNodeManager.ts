@@ -17,7 +17,7 @@ const debug = Debug('index-builder:manager')
 // evolves, and that will pay abstraction overhead off in terms of testability of otherwise
 // anonymous code in root file scope.
 export class QueryNodeManager {
-  private _query_node!: QueryNode
+  private _queryNode!: QueryNode
 
   constructor() {
     // TODO: a bit hacky, but okay for now
@@ -40,13 +40,13 @@ export class QueryNodeManager {
    * @param options options passed to create the indexer service
    */
   async index(options: IndexerOptions): Promise<void> {
-    if (this._query_node)
+    if (this._queryNode)
       throw Error('Cannot start the same manager multiple times.')
     await createDBConnection()
 
-    this._query_node = await QueryNode.create(options)
+    this._queryNode = await QueryNode.create(options)
     try {
-      await this._query_node.start()
+      await this._queryNode.start()
     } finally {
       debug('Trying to stop the query node')
       await QueryNodeManager.cleanUp()
