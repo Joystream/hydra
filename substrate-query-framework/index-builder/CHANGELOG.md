@@ -1,5 +1,9 @@
 # Changelog of major updates
 
+## 0.0.21-
+
+- The index builder caches finalized indexer heads it subscribes to. Added `FINALIZATION_THRESHOLD` env setting to further enforce the blocks to be final
+
 ## 0.0.20-
 
 - bugfix: the indexer subscribes only for finalized heads
