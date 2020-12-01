@@ -24,3 +24,10 @@ export const SUBSTRATE_API_CALL_RETRIES =
 // API is disconnected yet no error is thrown, with the block producer stuck in the waiting loop
 export const NEW_BLOCK_TIMEOUT_MS =
   numberEnv('NEW_BLOCK_TIMEOUT_MS') || 60 * 10 * 1000 // 10 minutes
+
+// number of finalized block headers retained in memory
+export const HEADER_CACHE_CAPACITY = numberEnv('HEADER_CACHE_CAPACITY') || 100
+
+// before resolving the block hash by the height, wait until it's behind the chain height
+// by at least that many blocks
+export const FINALITY_THRESHOLD = numberEnv('FINALITY_THRESHOLD') || 5
