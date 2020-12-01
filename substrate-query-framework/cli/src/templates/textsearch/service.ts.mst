@@ -29,8 +29,7 @@ export class {{query.typePrefix}}FTSService {
     }
 
     async search(text: string, limit:number = 5): Promise<{{query.typePrefix}}FTSOutput[]> {
-        const connection = getConnection();
-		const queryRunner = connection.createQueryRunner();
+        const queryRunner = getConnection().createQueryRunner();
         // establish real database connection using our new query runner
 		await queryRunner.connect();
         await queryRunner.startTransaction('REPEATABLE READ');
@@ -67,14 +66,17 @@ export class {{query.typePrefix}}FTSService {
                     isTypeOf: idMap[e.id].origin_table } as {{query.typePrefix}}FTSOutput;
             });
             
+            await queryRunner.commitTransaction();
+
             return enhancedEntities.reduce((accum: {{query.typePrefix}}FTSOutput[], entity) => {
                 if (entity.rank > 0) {
                     accum.push(entity);
                 }
                 return accum;
             }, []).sort((a,b) => b.rank - a.rank);
+
         } finally {
-            await queryRunner.commitTransaction();
+            await queryRunner.release();
         }
     }
 }
