@@ -26,8 +26,7 @@ const debug = Debug(DEBUG_TOPIC)
 export const NEW_CHAIN_HEIGHT_EVENT = 'NEW_CHAIN_HEIGHT'
 
 @Service('BlockProducer')
-export class BlockProducer
-  extends EventEmitter
+export class BlockProducer extends EventEmitter
   implements IBlockProducer<QueryEventBlock> {
   private _started: boolean
 
@@ -69,7 +68,7 @@ export class BlockProducer
     }
 
     //
-    this._newHeadsUnsubscriber = this.substrateService.subscribeNewHeads(
+    this._newHeadsUnsubscriber = this.substrateService.subscribeFinalizedHeads(
       (header) => {
         this._onNewHeads(header)
       }

@@ -2,7 +2,7 @@ version: "3"
 
 services:
   processor-gql-server:
-    image: hydra:latest
+    image: hydra-test:latest
     build: ./schema
     restart: unless-stopped
     environment:
@@ -17,10 +17,10 @@ services:
       - "4000:4000"
     depends_on:
       - hydra-processor
-    command: ["yarn", "server:start:prod"]
+    command: ["yarn", "workspace", "e2e-test", "server:start:prod"]
 
   hydra-processor:
-    image: hydra:latest
+    image: hydra-test:latest
     restart: unless-stopped
     environment:
       - DB_NAME=processor-db
@@ -41,7 +41,7 @@ services:
     depends_on:
       - hydra-indexer-gateway
     command: >
-      sh -c "yarn configure && yarn db:prepare && yarn db:migrate && yarn processor:start"
+      sh -c "yarn workspace e2e-test configure && yarn workspace e2e-test db:prepare && yarn workspace e2e-test db:migrate && yarn workspace e2e-test processor:start"
   
   hydra-indexer:
     image: hydra-indexer:latest

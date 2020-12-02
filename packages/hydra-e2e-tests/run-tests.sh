@@ -14,8 +14,7 @@ set -e
 trap cleanup ERR EXIT SIGINT SIGTERM
 
 docker build ../../ -t hydra-builder:latest
-#docker build ../hydra-cli -t hydra-cli:latest 
-docker build ./schema -t hydra:latest
+docker build . -t hydra-test:latest
 docker build ../hydra-indexer -t hydra-indexer:latest
 docker build ../hydra-indexer-gateway -t hydra-indexer-gateway:latest
 
@@ -24,7 +23,7 @@ docker-compose up -d
 attempt_counter=0
 max_attempts=10
 
-until $(curl -s --head  --request GET http://localhost:4001/graphql | grep "400" > /dev/null);  do
+until $(curl -s --head  --request GET http://localhost:4000/graphql | grep "400" > /dev/null);  do
     if [ ${attempt_counter} -eq ${max_attempts} ];then
       echo "Max attempts reached"
       exit 1

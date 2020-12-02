@@ -20,12 +20,10 @@ export class SubstrateEventService extends BaseService<SubstrateEvent> {
   }
 
   async getExtrinsic(eventID: string): Promise<SubstrateExtrinsic | undefined> {
-    const extrinsic = await createQueryBuilder(SubstrateExtrinsic, 'extrinsic')
+    return createQueryBuilder(SubstrateExtrinsic, 'extrinsic')
       .innerJoin('extrinsic.event', 'event')
       .where('event.id = :id', { id: eventID })
       .getOne()
-
-    return extrinsic
   }
 
   async findAfter<W extends SubstrateEventWhereInput>(
@@ -38,14 +36,7 @@ export class SubstrateEventService extends BaseService<SubstrateEvent> {
     if (after) {
       where = { ...where, AND: [{ 'id_gt': after }] }
     }
-    const events = await this.buildFindQuery<W>(
-      where,
-      'id_ASC',
-      { limit },
-      fields
-    ).getMany()
-
-    return events
+    return this.buildFindQuery<W>(where, 'id_ASC', { limit }, fields).getMany()
   }
 
   async findConnection<W extends SubstrateEventWhereInput>(

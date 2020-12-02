@@ -15,8 +15,9 @@ That's where Hydra gets you covered. Define your data model and the Hydra indexe
 
 The monorepo contains the following sub-packages:
 
-* [Hydra CLI](./packages/hydra-cli/README.md): set up and run a Hydra pipeline
+* [Hydra CLI](./packages/hydra-cli/README.md): Codegen tools to set up and run a Hydra pipeline
 * [Hydra Indexer](./packages/hydra-indexer/README.md): Hydra indexer for ingesting raw events and extrinsics
 * [Hydra Indexer Gateway](./packages/hydra-indexer-gateway/README.md): GraphQL interface for the Indexer
-* [Hydra Processor](./packages/hydra-indexer-gateway/README.md): Downstream part of the pipeline for transforming events into reach business-level objects
-* [Docs](./docs/README.md): In-depth documentation covering the whole pipeline and features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
+* [Hydra Processor](./packages/hydra-indexer-gateway/README.md): Processing part of the pipeline for transforming events into rich business-level objects
+* [Sample Project](./packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
+* [Docs](./docs/README.md): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!

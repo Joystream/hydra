@@ -7,7 +7,7 @@ import commander from 'commander'
 import path from 'path'
 import { configure, getLogger } from 'log4js'
 
-import { ProcessorRunner } from '.'
+import { ProcessorRunner } from '@dzlzv/hydra-processor'
 import { DatabaseManager } from '@dzlzv/hydra-db-utils'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 
@@ -37,19 +37,19 @@ const withEnvs = (command: (...args: any[]) => Promise<void>) => {
 function main(): commander.Command {
   console.log(chalk.green(figlet.textSync('Hydra-Processor')))
   const program = new commander.Command()
-  const version = require('./package.json').version
+  //const version = require('package.json').version
 
-  program.version(version).description('Hydra Processor')
+  //program.version(version).description('Hydra Processor')
 
   program
     .command('run')
     .option('-h, --height', 'starting block height')
-    .option('-e, --env <file>', '.env file location', '.env')
-    .option('-m, --mappings <file>', 'package with mappings', './mappings')
+    .option('-e, --env <file>', '.env file location', '../../.env')
+    .option('-m, --mappings <file>', 'package with mappings', '../../mappings')
     .option(
       '--entities <path>',
       'typeorm entities glob',
-      './graphql-server/src/modules/**/*.model.ts'
+      '../graphql-server/src/modules/**/*.model.ts'
     )
     .description('Process the event and extrinsic mappings using the index')
     .action(withErrors(withEnvs(runProcessor)))

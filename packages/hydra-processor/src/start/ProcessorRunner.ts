@@ -66,5 +66,7 @@ export class ProcessorRunner {
     }
   }
 
-  static async cleanUp(): Promise<void> {}
+  static async cleanUp(): Promise<void> {
+    debug('Nothing to clean up')
+  }
 }

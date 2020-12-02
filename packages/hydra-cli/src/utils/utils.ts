@@ -29,10 +29,14 @@ export async function copyFiles(from: string, to: string): Promise<void> {
 }
 
 export function getTemplatePath(template: string): string {
-  const templatePath = path.resolve(__dirname, '..', 'templates', template)
+  const templatePath = path.resolve(
+    __dirname,
+    '..',
+    'templates',
+    ...template.split('/')
+  )
   if (!fs.existsSync(templatePath)) {
-    console.error(`Tempate ${template} does not exists!`)
-    process.exit(1)
+    throw new Error(`Tempate ${template} does not exists!`)
   }
   return templatePath
 }
@@ -68,4 +72,14 @@ export function resolvePackageVersion(pkgName: string): string {
     )
   }
   return pkgJson.version as string
+}
+
+/**
+ * Tries to resolve a filepath from node_modules and reads the file as a string
+ *
+ * @param path a path like 'someModule/<path-to-file>
+ */
+export function readModuleFile(path: string): string {
+  const resolved = require.resolve(path)
+  return fs.readFileSync(resolved, 'utf-8')
 }

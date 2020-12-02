@@ -1,10 +1,7 @@
 import * as shortid from 'shortid'
 import { DeepPartial, QueryRunner, getConnection } from 'typeorm'
 
-import Debug from 'debug'
 import { logError } from '@dzlzv/hydra-common/lib'
-
-const debug = Debug('index-builder:helper')
 
 /**
  * Fixes compatibility between typeorm and warthog models.
