@@ -36,9 +36,9 @@ export default class Codegen extends Command {
       default: true,
     }),
 
-    dbschema: flags.boolean({
+    createDb: flags.boolean({
       char: 'd',
-      description: 'Create the DB schema (use with caution!)',
+      description: 'Create the DB and install migrations',
       default: false,
     }),
     // pass --no-install to skip the `yarn install` steps

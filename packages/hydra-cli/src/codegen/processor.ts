@@ -15,6 +15,7 @@ import { getTypeormConfig } from './torm-config'
 
 export async function createProcessor({
   install,
+  createDb,
 }: CodegenFlags): Promise<void> {
   // Take process where back at the end of the function execution
   const goBackDir = process.cwd()
@@ -77,7 +78,19 @@ export async function createProcessor({
     },
   }
 
-  const listr = new Listr([generateFiles, installDeps])
+  const migrate = {
+    title: 'Create processor DB tables',
+    skip: () => {
+      if (install !== true || createDb !== true) {
+        return `Skipping. Run the processor migrations manually with yarn db:processor:migrate`
+      }
+    },
+    task: async () => {
+      await execa('yarn', ['db:migrate'])
+    },
+  }
+
+  const listr = new Listr([generateFiles, installDeps, migrate])
   await listr.run()
 
   process.chdir(goBackDir)

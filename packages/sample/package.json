@@ -4,8 +4,8 @@
   "description": "GraphQL server and Substrate indexer. Generated with \u2665 by Hydra-CLI",
   "scripts": {
     "build": "yarn clean && yarn codegen:all",
-    "clean": "rm -rf ./generated",
     "lint": "echo \"Skippinng\"",
+    "clean": "rm -rf ./generated",
     "processor:start": "(cd ./generated/hydra-processor && yarn && DEBUG=${DEBUG} yarn start)",
     "server:start:dev": "(cd ./generated/graphql-server && yarn start:dev)",
     "server:start:prod": "(cd ./generated/graphql-server && yarn start:prod)",
@@ -16,9 +16,10 @@
     "db:schema:migrate": "(cd ./generated/graphql-server && yarn db:migrate)",
     "db:processor:migrate": "(cd ./generated/hydra-processor && yarn db:migrate)",
     "db:migrate": "yarn db:schema:migrate && yarn db:processor:migrate",
+    "bootstrap": "hydra-cli codegen --createDb",
     "codegen:all": "hydra-cli codegen",
     "codegen:processor": "hydra-cli codegen --no-graphql",
-    "codegen:server": "hydra-cli codegen --no-indexer",
+    "codegen:server": "hydra-cli codegen --no-processor",
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
     "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 hydra-kit:latest yarn db:migrate",
@@ -32,7 +33,7 @@
     "bn.js": "^5.1.2"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "^0.1.2",
+    "@dzlzv/hydra-cli": "0.1.3",
     "@dzlzv/hydra-common": "^0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
     "@dzlzv/hydra-processor": "^0.0.5"

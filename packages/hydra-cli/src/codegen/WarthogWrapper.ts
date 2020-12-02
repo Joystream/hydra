@@ -33,6 +33,18 @@ export default class WarthogWrapper {
   }
 
   async run(): Promise<void> {
+    const skipIfNoDeps = () => {
+      if (this.flags.install !== true) {
+        return 'Skipping: dependencies are not installed'
+      }
+    }
+
+    const skipSchema = () => {
+      if (this.flags.install === true && this.flags.createDb === true) {
+        return false
+      }
+      return `Skipping. Create the database and run the migrations with yarn db:prepare and yarn db:migrate`
+    }
     // Order of calling functions is important!!!
     debug(`Passed flags: ${JSON.stringify(this.flags, null, 2)}`)
     const tasks = new Listr([
@@ -50,35 +62,44 @@ export default class WarthogWrapper {
       },
       {
         title: 'Install dependencies',
-        skip: () => {
-          if (this.flags.install !== true) {
-            return 'Skipping: either --no-install flag has been passed or the HYDRA_NO_DEPS_INSTALL environment variable is set to'
-          }
-        },
+        skip: skipIfNoDeps,
         task: async () => {
           await this.installDependecies()
         },
       },
       {
         title: 'Generate server sources',
-        skip: () => {
-          if (this.flags.install !== true) {
-            return 'Skipping: dependencies are not installed'
-          }
-        },
+        skip: skipIfNoDeps,
         task: () => {
           this.generateWarthogSources()
         },
       },
       {
         title: 'Warthog codegen',
-        skip: () => {
-          if (this.flags.install !== true) {
-            return 'Skipping: dependencies are not installed'
-          }
-        },
+        skip: skipIfNoDeps,
         task: async () => {
           await this.codegen()
+        },
+      },
+      {
+        title: 'Create DB',
+        skip: skipSchema,
+        task: async () => {
+          await this.createDB()
+        },
+      },
+      {
+        title: 'Create DB schema',
+        skip: skipSchema,
+        task: async () => {
+          await this.syncSchema()
+        },
+      },
+      {
+        title: 'Run DB migrations',
+        skip: skipSchema,
+        task: async () => {
+          await this.runMigrations()
         },
       },
     ])
@@ -100,9 +121,9 @@ export default class WarthogWrapper {
         },
       },
       {
-        title: 'Generate migrations',
+        title: 'Sync Schema',
         task: async () => {
-          await this.createMigrations()
+          await this.syncSchema()
         },
       },
       {
@@ -171,6 +192,7 @@ export default class WarthogWrapper {
   async installDependecies(): Promise<void> {
     debug('Installing the dependencies')
     await execa('yarn', ['add', 'lodash']) // add lodash dep
+    await execa('yarn', ['add', '-D', 'typeorm']) // dev dependency
     await execa('yarn', ['install'])
   }
 
@@ -210,7 +232,7 @@ export default class WarthogWrapper {
     await execa('yarn', ['dotenv:generate'])
   }
 
-  async createMigrations(): Promise<void> {
+  async syncSchema(): Promise<void> {
     await execa('yarn', ['db:sync'])
   }
 

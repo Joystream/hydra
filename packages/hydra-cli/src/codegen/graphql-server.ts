@@ -18,9 +18,5 @@ export default async function createGraphQLServer(
   const warthogWrapper = new WarthogWrapper(flags)
   await warthogWrapper.run()
 
-  if (flags.dbschema) {
-    await warthogWrapper.generateDB()
-  }
-
   process.chdir(goBackDir)
 }
