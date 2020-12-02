@@ -1,4 +1,4 @@
-import { SubstrateEvent, DB } from '../generated/indexer'
+import { SubstrateEvent, DB } from '../generated/hydra-processor'
 import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model'
 import BN from 'bn.js'
 

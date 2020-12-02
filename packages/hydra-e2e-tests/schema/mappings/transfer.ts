@@ -9,7 +9,9 @@ export async function balances_Transfer(db: DB, event: SubstrateEvent) {
   transfer.to = Buffer.from(to.value as string)
   transfer.value = convertBN(value.value as string)
   transfer.block = event.blockNumber
-
+  transfer.comment = `Transferred ${value.value as string} from ${
+    from.value as string
+  } to ${to.value as string}`
   await db.save<Transfer>(transfer)
 }
 
