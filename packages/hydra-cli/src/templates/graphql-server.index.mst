@@ -8,6 +8,7 @@ import { Logger } from '../src/logger';
 
 import { getServer } from './server';
 
+
 class CustomNamingStrategy extends SnakeNamingStrategy {
   constructor() {
     super();
