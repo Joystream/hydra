@@ -12,11 +12,31 @@ query FindTransferByValue($value: BigInt, $block: Int) {
 }
 `
 
+const FTS_COMMENT_QUERY = `
+query Search($text: String!) {
+  commentSearch(text: $text) {
+    highlight
+  }
+}
+`
+
 export interface Transfer {
   value: string
   from: string
   to: string
   block: number
+}
+
+export async function findTransfersByComment(text: string): Promise<string[]> {
+  const graphClient = Container.get<GraphQLClient>('ProcessorClient')
+
+  const result = await graphClient.request<{
+    commentSearch: {
+      highlight: string
+    }[]
+  }>(FTS_COMMENT_QUERY, { text })
+
+  return result.commentSearch.map((c) => c.highlight)
 }
 
 export async function findTransfersByValue(

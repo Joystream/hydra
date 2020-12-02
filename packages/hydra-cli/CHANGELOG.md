@@ -1,6 +1,18 @@
 # CHANGELOG
 
-## 0.1.1
+## 0.0.24
+
+- bugfix: QueryRunner connection leaks in full-text search queries
+
+## 0.0.23
+
+- bugfix: fields resolution in findOne queries
+
+## 0.0.22
+
+- Add unique entity queries
+
+## 0.0.21
 
 Major upgrade
 
