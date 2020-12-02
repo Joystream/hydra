@@ -51,7 +51,7 @@ export class {{query.typePrefix}}FTSService {
             const ids: string[] = results.map(item => item.id);
             
             {{#entities}}
-            const {{arrayName}}: {{type}}[] = await em.createQueryBuilder({{type}})
+            const {{arrayName}}: {{type}}[] = await em.createQueryBuilder<{{type}}>({{type}}, '{{type}}')
                         .where("id IN (:...ids)", { ids }).getMany();
             {{/entities}}
 

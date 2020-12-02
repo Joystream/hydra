@@ -13,7 +13,7 @@ const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 
 describe('End-to-end tests', () => {
   let amount: number
-  let blockHeight: Number
+  let blockHeight: number
 
   before(async () => {
     amount = 213423

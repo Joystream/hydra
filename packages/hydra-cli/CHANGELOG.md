@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.24
+
+- bugfix: QueryRunner connection leaks in full-text search queries
+
 ## 0.0.23
 
 - bugfix: fields resolution in findOne queries
