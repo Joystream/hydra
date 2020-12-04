@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
   "license": "MIT",
   "bin": {
@@ -72,7 +72,7 @@
   "devDependencies": {
     "@dzlzv/hydra-common": "^0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
-    "@dzlzv/hydra-processor": "^0.0.5",
+    "@dzlzv/hydra-processor": "^0.0.7",
     "@oclif/dev-cli": "^1",
     "@oclif/test": "^1",
     "@types/chai": "^4",

@@ -1,11 +1,12 @@
 {
   "name": "@dzlzv/hydra-processor",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Hydra Processor tool",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib",
+    "templates",
     "README.md"
   ],
   "license": "MIT",
