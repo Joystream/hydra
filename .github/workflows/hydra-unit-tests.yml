@@ -1,5 +1,5 @@
 name: hydra-unit-tests
-on: [push, pull_request]
+on: [push]
   
 jobs:
   run_unit_tests:
