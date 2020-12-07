@@ -1,11 +1,12 @@
 name: publish
 on:
   # When Release Pull Request is merged
+  workflow_dispatch:
   pull_request:
     branches:
       - master
       - hydra_v1
-    #types: [closed]
+    types: [closed]
 
 env:
   CI: true
