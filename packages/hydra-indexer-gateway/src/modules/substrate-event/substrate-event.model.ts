@@ -7,11 +7,16 @@ import {
   IntField,
   WarthogField,
 } from 'warthog'
-import { SubstrateExtrinsic } from '../substrate-extrinsic/substrate-extrinsic.model'
-import { Column, OneToOne, JoinColumn } from 'typeorm'
+import BN from 'bn.js'
 import { ObjectType, Field } from 'type-graphql'
-import { AnyJson, AnyJsonField } from '@dzlzv/hydra-common'
+import { Column, OneToOne, JoinColumn } from 'typeorm'
 import { GraphQLJSON } from 'graphql-type-json'
+
+import { NumericTransformer } from '@dzlzv/bn-typeorm'
+import { AnyJson, AnyJsonField } from '@dzlzv/hydra-common'
+
+import { SubstrateExtrinsic } from '../substrate-extrinsic/substrate-extrinsic.model'
+import GraphQLBigNumber from '../../types/bn-graphql'
 
 @ObjectType()
 export class EventParam {
@@ -59,4 +64,9 @@ export class SubstrateEvent extends BaseModel {
   @Field(() => SubstrateExtrinsic, { nullable: true })
   @JoinColumn()
   extrinsic?: SubstrateExtrinsic
+
+  @Field(() => GraphQLBigNumber)
+  @WarthogField('numeric')
+  @Column({ type: 'numeric', transformer: new NumericTransformer() })
+  blockTimestamp!: BN
 }

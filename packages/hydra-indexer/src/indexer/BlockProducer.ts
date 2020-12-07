@@ -1,4 +1,4 @@
-import { ISubstrateService } from '../substrate'
+import { getBlockTimestamp, ISubstrateService } from '../substrate'
 import { IQueryEvent, QueryEventBlock, QueryEvent } from '../model'
 import { Header, Hash, Extrinsic } from '@polkadot/types/interfaces'
 import * as assert from 'assert'
@@ -151,6 +151,8 @@ export class BlockProducer extends EventEmitter
     debug(`\tFetched full block.`)
 
     blockExtrinsics = signedBlock.block.extrinsics.toArray()
+    const timestamp = getBlockTimestamp(blockExtrinsics)
+
     const blockEvents: IQueryEvent[] = records.map(
       (record, index): IQueryEvent => {
         // Extract the phase, event
@@ -165,7 +167,13 @@ export class BlockProducer extends EventEmitter
               ]
             : undefined
 
-        const event = new QueryEvent(record, height, index, extrinsic)
+        const event = new QueryEvent(
+          record,
+          height,
+          index,
+          timestamp,
+          extrinsic
+        )
 
         // Reduce log verbosity and log only if a flag is set
         if (process.env.LOG_QUERY_EVENTS) {

@@ -21,6 +21,7 @@ query GetEventsAfterID( $afterID: ID, $names: [String!]!, $fromBlock: Int, $toBl
     }
     index 
     blockNumber
+    blockTimestamp
     extrinsic {
       method
       section
