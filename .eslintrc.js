@@ -28,5 +28,13 @@ module.exports = {
     "sonarjs/no-identical-functions": "warn",
     "sonarjs/no-duplicate-string": "warn",
     "sonarjs/no-collapsible-if": "warn"
-  }
+  },
+  "overrides": [
+    {
+        "files": ["*.test.ts"],
+        "rules": {
+            "no-unused-expressions": "off"
+        }
+    }
+  ]
 }
