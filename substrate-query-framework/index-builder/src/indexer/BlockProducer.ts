@@ -1,6 +1,6 @@
 import { ISubstrateService } from '../substrate'
 import { IQueryEvent, QueryEventBlock, QueryEvent } from '../model'
-import { Header, Extrinsic } from '@polkadot/types/interfaces'
+import { Header, Hash, Extrinsic } from '@polkadot/types/interfaces'
 import * as assert from 'assert'
 
 import Debug from 'debug'
@@ -12,8 +12,11 @@ import { Service, Inject } from 'typedi'
 import {
   BLOCK_PRODUCER_FETCH_RETRIES,
   NEW_BLOCK_TIMEOUT_MS,
+  HEADER_CACHE_CAPACITY,
+  FINALITY_THRESHOLD,
 } from './indexer-consts'
 import { EventEmitter } from 'events'
+import FIFOCache from './FIFOCache'
 
 const DEBUG_TOPIC = 'index-builder:producer'
 
@@ -22,8 +25,7 @@ const debug = Debug(DEBUG_TOPIC)
 export const NEW_CHAIN_HEIGHT_EVENT = 'NEW_CHAIN_HEIGHT'
 
 @Service('BlockProducer')
-export class BlockProducer
-  extends EventEmitter
+export class BlockProducer extends EventEmitter
   implements IBlockProducer<QueryEventBlock> {
   private _started: boolean
 
@@ -32,6 +34,8 @@ export class BlockProducer
   private _blockToProduceNext: number
 
   private _chainHeight: number
+
+  private _headerCache = new FIFOCache<number, Header>(HEADER_CACHE_CAPACITY)
 
   @Inject('SubstrateService')
   private readonly substrateService!: ISubstrateService
@@ -66,7 +70,8 @@ export class BlockProducer
 
     //
     this._newHeadsUnsubscriber = this.substrateService.subscribeFinalizedHeads(
-      (header) => {
+      (header: Header) => {
+        this._headerCache.put(header.number.toNumber(), header)
         this._OnNewHeads(header)
       }
     )
@@ -112,6 +117,15 @@ export class BlockProducer
     ) // retry after 5 seconds
   }
 
+  public async *blockHeights(): AsyncGenerator<number> {
+    while (this._started) {
+      await this.checkHeightOrWait()
+      debug(`Yield: ${this._blockToProduceNext.toString()}`)
+      yield this._blockToProduceNext
+      this._blockToProduceNext++
+    }
+  }
+
   /**
    * This sub-routine does the actual fetching and block processing.
    * It can throw errors which should be handled by the top-level code
@@ -120,9 +134,7 @@ export class BlockProducer
   private async _doBlockProduce(height: number): Promise<QueryEventBlock> {
     debug(`Fetching block #${height.toString()}`)
 
-    const targetHash = await this.substrateService.getBlockHash(
-      height.toString()
-    )
+    const targetHash = await this.getBlockHash(height)
     debug(`\tHash ${targetHash.toString()}.`)
 
     const records = await this.substrateService.eventsAt(targetHash)
@@ -179,12 +191,17 @@ export class BlockProducer
     )
   }
 
-  public async *blockHeights(): AsyncGenerator<number> {
-    while (this._started) {
-      await this.checkHeightOrWait()
-      debug(`Yield: ${this._blockToProduceNext.toString()}`)
-      yield this._blockToProduceNext
-      this._blockToProduceNext++
+  private async getBlockHash(h: number): Promise<Hash> {
+    const cachedHeader = this._headerCache.get(h)
+
+    if (cachedHeader) {
+      debug(`Cached header ${cachedHeader.toString()} at height ${h} `)
+      return cachedHeader.hash
     }
+    // wait for finality threshold to be on the safe side
+    debug(`Waiting for the finality threshold: ${FINALITY_THRESHOLD}`)
+    await waitFor(() => this._chainHeight - h > FINALITY_THRESHOLD)
+
+    return await this.substrateService.getBlockHash(h.toString())
   }
 }
