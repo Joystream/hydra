@@ -1,11 +1,12 @@
 name: publish
 on:
   # When Release Pull Request is merged
+  workflow_dispatch:
   pull_request:
     branches:
       - master
       - hydra_v1
-    #types: [closed]
+    types: [closed]
 
 env:
   CI: true
@@ -44,9 +45,8 @@ jobs:
         run: |
           yarn 
           yarn workspace @dzlzv/hydra-cli build 
-          yarn config set version-tag-prefix "hydra-cli:v"
-          yarn config set version-git-message "[release] hydra-cli:v%s"
           yarn workspace @dzlzv/hydra-cli version --patch
+          git push 
       # Define ${RELEASE_VERSION}
       - name: Set Release Version
         if: steps.checkLabel.outputs.hasLabel == 'true'
@@ -62,7 +62,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_repo: ${{ github.repository }}
           git_commit_sha: ${{ github.sha }}
-          git_tag_prefix: "hydra-cli:v"
+          git_tag_prefix: "hydra-cli-v"
       - name: Create Release
         id: create_release
         if: steps.checkLabel.outputs.hasLabel == 'true' && github.event.pull_request.merged == true
