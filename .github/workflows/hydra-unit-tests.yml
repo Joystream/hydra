@@ -1,5 +1,5 @@
 name: hydra-unit-tests
-on: [push, pull_request]
+on: [pull_request]
   
 jobs:
   run_unit_tests:
@@ -13,8 +13,10 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - name: lint
+        run: |
+          yarn && yarn workspaces run lint
       - name: run unit tests
         run: |
-          cd ./substrate-query-framework/cli
-          yarn && yarn test
+          yarn && yarn workspace @dzlzv/hydra-cli test
  

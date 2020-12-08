@@ -1,0 +1,29 @@
+{
+  "name": "@dzlzv/bn-typeorm",
+  "version": "0.0.1",
+  "description": "TypeORM transformer for BigNumber",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "pub": "yarn build && yarn publish --access public",
+    "build": "rm -rf lib && tsc --build tsconfig.json",
+    "lint": "eslint . --cache --ext .ts"
+  },
+  "dependencies": {
+    "bn.js": "^5.1.3",
+    "typeorm": "^0.2.25"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^4.11.6",
+    "eslint": "^7.12.1",
+    "mocha": "^8.1.3",
+    "nyc": "^15.1.0",
+    "ts-node": "^9.0.0",
+    "typescript": "^3.8"
+  }
+}

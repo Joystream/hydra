@@ -4,6 +4,7 @@ on: [pull_request]
 jobs:
   run_e2e_tests:
     name: run Hydra e2e tests
+    if: contains(github.event.pull_request.labels.*.name, 'skip-CI') == false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -15,6 +16,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: run e2e tests
         run: |
-          cd ./substrate-query-framework/e2e-tests
-          yarn && bash run-tests.sh
+          yarn && yarn workspaces run build && yarn e2e-test
  
