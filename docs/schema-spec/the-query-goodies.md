@@ -33,7 +33,7 @@ query {
 
 ## Pagination
 
-All queries enjoy support of pagination by accepting `offset` and `limit` input parameters. By default, `limit` is set to 5.
+All queries enjoy pagination support by accepting `offset` and `limit` input parameters. By default, `limit` is set to 5.
 
 ```graphql
 query {

@@ -6,7 +6,7 @@ description: Mappings describe how Substate events should be handled by the inde
 
 A mapping file is a standalone typescript module defining how the Substrate events of interest should be handled by the Hydra indexer.
 
-The event handlers \(aka _mappings_\) should by convention be named `handle<EventName>` , so, for example, a handle for `trasury.Proposal` event should be named `handleProposal`
+The event handlers \(aka _mappings_\) should by convention be named `<RuntimeModule>_<EventName>` . For example, a handler for `treasury.Proposal` events should be named `treasury_Proposal`
 
 Each handler must have exactly two arguments exported by the Indexer: the `db` handle which gives access to the database and `SubstrateEvent` which contains all the necessary data extracted by the indexer from the Substrate chain.
 
@@ -48,4 +48,6 @@ Next, the body of the handler transforms the event parameters and extrinsic argu
 
 * `ProposalIndex` is a single named param of `treasury.Proposed` event
 * The extrinsic has to arguments: `value` and `beneficiary`, propagated to the entity in a straightforward fashion.
+
+Type-safe mappings and runtime upgrades will be supported in future releases of Hydra.
 

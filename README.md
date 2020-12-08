@@ -1,9 +1,8 @@
 # Hydra
 
-![A query node builder for Substrate chains](./.gitbook/assets/hydra-logo-horizontallockup.svg)
+![A query node builder for Substrate chains](.gitbook/assets/hydra-logo-horizontallockup.svg)
 
-A Substrate query node framework.
-[TheGraph](http://thegraph.com/), it gives a smooth way to provide powerful GraphQL queries to app developers over your Substrate blockchain state and history.
+A Substrate query node framework. Inspired by [TheGraph](http://thegraph.com/), it gives a smooth way to provide powerful GraphQL queries to app developers over your Substrate blockchain state and history.
 
 ## What's Hydra?
 
@@ -15,9 +14,10 @@ That's where Hydra gets you covered. Define your data model and the Hydra indexe
 
 The monorepo contains the following sub-packages:
 
-* [Hydra CLI](./packages/hydra-cli/README.md): Codegen tools to set up and run a Hydra pipeline
-* [Hydra Indexer](./packages/hydra-indexer/README.md): Hydra indexer for ingesting raw events and extrinsics
-* [Hydra Indexer Gateway](./packages/hydra-indexer-gateway/README.md): GraphQL interface for the Indexer
-* [Hydra Processor](./packages/hydra-indexer-gateway/README.md): Processing part of the pipeline for transforming events into rich business-level objects
-* [Sample Project](./packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
-* [Docs](./docs/README.md): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
+* [Hydra CLI](https://github.com/dzhelezov/hydra/tree/d8c7f79fd26db49de753e0247ef561f5fcb7878f/packages/hydra-cli/README.md): Codegen tools to set up and run a Hydra pipeline
+* [Hydra Indexer](https://github.com/dzhelezov/hydra/tree/d8c7f79fd26db49de753e0247ef561f5fcb7878f/packages/hydra-indexer/README.md): Hydra indexer for ingesting raw events and extrinsics
+* [Hydra Indexer Gateway](https://github.com/dzhelezov/hydra/tree/d8c7f79fd26db49de753e0247ef561f5fcb7878f/packages/hydra-indexer-gateway/README.md): GraphQL interface for the Indexer
+* [Hydra Processor](https://github.com/dzhelezov/hydra/tree/d8c7f79fd26db49de753e0247ef561f5fcb7878f/packages/hydra-indexer-gateway/README.md): Processing part of the pipeline for transforming events into rich business-level objects
+* [Sample Project](https://github.com/dzhelezov/hydra/tree/d8c7f79fd26db49de753e0247ef561f5fcb7878f/packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
+* [Docs](docs/): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
+
