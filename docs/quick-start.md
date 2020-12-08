@@ -97,7 +97,7 @@ This will create Docker images named `hydra-indexer` and `hydra-graphql-server`
 
 ## What to do next?
 
-* Explore more [examples](../examples/)
+* Explore more [examples]()
 * Describe your own [schema](schema-spec/) in `schema.graphql`
 * Write your indexer [mappings](mappings/)
 * Push your Hydra indexer and GraphQL Docker images to [Docker Hub](https://hub.docker.com/) and deploy  

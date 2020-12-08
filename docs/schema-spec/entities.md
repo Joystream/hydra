@@ -6,7 +6,7 @@ description: Entities is the backbone of the data model and translate into the d
 
 Entities are the top-level type definitions in the input schema marked with the `@entity` directive. Entity fields are normally built-in scalar types but can also be
 
-* an array of a primitive types
+* an array of primitive types
 * an [enum](enums.md),
 * an [entity reference](entity-relationship.md)
 * an [algebraic type ](variant-types.md)
