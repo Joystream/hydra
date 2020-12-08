@@ -7,6 +7,7 @@ import {
   {{#has.numeric}}NumericField,{{/has.numeric}}
   {{#has.json}}JSONField,{{/has.json}}
   {{#has.bytes}}BytesField,{{/has.bytes}}
+  {{#has.date}}DateTimeField, DateTimeString,{{/has.date}}
   Model,
   {{#has.mto}}ManyToOne,{{/has.mto}}
   {{#has.mtm}}ManyToMany,{{/has.mtm}}
