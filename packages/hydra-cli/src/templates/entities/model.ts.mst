@@ -1,7 +1,6 @@
 import {
   BaseModel,
   {{#has.bool}}BooleanField,{{/has.bool}}
-  {{#has.date}}DateField,{{/has.date}}
   {{#has.float}}FloatField,{{/has.float}}
   {{#has.int}}IntField,{{/has.int}}
   {{#has.numeric}}NumericField,{{/has.numeric}}
