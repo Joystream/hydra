@@ -22,6 +22,7 @@ export interface SubstrateEvent {
   id: string
   blockNumber: number
   extrinsic?: SubstrateExtrinsic
+  blockTimestamp: BN
 }
 
 export interface SubstrateExtrinsic {

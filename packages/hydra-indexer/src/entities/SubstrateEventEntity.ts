@@ -11,6 +11,7 @@ import { formatEventId, IQueryEvent } from '..'
 import * as BN from 'bn.js'
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
+import { NumericTransformer } from '@dzlzv/bn-typeorm'
 
 export const EVENT_TABLE_NAME = 'substrate_event'
 
@@ -43,6 +44,10 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
   @Index()
   blockNumber!: number
 
+  // PG int type size is not large enough
+  @Column('numeric', { transformer: new NumericTransformer() })
+  blockTimestamp!: BN
+
   @Column()
   index!: number
 
@@ -66,6 +71,7 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
     const _entity = new SubstrateEventEntity()
 
     _entity.blockNumber = q.blockNumber
+    _entity.blockTimestamp = q.blockTimestamp
     _entity.index = q.indexInBlock
     _entity.id = formatEventId(_entity.blockNumber, _entity.index)
     _entity.method = q.eventRecord.event.method || 'NO_METHOD'

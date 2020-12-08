@@ -1,9 +1,11 @@
 import { EventRecord, Extrinsic } from '@polkadot/types/interfaces'
 import { Codec } from '@polkadot/types/types'
+import * as BN from 'bn.js'
 
 export interface IQueryEvent {
   eventRecord: EventRecord
   blockNumber: number
+  blockTimestamp: BN
   indexInBlock: number
   eventName: string
   eventMethod: string
@@ -22,6 +24,8 @@ export class QueryEvent implements IQueryEvent {
 
   readonly blockNumber: number
 
+  readonly blockTimestamp: BN
+
   readonly extrinsic?: Extrinsic
 
   readonly indexInBlock: number
@@ -30,12 +34,14 @@ export class QueryEvent implements IQueryEvent {
     eventRecord: EventRecord,
     blockNumber: number,
     indexInBlock: number,
+    blockTimestamp: BN,
     extrinsic?: Extrinsic
   ) {
     this.eventRecord = eventRecord
     this.extrinsic = extrinsic
     this.blockNumber = blockNumber
     this.indexInBlock = indexInBlock
+    this.blockTimestamp = blockTimestamp
   }
 
   get eventName(): string {

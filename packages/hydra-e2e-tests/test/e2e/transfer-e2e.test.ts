@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { waitForAsync } from '@dzlzv/hydra-common'
-import { indexerHead } from './api/indexer-api'
+import { indexerHead, blockTimestamp } from './api/indexer-api'
 import {
   findTransfersByComment,
   findTransfersByValue,
@@ -35,5 +35,14 @@ describe('End-to-end tests', () => {
     const highlihts: string[] = await findTransfersByComment('transfer')
     expect(highlihts).length.gte(1, 'Full text search should find comment')
     expect(highlihts[0]).contains('Transfer')
+  })
+
+  it('fetch block timestamp from substrate event', async () => {
+    const tm = await blockTimestamp()
+    expect(tm).not.equal(0, 'Timestamp should not be equal to zero (0)')
+    expect(tm).to.be.lessThan(
+      Date.now(),
+      'Timestamp should be less then Date.now()'
+    )
   })
 })
