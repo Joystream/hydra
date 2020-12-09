@@ -1,12 +1,12 @@
 {
   "name": "@dzlzv/hydra-indexer-gateway",
-  "version": "0.0.1",
+  "version": "0.1.2",
   "description": "Generated Warthog Project",
   "license": "MIT",
   "scripts": {
-    "docker:build": "docker build . -t joystream/hydra-indexer-gateway:${TAG:-latest}",
-    "docker:push": "docker push joystream/hydra-indexer-gateway:${TAG:-latest}",
-    "docker:publish": "yarn docker:build && yarn docker:push",
+    "docker:build": "docker build . -t joystream/hydra-indexer-gateway:latest -t joystream/hydra-indexer-gateway:${TAG:-latest}",
+    "docker:push": "docker push joystream/hydra-indexer-gateway",
+    "docker:publish": "export TAG=$(node -p 'require(\"./package.json\").version') && yarn docker:build && yarn docker:push",
     "bootstrap": "yarn bootstrap:dev",
     "bootstrap:dev": "yarn && yarn build:dev && yarn db:drop && yarn db:create && yarn db:migrate && yarn db:seed",
     "bootstrap:prod": "yarn && yarn build:prod && yarn start:prod",
