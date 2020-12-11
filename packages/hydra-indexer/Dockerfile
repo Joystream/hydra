@@ -11,7 +11,7 @@ COPY *.js ./
 
 
 RUN yarn 
-RUN yarn build
+RUN yarn build 
 
 FROM node:12-alpine
 
