@@ -1,10 +1,10 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
-import testKeyring from '@polkadot/keyring/testing'
+import { createTestKeyring } from '@polkadot/keyring/testing'
 import { Hash } from '@polkadot/types/interfaces'
 import Container from 'typedi'
 import { waitFor } from '@dzlzv/hydra-common'
-import registry from '../../substrate-types/typeRegistry'
-import typesSpec from '../../substrate-types/typesSpec'
+import { typesSpec } from '@dzlzv/apps-config'
+import registry from './typeRegistry'
 
 export async function transfer(
   from: string,
@@ -15,7 +15,7 @@ export async function transfer(
   // Create a extrinsic, transferring randomAmount units to Bob.
   const transfer = api.tx.balances.transfer(to, amount)
 
-  const keyring = testKeyring()
+  const keyring = createTestKeyring()
 
   // Sign and Send the transaction
   let blockHash: Hash | undefined
