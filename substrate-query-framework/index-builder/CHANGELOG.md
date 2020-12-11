@@ -1,5 +1,9 @@
 # Changelog of major updates
 
+## 0.0.22
+
+- If the indexer is started at a block ahead of the current chain height, it waits intstead of throwing
+
 ## 0.0.21-
 
 - The index builder caches finalized indexer heads it subscribes to. Added `FINALIZATION_THRESHOLD` env setting to further enforce the blocks to be final
