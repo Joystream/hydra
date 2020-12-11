@@ -53,7 +53,7 @@ export class BlockProducer extends EventEmitter
     this._chainHeight = 0
   }
 
-  async start(atBlock?: number): Promise<void> {
+  async start(atBlock: number): Promise<void> {
     assert(this.substrateService, 'SubstrateService must be set')
     if (this._started) throw Error(`Cannot start when already started.`)
 
@@ -65,13 +65,6 @@ export class BlockProducer extends EventEmitter
     const header = await this.substrateService.getHeader(finalizedHeadHash)
     this._chainHeight = header.number.toNumber()
 
-    if (atBlock) {
-      this._blockToProduceNext = atBlock
-
-      if (atBlock > this._chainHeight)
-        throw Error(`Provided block is ahead of chain.`)
-    }
-
     //
     this._newHeadsUnsubscriber = this.substrateService.subscribeFinalizedHeads(
       (header: Header) => {
@@ -80,9 +73,16 @@ export class BlockProducer extends EventEmitter
       }
     )
 
+    this._blockToProduceNext = atBlock
     debug(
       `Starting the block producer, next block: ${this._blockToProduceNext.toString()}`
     )
+    if (atBlock > this._chainHeight) {
+      debug(
+        `Current finalized head ${this._chainHeight} is behind the start block ${atBlock}. Waiting...`
+      )
+      await waitFor(() => this._chainHeight >= atBlock)
+    }
   }
 
   async stop(): Promise<void> {
@@ -91,7 +91,6 @@ export class BlockProducer extends EventEmitter
       return
     }
 
-    // THIS IS VERY CRUDE, NEED TO MANAGE LOTS OF STUFF HERE!
     if (this._newHeadsUnsubscriber) {
       // eslint-disable-next-line
       ;(await this._newHeadsUnsubscriber)()
@@ -211,8 +210,13 @@ export class BlockProducer extends EventEmitter
       return cachedHeader.hash
     }
     // wait for finality threshold to be on the safe side
-    debug(`Waiting for the finality threshold: ${FINALITY_THRESHOLD}`)
-    await waitFor(() => this._chainHeight - h > FINALITY_THRESHOLD)
+    const isFinal = () => this._chainHeight - h > FINALITY_THRESHOLD
+    if (!isFinal()) {
+      debug(
+        `Block number: ${h}, current chain height: ${this._chainHeight}. Waiting for the finality threshold: ${FINALITY_THRESHOLD}.`
+      )
+      await waitFor(isFinal)
+    }
 
     return await this.substrateService.getBlockHash(h.toString())
   }
