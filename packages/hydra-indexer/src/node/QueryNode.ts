@@ -92,7 +92,7 @@ export class QueryNode {
 
     Container.set('ApiPromise', api)
 
-    //debug(`Api is set: ${JSON.stringify(api, null, 2)}`)
+    // debug(`Api is set: ${JSON.stringify(api, null, 2)}`)
   }
 
   async start(): Promise<void> {

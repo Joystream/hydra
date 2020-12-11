@@ -9,13 +9,13 @@ export default {
     approve: 'BTreeSet<AuthorityId>',
     complete: 'bool',
     decline: 'BTreeSet<AuthorityId>',
-    params: 'Lockdrop'
+    params: 'Lockdrop',
   },
   ClaimId: 'H256',
   ClaimVote: {
     approve: 'bool',
     authority: 'u16',
-    claim_id: 'ClaimId'
+    claim_id: 'ClaimId',
   },
   DollarRate: 'u128',
   Keys: 'SessionKeys2',
@@ -24,13 +24,13 @@ export default {
     public_key: '[u8; 33]',
     transaction_hash: 'H256',
     type: 'u8',
-    value: 'u128'
+    value: 'u128',
   },
   PredicateHash: 'H256',
   RefCount: 'u8',
   TickerRate: {
     authority: 'u16',
     btc: 'u128',
-    eth: 'u128'
-  }
-};
+    eth: 'u128',
+  },
+}

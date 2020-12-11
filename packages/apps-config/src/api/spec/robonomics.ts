@@ -14,6 +14,6 @@ export default {
   ValidationFunctionParams: {
     max_code_size: 'u32',
     relay_chain_height: 'u32',
-    code_upgrade_allowed: 'Option<u32>'
-  }
-};
+    code_upgrade_allowed: 'Option<u32>',
+  },
+}

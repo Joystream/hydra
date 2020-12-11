@@ -10,25 +10,25 @@ export default {
   EthereumTxHash: 'H256',
   MiningInfo: {
     isMining: 'bool',
-    startBlock: 'Option<BlockNumber>'
+    startBlock: 'Option<BlockNumber>',
   },
   PayoutPrefs: {
     commission: 'u32',
-    target: 'AccountId'
+    target: 'AccountId',
   },
   Score: {
     features: 'Vec<u32>',
-    overallScore: 'u32'
+    overallScore: 'u32',
   },
   StashInfo: {
     controller: 'AccountId',
-    payoutPrefs: 'PayoutPrefs'
+    payoutPrefs: 'PayoutPrefs',
   },
   WorkerInfo: {
     machineId: 'Vec<u8>',
     pubkey: 'Vec<u8>',
     lastUpdated: 'u64',
     score: 'Option<Score>',
-    status: 'i32'
-  }
-};
+    status: 'i32',
+  },
+}

@@ -1,13 +1,13 @@
 // Copyright 2017-2020 @polkadot/apps-config authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import BN from 'bn.js';
+import BN from 'bn.js'
 
 export default {
   chains: {
     Kusama: 'kusama',
     'Kusama CC3': 'kusama',
-    Polkadot: 'polkadot'
+    Polkadot: 'polkadot',
   },
   create: (chain: string, path: string, data: BN | number | string): string =>
     `https://${chain}.polkassembly.io/${path}/${data.toString()}`,
@@ -18,7 +18,7 @@ export default {
     proposal: 'proposal',
     referendum: 'referendum',
     tip: 'tip',
-    treasury: 'treasury'
+    treasury: 'treasury',
   },
-  url: 'https://polkassembly.io/'
-};
+  url: 'https://polkassembly.io/',
+}

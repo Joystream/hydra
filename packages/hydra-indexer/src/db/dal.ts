@@ -1,9 +1,4 @@
-import {
-  QueryRunner,
-  getRepository,
-  Connection,
-  createConnection,
-} from 'typeorm'
+import { QueryRunner, Connection, createConnection } from 'typeorm'
 import { EVENT_TABLE_NAME } from '../entities/SubstrateEventEntity'
 import { doInTransaction } from '@dzlzv/hydra-db-utils'
 import Debug from 'debug'

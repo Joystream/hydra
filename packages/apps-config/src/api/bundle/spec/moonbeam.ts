@@ -1,9 +1,9 @@
 // Copyright 2017-2020 @polkadot/apps-config authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { OverrideBundleDefinition } from '@polkadot/types/types';
+import type { OverrideBundleDefinition } from '@polkadot/types/types'
 
-import rpcGen from './moonbeam-rpc';
+import rpcGen from './moonbeam-rpc'
 
 // structs need to be in order
 /* eslint-disable sort-keys */
@@ -21,13 +21,13 @@ export default {
         LookupSource: 'AccountId',
         Account: {
           nonce: 'U256',
-          balance: 'u128'
+          balance: 'u128',
         },
         TransactionCondition: {
           _enum: {
             block: 'u64',
-            time: 'u64'
-          }
+            time: 'u64',
+          },
         },
         Transaction: {
           block_hash: 'Option<H256>',
@@ -49,7 +49,7 @@ export default {
           to: 'Option<H160>',
           transaction_index: 'Option<U256>',
           v: 'U256',
-          value: 'U256'
+          value: 'U256',
         },
         TransactionStatus: {
           transaction_hash: 'H256',
@@ -58,7 +58,7 @@ export default {
           to: 'Option<H160>',
           contract_address: 'Option<H160>',
           logs: 'Vec<Log>',
-          logs_bloom: 'Bloom'
+          logs_bloom: 'Bloom',
         },
         Receipt: {
           transaction_hash: 'Option<H256>',
@@ -73,17 +73,17 @@ export default {
           logs: 'Vec<Log>',
           state_root: 'Option<H256>',
           logs_bloom: 'H2048',
-          status_code: 'Option<U64>'
+          status_code: 'Option<U64>',
         },
         ExitReason: {
           _enum: {
             ExitSucceed: 'bool',
             ExitError: 'bool',
             ExitRevert: 'bool',
-            ExitFatal: 'bool'
-          }
-        }
-      }
+            ExitFatal: 'bool',
+          },
+        },
+      },
     },
     {
       minmax: [5, 5],
@@ -94,13 +94,13 @@ export default {
         LookupSource: 'AccountId',
         Account: {
           nonce: 'U256',
-          balance: 'u128'
+          balance: 'u128',
         },
         TransactionCondition: {
           _enum: {
             block: 'u64',
-            time: 'u64'
-          }
+            time: 'u64',
+          },
         },
         Transaction: {
           block_hash: 'Option<H256>',
@@ -122,7 +122,7 @@ export default {
           to: 'Option<H160>',
           transaction_index: 'Option<U256>',
           v: 'U256',
-          value: 'U256'
+          value: 'U256',
         },
         TransactionStatus: {
           transaction_hash: 'H256',
@@ -131,7 +131,7 @@ export default {
           to: 'Option<H160>',
           contract_address: 'Option<H160>',
           logs: 'Vec<Log>',
-          logs_bloom: 'Bloom'
+          logs_bloom: 'Bloom',
         },
         Receipt: {
           transaction_hash: 'Option<H256>',
@@ -146,17 +146,17 @@ export default {
           logs: 'Vec<Log>',
           state_root: 'Option<H256>',
           logs_bloom: 'H2048',
-          status_code: 'Option<U64>'
+          status_code: 'Option<U64>',
         },
         ExitReason: {
           _enum: {
             ExitSucceed: 'bool',
             ExitError: 'bool',
             ExitRevert: 'bool',
-            ExitFatal: 'bool'
-          }
-        }
-      }
+            ExitFatal: 'bool',
+          },
+        },
+      },
     },
     {
       minmax: [6, undefined],
@@ -167,15 +167,15 @@ export default {
         LookupSource: 'AccountId',
         Account: {
           nonce: 'U256',
-          balance: 'u128'
+          balance: 'u128',
         },
         ExtrinsicSignature: 'EthereumSignature',
         EthereumSignature: '[u8; 65]',
         TransactionCondition: {
           _enum: {
             block: 'u64',
-            time: 'u64'
-          }
+            time: 'u64',
+          },
         },
         Transaction: {
           block_hash: 'Option<H256>',
@@ -197,7 +197,7 @@ export default {
           to: 'Option<H160>',
           transaction_index: 'Option<U256>',
           v: 'U256',
-          value: 'U256'
+          value: 'U256',
         },
         TransactionStatus: {
           transaction_hash: 'H256',
@@ -206,7 +206,7 @@ export default {
           to: 'Option<H160>',
           contract_address: 'Option<H160>',
           logs: 'Vec<Log>',
-          logs_bloom: 'Bloom'
+          logs_bloom: 'Bloom',
         },
         Receipt: {
           transaction_hash: 'Option<H256>',
@@ -221,17 +221,17 @@ export default {
           logs: 'Vec<Log>',
           state_root: 'Option<H256>',
           logs_bloom: 'H2048',
-          status_code: 'Option<U64>'
+          status_code: 'Option<U64>',
         },
         ExitReason: {
           _enum: {
             ExitSucceed: 'bool',
             ExitError: 'bool',
             ExitRevert: 'bool',
-            ExitFatal: 'bool'
-          }
-        }
-      }
-    }
-  ]
-} as OverrideBundleDefinition;
+            ExitFatal: 'bool',
+          },
+        },
+      },
+    },
+  ],
+} as OverrideBundleDefinition

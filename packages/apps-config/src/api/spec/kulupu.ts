@@ -8,11 +8,11 @@ export default {
   Difficulty: 'U256',
   DifficultyAndTimestamp: {
     difficulty: 'Difficulty',
-    timestamp: 'Moment'
+    timestamp: 'Moment',
   },
   Era: {
     genesisBlockHash: 'H256',
     finalBlockHash: 'H256',
-    finalStateRoot: 'H256'
-  }
-};
+    finalStateRoot: 'H256',
+  },
+}

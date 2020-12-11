@@ -13,31 +13,31 @@ export default {
     lock_for: 'LockFor',
     lock_reasons: 'LockReasons',
     amount: 'Balance',
-    reasons: 'Reasons'
+    reasons: 'Reasons',
   },
   LockFor: {
     _enum: {
       Common: 'Common',
-      Staking: 'StakingLock'
-    }
+      Staking: 'StakingLock',
+    },
   },
   Common: {
-    amount: 'Balance'
+    amount: 'Balance',
   },
   StakingLock: {
     staking_amount: 'Balance',
-    unbondings: 'Vec<Unbonding>'
+    unbondings: 'Vec<Unbonding>',
   },
   LockReasons: {
     _enum: {
       Fee: null,
       Misc: null,
-      All: null
-    }
+      All: null,
+    },
   },
   Unbonding: {
     amount: 'Balance',
-    until: 'BlockNumber'
+    until: 'BlockNumber',
   },
   AccountData: {
     free: 'Balance',
@@ -45,7 +45,7 @@ export default {
     free_kton: 'Balance',
     reserved_kton: 'Balance',
     misc_frozen: 'Balance',
-    fee_frozen: 'Balance'
+    fee_frozen: 'Balance',
   },
   RingBalance: 'Balance',
   KtonBalance: 'Balance',
@@ -55,8 +55,8 @@ export default {
   StakingBalanceT: {
     _enum: {
       RingBalance: 'Balance',
-      KtonBalance: 'Balance'
-    }
+      KtonBalance: 'Balance',
+    },
   },
   StakingLedgerT: {
     stash: 'AccountId',
@@ -69,22 +69,22 @@ export default {
     claimed_rewards: 'Vec<EraIndex>',
     total: 'Compact<Balance>',
     active: 'Compact<Balance>',
-    unlocking: 'Vec<UnlockChunk>'
+    unlocking: 'Vec<UnlockChunk>',
   },
   TimeDepositItem: {
     value: 'Compact<Balance>',
     start_time: 'Compact<TsInMs>',
-    expire_time: 'Compact<TsInMs>'
+    expire_time: 'Compact<TsInMs>',
   },
   RewardDestination: {
     _enum: {
       Staked: 'Staked',
       Stash: null,
-      Controller: null
-    }
+      Controller: null,
+    },
   },
   Staked: {
-    promise_month: 'u8'
+    promise_month: 'u8',
   },
   ExposureT: {
     own_ring_balance: 'Compact<Balance>',
@@ -93,34 +93,34 @@ export default {
     total_power: 'Power',
     others: 'Vec<IndividualExposure>',
     total: 'Compact<Balance>',
-    own: 'Compact<Balance>'
+    own: 'Compact<Balance>',
   },
   IndividualExposure: {
     who: 'AccountId',
     ring_balance: 'Compact<Balance>',
     kton_balance: 'Compact<Balance>',
     power: 'Power',
-    value: 'Compact<Balance>'
+    value: 'Compact<Balance>',
   },
   ElectionResultT: {
     elected_stashes: 'Vec<AccountId>',
     exposures: 'Vec<(AccountId, ExposureT)>',
-    compute: 'ElectionCompute'
+    compute: 'ElectionCompute',
   },
   RKT: {
     r: 'Balance',
-    k: 'Balance'
+    k: 'Balance',
   },
   SpanRecord: {
     slashed: 'RKT',
-    paid_out: 'RKT'
+    paid_out: 'RKT',
   },
   UnappliedSlash: {
     validator: 'AccountId',
     own: 'RKT',
     others: 'Vec<(AccountId, RKT)>',
     reporters: 'Vec<AccountId>',
-    payout: 'RKT'
+    payout: 'RKT',
   },
   TreasuryProposal: {
     proposer: 'AccountId',
@@ -130,21 +130,21 @@ export default {
     ring_bond: 'Balance',
     kton_bond: 'Balance',
     value: 'Balance',
-    bond: 'Balance'
+    bond: 'Balance',
   },
   EthTransactionIndex: '(H256, u64)',
   EthHeaderBrief: {
     total_difficulty: 'U256',
     parent_hash: 'H256',
     number: 'EthBlockNumber',
-    relayer: 'AccountId'
+    relayer: 'AccountId',
   },
   EthBlockNumber: 'u64',
   EthHeaderThing: {
     eth_header: 'EthHeader',
     ethash_proof: 'Vec<EthashProof>',
     mmr_root: 'MMRHash',
-    mmr_proof: 'Vec<MMRHash>'
+    mmr_proof: 'Vec<MMRHash>',
   },
   EthHeader: {
     parent_hash: 'H256',
@@ -161,57 +161,57 @@ export default {
     gas_limit: 'U256',
     difficulty: 'U256',
     seal: 'Vec<Bytes>',
-    hash: 'Option<H256>'
+    hash: 'Option<H256>',
   },
   EthAddress: 'H160',
   Bloom: '[u8; 256; Bloom]',
   H128: '[u8; 16; H128]',
   EthashProof: {
     dag_nodes: '(H512, H512)',
-    proof: 'Vec<H128>'
+    proof: 'Vec<H128>',
   },
   Receipt: {
     gas_used: 'U256',
     log_bloom: 'Bloom',
     logs: 'Vec<LogEntry>',
-    outcome: 'TransactionOutcome'
+    outcome: 'TransactionOutcome',
   },
   EthereumNetworkType: {
     _enum: {
       Mainnet: null,
-      Ropsten: null
-    }
+      Ropsten: null,
+    },
   },
   RedeemFor: {
     _enum: {
       Ring: null,
       Kton: null,
-      Deposit: null
-    }
+      Deposit: null,
+    },
   },
   EthereumReceiptProof: {
     index: 'u64',
     proof: 'Bytes',
-    header_hash: 'H256'
+    header_hash: 'H256',
   },
   MMRProof: 'Vec<H256>',
   OtherSignature: {
     _enum: {
       Eth: 'EcdsaSignature',
-      Tron: 'EcdsaSignature'
-    }
+      Tron: 'EcdsaSignature',
+    },
   },
   EcdsaSignature: '[u8; 65; EcdsaSignature]',
   OtherAddress: {
     _enum: {
       Eth: '[u8; 20; EthereumAddress]',
-      Tron: '[u8; 20; TronAddress]'
-    }
+      Tron: '[u8; 20; TronAddress]',
+    },
   },
   AddressT: '[u8; 20; AddressT]',
   MerkleMountainRangeRootLog: {
     prefix: '[u8; 4; Prefix]',
-    mmr_root: 'Hash'
+    mmr_root: 'Hash',
   },
   Round: 'u64',
   TcBlockNumber: 'Vec<u8>',
@@ -221,9 +221,9 @@ export default {
   GameId: 'TcBlockNumber',
   RawHeaderThing: 'Vec<u8>',
   BalancesRuntimeDispatchInfo: {
-    usable_balance: 'Balance'
+    usable_balance: 'Balance',
   },
   StakingRuntimeDispatchInfo: {
-    power: 'Power'
-  }
-};
+    power: 'Power',
+  },
+}

@@ -9,7 +9,7 @@ export default {
     account: 'AccountName',
     name: 'ActionName',
     authorization: 'Vec<PermissionLevel>',
-    data: 'Vec<u8>'
+    data: 'Vec<u8>',
   },
   IostAction: { contract: 'Vec<u8>', action_name: 'Vec<u8>', data: 'Vec<u8>' },
   PermissionLevel: { actor: 'AccountName', permission: 'PermissionName' },
@@ -21,7 +21,7 @@ export default {
     recv_sequence: 'u64',
     auth_sequence: 'FlatMap<AccountName, u64>',
     code_sequence: 'UnsignedInt',
-    abi_sequence: 'UnsignedInt'
+    abi_sequence: 'UnsignedInt',
   },
   Checksum256: '([u8;32])',
   BlockchainType: { _enum: ['BIFROST', 'EOS', 'IOST'] },
@@ -29,7 +29,7 @@ export default {
   BridgeAssetSymbol: {
     blockchain: 'BlockchainType',
     symbol: 'Vec<u8>',
-    precision: 'Precision'
+    precision: 'Precision',
   },
   ProducerSchedule: { version: 'u32', producers: 'Vec<ProducerKey>' },
   ProducerKey: { producer_name: 'AccountName', block_signing_key: 'PublicKey' },
@@ -38,7 +38,10 @@ export default {
   PublicKey: { type_: 'UnsignedInt', data: '[u8;33]' },
   UnsignedInt: 'u32',
   Signature: { type_: 'UnsignedInt', data: '[u8;65]' },
-  SignedBlockHeader: { block_header: 'BlockHeader', producer_signature: 'Signature' },
+  SignedBlockHeader: {
+    block_header: 'BlockHeader',
+    producer_signature: 'Signature',
+  },
   BlockHeader: {
     timestamp: 'BlockTimestamp',
     producer: 'AccountName',
@@ -48,7 +51,7 @@ export default {
     action_mroot: 'Checksum256',
     schedule_version: 'u32',
     new_producers: 'Option<ProducerSchedule>',
-    header_extensions: 'Vec<Extension>'
+    header_extensions: 'Vec<Extension>',
   },
   BlockTimestamp: '(u32)',
   Extension: '(u16, Vec<u8>)',
@@ -63,7 +66,7 @@ export default {
     multi_sig: 'MultiSig',
     action: 'Action',
     from: 'AccountId',
-    token_symbol: 'TokenSymbol'
+    token_symbol: 'TokenSymbol',
   },
   Sent: { tx_id: 'Vec<u8>', from: 'AccountId', token_symbol: 'TokenSymbol' },
   Succeeded: { tx_id: 'Vec<u8>' },
@@ -75,8 +78,8 @@ export default {
       SignComplete: 'MultiSigTx',
       Sent: 'Sent',
       Succeeded: 'Succeeded',
-      Failed: 'Failed'
-    }
+      Failed: 'Failed',
+    },
   },
   RewardRecord: { account_id: 'AccountId', record_amount: 'Balance' },
   ConvertPrice: 'u128',
@@ -88,19 +91,23 @@ export default {
   PoolCreateTokenDetails: {
     token_id: 'TokenSymbol',
     token_balance: 'Balance',
-    token_weight: 'PoolWeight'
+    token_weight: 'PoolWeight',
   },
   TokenPool: 'Balance',
   VTokenPool: 'Balance',
   InVariantPool: 'Balance',
   TokenSymbol: {
     _enum: [
-      'aUSD', 'DOT',
-      'vDOT', 'KSM',
-      'vKSM', 'EOS',
-      'vEOS', 'IOST',
-      'vIOST'
-    ]
+      'aUSD',
+      'DOT',
+      'vDOT',
+      'KSM',
+      'vKSM',
+      'EOS',
+      'vEOS',
+      'IOST',
+      'vIOST',
+    ],
   },
   TransactionStatus: {
     _enum: [
@@ -109,8 +116,8 @@ export default {
       'SignComplete',
       'Sent',
       'Succeeded',
-      'Failed'
-    ]
+      'Failed',
+    ],
   },
   Cost: 'u128',
   Income: 'u128',
@@ -120,7 +127,7 @@ export default {
     locked: 'Balance',
     available: 'Balance',
     cost: 'Cost',
-    income: 'Income'
+    income: 'Income',
   },
   SpecIndex: 'u32',
   RequestIdentifier: 'u64',
@@ -129,23 +136,32 @@ export default {
     token_pool: 'Balance',
     vtoken_pool: 'Balance',
     current_reward: 'Balance',
-    pending_reward: 'Balance'
+    pending_reward: 'Balance',
   },
-  ProducerAuthoritySchedule: { version: 'u32', producers: 'Vec<ProducerAuthority>' },
-  ProducerAuthority: { producer_name: 'ActionName', authority: 'BlockSigningAuthority' },
+  ProducerAuthoritySchedule: {
+    version: 'u32',
+    producers: 'Vec<ProducerAuthority>',
+  },
+  ProducerAuthority: {
+    producer_name: 'ActionName',
+    authority: 'BlockSigningAuthority',
+  },
   BlockSigningAuthority: '(UnsignedInt, BlockSigningAuthorityV0)',
   BlockSigningAuthorityV0: { threshold: 'u32', keys: 'Vec<KeyWeight>' },
   KeyWeight: { key: 'PublicKey', weight: 'u16' },
   InvariantValue: 'Balance',
   PoolWeight: 'Balance',
-  AssetConfig: { redeem_duration: 'BlockNumber', min_reward_per_block: 'Balance' },
+  AssetConfig: {
+    redeem_duration: 'BlockNumber',
+    min_reward_per_block: 'Balance',
+  },
   ProxyValidatorRegister: {
     last_block: 'BlockNumber',
     deposit: 'Balance',
     need: 'Balance',
     staking: 'Balance',
     reward_per_block: 'Balance',
-    validator_address: 'Vec<u8>'
+    validator_address: 'Vec<u8>',
   },
-  BlockNumber: 'u32'
-};
+  BlockNumber: 'u32',
+}

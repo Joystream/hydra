@@ -7,5 +7,5 @@
 export default {
   Address: 'AccountId',
   LookupSource: 'AccountId',
-  Schedule: 'ScheduleTo258'
-};
+  Schedule: 'ScheduleTo258',
+}

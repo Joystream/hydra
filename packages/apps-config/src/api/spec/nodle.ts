@@ -14,7 +14,7 @@ export default {
     voters_against: 'Vec<(AccountId, Balance)>',
     voters_for: 'Vec<(AccountId, Balance)>',
     votes_against: 'Option<Balance>',
-    votes_for: 'Option<Balance>'
+    votes_for: 'Option<Balance>',
   },
   CertificateId: 'AccountId',
   RefCount: 'u8',
@@ -25,6 +25,6 @@ export default {
     owner: 'AccountId',
     renewed: 'BlockNumber',
     revoked: 'bool',
-    validity: 'BlockNumber'
-  }
-};
+    validity: 'BlockNumber',
+  },
+}

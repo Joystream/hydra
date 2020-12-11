@@ -1,60 +1,62 @@
 // Copyright 2017-2020 @polkadot/apps-config authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TFunction } from 'i18next';
-import type { Option } from './types';
+import type { TFunction } from 'i18next'
+import type { Option } from './types'
 
-export function createLanguages (t: TFunction): Option[] {
+export function createLanguages(t: TFunction): Option[] {
   return [
     {
-      text: t('lng.detect', 'Default browser language (auto-detect)', { ns: 'apps-config' }),
-      value: 'default'
+      text: t('lng.detect', 'Default browser language (auto-detect)', {
+        ns: 'apps-config',
+      }),
+      value: 'default',
     },
     // default/native
     {
       text: 'English',
-      value: 'en'
+      value: 'en',
     },
     // translations (sorted by language code)
     {
       text: 'عربى',
-      value: 'ar'
+      value: 'ar',
     },
     {
       text: 'Español',
-      value: 'es'
+      value: 'es',
     },
     {
       text: 'Français',
-      value: 'fr'
+      value: 'fr',
     },
     {
       text: 'Bahasa Indonesia',
-      value: 'id'
+      value: 'id',
     },
     {
       text: 'Italiano',
-      value: 'it'
+      value: 'it',
     },
     {
       text: '日本語',
-      value: 'ja'
+      value: 'ja',
     },
     {
       text: '한국어',
-      value: 'ko'
+      value: 'ko',
     },
     {
       text: 'Português',
-      value: 'pt'
+      value: 'pt',
     },
     {
       text: 'русский',
-      value: 'ru'
+      value: 'ru',
     },
     {
       text: '汉语',
-      value: 'zh'
-    }
-  ];
+      value: 'zh',
+    },
+  ]
 }
