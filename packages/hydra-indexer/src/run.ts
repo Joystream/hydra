@@ -1,8 +1,8 @@
-import * as dotenv from 'dotenv'
-import * as chalk from 'chalk'
-import * as figlet from 'figlet'
-import * as commander from 'commander'
-import * as path from 'path'
+import dotenv from 'dotenv'
+import chalk from 'chalk'
+import figlet from 'figlet'
+import commander from 'commander'
+import path from 'path'
 
 import { configure, getLogger } from 'log4js'
 
@@ -37,7 +37,7 @@ function main(): commander.Command {
 
   program
     .command('index')
-    .option('-h, --height', 'starting block height')
+    .option('-h, --height <height>', 'starting block height')
     .option('-t, --typedefs [typedefs]', 'type definitions')
     .option('--provider [chain]', 'substrate chain provider url')
     .option('-e, --env <file>', '.env file location', '.env')
@@ -97,7 +97,7 @@ async function runIndexer(opts: Record<string, unknown>) {
 
   await node.index({
     wsProviderURI,
-    atBlock: atBlock && atBlock !== '0' ? Number.parseInt(atBlock) : undefined,
+    atBlock: atBlock ? Number.parseInt(atBlock) : undefined,
     types,
   })
 }

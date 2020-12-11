@@ -1,5 +1,5 @@
 import { Extrinsic } from '@polkadot/types/interfaces'
-import * as BN from 'bn.js'
+import BN from 'bn.js'
 
 // Except genesis block all blocks have timestamp event
 export function getBlockTimestamp(extrinsics: Extrinsic[]): BN {

@@ -1,10 +1,6 @@
 import { ConnectionOptions } from 'typeorm'
 import { SnakeNamingStrategy } from '@dzlzv/hydra-db-utils'
-import {
-  SubstrateEventEntity,
-  SubstrateExtrinsicEntity,
-  ProcessedEventsLogEntity,
-} from '../entities'
+import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { IndexerSchema } from '../migrations/IndexerSchema'
 
 const config: () => ConnectionOptions = () => {

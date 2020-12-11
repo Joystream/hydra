@@ -1,7 +1,7 @@
 import { getBlockTimestamp, ISubstrateService } from '../substrate'
 import { IQueryEvent, QueryEventBlock, QueryEvent } from '../model'
 import { Header, Hash, Extrinsic } from '@polkadot/types/interfaces'
-import * as assert from 'assert'
+import assert from 'assert'
 
 import Debug from 'debug'
 import { UnsubscribePromise } from '@polkadot/api/types'
@@ -29,7 +29,8 @@ const debug = Debug(DEBUG_TOPIC)
 export const NEW_CHAIN_HEIGHT_EVENT = 'NEW_CHAIN_HEIGHT'
 
 @Service('BlockProducer')
-export class BlockProducer extends EventEmitter
+export class BlockProducer
+  extends EventEmitter
   implements IBlockProducer<QueryEventBlock> {
   private _started: boolean
 

@@ -6,13 +6,14 @@ import { IndexerOptions } from '.'
 import Debug from 'debug'
 
 import Container, { Inject, Service } from 'typedi'
-import registry from '../substrate/typeRegistry'
-import typesSpec from '../substrate/typesSpec'
 
 import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 import { retry, waitFor } from '@dzlzv/hydra-common'
 import { SUBSTRATE_API_CALL_RETRIES } from '../indexer/indexer-consts'
 import { RedisRelayer } from '../indexer/RedisRelayer'
+
+import { typesBundle, typesChain, typesSpec } from '@dzlzv/apps-config'
+import registry from '../substrate/typeRegistry'
 
 const debug = Debug('index-builder:query-node')
 
@@ -35,7 +36,7 @@ export class QueryNode {
   readonly indexBuilder!: IndexBuilder
 
   @Inject('IndexerOptions')
-  readonly indexerOptions!: IndexerOptions
+  private indexerOptions!: IndexerOptions
 
   private constructor() {
     this._state = QueryNodeState.NOT_STARTED
@@ -57,7 +58,9 @@ export class QueryNode {
     const redisURL = options.redisURI || process.env.REDIS_URI
     Container.set('RedisClientFactory', new RedisClientFactory(redisURL))
     Container.set('RedisRelayer', new RedisRelayer())
-    return Container.get<QueryNode>('QueryNode')
+    const node = Container.get<QueryNode>('QueryNode')
+    node.indexerOptions = options
+    return node
   }
 
   static async createApi(
@@ -71,9 +74,17 @@ export class QueryNode {
     names.length && debug(`Injected types: ${names.join(', ')}`)
 
     // Create the API and wait until ready
+    // TODO: move to substrate
     const api = await retry(
       () =>
-        new ApiPromise({ provider, registry, types, typesSpec }).isReadyOrError,
+        new ApiPromise({
+          provider,
+          registry,
+          types,
+          typesBundle,
+          typesChain,
+          typesSpec,
+        }).isReadyOrError,
       SUBSTRATE_API_CALL_RETRIES
     )
 
@@ -81,7 +92,7 @@ export class QueryNode {
 
     Container.set('ApiPromise', api)
 
-    debug(`Api is set: ${JSON.stringify(api, null, 2)}`)
+    //debug(`Api is set: ${JSON.stringify(api, null, 2)}`)
   }
 
   async start(): Promise<void> {
