@@ -1,11 +1,8 @@
 import { ConnectionOptions } from 'typeorm'
 import { SnakeNamingStrategy } from '@dzlzv/hydra-db-utils'
-import {
-  SubstrateEventEntity,
-  SubstrateExtrinsicEntity,
-  ProcessedEventsLogEntity,
-} from '../entities'
+import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { IndexerSchema } from '../migrations/IndexerSchema'
+import { BlockTimestamp } from '../migrations/BlockTimestamp'
 
 const config: () => ConnectionOptions = () => {
   return {
@@ -19,7 +16,7 @@ const config: () => ConnectionOptions = () => {
     password: process.env.TYPEORM_PASSWORD || process.env.DB_PASS,
     database: process.env.TYPEORM_DATABASE || process.env.DB_NAME,
     entities: [SubstrateEventEntity, SubstrateExtrinsicEntity],
-    migrations: [IndexerSchema],
+    migrations: [IndexerSchema, BlockTimestamp],
     cli: {
       migrationsDir: 'migrations',
     },
