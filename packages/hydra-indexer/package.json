@@ -34,7 +34,7 @@
     "@dzlzv/bn-typeorm": "^0.0.1",
     "@dzlzv/hydra-common": "^0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
-    "@polkadot/api": "^2.10.2-7",
+    "@polkadot/api": "~2.10.2-7",
     "@dzlzv/apps-config": "^0.70.2-11",
     "@types/express": "^4.17.8",
     "@types/ioredis": "^4.17.4",
