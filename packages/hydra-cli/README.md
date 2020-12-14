@@ -67,14 +67,53 @@ and answer the prompts. The scaffolder will generate the following files:
 
 The scaffolder auto-generates sample mappings and an input  schema file as a quick starter. The provided example simply tracks all the transfers in the chain and is not that interesting on its own.
 
+Make sure a PostgresDB is running in the background. You may start it with docker:
+
+```bash
+docker-compose up -d db
+```
+
+Then run all the nessary migrations and codegen in a single run:
+
+```bash
+yarn bootstrap
+```
+
+Now you can start Hydra processor running the mappings in `./mappings` against the indexer as configure in `.env`:
+
+```bash
+yarn processor:start
+```
+
+To run a GraphQL query node server run in a separate window:
+
+```bash
+yarn server:start:dev
+```
+
+A GraphQL playground will open up at `localhost:4000`. Try to query some Kusama transfers:
+
+```gql
+query {
+  transfers(limit: 5, where: { value_gt: 1000000000000 }) {
+    block
+    value
+    from
+    to
+  }
+}
+```
+
+The schema and the queries can be inspected on the Schema and Docs tabs on the right.
+
 For an in-depth guide on how to create complex schemas and supported features like full-text search, interfaces, union and algebraic types and more, check the [Docs](./../../docs/README.md) and also visit [Hydra Webpage](https://joystream.org/hydra) for a one-pager.
 
 ## Dockerized quickstart
 
-The easiest way to get the whole Hydra stack working is to build a `hydra-kit` Docker image. It is a one-size-fits-all tool to run
-a database migrations for the inpust schema, and the processor.
+The easiest way to get the whole Hydra stack working inside a Docker container is to build a `hydra-kit` Docker image. The provided `docker-compose.yml` comes with a `node-template` image for a Substate chain and a Hydra indexer run against it.
 
 First, build `hydra-kit`:
+
 ```bash
 $ yarn docker:build
 ```
@@ -83,7 +122,7 @@ Let's start the db and run the migrations. `hydra-kit` will connect to the netwo
 ```bash
 $ yarn docker:db:up
 $ yarn db:prepare
-$ yarn docker:db:migration
+$ yarn docker:db:migrate
 ```
 
 Now everything is ready to run the whole stack locally:
@@ -91,26 +130,7 @@ Now everything is ready to run the whole stack locally:
 $ yarn docker:up
 ```
 
-After some warm-up time, the query node will be available at `localhost:8080` and the indexer gateway playground at `localhost:4000`
-
-## Local setup
-
-Generate the indexer and the server:
-
-```bash
-$ hydra-cli codegen
-```
-
-The indexer and server files will be generated in `./generated/processor` and `./generated/graphql-server`.
-
-Make sure the database is up and running. The credentials may be provided in `.env` file. By default, the scaffolder generates a database service `docker-compose.yml` with the same credentials via environment variables. Run
-
-```bash
-$ yarn db:up
-$ yarn db:prepare
-$ yarn db:migrate
-```
-to create the database and set up the db schemas.
+After some warm-up time, the query node will be available at `localhost:4000` and the indexer gateway playground at `localhost:4001`
 
 ## Setting up the indexer
 
@@ -122,7 +142,7 @@ $ docker-compose up -d indexer
 $ docker-compose up -d indexer-api-gateway
 ```
 
-If everything set up correctly, it should be possible to inspect the Indexer gateway at `http://localhost:4000/graphql`
+If everything set up correctly, it should be possible to inspect the Indexer gateway at `http://localhost:4001/graphql`
 
 ## Running the processor
 
