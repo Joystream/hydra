@@ -1,7 +1,7 @@
 import { getBlockTimestamp, ISubstrateService } from '../substrate'
 import { IQueryEvent, QueryEventBlock, QueryEvent } from '../model'
 import { Header, Hash, Extrinsic } from '@polkadot/types/interfaces'
-import * as assert from 'assert'
+import assert from 'assert'
 
 import Debug from 'debug'
 import { UnsubscribePromise } from '@polkadot/api/types'

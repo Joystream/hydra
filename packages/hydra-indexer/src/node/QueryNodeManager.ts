@@ -44,6 +44,7 @@ export class QueryNodeManager {
       throw Error('Cannot start the same manager multiple times.')
     await createDBConnection()
 
+    debug(`Indexer options: ${JSON.stringify(options, null, 2)}`)
     this._queryNode = await QueryNode.create(options)
     try {
       await this._queryNode.start()

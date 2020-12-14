@@ -8,7 +8,7 @@ import {
 } from 'typeorm'
 import { AnyJson, AnyJsonField, EventParam } from '@dzlzv/hydra-common'
 import { formatEventId, IQueryEvent } from '..'
-import * as BN from 'bn.js'
+import BN from 'bn.js'
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
 import { NumericTransformer } from '@dzlzv/bn-typeorm'
