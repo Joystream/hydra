@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import { waitForAsync } from '@dzlzv/hydra-common'
 import { indexerHead, blockTimestamp } from './api/indexer-api'
 import {
+  fetchDateTimeFieldFromTransfer,
   findTransfersByComment,
   findTransfersByValue,
 } from './api/processor-api'
@@ -44,5 +45,10 @@ describe('End-to-end tests', () => {
       Date.now(),
       'Timestamp should be less then Date.now()'
     )
+  })
+
+  it('fetch datetime field from transfer', async () => {
+    const date = await fetchDateTimeFieldFromTransfer()
+    expect(date.getTime()).to.be.lessThan(Date.now())
   })
 })

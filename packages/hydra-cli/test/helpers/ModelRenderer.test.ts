@@ -88,7 +88,7 @@ describe('ModelRenderer', () => {
     warthogModel.addField('Post', new Field('a', 'ID'))
     warthogModel.addField('Post', new Field('b', 'String'))
     warthogModel.addField('Post', new Field('c', 'Int'))
-    warthogModel.addField('Post', new Field('d', 'Date'))
+    warthogModel.addField('Post', new Field('d', 'DateTime'))
     warthogModel.addField('Post', new Field('e', 'Float'))
     warthogModel.addField('Post', new Field('f', 'BigInt'))
     warthogModel.addField('Post', new Field('g', 'BigDecimal'))
@@ -104,7 +104,7 @@ describe('ModelRenderer', () => {
     const rendered = generator.render(modelTemplate)
 
     expect(rendered).to.include('BooleanField,', 'Should import BooleanField')
-    expect(rendered).to.include('DateField,', 'Should import DateField')
+    expect(rendered).to.include('DateTimeField,', 'Should import DateTimeField')
     expect(rendered).to.include('FloatField,', 'Should import FloatField')
     expect(rendered).to.include('IntField,', 'Should import IntField')
     expect(rendered).to.include('NumericField,', 'Should import NumericField')

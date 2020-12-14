@@ -9,7 +9,7 @@ export const TYPE_FIELDS: { [key: string]: { [key: string]: string } } = {
     tsType: 'boolean',
   },
   date: {
-    decorator: 'DateField',
+    decorator: 'DateTimeField',
     tsType: 'Date',
   },
   int: {

@@ -10,7 +10,7 @@ export const availableTypes: ScalarType = {
   String: 'string',
   Int: 'int',
   Boolean: 'bool',
-  Date: 'date',
+  DateTime: 'date',
   Float: 'float',
   BigInt: 'numeric',
   BigDecimal: 'decimal',

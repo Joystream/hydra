@@ -12,6 +12,7 @@ export async function balances_Transfer(db: DB, event: SubstrateEvent) {
   transfer.comment = `Transferred ${value.value as string} from ${
     from.value as string
   } to ${to.value as string}`
+  transfer.insertedAt = new Date()
   await db.save<Transfer>(transfer)
 }
 

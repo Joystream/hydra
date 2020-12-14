@@ -1,24 +1,11 @@
 import { GraphQLClient } from 'graphql-request'
 import Container from 'typedi'
 
-const FIND_TRANSFER_BY_VALUE = `
-query FindTransferByValue($value: BigInt, $block: Int) {
-	transfers(where: { value_eq: $value, block_eq: $block }) {
-        value
-        to
-        from
-        block
-    }  
-}
-`
-
-const FTS_COMMENT_QUERY = `
-query Search($text: String!) {
-  commentSearch(text: $text) {
-    highlight
-  }
-}
-`
+import {
+  FTS_COMMENT_QUERY,
+  FIND_TRANSFER_BY_VALUE,
+  FETCH_INSERTED_AT_FIELD_FROM_TRANSFER,
+} from './graphql-queries'
 
 export interface Transfer {
   value: string
@@ -55,4 +42,15 @@ export async function findTransfersByValue(
   }>(FIND_TRANSFER_BY_VALUE, { value: value.toString(), block })
 
   return result.transfers
+}
+
+export async function fetchDateTimeFieldFromTransfer(): Promise<Date> {
+  const graphClient = Container.get<GraphQLClient>('ProcessorClient')
+  const result = await graphClient.request<{
+    transfers: {
+      insertedAt: string
+    }[]
+  }>(FETCH_INSERTED_AT_FIELD_FROM_TRANSFER)
+
+  return new Date(result.transfers[0].insertedAt)
 }
