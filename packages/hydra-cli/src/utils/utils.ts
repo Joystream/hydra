@@ -64,14 +64,25 @@ export async function copyTemplateToCWD(
  */
 export function resolvePackageVersion(pkgName: string): string {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const pkgJson = require(`${pkgName}/package.json`) as Record<string, unknown>
-  debug(`Resolved: ${JSON.stringify(pkgJson)}`)
-  if (!pkgJson.version) {
-    throw new Error(
-      `Can't resolve ${pkgName} version based on ${pkgName}/package.json`
-    )
+  const path = require.resolve('@dzlzv/hydra-cli/package.json')
+
+  const pkgJson = JSON.parse(fs.readFileSync(path, 'utf-8')) as Record<
+    string,
+    unknown
+  >
+
+  debug(`Resolved hydra-cli package.json: ${JSON.stringify(pkgJson, null, 2)}`)
+
+  if (pkgName === '@dzlzv/hydra-cli') {
+    return pkgJson.version as string
   }
-  return pkgJson.version as string
+
+  if (pkgJson.hydraDependencies) {
+    const deps = pkgJson.hydraDependencies as Record<string, string>
+    if (deps[pkgName]) return deps[pkgName]
+  }
+
+  throw new Error(`Can't resolve ${pkgName} version`)
 }
 
 /**

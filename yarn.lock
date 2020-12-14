@@ -3926,7 +3926,7 @@ debug@^3.2.6:
   dependencies:
     ms "^2.1.1"
 
-debug@^4, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@^4.2.0:
+debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@^4.2.0, debug@^4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.1.tgz#f0d229c505e0c6d8c49ac553d1b13dc183f6b2ee"
   integrity sha512-doEwdvm4PCeK4K3RQN2ZC2BYUBaxwLARCqZmMjtF8a51J2Rb0xpVloFRnCODwqjpwnAoao4pelN8l3RJdv3gRQ==
@@ -8340,13 +8340,13 @@ ms@^2.1.1:
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
 mssql@^6.2.1:
-  version "6.2.3"
-  resolved "https://registry.yarnpkg.com/mssql/-/mssql-6.2.3.tgz#1d15bbe8c3057e32ee6e98596b6c323b097a6cba"
-  integrity sha512-4TW/fA9UgzmVTNgjl65r6ISr6aL5QHnlptEt1A3jIpdzkNbFPIkRbUNz90324HIdE+5pKc3VqikOImcTrhd4og==
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/mssql/-/mssql-6.3.0.tgz#ad070d07fd3690d172541a9944fb7cf18caee41d"
+  integrity sha512-6/BK/3J8Oe4t6BYnmdCCORHhyBtBI/Fh0Sh6l1hPzb/hKtxDrsaSDGIpck1u8bzkLzev39TH5W2nz+ffeRz7gg==
   dependencies:
-    debug "^4"
+    debug "^4.3.1"
     tarn "^1.1.5"
-    tedious "^6.6.2"
+    tedious "^6.7.0"
 
 multibase@^0.7.0:
   version "0.7.0"
@@ -11021,7 +11021,7 @@ tdigest@^0.1.1:
   dependencies:
     bintrees "1.0.1"
 
-tedious@^6.6.2:
+tedious@^6.7.0:
   version "6.7.0"
   resolved "https://registry.yarnpkg.com/tedious/-/tedious-6.7.0.tgz#ad02365f16f9e0416b216e13d3f83c53addd42ca"
   integrity sha512-8qr7+sB0h4SZVQBRWUgHmYuOEflAOl2eihvxk0fVNvpvGJV4V5UC/YmSvebyfgyfwWcPO22/AnSbYVZZqf9wuQ==
