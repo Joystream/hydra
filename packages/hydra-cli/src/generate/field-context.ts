@@ -10,7 +10,7 @@ export const TYPE_FIELDS: { [key: string]: { [key: string]: string } } = {
   },
   date: {
     decorator: 'DateTimeField',
-    tsType: 'DateTimeString',
+    tsType: 'Date',
   },
   int: {
     decorator: 'IntField',
