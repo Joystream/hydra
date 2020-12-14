@@ -1,12 +1,6 @@
-import {
-  QueryRunner,
-  getRepository,
-  Connection,
-  createConnection,
-} from 'typeorm'
+import { QueryRunner, Connection, createConnection } from 'typeorm'
 import { EVENT_TABLE_NAME } from '../entities/SubstrateEventEntity'
 import { doInTransaction } from '@dzlzv/hydra-db-utils'
-import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 import Debug from 'debug'
 import config from './ormconfig'
 
@@ -43,24 +37,5 @@ export async function getIndexerHead(): Promise<number> {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     return Number(raw[0].block_number)
-  })
-}
-
-/**
- * Get last event processed by the given mappings processor
- *
- * @param processorID Name of the processor
- */
-export async function loadState(
-  processorID: string
-): Promise<ProcessedEventsLogEntity | undefined> {
-  return await getRepository(ProcessedEventsLogEntity).findOne({
-    where: {
-      processor: processorID,
-    },
-    order: {
-      eventId: 'DESC',
-      lastScannedBlock: 'DESC',
-    },
   })
 }

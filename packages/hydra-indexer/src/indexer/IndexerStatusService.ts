@@ -2,7 +2,7 @@ import Container, { Service } from 'typedi'
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
-import { logError, stringifyWithTs } from '@dzlzv/hydra-common'
+import { logError, stringifyWithTs, waitFor } from '@dzlzv/hydra-common'
 import { BlockPayload, QueryEventBlock } from './../model'
 import {
   INDEXER_HEAD_BLOCK,
@@ -26,6 +26,8 @@ export class IndexerStatusService implements IStatusService {
   private redisSub: IORedis.Redis
   private redisPub: IORedis.Redis
   private redisClient: IORedis.Redis
+
+  private _isLoading = false
 
   constructor() {
     const clientFactory = Container.get<RedisClientFactory>(
@@ -91,8 +93,11 @@ export class IndexerStatusService implements IStatusService {
       return Number.parseInt(headVal)
     }
 
+    await waitFor(() => !this._isLoading)
     debug(`Redis cache is empty, loading from the database`)
+    this._isLoading = true
     const _indexerHead = await this.slowIndexerHead()
+    this._isLoading = false
     debug(`Loaded ${_indexerHead}`)
     await this.updateHeadKey(_indexerHead)
     return _indexerHead

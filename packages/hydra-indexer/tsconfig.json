@@ -11,8 +11,9 @@
 		"emitDecoratorMetadata": true,
 		"skipLibCheck": true,
 		"sourceMap": true,
-		"inlineSources": false
+        "inlineSources": false,
+        "esModuleInterop": true,
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules"]
 }
