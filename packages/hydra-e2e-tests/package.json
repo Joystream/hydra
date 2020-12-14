@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@dzlzv/hydra-common": "^0.0.3",
-    "@polkadot/api": "^2.10.2-7",
     "@dzlzv/apps-config": "^0.70.2-11",
     "graphql-request": "^3.3.0",
     "typedi": "^0.8.0"

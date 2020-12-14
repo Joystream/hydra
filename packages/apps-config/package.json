@@ -16,7 +16,7 @@
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },
   "dependencies": {
-    "@acala-network/type-definitions": "^0.4.0-beta.33",
+    "@acala-network/type-definitions": "^0.5.1",
     "@babel/runtime": "^7.12.5",
     "@edgeware/node-types": "^3.0.10",
     "@laminar/type-definitions": "^0.2.0-beta.141",
