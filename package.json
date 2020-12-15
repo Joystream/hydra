@@ -1,8 +1,16 @@
 {
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "packages/sample/generated/*",
+      "packages/sample/mappings"
+    ],
+    "nohoist": [
+      "**/apps-config",
+      "**/apps-config/**"
+    ]
+  },
   "scripts": {
     "e2e-test": "yarn workspace hydra-e2e-tests run e2e-test",
     "lint": "yarn workspaces run lint"

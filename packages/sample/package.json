@@ -1,5 +1,9 @@
 {
   "name": "sample",
+  "private": "true",
+  "workspaces": [
+    "./generated/*"
+  ],
   "version": "1.0.0",
   "description": "GraphQL server and Substrate indexer. Generated with \u2665 by Hydra-CLI",
   "scripts": {
@@ -20,6 +24,7 @@
     "codegen:all": "hydra-cli codegen",
     "codegen:processor": "hydra-cli codegen --no-graphql",
     "codegen:server": "hydra-cli codegen --no-processor",
+    "codegen:event-types": "hydra-typegen typegen --outDir ./mappings/generated/types",
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
     "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 hydra-kit:latest yarn db:migrate",
@@ -34,8 +39,9 @@
   },
   "devDependencies": {
     "@dzlzv/hydra-cli": "0.1.3",
-    "@dzlzv/hydra-common": "^0.0.3",
+    "@dzlzv/hydra-common": "~0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
-    "@dzlzv/hydra-processor": "^0.0.5"
+    "@dzlzv/hydra-processor": "^0.0.7",
+    "hydra-typegen": "~0.0.1"
   }
 }

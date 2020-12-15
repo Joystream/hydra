@@ -1,0 +1,56 @@
+import { createTypeUnsafe } from "@polkadot/types/create";
+import { SubstrateEvent } from "@dzlzv/hydra-common";
+import { Codec } from "@polkadot/types/types";
+import { typeRegistry } from ".";
+
+{{{imports}}}
+
+export namespace {{module.name}} {
+    {{#each events}}
+    {{#if documentation}}
+    /**
+    {{#each documentation}}
+     * {{{this}}}
+    {{/each}}
+     */
+    {{/if}}
+    export class {{name}}Event {
+        public readonly expectedArgTypes = [{{#each args}}'{{this}}', {{/each}}]
+
+        constructor(public readonly ctx: SubstrateEvent) {}
+
+        get data(): {{name}}_Params {
+            
+            {{#if @root.validateArgs}}
+            if (!this.validateArgs()) {
+                throw new Error(`Expected event arguments of types [${this.expectedArgTypes.join(',')}] but received [${this.ctx.params.map((p) => p.type).join(',')}]`)
+            }
+            {{/if}}
+
+            return new {{name}}_Params(this.ctx)
+        }
+
+        validateArgs(): boolean {
+            if (this.expectedArgTypes.length !== this.ctx.params.length) {
+                return false
+            }
+            let valid = true
+            this.expectedArgTypes.forEach((type, i) => {
+                if (type !== this.ctx.params[i].type) {
+                    valid = false
+                }
+            })
+            return valid
+        }
+
+    }     
+
+    class {{name}}_Params {
+    
+        constructor(public readonly ctx: SubstrateEvent) {}
+
+        {{{getters}}}
+        
+    }
+    {{/each}}
+}

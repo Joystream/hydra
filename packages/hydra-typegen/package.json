@@ -1,0 +1,55 @@
+{
+  "name": "hydra-typegen",
+  "scope": "@dzlzv",
+  "version": "0.0.1",
+  "description": "\"Hydra-cli pluging for generating typed events\"",
+  "main": "lib/index.js",
+  "repository": "https://github.com/Joystream/hydra",
+  "author": "@dzhelezov",
+  "license": "MIT",
+  "files": [
+    "/bin",
+    "/lib",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "bin": {
+    "hydra-typegen": "./bin/run"
+  },
+  "scripts": {
+    "build": "rm -rf lib && tsc --build tsconfig.json",
+    "run-dev": "DEBUG=hydra-typegen:* node ./bin/run",
+    "postpack": "rm -f oclif.manifest.json",
+    "lint": "eslint . --cache --ext .ts",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\"",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "hydra-typegen",
+    "scope": "@dzlzv",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/errors",
+      "@oclif/plugin-plugins"
+    ]
+  },
+  "dependencies": {
+    "@oclif/command": "^1.8.0",
+    "@polkadot/api": "^2.10.1",
+    "debug": "^4.3.1",
+    "handlebars": "^4.7.6",
+    "lodash": "^4.17.20"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.14",
+    "@types/figlet": "^1.2.0",
+    "@types/mocha": "^8.2.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "ts-node": "^7.0.1",
+    "ts-node-dev": "^1.0.0-pre.40",
+    "typescript": "^4.1.3"
+  }
+}
