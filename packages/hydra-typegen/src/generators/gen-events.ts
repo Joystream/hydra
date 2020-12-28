@@ -10,7 +10,7 @@ const debug = require('debug')('hydra-typegen:gen-events')
 
 const generateEventTypeTemplate = handlebars.compile(readTemplate('events'))
 
-export function generateEventTypes(config: GeneratorConfig) {
+export function generateEventTypes(config: GeneratorConfig): void {
   const { modules, dest } = config
   modules.forEach((meta) => {
     const { module } = meta
@@ -35,6 +35,6 @@ export function getEventTypes(
     validateArgs,
     imports,
     module,
-    events
+    events,
   })
 }

@@ -75,11 +75,11 @@ function validateEventTypes(e: Event) {
  * @param e event
  */
 export function strippedArgTypes(e: Event): string[] {
-  let types: string[] = []
+  const types: string[] = []
   e.args.forEach((a) => {
     const type = a.toString().trim()
     if (type.includes('<') || type.includes('&') || type.includes('|')) {
-      types.push(...type.split(/[<>\&|]/).map((t) => t.trim()))
+      types.push(...type.split(/[<>&|]/).map((t) => t.trim()))
     } else {
       types.push(type)
     }

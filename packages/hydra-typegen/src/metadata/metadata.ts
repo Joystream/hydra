@@ -27,7 +27,7 @@ export async function getMetadata({
   source,
   blockHash,
 }: MetadataSource): Promise<MetadataLatest> {
-  let metaHex: string | undefined = undefined
+  let metaHex: string | undefined
   debug(`Reading metadata: from ${source}`)
 
   if (source.startsWith('wss://') || source.startsWith('ws://')) {
@@ -66,11 +66,15 @@ async function fromChain(endpoint: string, blockHash = ''): Promise<string> {
       const websocket = new WS(endpoint)
 
       websocket.onclose = (event: { code: number; reason: string }): void => {
-        reject(`disconnected, code: '${event.code}' reason: '${event.reason}'`)
+        reject(
+          new Error(
+            `disconnected, code: '${event.code}' reason: '${event.reason}'`
+          )
+        )
       }
 
-      websocket.onerror = (event: any): void => {
-        reject(event)
+      websocket.onerror = (event: unknown): void => {
+        reject(new Error(JSON.stringify(event, null, 2)))
       }
 
       websocket.onopen = (): void => {
@@ -87,7 +91,9 @@ async function fromChain(endpoint: string, blockHash = ''): Promise<string> {
       }
     } catch (e) {
       reject(
-        `Cannot fetch metadata: ${e.message}, ${JSON.stringify(e, null, 2)}`
+        new Error(
+          `Cannot fetch metadata: ${e.message}, ${JSON.stringify(e, null, 2)}`
+        )
       )
     }
   })

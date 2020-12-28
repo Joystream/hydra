@@ -4,6 +4,7 @@ module.exports = {
     'plugin:sonarjs/recommended',
   ],
   rules: {
+    "@typescript-eslint/no-var-requires": "warn",
     "@typescript-eslint/no-unused-vars": "error",
     "no-useless-constructor": "off",
     "@typescript-eslint/naming-convention": [

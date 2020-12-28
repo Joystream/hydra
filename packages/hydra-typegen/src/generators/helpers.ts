@@ -54,7 +54,7 @@ export function renderArgs(args: string[]): string {
   return args.reduce((result, argType, index) => {
     let getStmt = ''
 
-    if (grouped[argType] == 1) {
+    if (grouped[argType] === 1) {
       getStmt = `get ${nameFromType(argType)}(): ${argType} {
         return ${renderCreateTypeStmt(argType, index)}
       }`
@@ -89,7 +89,7 @@ export function nameFromType(rawType: string): string {
   let stripped = rawType.trim()
   if (stripped.includes('&')) {
     // if its a union type, take only the first part as it's
-    //probably most descriptive
+    // probably most descriptive
     stripped = stripped.split('&')[0].trim()
   }
   const match = /[^<]*<([^>]+)>.*/g.exec(stripped)

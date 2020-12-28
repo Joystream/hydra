@@ -11,13 +11,13 @@ import { warn } from '../log'
 const debug = require('debug')('hydra-typegen:events-gen')
 
 const KNOWN_LOCATIONS = {
-  INTEFACES: '@polkadot/types/interfaces',
-  TYPES: '@polkadot/types',
-  TYPES_TYPES: '@polkadot/types/types',
-  TYPES_CREATE: '@polkadot/types/create',
-  METADATA: '@polkadot/metadata',
-  LOCAL: '.',
-  HYDRA_COMMON: '@dzlzv/hydra-common',
+  interfaces: '@polkadot/types/interfaces',
+  types: '@polkadot/types',
+  typesTypes: '@polkadot/types/types',
+  typesCreate: '@polkadot/types/create',
+  metadata: '@polkadot/metadata',
+  local: '.',
+  hydraCommon: '@dzlzv/hydra-common',
 }
 
 const NO_CODEC = ['Tuple', 'VecFixed']
@@ -45,9 +45,7 @@ export function buildImportsRegistry(
   const importsRegistry = {}
   // add primitive classes
   const typeClasses = [
-    ...Object.keys(primitiveClasses).filter(
-      (name) => !name.includes('Generic')
-    ),
+    ...Object.keys(primitive).filter((name) => !name.includes('Generic')),
     ...Object.keys(codecClasses as Record<string, unknown>).filter(
       (name) => !NO_CODEC.includes(name)
     ),
@@ -58,27 +56,27 @@ export function buildImportsRegistry(
   debug(`${typeClasses.join(',')}`)
 
   typeClasses.forEach((primitiveName) => {
-    importsRegistry[primitiveName] = KNOWN_LOCATIONS.TYPES
+    importsRegistry[primitiveName] = KNOWN_LOCATIONS.types
   })
 
   for (const t of TYPES_TYPES) {
-    importsRegistry[t] = KNOWN_LOCATIONS.TYPES_TYPES
+    importsRegistry[t] = KNOWN_LOCATIONS.typesTypes
   }
 
   for (const t of TYPES_CREATE) {
-    importsRegistry[t] = KNOWN_LOCATIONS.TYPES_CREATE
+    importsRegistry[t] = KNOWN_LOCATIONS.typesCreate
   }
 
   for (const t of METADATA) {
-    importsRegistry[t] = KNOWN_LOCATIONS.METADATA
+    importsRegistry[t] = KNOWN_LOCATIONS.metadata
   }
 
   for (const t of LOCAL) {
-    importsRegistry[t] = KNOWN_LOCATIONS.LOCAL
+    importsRegistry[t] = KNOWN_LOCATIONS.local
   }
 
   for (const t of HYDRA_COMMON) {
-    importsRegistry[t] = KNOWN_LOCATIONS.HYDRA_COMMON
+    importsRegistry[t] = KNOWN_LOCATIONS.hydraCommon
   }
 
   addPolkadotInterfaces(importsRegistry)
@@ -95,10 +93,10 @@ function addPolkadotInterfaces(importsRegistry: ImportsRegistry) {
     Object.keys(packageDef.types).forEach((type): void => {
       if (importsRegistry[type]) {
         warn(
-          `Overwriting duplicated type '${type}' ${importsRegistry[type]} -> ${KNOWN_LOCATIONS.INTEFACES}`
+          `Overwriting duplicated type '${type}' ${importsRegistry[type]} -> ${KNOWN_LOCATIONS.interfaces}`
         )
       }
-      importsRegistry[type] = KNOWN_LOCATIONS.INTEFACES
+      importsRegistry[type] = KNOWN_LOCATIONS.interfaces
     })
   })
 }

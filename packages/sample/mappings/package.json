@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf lib && tsc --build tsconfig.json",
+    "lint": "echo \"Skippinng\"",
     "clean": "rm -rf lib"
   },
   "dependencies": {

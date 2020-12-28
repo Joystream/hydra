@@ -75,7 +75,7 @@ Otherwise a relative path to a json file matching the RPC call response is expec
 types don't much the metadata definiton`,
       default: true,
     }),
-    //verbose: flags.boolean({ char: 'v' }),
+    // verbose: flags.boolean({ char: 'v' }),
   }
 
   async run(): Promise<void> {
@@ -111,13 +111,13 @@ types don't much the metadata definiton`,
     this.generate(config)
   }
 
-  generate(config: IConfig) {
+  generate(config: IConfig): void {
     const { dest, customTypes } = config
 
     debug(`Output dir: ${dest}`)
     fs.mkdirSync(dest, { recursive: true })
 
-    let generatorConfig: GeneratorConfig = {
+    const generatorConfig: GeneratorConfig = {
       customTypes,
       importsRegistry: buildImportsRegistry(customTypes),
       modules: extractMeta(config),

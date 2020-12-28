@@ -19,7 +19,7 @@ export function readFile(source: string, root: string = process.cwd()): string {
 export function readJson(
   source: string,
   root: string = process.cwd()
-): Record<string, any> {
+): Record<string, unknown> {
   return JSON.parse(readFile(source, root))
 }
 

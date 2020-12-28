@@ -17,5 +17,6 @@ ADD --chown=node:node ./packages/hydra-db-utils ./packages/hydra-db-utils
 ADD --chown=node:node ./packages/hydra-processor ./packages/hydra-processor
 ADD --chown=node:node ./packages/hydra-cli ./packages/hydra-cli
 ADD --chown=node:node ./packages/sample ./packages/sample
+ADD --chown=node:node ./packages/hydra-typegen ./packages/hydra-typegen
 
 RUN yarn --frozen-lockfile 

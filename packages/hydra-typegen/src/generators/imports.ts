@@ -1,8 +1,6 @@
 import { GeneratorConfig, ImportsDef } from './types'
 import { ModuleMeta, strippedArgTypes } from '../metadata'
 
-const debug = require('debug')('hydra-typegen:imports')
-
 export function buildModuleImports(
   { events }: ModuleMeta,
   { importsRegistry }: GeneratorConfig

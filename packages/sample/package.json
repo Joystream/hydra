@@ -7,9 +7,9 @@
   "version": "1.0.0",
   "description": "GraphQL server and Substrate indexer. Generated with \u2665 by Hydra-CLI",
   "scripts": {
-    "build": "yarn clean && yarn codegen:all",
+    "build": "yarn clean && yarn codegen:all && yarn codegen:event-types --metadata wss://kusama-rpc.polkadot.io Balances.Transfer",
     "lint": "echo \"Skippinng\"",
-    "clean": "rm -rf ./generated",
+    "clean": "rm -rf ./generated && rm -rf ./mappings/generated",
     "processor:start": "(cd ./generated/hydra-processor && yarn && DEBUG=${DEBUG} yarn start)",
     "server:start:dev": "(cd ./generated/graphql-server && yarn start:dev)",
     "server:start:prod": "(cd ./generated/graphql-server && yarn start:prod)",

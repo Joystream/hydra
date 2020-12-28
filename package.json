@@ -8,7 +8,9 @@
     ],
     "nohoist": [
       "**/apps-config",
-      "**/apps-config/**"
+      "**/apps-config/**",
+      "**/hydra-typegen",
+      "**/hydra-typegen/**"
     ]
   },
   "scripts": {

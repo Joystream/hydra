@@ -8,7 +8,7 @@ const debug = require('debug')('hydra-typegen:gen-index')
 
 const generateIndexTemplate = handlebars.compile(readTemplate('index'))
 
-export function generateIndex(config: GeneratorConfig) {
+export function generateIndex(config: GeneratorConfig): void {
   const { modules, customTypes, dest } = config
 
   if (customTypes && customTypes.typedefsLoc) {
