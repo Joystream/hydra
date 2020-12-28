@@ -15,6 +15,22 @@ yarn codegen:all
 
 to generate the model files as defined in `schema.graphql`
 
+## Codegen for event types
+
+A separate tool Hydra Typegen can be used for generating Typescript classes for the event handlers (the _mappings_).  
+Run
+
+```bash
+yarn codegen:event-types --metadata wss://<node endpoint> <comma-separated list of events>
+```
+
+For custom substrate types use the additional flags `--typedefs` and `--typelib`.
+For a full list of flags, run
+
+``` bash
+yarn hydra-typegen typegen --help
+```
+
 ## DB Migrations
 
 Inspect the DB settings in `.env` and prepare run the database migrations:
@@ -44,3 +60,7 @@ and the GraphQL server (opens a GraphQL playground at localhost by default):
 ```bash
 yarn server:start:dev
 ```
+
+## Custom chains
+
+If there is no public Hydra Indexer readily available, one should set-up a self-hosted [indexer](../hydra-indexer/README.md) and [indexer-api-gateway](../hydra-indexer-gateway/README.md). The simplest way is set it up is to run pre-built docker images for `indexer` and `indexer-api-gateway` as defined in `docker-compose.yml`. 

@@ -44,35 +44,38 @@ export default class Typegen extends Command {
   static flags = {
     metadata: flags.string({
       char: 'm',
-      description: 'Chain metadata file',
+      description: `Chain metadata source. \
+If starts with ws:// or wss:// the metadata is pulled by an RPC call to the provided endpoint. \
+Otherwise a relative path to a json file matching the RPC call response is expected`,
       default: 'metadata.json',
     }),
     blockHash: flags.string({
       char: 'h',
       description:
-        'Hash of the block from where the metadata should be fetched',
+        'Hash of the block from which the metadata will be fetched. Only applied if metadata is pulled via an RPC call',
     }),
     typedefs: flags.string({
       char: 't',
-      description: 'JSON definitions for custom types used by the chain',
+      description:
+        'A relative path to a file with JSON definitions for custom types used by the chain',
     }),
     typelib: flags.string({
       char: 'i',
-      description:
-        'Destination from where the custom types should be imported, if provided',
+      description: `A JavaScript module from which the custom types should be imported, e.g. '@joystream/types/augment'`,
     }),
     outDir: flags.string({
       char: 'o',
-      description: 'Root folder to output generated files',
+      description:
+        'A relative path the root folder where the generated files will be generated',
       default: 'generated/types',
     }),
     strict: flags.boolean({
       char: 's',
-      description:
-        'If the generated code should pre-validate event argument types',
+      description: `Strict mode. If on, the generated code throws an error if the input event argument \
+types don't much the metadata definiton`,
       default: true,
     }),
-    verbose: flags.boolean({ char: 'v' }),
+    //verbose: flags.boolean({ char: 'v' }),
   }
 
   async run(): Promise<void> {
