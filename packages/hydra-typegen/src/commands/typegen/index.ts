@@ -73,6 +73,7 @@ Otherwise a relative path to a json file matching the RPC call response is expec
       char: 's',
       description: `Strict mode. If on, the generated code throws an error if the input event argument \
 types don't much the metadata definiton`,
+      allowNo: true,
       default: true,
     }),
     // verbose: flags.boolean({ char: 'v' }),

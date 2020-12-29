@@ -63,4 +63,4 @@ yarn server:start:dev
 
 ## Custom chains
 
-If there is no public Hydra Indexer readily available, one should set-up a self-hosted [indexer](../hydra-indexer/README.md) and [indexer-api-gateway](../hydra-indexer-gateway/README.md). The simplest way is set it up is to run pre-built docker images for `indexer` and `indexer-api-gateway` as defined in `docker-compose.yml`. 
+If there is no public Hydra Indexer readily available, one should set-up a self-hosted [indexer](../hydra-indexer/README.md) and [indexer-api-gateway](../hydra-indexer-gateway/README.md). The simplest way is set it up is to run pre-built docker images for `indexer` and `indexer-api-gateway` as defined in `docker-compose.yml`.
