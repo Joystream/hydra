@@ -1,17 +1,13 @@
 import { GeneratorConfig, ImportsDef } from './types'
-import { ModuleMeta, strippedArgTypes } from '../metadata'
+import { ModuleMeta, stripTypes } from '../metadata'
 
 export function buildModuleImports(
-  { events }: ModuleMeta,
+  { types }: ModuleMeta,
   { importsRegistry }: GeneratorConfig
 ): ImportsDef {
-  const allToImport: string[] = []
-
-  events.forEach((e) => allToImport.push(...strippedArgTypes(e)))
-
   const importsDef: ImportsDef = {}
 
-  allToImport.forEach((i) => {
+  types.forEach((i) => {
     if (importsRegistry[i] === undefined) {
       throw new Error(`Cannot resolve import for type ${i}`)
     }

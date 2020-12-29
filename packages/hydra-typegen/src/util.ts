@@ -56,3 +56,17 @@ export function formatWithPrettier(
   }
   return formatted
 }
+
+export type Key = string | number
+
+export function pushToDictionary<V>(
+  dict: Record<Key, V[]>,
+  key: Key,
+  ...values: V[]
+): void {
+  if (dict[key] === undefined) {
+    dict[key] = [...values]
+  } else {
+    dict[key].push(...values)
+  }
+}

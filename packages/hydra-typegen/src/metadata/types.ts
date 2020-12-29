@@ -1,15 +1,22 @@
 import { Option, Vec } from '@polkadot/types/codec'
-import { Type, Text } from '@polkadot/types/primitive'
+import { Text } from '@polkadot/types/primitive'
 import { Codec } from '@polkadot/types/types'
 
-type Arg = { type: Type } & Codec
+export type Arg = {
+  type: Text
+  name: Text
+} & Codec
 
-type Call = { args: Vec<Arg> } & Codec
+export type Call = {
+  args: Vec<Arg>
+  name: Text
+  documentation?: Vec<Text>
+} & Codec
 
-type Calls = Option<Vec<Call>>
+export type Calls = Option<Vec<Call>>
 
 export type Event = {
-  args: Vec<Type>
+  args: Vec<Text>
   documentation?: Vec<Text>
   name: Text
 } & Codec
@@ -17,6 +24,7 @@ export type Event = {
 export type ModuleMeta = {
   module: Module
   events: Event[]
+  calls: Call[]
   types: string[]
 }
 

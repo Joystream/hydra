@@ -1,18 +1,14 @@
-import { strippedArgTypes } from './events'
-import { Event } from './types'
+import { stripTypes } from './extract'
 import { expect } from 'chai'
 
 describe('events', () => {
   it('should parse arg types', () => {
-    const event = ({
-      args: [
-        'Vec<u32>',
-        'AccountId & Codec',
-        'Balance | LookupSource<Balance>',
-      ],
-      name: 'testEvent',
-    } as unknown) as Event
-    const types = strippedArgTypes(event)
+    const argTypes = [
+      'Vec<u32>',
+      'AccountId & Codec',
+      'Balance | LookupSource<Balance>',
+    ]
+    const types = stripTypes(argTypes)
     console.log(types.join(','))
 
     expect(types).to.include.members(['Vec', 'u32'])

@@ -6,7 +6,7 @@ import Debug from 'debug'
 import { getMetadata, registerCustomTypes } from '../../metadata/metadata'
 import { extractMeta, ExtractedMetadata, TypeDefs } from '../../metadata'
 import {
-  generateEventTypes,
+  generateModuleTypes,
   GeneratorConfig,
   buildImportsRegistry,
   generateIndex,
@@ -21,6 +21,7 @@ export type CustomTypes = {
 export interface IConfig {
   metadata: ExtractedMetadata
   events: string[]
+  calls: string[]
   customTypes?: CustomTypes
   dest: string
   strict: boolean
@@ -33,15 +34,15 @@ export default class Typegen extends Command {
 
   static usage = 'typegen Balances.transfer,Treasury.depositCreated'
 
-  static args = [
-    {
-      name: 'events',
-      description: 'Comma-separated list of events',
-      required: true,
-    },
-  ]
-
   static flags = {
+    events: flags.string({
+      char: 'e',
+      description: `Comma-separated list of substrate events in the formation <module>.<name>`,
+    }),
+    calls: flags.string({
+      char: 'c',
+      description: `Comma-separated list of substrate calls in the format <module>.<name>`,
+    }),
     metadata: flags.string({
       char: 'm',
       description: `Chain metadata source. \
@@ -80,7 +81,7 @@ types don't much the metadata definiton`,
   }
 
   async run(): Promise<void> {
-    const { flags, args } = this.parse(Typegen)
+    const { flags } = this.parse(Typegen)
 
     // TODO: we can in fact replace metadata and typedefs
     // for popular chains with just chain spec
@@ -98,8 +99,22 @@ types don't much the metadata definiton`,
       }
     }
 
+    const events: string[] = flags.events
+      ? flags.events.split(',').map((e) => e.trim())
+      : []
+    const calls: string[] = flags.calls
+      ? flags.calls.split(',').map((c) => c.trim())
+      : []
+
+    if (events.length === 0 && calls.length === 0) {
+      throw new Error(
+        `Nothing to generate: at least one event or call should be provided.`
+      )
+    }
+
     const config: IConfig = {
-      events: args.events.split(',').map((e: string) => e.trim()),
+      events,
+      calls,
       dest: path.join(process.cwd(), flags.outDir),
       metadata: await getMetadata({
         source: flags.metadata,
@@ -126,7 +141,7 @@ types don't much the metadata definiton`,
       dest,
     }
 
-    generateEventTypes(generatorConfig)
+    generateModuleTypes(generatorConfig)
     generateIndex(generatorConfig)
   }
 }

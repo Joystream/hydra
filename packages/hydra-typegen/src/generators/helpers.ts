@@ -1,6 +1,6 @@
 import Handlebars from 'handlebars'
 import { ImportsDef } from './types'
-import { kebabCase, countBy, last, camelCase } from 'lodash'
+import { kebabCase, countBy, last, camelCase, upperFirst } from 'lodash'
 
 const debug = require('debug')('hydra-typegen:metadata')
 
@@ -14,6 +14,14 @@ handlebars.registerHelper({
 
   kebabCase(s: string) {
     return kebabCase(s)
+  },
+
+  camelCase(s: string) {
+    return camelCase(s)
+  },
+
+  pascalCase(s: string) {
+    return upperFirst(camelCase(s))
   },
 
   getters() {

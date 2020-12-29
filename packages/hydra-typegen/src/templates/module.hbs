@@ -52,5 +52,30 @@ export namespace {{module.name}} {
         {{{getters}}}
         
     }
+    {{/each calls}}
+    {{#if documentation}}
+    /**
+    {{#each documentation}}
+     * {{{this}}}
+    {{/each}}
+     */
+    {{/if}}
+    export class {{name}}Call {
+        constructor(public readonly ctx: SubstrateEvent) {}
+
+        get args(): {{name}}_Args {
+            return new {{name}}_Args(this.ctx)
+        }
+    }
+
+    class {{name}}_Args {
+    
+        constructor(public readonly ctx: SubstrateEvent) {}
+
+        {{{getters}}}
+        
+    }
+
+
     {{/each}}
 }

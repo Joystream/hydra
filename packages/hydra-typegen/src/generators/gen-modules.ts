@@ -8,33 +8,32 @@ import { kebabCase } from 'lodash'
 
 const debug = require('debug')('hydra-typegen:gen-events')
 
-const generateEventTypeTemplate = handlebars.compile(readTemplate('events'))
+const generateModuleTemplate = handlebars.compile(readTemplate('module'))
 
-export function generateEventTypes(config: GeneratorConfig): void {
+export function generateModuleTypes(config: GeneratorConfig): void {
   const { modules, dest } = config
   modules.forEach((meta) => {
     const { module } = meta
+    const props = buildModuleProps(meta, config)
     writeFile(path.join(dest, `${kebabCase(module.name.toString())}.ts`), () =>
-      formatWithPrettier(getEventTypes(meta, config))
+      formatWithPrettier(generateModuleTemplate(props))
     )
   })
   debug('Done writing event types')
 }
 
-export function getEventTypes(
+export function buildModuleProps(
   meta: ModuleMeta,
   config: GeneratorConfig
-): string {
+): unknown {
   const { validateArgs } = config
   const imports = buildModuleImports(meta, config)
 
   debug(`Imports: ${JSON.stringify(imports, null, 2)}`)
 
-  const { module, events } = meta
-  return generateEventTypeTemplate({
+  return {
     validateArgs,
     imports,
-    module,
-    events,
-  })
+    ...meta,
+  }
 }
