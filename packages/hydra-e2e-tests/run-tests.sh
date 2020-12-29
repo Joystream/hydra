@@ -3,7 +3,7 @@
 cleanup()
 {
   (echo "## Processor Logs ##" && docker logs hydra-e2e-tests_hydra-processor_1 --tail 50) || :
-  (echo "## Processor Server Logs ##" && docker logs hydra-e2e-tests_processor-gql-server_1 --tail 50) || :  
+  (echo "## Query Node Logs ##" && docker logs hydra-e2e-tests_query-node_1 --tail 50) || :  
   (echo "## Indexer Logs ##" && docker logs hydra-e2e-tests_hydra-indexer_1 --tail 50) || :  
   (echo "## Indexer API Server ##" && docker logs hydra-e2e-tests_hydra-indexer-gateway_1 --tail 50) || :  
   yarn post-e2e-test
@@ -18,7 +18,15 @@ docker build . -t hydra-test:latest
 docker build ../hydra-indexer -t hydra-indexer:latest
 docker build ../hydra-indexer-gateway -t hydra-indexer-gateway:latest
 
-docker-compose up -d
+docker-compose up -d substrate
+docker-compose up -d hydra-indexer
+docker-compose up -d hydra-indexer-gateway
+
+sleep 10
+
+docker-compose up -d hydra-processor
+docker-compose up -d query-node
+
 # wait for the indexer api to start 
 attempt_counter=0
 max_attempts=10

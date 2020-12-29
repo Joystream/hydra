@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  processor-gql-server:
+  query-node:
     image: hydra-test:latest
     build: ./schema
     restart: unless-stopped
@@ -17,7 +17,9 @@ services:
       - "4000:4000"
     depends_on:
       - hydra-processor
-    command: ["yarn", "workspace", "e2e-test", "server:start:prod"]
+    command: ["yarn", "workspace", "sample", "query-node:start:prod"]
+
+
 
   hydra-processor:
     image: hydra-test:latest
@@ -36,12 +38,17 @@ services:
       - TYPEORM_HOST=db
       - TYPEORM_PORT=5432
       - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:4000/graphql
+      - NODE_URL=ws://substrate:9944
       - PROCESSOR_POLL_INTERVAL=300 # refresh every second 
       - DEBUG=index-builder:*
     depends_on:
       - hydra-indexer-gateway
     command: >
-      sh -c "yarn workspace e2e-test configure && yarn workspace e2e-test db:prepare && yarn workspace e2e-test db:migrate && yarn workspace e2e-test processor:start"
+      sh -c "yarn workspace sample query-node:configure && \
+             yarn workspace sample db:prepare && \
+             yarn workspace sample db:migrate && \
+             yarn workspace sample mappings:build && \
+             yarn workspace sample processor:start"
   
   hydra-indexer:
     image: hydra-indexer:latest
