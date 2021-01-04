@@ -1,10 +1,18 @@
 import Handlebars from 'handlebars'
 import { ImportsDef } from './types'
 import { kebabCase, countBy, last, camelCase, upperFirst } from 'lodash'
+import { Arg } from '../metadata'
+import { warn } from '../log'
 
 const debug = require('debug')('hydra-typegen:metadata')
 
 export const handlebars = Handlebars.create()
+
+const callArgValueGetter = (ctxIndex: number) =>
+  `[this.ctx.extrinsic.args[${ctxIndex}].value]`
+
+const eventParamValueGetter = (ctxIndex: number) =>
+  `[this.ctx.param[${ctxIndex}].value]`
 
 handlebars.registerHelper({
   imports() {
@@ -25,10 +33,20 @@ handlebars.registerHelper({
   },
 
   getters() {
-    const { args } = (this as unknown) as { args: string[] }
-    return renderArgs(args)
+    const { args } = (this as unknown) as { args: string[] | Arg[] }
+    return isTypeOnlyArgs(args)
+      ? renderTypeOnlyArgs(args, eventParamValueGetter)
+      : renderNamedArgs(args, callArgValueGetter)
   },
 })
+
+function isTypeOnlyArgs(args: string[] | Arg[]): args is string[] {
+  if (args.length === 0) {
+    warn(`WARNING: empty arguments list`)
+    return true
+  }
+  return 'name' in (args[0] as any)
+}
 
 export function renderImports(imports: ImportsDef): string {
   const defs = Object.keys(imports).map((loc: string) => ({
@@ -47,11 +65,33 @@ export function renderImports(imports: ImportsDef): string {
   }, '')
 }
 
-export function renderArgs(args: string[]): string {
-  const grouped = countBy(args)
+export function renderNamedArgs(
+  args: Arg[],
+  ctxValueGetter: (ctxIndex: number) => string
+): string {
+  return args.reduce((result, arg: Arg, index) => {
+    const type = arg.type.toString()
+    const name = camelCase(arg.name.toString())
+    const getStmt =
+      // prettier-ignore
+      `get ${name}(): ${type} {
+          return {
+            ${renderCreateTypeStmt(type, ctxValueGetter(index))}
+          }
+       }`
+
+    return `${result}\n${getStmt}\n`
+  }, '')
+}
+
+export function renderTypeOnlyArgs(
+  argTypes: string[],
+  ctxValueGetter: (ctxIndex: number) => string
+): string {
+  const grouped = countBy(argTypes)
   const typeToIndices: Record<string, number[]> = {}
 
-  args.forEach((a, i) => {
+  argTypes.forEach((a, i) => {
     if (typeToIndices[a]) {
       typeToIndices[a].push(i)
     } else {
@@ -59,12 +99,12 @@ export function renderArgs(args: string[]): string {
     }
   })
 
-  return args.reduce((result, argType, index) => {
+  return argTypes.reduce((result, argType: string, index) => {
     let getStmt = ''
 
     if (grouped[argType] === 1) {
       getStmt = `get ${nameFromType(argType)}(): ${argType} {
-        return ${renderCreateTypeStmt(argType, index)}
+        return ${renderCreateTypeStmt(argType, ctxValueGetter(index))}
       }`
       // once we at the last index of that type
     } else if (index === last(typeToIndices[argType])) {
@@ -72,7 +112,7 @@ export function renderArgs(args: string[]): string {
         // prettier-ignore
         `get ${nameFromType(argType)}s(): { [key: number]: ${argType} } {
           return {
-            ${renderCreateTypesArray(argType, typeToIndices[argType])}
+            ${renderCreateTypesArray(argType, typeToIndices[argType], ctxValueGetter)}
           }
         }`
     }
@@ -80,17 +120,36 @@ export function renderArgs(args: string[]): string {
   }, '')
 }
 
-function renderCreateTypesArray(argType: string, indices: number[]) {
+function renderCreateTypesArray(
+  argType: string,
+  indices: number[],
+  ctxValueGetter: (ctxIndex: number) => string
+) {
   return indices.reduce(
     (result, argIndex, i) =>
-      `${result}${i}: ${renderCreateTypeStmt(argType, argIndex)},\n`,
+      `${result}${i}: ${renderCreateTypeStmt(
+        argType,
+        ctxValueGetter(argIndex)
+      )},\n`,
     ''
   )
 }
 
-function renderCreateTypeStmt(argType: string, argIndex: number) {
+function renderCreateTypeStmt(argType: string, ctxValueGetter: string) {
   return `createTypeUnsafe<${argType} & Codec>(
-            typeRegistry, '${argType}', [this.ctx.params[${argIndex}].value]) `
+            typeRegistry, '${argType}', ${ctxValueGetter}) `
+}
+
+export function inferName(arg: string | Arg): string {
+  if (typeof arg === 'string') {
+    return nameFromType(arg)
+  }
+
+  if (arg.name !== undefined) {
+    return arg.name.toString()
+  }
+
+  return nameFromType(arg.type.toRawType())
 }
 
 export function nameFromType(rawType: string): string {

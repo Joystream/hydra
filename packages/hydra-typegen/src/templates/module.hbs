@@ -60,15 +60,15 @@ export namespace {{module.name}} {
     {{/each}}
      */
     {{/if}}
-    export class {{name}}Call {
+    export class {{pascalCase name}}Call {
         constructor(public readonly ctx: SubstrateEvent) {}
 
-        get args(): {{name}}_Args {
-            return new {{name}}_Args(this.ctx)
+        get args(): {{pascalCase name}}_Args {
+            return new {{pascalCase name}}_Args(this.ctx)
         }
     }
 
-    class {{name}}_Args {
+    class {{pascalCase name}}_Args {
     
         constructor(public readonly ctx: SubstrateEvent) {}
 
