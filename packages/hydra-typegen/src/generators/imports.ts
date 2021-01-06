@@ -1,5 +1,5 @@
 import { GeneratorConfig, ImportsDef } from './types'
-import { ModuleMeta, stripTypes } from '../metadata'
+import { ModuleMeta } from '../metadata'
 
 export function buildModuleImports(
   { types }: ModuleMeta,

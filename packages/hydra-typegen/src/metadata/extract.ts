@@ -3,10 +3,18 @@ import { registry } from './metadata'
 import { uniq, compact } from 'lodash'
 import { Vec } from '@polkadot/types/codec'
 import { Text } from '@polkadot/types/primitive'
-import { ExtractedMetadata, Module, ModuleMeta, Event, Call } from './types'
+import {
+  ExtractedMetadata,
+  Module,
+  ModuleMeta,
+  Event,
+  Call,
+  weakEquals,
+} from './types'
 import { pushToDictionary } from '../util'
+import { builtInClasses } from './default-types'
 
-const debug = require('debug')('hydra-typegen:events')
+const debug = require('debug')('hydra-typegen:extract')
 
 export function extractMeta({
   metadata,
@@ -21,7 +29,7 @@ export function extractMeta({
   for (const e of events) {
     const [module, event] = findEvent(metadata, e)
     const name = module.name.toString()
-
+    modules[name] = module
     pushToDictionary(moduleEvents, name, event)
     pushToDictionary(moduleTypes, name, ...stripTypes(event.args))
   }
@@ -29,7 +37,7 @@ export function extractMeta({
   for (const c of calls) {
     const [module, call] = findCall(metadata, c)
     const name = module.name.toString()
-
+    modules[name] = module
     pushToDictionary(moduleCalls, name, call)
     pushToDictionary(
       moduleTypes,
@@ -52,7 +60,7 @@ function findCall(
 ): [Module, Call] {
   const [moduleName, method] = callName.split('.')
 
-  const module = metadata.modules.find((v) => v.name.toString() === moduleName)
+  const module = metadata.modules.find((v) => weakEquals(v.name, moduleName))
 
   if (module === undefined || module.calls === undefined) {
     throw new Error(`No metadata found for module ${moduleName}`)
@@ -60,7 +68,7 @@ function findCall(
 
   const call = module.calls
     .unwrapOr<Call[]>([])
-    .find((e) => e.name.toString() === method)
+    .find((c) => weakEquals(c.name, method))
 
   if (call === undefined) {
     throw new Error(`No metadata found for the call ${callName}`)
@@ -77,7 +85,7 @@ function findEvent(
 ): [Module, Event] {
   const [moduleName, method] = eventName.split('.')
 
-  const module = metadata.modules.find((v) => v.name.toString() === moduleName)
+  const module = metadata.modules.find((v) => weakEquals(v.name, moduleName))
 
   if (module === undefined || module.events === undefined) {
     throw new Error(`No metadata found for module ${moduleName}`)
@@ -85,7 +93,7 @@ function findEvent(
 
   const event = module.events
     .unwrapOr<Event[]>([])
-    .find((e) => e.name.toString() === method)
+    .find((e) => weakEquals(e.name, method))
 
   if (event === undefined) {
     throw new Error(`No metadata found for the event ${eventName}`)
@@ -97,8 +105,9 @@ function findEvent(
 }
 
 function validateTypes(argTypes: string[] | Text[] | Vec<Text>) {
-  for (const t of stripTypes(argTypes)) {
-    if (!registry.hasType(t)) {
+  const stripped = stripTypes(argTypes)
+  for (const t of stripped) {
+    if (!builtInClasses.includes(t) && !registry.hasType(t)) {
       throw new Error(
         `Cannot find a type defintion for ${t}. Make sure it is included in the type definition file`
       )

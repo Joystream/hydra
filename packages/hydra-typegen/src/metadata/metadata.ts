@@ -81,12 +81,17 @@ async function fromChain(endpoint: string, blockHash = ''): Promise<string> {
         debug('connected')
         // TODO: support chain height
         websocket.send(
-          `{"id":"1","jsonrpc":"2.0","method":"state_getMetadata","params":[${blockHash}]}`
+          `{"id":"1","jsonrpc":"2.0","method":"state_getMetadata","params":["${blockHash}"]}`
         )
       }
 
       websocket.onmessage = (message: any): void => {
-        resolve(JSON.parse(message.data).result)
+        const data = JSON.parse(message.data)
+        if (data.error) {
+          reject(new Error(`RPC error: ${JSON.stringify(data.error, null, 2)}`))
+        } else {
+          resolve(data.result)
+        }
         websocket.close()
       }
     } catch (e) {

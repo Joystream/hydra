@@ -6,7 +6,7 @@ import { GeneratorConfig } from '.'
 import { handlebars } from './helpers'
 import { kebabCase } from 'lodash'
 
-const debug = require('debug')('hydra-typegen:gen-events')
+const debug = require('debug')('hydra-typegen:gen-modules')
 
 const generateModuleTemplate = handlebars.compile(readTemplate('module'))
 

@@ -4,15 +4,15 @@ import { kebabCase, countBy, last, camelCase, upperFirst } from 'lodash'
 import { Arg } from '../metadata'
 import { warn } from '../log'
 
-const debug = require('debug')('hydra-typegen:metadata')
+const debug = require('debug')('hydra-typegen:helpers')
 
 export const handlebars = Handlebars.create()
 
 const callArgValueGetter = (ctxIndex: number) =>
-  `[this.ctx.extrinsic.args[${ctxIndex}].value]`
+  `[this.extrinsic.args[${ctxIndex}].value]`
 
 const eventParamValueGetter = (ctxIndex: number) =>
-  `[this.ctx.param[${ctxIndex}].value]`
+  `[this.ctx.params[${ctxIndex}].value]`
 
 handlebars.registerHelper({
   imports() {
@@ -32,15 +32,22 @@ handlebars.registerHelper({
     return upperFirst(camelCase(s))
   },
 
+  toString(s: any) {
+    if (s.toString !== undefined) {
+      return s.toString()
+    }
+    return JSON.stringify(s)
+  },
+
   getters() {
     const { args } = (this as unknown) as { args: string[] | Arg[] }
-    return isTypeOnlyArgs(args)
-      ? renderTypeOnlyArgs(args, eventParamValueGetter)
-      : renderNamedArgs(args, callArgValueGetter)
+    return isNamedArgs(args)
+      ? renderNamedArgs(args, callArgValueGetter)
+      : renderTypeOnlyArgs(args, eventParamValueGetter)
   },
 })
 
-function isTypeOnlyArgs(args: string[] | Arg[]): args is string[] {
+function isNamedArgs(args: string[] | Arg[]): args is Arg[] {
   if (args.length === 0) {
     warn(`WARNING: empty arguments list`)
     return true
@@ -69,15 +76,14 @@ export function renderNamedArgs(
   args: Arg[],
   ctxValueGetter: (ctxIndex: number) => string
 ): string {
+  debug(`Rendering named args: ${JSON.stringify(args, null, 2)}`)
   return args.reduce((result, arg: Arg, index) => {
     const type = arg.type.toString()
     const name = camelCase(arg.name.toString())
     const getStmt =
       // prettier-ignore
       `get ${name}(): ${type} {
-          return {
-            ${renderCreateTypeStmt(type, ctxValueGetter(index))}
-          }
+          return ${renderCreateTypeStmt(type, ctxValueGetter(index))}
        }`
 
     return `${result}\n${getStmt}\n`
@@ -88,6 +94,8 @@ export function renderTypeOnlyArgs(
   argTypes: string[],
   ctxValueGetter: (ctxIndex: number) => string
 ): string {
+  debug(`Rendering type only args: ${JSON.stringify(argTypes, null, 2)}`)
+
   const grouped = countBy(argTypes)
   const typeToIndices: Record<string, number[]> = {}
 

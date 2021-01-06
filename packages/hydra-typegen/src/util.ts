@@ -23,7 +23,7 @@ export function readJson(
   return JSON.parse(readFile(source, root))
 }
 
-export function writeFile(dest: string, generator: () => string) {
+export function writeFile(dest: string, generator: () => string): void {
   log(`${dest}\n\tGenerating`)
 
   let generated = generator()

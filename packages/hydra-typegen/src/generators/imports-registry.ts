@@ -1,14 +1,9 @@
-import * as codecClasses from '@polkadot/types/codec'
-import * as extrinsicClasses from '@polkadot/types/extrinsic'
-import * as genericClasses from '@polkadot/types/generic'
-import * as primitiveClasses from '@polkadot/types/primitive'
-import * as interfaceDefinitions from '@polkadot/types/interfaces/definitions'
-import { Json, Raw } from '@polkadot/types/codec'
 import { ImportsRegistry } from './types'
 import { CustomTypes } from '../commands/typegen'
 import { warn } from '../log'
+import { builtInClasses, builtInInterfaceDefs } from '../metadata/default-types'
 
-const debug = require('debug')('hydra-typegen:events-gen')
+const debug = require('debug')('hydra-typegen:imports-registry')
 
 const KNOWN_LOCATIONS = {
   interfaces: '@polkadot/types/interfaces',
@@ -33,27 +28,14 @@ const METADATA = ['Metadata']
 const LOCAL = ['typeRegistry']
 const HYDRA_COMMON = ['substrate']
 
-const primitive = {
-  ...primitiveClasses,
-  Json,
-  Raw,
-}
-
 export function buildImportsRegistry(
   customTypes: CustomTypes | undefined
 ): ImportsRegistry {
   const importsRegistry = {}
   // add primitive classes
-  const typeClasses = [
-    ...Object.keys(primitive).filter((name) => !name.includes('Generic')),
-    ...Object.keys(codecClasses as Record<string, unknown>).filter(
-      (name) => !NO_CODEC.includes(name)
-    ),
-    ...Object.keys(genericClasses as Record<string, unknown>),
-    ...Object.keys(extrinsicClasses as Record<string, unknown>),
-  ]
+  const typeClasses = builtInClasses.filter((name) => !NO_CODEC.includes(name))
 
-  debug(`${typeClasses.join(',')}`)
+  debug(`Built-in classes: ${typeClasses.join(',')}`)
 
   typeClasses.forEach((primitiveName) => {
     importsRegistry[primitiveName] = KNOWN_LOCATIONS.types
@@ -89,7 +71,7 @@ export function buildImportsRegistry(
 }
 
 function addPolkadotInterfaces(importsRegistry: ImportsRegistry) {
-  Object.entries(interfaceDefinitions).forEach(([, packageDef]): void => {
+  Object.entries(builtInInterfaceDefs).forEach(([, packageDef]): void => {
     Object.keys(packageDef.types).forEach((type): void => {
       if (importsRegistry[type]) {
         warn(

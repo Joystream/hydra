@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "rm -rf lib && tsc --build tsconfig.json",
-    "run-dev": "DEBUG=hydra-typegen:* node ./bin/run",
+    "run-dev": "node ./bin/run",
     "postpack": "rm -f oclif.manifest.json",
     "lint": "eslint . --cache --ext .ts",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",

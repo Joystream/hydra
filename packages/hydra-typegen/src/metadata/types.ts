@@ -1,6 +1,7 @@
 import { Option, Vec } from '@polkadot/types/codec'
 import { Text } from '@polkadot/types/primitive'
 import { Codec } from '@polkadot/types/types'
+import { lowerCase } from 'lodash'
 
 export type Arg = {
   type: Text
@@ -62,3 +63,10 @@ export type TypeDefs = Record<
   | { _enum: string[] | Record<string, string | null> }
   | { _set: Record<string, number> }
 >
+
+export function weakEquals(s1: string | Text, s2: string | Text): boolean {
+  if (s1 === undefined || s2 === undefined) {
+    return false
+  }
+  return lowerCase(s1.toString()) === lowerCase(s2.toString())
+}

@@ -27,7 +27,7 @@
     "codegen:all": "hydra-cli codegen",
     "codegen:processor": "hydra-cli codegen --no-graphql",
     "codegen:query-node": "hydra-cli codegen --no-processor",
-    "codegen:mappings-types": "hydra-typegen typegen --outDir ./mappings/generated/types --no-strict --metadata ${NODE_URL:-wss://kusama-rpc.polkadot.io} ${EVENTS:-Balances.Transfer}",
+    "codegen:mappings-types": "hydra-typegen typegen --outDir ./mappings/generated/types --no-strict --metadata ${NODE_URL:-wss://kusama-rpc.polkadot.io} --events ${EVENTS:-Balances.Transfer} --blockHash 0x45eb7ddd324361adadd4f8cfafadbfb7e0a26393a70a70e5bee6204fc46af62e --calls ${CALLS:-Balances.transfer,Sudo.sudo} --debug",
     "mappings:build": "rm -rf ./mappings/generated && yarn codegen:mappings-types && yarn workspace sample-mappings build",
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",

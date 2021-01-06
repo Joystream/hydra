@@ -75,13 +75,21 @@ Otherwise a relative path to a json file matching the RPC call response is expec
       description: `Strict mode. If on, the generated code throws an error if the input event argument \
 types don't much the metadata definiton`,
       allowNo: true,
-      default: true,
+      default: false,
     }),
-    // verbose: flags.boolean({ char: 'v' }),
+    debug: flags.boolean({
+      description: `Output debug info`,
+      char: 'd',
+      default: false,
+    }),
   }
 
   async run(): Promise<void> {
     const { flags } = this.parse(Typegen)
+
+    if (flags.debug) {
+      Debug.enable('hydra-typegen:*')
+    }
 
     // TODO: we can in fact replace metadata and typedefs
     // for popular chains with just chain spec
