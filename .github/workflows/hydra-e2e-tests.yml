@@ -16,5 +16,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: run e2e tests
         run: |
-          yarn && yarn workspaces run build && yarn e2e-test
+          yarn 
+          yarn workspace @dzlzv/bn-typeorm build
+          yarn workspace @dzlzv/hydra-common build
+          yarn workspace @dzlzv/hydra-db-utils build
+          yarn workspace @dzlzv/hydra-processor build
+          yarn workspace @dzlzv/hydra-cli build
+          yarn workspace @dzlzv/apps-config build
+          yarn workspace hydra-typegen build 
+          yarn e2e-test
  

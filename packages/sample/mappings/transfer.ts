@@ -17,6 +17,7 @@ export async function balancesTransfer(
   transfer.block = event.ctx.blockNumber
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
   transfer.insertedAt = new Date()
+  console.log(`Saving ${JSON.stringify(transfer, null, 2)}`)
 
   await db.save<Transfer>(transfer)
 }

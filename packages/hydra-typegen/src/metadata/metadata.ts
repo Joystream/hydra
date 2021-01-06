@@ -60,7 +60,11 @@ export function registerCustomTypes(typeDefs: string): TypeDefs {
 //   }
 // }
 
-async function fromChain(endpoint: string, blockHash = ''): Promise<string> {
+async function fromChain(
+  endpoint: string,
+  blockHash: string | undefined
+): Promise<string> {
+  const blockHashParam = blockHash ? `"${blockHash}"` : ''
   return new Promise<string>((resolve, reject) => {
     try {
       const websocket = new WS(endpoint)
@@ -81,7 +85,7 @@ async function fromChain(endpoint: string, blockHash = ''): Promise<string> {
         debug('connected')
         // TODO: support chain height
         websocket.send(
-          `{"id":"1","jsonrpc":"2.0","method":"state_getMetadata","params":["${blockHash}"]}`
+          `{"id":"1","jsonrpc":"2.0","method":"state_getMetadata","params":[${blockHashParam}]}`
         )
       }
 

@@ -10,6 +10,8 @@
       "**/apps-config",
       "**/apps-config/**",
       "**/hydra-typegen",
+      "**/sample/generated/graphql-server",
+      "**/sample/generated/graphql-server/**",
       "**/hydra-typegen/**"
     ]
   },

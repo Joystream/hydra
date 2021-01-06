@@ -15,8 +15,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: lint
         run: |
-          yarn && yarn workspaces run lint
+          yarn 
+          yarn workspaces run lint
       - name: run unit tests
         run: |
-          yarn && yarn workspace @dzlzv/hydra-cli test && yarn workspace hydra-typegen test
+          yarn  
+          yarn workspace @dzlzv/hydra-cli test 
+          yarn workspace hydra-typegen test
  

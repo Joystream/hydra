@@ -18,14 +18,7 @@ docker build . -t hydra-test:latest
 docker build ../hydra-indexer -t hydra-indexer:latest
 docker build ../hydra-indexer-gateway -t hydra-indexer-gateway:latest
 
-docker-compose up -d substrate
-docker-compose up -d hydra-indexer
-docker-compose up -d hydra-indexer-gateway
-
-sleep 10
-
-docker-compose up -d hydra-processor
-docker-compose up -d query-node
+docker-compose up -d
 
 # wait for the indexer api to start 
 attempt_counter=0
