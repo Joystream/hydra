@@ -1,7 +1,7 @@
 {
   "name": "sample",
   "version": "1.0.0",
-  "description": "GraphQL server and Substrate indexer. Generated with \u2665 by Hydra-CLI",
+  "description": "GraphQL server and Substrate indexer. Generated with ♥ by Hydra-CLI",
   "scripts": {
     "build": "yarn clean && yarn codegen:all",
     "lint": "echo \"Skippinng\"",
@@ -28,12 +28,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "tslib": "^2.0.0",
+    "@dzlzv/hydra-cli": "^0.1.5-3",
     "@types/bn.js": "^4.11.6",
-    "bn.js": "^5.1.2"
+    "bn.js": "^5.1.2",
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "0.1.3",
     "@dzlzv/hydra-common": "^0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
     "@dzlzv/hydra-processor": "^0.0.5"
