@@ -381,7 +381,6 @@
     mustache "^4.0.1"
     pluralize "^8.0.0"
     tslib "1.11.2"
-    typeorm-model-generator "^0.4.2"
     warthog "https://github.com/metmirr/warthog/releases/download/v2.22.0/warthog-v2.22.0.tgz"
 
 "@dzlzv/hydra-common@^0.0.2":
@@ -11440,25 +11439,6 @@ typedi@^0.8.0:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/typedi/-/typedi-0.8.0.tgz#d8e203bd1d41a96e2b0a5c6295147d74b2b2d03e"
   integrity sha512-/c7Bxnm6eh5kXx2I+mTuO+2OvoWni5+rXA3PhXwVWCtJRYmz3hMok5s1AKLzoDvNAZqj/Q/acGstN0ri5aQoOA==
-
-typeorm-model-generator@^0.4.2:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/typeorm-model-generator/-/typeorm-model-generator-0.4.3.tgz#98f12d2801a7e9d1e8ddf3a24c77926f767827d5"
-  integrity sha512-4qb6Ga9q9kVc6oOUNa2lLOZyYBaCb9OceSBBTFcK+nj52t2blFat/6MY8/ER4rWpAgr2PsTzc+/eyrdtYOHeyw==
-  dependencies:
-    change-case "^4.1.1"
-    fs-extra "^9.0.1"
-    handlebars "^4.7.6"
-    inquirer "^7.3.3"
-    mssql "^6.2.1"
-    mysql "^2.18.1"
-    pg "^8.3.3"
-    pluralize "^8.0.0"
-    prettier "^2.1.1"
-    reflect-metadata "^0.1.13"
-    sqlite3 "^5.0.0"
-    typeorm "^0.2.26"
-    yargs "^16.0.3"
 
 typeorm-typedi-extensions@^0.2.3:
   version "0.2.3"
