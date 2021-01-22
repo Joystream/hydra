@@ -61,7 +61,7 @@ services:
       - REDIS_URI=redis://redis:6379/0
       - DEBUG=index-builder:*
     command: > 
-      sh -c "yarn db:bootstrap && yarn start:prod" 
+      sh -c "yarn workspace @dzlzv/hydra-indexer db:bootstrap && yarn workspace @dzlzv/hydra-indexer start:prod" 
     depends_on:
       - substrate
       - redis

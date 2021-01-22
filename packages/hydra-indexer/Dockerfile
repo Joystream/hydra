@@ -1,26 +1,27 @@
-FROM node:12-alpine as builder 
+FROM node:12-alpine
 
 # TODO: optimize this
 #
-RUN mkdir -p /home/hydra-indexer-builder
-WORKDIR /home/hydra-indexer-builder
+RUN mkdir -p /home/hydra && chown -R node:node /home/hydra
 
-COPY src ./src
-COPY *.json ./
-COPY *.js ./
+WORKDIR /home/hydra
 
-
-RUN yarn 
-RUN yarn build 
-
-FROM node:12-alpine
-
-RUN mkdir -p /home/hydra-indexer && chown -R node:node /home/hydra-indexer
-WORKDIR /home/hydra-indexer
-
-COPY --from=builder --chown=node:node /home/hydra-indexer-builder/lib ./lib
-COPY --from=builder --chown=node:node /home/hydra-indexer-builder/node_modules ./node_modules
+## Add one by one for better caching
+ADD --chown=node:node ./packages/apps-config ./packages/apps-config
+ADD --chown=node:node ./packages/bn-typeorm ./packages/bn-typeorm
+ADD --chown=node:node ./packages/hydra-common ./packages/hydra-common
+ADD --chown=node:node ./packages/hydra-db-utils ./packages/hydra-db-utils
+ADD --chown=node:node ./packages/hydra-indexer ./packages/hydra-indexer
 
 COPY package.json .
+COPY yarn.lock .
 
-CMD ["yarn", "start:prod"]
+RUN yarn --pure-lockfile --non-interactive 
+
+RUN yarn workspace @dzlzv/bn-typeorm build
+RUN yarn workspace @dzlzv/apps-config build
+RUN yarn workspace @dzlzv/hydra-common build
+RUN yarn workspace @dzlzv/hydra-db-utils build
+RUN yarn workspace @dzlzv/hydra-indexer build 
+
+CMD yarn workspace @dzlzv/hydra-indexer start:prod
