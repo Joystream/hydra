@@ -5,6 +5,10 @@ import { {{type}} } from '../{{model}}/{{model}}.model';
 {{/entities}}  
 import { {{query.typePrefix}}FTSService } from './{{query.name}}.service';
 
+{{#whereInputs}}
+import { {{#entities}} {{type}}WhereInput, {{/entities}} } from '../../../generated';
+{{/whereInputs}}
+
 @ObjectType()
 export class {{query.typePrefix}}FTSOutput {
     @Field(type => {{query.typePrefix}}SearchItem)
@@ -37,10 +41,14 @@ export default class {{query.typePrefix}}FTSResolver {
 
     @Query(() => [{{query.typePrefix}}FTSOutput])
     async {{query.name}}(
-        @Arg('text') query: string, 
-        @Arg('limit', () => Int, { defaultValue: 5 }) limit: number):Promise<Array<{{query.typePrefix}}FTSOutput>>{
-        
-        return this.service.search(query, limit);
+      @Arg('text') query: string, 
+      @Arg('limit', () => Int, { defaultValue: 5 }) limit: number,
+      @Arg('skip', () => Int, { defaultValue: 0 }) skip: number,
+      {{#entities}}
+      @Arg('where{{type}}', { nullable: true }) where{{type}}?: {{type}}WhereInput,
+      {{/entities}}
+    ):Promise<Array<{{query.typePrefix}}FTSOutput>>{
+      return this.service.search(query, limit, skip, {{#entities}}where{{type}},{{/entities}});
     }
 
 }

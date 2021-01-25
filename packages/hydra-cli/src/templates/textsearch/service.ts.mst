@@ -1,7 +1,12 @@
-import { Service } from 'typedi';
+import { Service, Inject } from 'typedi';
 {{#entities}}  
 import { {{type}} } from '../{{model}}/{{model}}.model';
+import { {{type}}Service } from '../{{model}}/{{model}}.service';
 {{/entities}}  
+
+{{#whereInputs}}
+import { {{#entities}} {{type}}WhereInput, {{/entities}} } from '../../../generated';
+{{/whereInputs}}
 
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Repository, getConnection, EntityManager } from 'typeorm';
@@ -21,14 +26,19 @@ export class {{query.typePrefix}}FTSService {
     readonly {{fieldName}}Repository: Repository<{{type}}>;
     {{/entities}} 
 
-    constructor({{#entities}}@InjectRepository({{type}}) {{fieldName}}Repository: Repository<{{type}}>{{^last}},{{/last}}
-                 {{/entities}}) {
-        {{#entities}}  
-        this.{{fieldName}}Repository = {{fieldName}}Repository;
-        {{/entities}} 
+    constructor(
+      {{#entities}}@InjectRepository({{type}}) {{fieldName}}Repository: Repository<{{type}}>{{^last}},{{/last}}{{/entities}}
+      {{#entities}},@Inject('{{type}}Service') public readonly {{fieldName}}Service: {{type}}Service {{/entities}}
+    ) {
+      {{#entities}} this.{{fieldName}}Repository = {{fieldName}}Repository; {{/entities}} 
     }
 
-    async search(text: string, limit:number = 5): Promise<{{query.typePrefix}}FTSOutput[]> {
+    async search(
+      text: string,
+      limit = 5,
+      skip = 0,
+      {{#entities}}where{{type}}?: {{type}}WhereInput,{{/entities}}
+    ): Promise<{{query.typePrefix}}FTSOutput[]> {
         
         return getConnection().transaction<{{query.typePrefix}}FTSOutput[]>('REPEATABLE READ', async (em: EntityManager) => {
             const query = `
@@ -38,9 +48,10 @@ export class {{query.typePrefix}}FTSService {
             FROM {{query.viewName}}
             WHERE phraseto_tsquery('{{query.language}}', $1) @@ tsv
             ORDER BY rank DESC
-            LIMIT $2`;
+            LIMIT $2
+            OFFSET $3`;
 
-            const results = await em.query(query, [text, limit]) as RawSQLResult[];
+            const results = await em.query(query, [text, limit, skip]) as RawSQLResult[];
 
             if (results.length == 0) {
                 return [];
@@ -51,9 +62,18 @@ export class {{query.typePrefix}}FTSService {
             const ids: string[] = results.map(item => item.id);
             
             {{#entities}}
-            const {{arrayName}}: {{type}}[] = await em.createQueryBuilder<{{type}}>({{type}}, '{{type}}')
-                        .where("id IN (:...ids)", { ids }).getMany();
+            const {{arrayName}}: {{type}}[] = await this.{{fieldName}}Service.find(
+              {
+                ...where{{type}},
+                id_in: ids
+              },
+              undefined,
+              undefined,
+              undefined,
+              this.{{fieldName}}Repository.metadata.columns.map(v => v.propertyName)
+            );
             {{/entities}}
+            
 
             const enhancedEntities = [{{#entities}}...{{arrayName}} {{^last}},{{/last}}{{/entities}}].map((e) => {
                 return { item: e, 
