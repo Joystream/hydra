@@ -1,8 +1,20 @@
 {
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "packages/sample/generated/*",
+      "packages/sample/mappings"
+    ],
+    "nohoist": [
+      "**/apps-config",
+      "**/apps-config/**",
+      "**/hydra-typegen",
+      "**/sample/generated/graphql-server",
+      "**/sample/generated/graphql-server/**",
+      "**/hydra-typegen/**"
+    ]
+  },
   "scripts": {
     "e2e-test": "yarn workspace hydra-e2e-tests run e2e-test",
     "lint": "yarn workspaces run lint"

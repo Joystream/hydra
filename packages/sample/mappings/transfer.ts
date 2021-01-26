@@ -1,23 +1,23 @@
-import { SubstrateEvent, DB } from '../generated/hydra-processor'
+import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { DatabaseManager } from '@dzlzv/hydra-db-utils'
 import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model'
-import BN from 'bn.js'
+// run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
+// to genenerate typescript classes for events, such as Balances.TransferEvent
+import { Balances } from './generated/types'
 
-export async function balances_Transfer(db: DB, event: SubstrateEvent) {
-  const [from, to, value] = event.params
+export async function balancesTransfer(
+  db: DatabaseManager,
+  _event: SubstrateEvent
+) {
+  const event = new Balances.TransferEvent(_event)
   const transfer = new Transfer()
-  transfer.from = Buffer.from(from.value as string)
-  transfer.to = Buffer.from(to.value as string)
-  transfer.value = convertBN(value.value as string)
-  transfer.block = event.blockNumber
-  transfer.comment = `Transferred ${value.value as string} from ${
-    from.value as string
-  } to ${to.value as string}`
-  await db.save<Transfer>(transfer)
-}
+  transfer.from = Buffer.from(event.data.accountIds[0].toHex())
+  transfer.to = Buffer.from(event.data.accountIds[1].toHex())
+  transfer.value = event.data.balance.toBn()
+  transfer.block = event.ctx.blockNumber
+  transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
+  transfer.insertedAt = new Date()
+  console.log(`Saving ${JSON.stringify(transfer, null, 2)}`)
 
-function convertBN(s: string): BN {
-  if (String(s).startsWith('0x')) {
-    return new BN(s.substring(2), 16)
-  }
-  return new BN(s)
+  await db.save<Transfer>(transfer)
 }

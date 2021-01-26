@@ -22,11 +22,13 @@
     "@laminar/type-definitions": "^0.2.0-beta.141",
     "@polkadot/networks": "^4.2.1",
     "@sora-substrate/type-definitions": "^0.1.7",
-    "@subsocial/types": "^0.4.23"
+    "@subsocial/types": "^0.4.23",
+    "@polkadot/api": "~2.10.2-7"
   },
   "devDependencies": {
     "i18next": "^19.8.4",
-    "ts-node": "^9.0.0",
-    "typescript": "^3.8"
+    "ts-node": "^7.0.1",
+    "ts-node-dev": "^1.0.0-pre.40",
+    "typescript": "^4.1.3"
   }
 }

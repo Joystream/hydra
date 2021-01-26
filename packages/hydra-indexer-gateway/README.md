@@ -15,7 +15,7 @@ Then the server can be run with `yarn start:dev`
 
 For production a pre-built Docker image in recommended. The following environment variables must be set:
 
-| Variable        | |  Description |
+| Variable        |  Description |
 | -------| ---------------------------|
 | WARTHOG_STARTER_DB_DATABASE      | Indexer database name |
 | WARTHOG_STARTER_DB_HOST      | Indexer database host |
