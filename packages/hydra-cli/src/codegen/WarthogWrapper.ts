@@ -20,7 +20,13 @@ export default class WarthogWrapper {
   // private readonly schemaPath: string
   private readonly schemaResolvedPath: string
 
-  constructor(readonly flags: CodegenFlags) {
+  // When it is set to true `dotenvi:generate` command will not run. `dotenvi:generate` requires
+  // some environment variables to be set in case if you don't set them codegen will fail.
+  // Since we don't have docs about the env vars user must use scaffold command first, then move on.
+  private prod: boolean
+
+  constructor(readonly flags: CodegenFlags, prod = true) {
+    this.prod = prod
     this.schemaResolvedPath = path.resolve(
       process.cwd(),
       this.flags.schema as string
@@ -136,15 +142,6 @@ export default class WarthogWrapper {
     await tasks.run()
   }
 
-  async generateAPIPreview(): Promise<void> {
-    // Order of calling functions is important!!!
-    await this.newProject()
-    this.prepareProjectFiles()
-    await this.installDependecies()
-    this.generateWarthogSources()
-    await this.codegen()
-  }
-
   async newProject(projectName = 'query_node'): Promise<void> {
     const consoleFn = console.log
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -229,7 +226,7 @@ export default class WarthogWrapper {
 
   async codegen(): Promise<void> {
     await execa('yarn', ['warthog', 'codegen'])
-    await execa('yarn', ['dotenv:generate'])
+    if (this.prod) await execa('yarn', ['dotenv:generate'])
   }
 
   async syncSchema(): Promise<void> {
