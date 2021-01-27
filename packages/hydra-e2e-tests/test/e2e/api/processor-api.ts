@@ -5,6 +5,7 @@ import {
   FTS_COMMENT_QUERY,
   FIND_TRANSFER_BY_VALUE,
   FETCH_INSERTED_AT_FIELD_FROM_TRANSFER,
+  FTS_COMMENT_QUERY_WITH_WHERE_CONDITION,
 } from './graphql-queries'
 
 export interface Transfer {
@@ -56,12 +57,17 @@ export async function findTransfersByCommentAndWhereCondition(
   text: string,
   from: string,
   skip = 0
-): Promise<string[]> {
+): Promise<
+  {
+    highlight: string
+    rank: number
+  }[]
+> {
   const result = await getGQLClient().request<{
     commentSearch: {
       highlight: string
+      rank: number
     }[]
-  }>(FTS_COMMENT_QUERY, { text, skip, from })
-
-  return result.commentSearch.map((c) => c.highlight)
+  }>(FTS_COMMENT_QUERY_WITH_WHERE_CONDITION, { text, skip, from })
+  return result.commentSearch
 }

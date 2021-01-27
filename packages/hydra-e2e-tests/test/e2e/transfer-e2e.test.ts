@@ -54,13 +54,13 @@ describe('End-to-end tests', () => {
   })
 
   it('performs full-text-search with filtering options', async () => {
-    const highlihts: string[] = await findTransfersByCommentAndWhereCondition(
-      'transfer',
-      'non-exist-address',
+    const transfers = await findTransfersByCommentAndWhereCondition(
+      'Transfer',
+      '4364776e52',
       1
     )
-    expect(highlihts.length).equal(
-      undefined,
+    expect(transfers.length).equal(
+      0,
       'Full text search with filtering should not find comment'
     )
   })
