@@ -48,7 +48,7 @@ export default class Preview extends Command {
     createDir(warthogProjectPath)
     process.chdir(warthogProjectPath)
 
-    await new WarthogWrapper({ schema } as CodegenFlags).run()
+    await new WarthogWrapper({ schema, install: true } as CodegenFlags).run()
 
     fs.copyFileSync(
       path.resolve(
