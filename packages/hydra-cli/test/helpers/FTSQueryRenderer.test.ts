@@ -40,4 +40,49 @@ describe('FTSQueryRenderer', () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     ;(expect(transformed).to as any).matchSnapshot(this)
   })
+
+  it(`Should add filter options to fts resolver`, () => {
+    const warthogModel = createModel()
+    warthogModel.addQueryClause('search', 'title', 'Post')
+
+    const resolverTemplate = fs.readFileSync(
+      './src/templates/textsearch/resolver.ts.mst',
+      'utf-8'
+    )
+    const rendered = generator.generate(
+      resolverTemplate,
+      warthogModel.lookupQuery(`search`)
+    )
+
+    expect(rendered).to.include(
+      `import {  PostWhereInput,  } from '../../../generated'`
+    )
+    expect(rendered).to.include(
+      `@Arg('skip', () => Int, { defaultValue: 0 }) skip: number`
+    )
+    expect(rendered).to.include(
+      `@Arg('wherePost', { nullable: true }) wherePost?: PostWhereInput`
+    )
+  })
+  it(`Should add filter options to fts service`, () => {
+    const warthogModel = createModel()
+    warthogModel.addQueryClause('search', 'title', 'Post')
+
+    const resolverTemplate = fs.readFileSync(
+      './src/templates/textsearch/service.ts.mst',
+      'utf-8'
+    )
+    const rendered = generator.generate(
+      resolverTemplate,
+      warthogModel.lookupQuery(`search`)
+    )
+
+    expect(rendered).to.include(`@Inject('PostService')`)
+    expect(rendered).to.include(`skip = 0`)
+    expect(rendered).to.include(`wherePost?: PostWhereInput`)
+    expect(rendered).to.include(`[text, limit, skip]`)
+    expect(rendered).to.include(
+      `this.postRepository.metadata.columns.map(v => v.propertyName)`
+    )
+  })
 })

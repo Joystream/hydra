@@ -4,6 +4,7 @@ import { indexerHead, blockTimestamp } from './api/indexer-api'
 import {
   fetchDateTimeFieldFromTransfer,
   findTransfersByComment,
+  findTransfersByCommentAndWhereCondition,
   findTransfersByValue,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
@@ -50,5 +51,17 @@ describe('End-to-end tests', () => {
   it('fetch datetime field from transfer', async () => {
     const date = await fetchDateTimeFieldFromTransfer()
     expect(date.getTime()).to.be.lessThan(Date.now())
+  })
+
+  it('performs full-text-search with filtering options', async () => {
+    const highlihts: string[] = await findTransfersByCommentAndWhereCondition(
+      'transfer',
+      'non-exist-address',
+      1
+    )
+    expect(highlihts.length).equal(
+      undefined,
+      'Full text search with filtering should not find comment'
+    )
   })
 })
