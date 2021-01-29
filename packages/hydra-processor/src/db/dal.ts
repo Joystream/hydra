@@ -6,8 +6,8 @@ import config from './ormconfig'
 
 const debug = Debug('index-builder:helper')
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createDBConnection(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entities: any[] = []
 ): Promise<Connection> {
   // const connectionOptions = await getConnectionOptions();
