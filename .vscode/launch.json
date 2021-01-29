@@ -12,7 +12,15 @@
             "runtimeExecutable": "yarn",
             "runtimeArgs": ["run-dev", "typegen", "--no-strict", "--metadata", "wss://kusama-rpc.polkadot.io", 
                 "--events", "Balances.Transfer", "--blockHash", "--blockHash 0x45eb7ddd324361adadd4f8cfafadbfb7e0a26393a70a70e5bee6204fc46af62e", "--calls", "Balances.transfer"]
-          }
+        },
+        {
+            "name": "hydra-typegen with config",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/packages/hydra-typegen",
+            "runtimeExecutable": "yarn",
+            "runtimeArgs": ["run-dev", "typegen", "test/config.yml"]
+        }
           
     ]
 }

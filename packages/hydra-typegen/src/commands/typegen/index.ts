@@ -3,28 +3,40 @@ import fs from 'fs'
 import path from 'path'
 import Debug from 'debug'
 
-import { getMetadata, registerCustomTypes } from '../../metadata/metadata'
-import { extractMeta, ExtractedMetadata, TypeDefs } from '../../metadata'
+import { MetadataSource, registerCustomTypes } from '../../metadata/metadata'
+import { extractMeta } from '../../metadata'
 import {
   generateModuleTypes,
   GeneratorConfig,
   buildImportsRegistry,
   generateIndex,
 } from '../../generators'
+import { parseConfigFile } from '../../helpers/parse-yaml'
 
 export type CustomTypes = {
-  defs: TypeDefs
   lib: string // package with types. All custom types will be imported from there
-  typedefsLoc?: string // path to type definitions
+  typedefsLoc: string // path to type definitions
 }
 
 export interface IConfig {
-  metadata: ExtractedMetadata
+  metadata: MetadataSource
   events: string[]
   calls: string[]
   customTypes?: CustomTypes
-  dest: string
+  outDir: string
+  strict?: boolean
+}
+
+export type Flags = {
+  events: string | undefined
+  calls: string | undefined
+  metadata: string
+  blockHash: string | undefined
+  typedefs: string | undefined
+  typelib: string | undefined
+  outDir: string
   strict: boolean
+  debug: boolean
 }
 
 const debug = Debug('hydra-typegen:typegen')
@@ -33,6 +45,14 @@ export default class Typegen extends Command {
   static description = `Generate Typescript classes for the Substrate events`
 
   static usage = 'typegen Balances.transfer,Treasury.depositCreated'
+
+  static args = [
+    {
+      name: 'config',
+      optional: true,
+      description: `Path to YML config file`,
+    },
+  ]
 
   static flags = {
     events: flags.string({
@@ -85,15 +105,25 @@ types don't much the metadata definiton`,
   }
 
   async run(): Promise<void> {
-    const { flags } = this.parse(Typegen)
+    const { flags, args } = this.parse(Typegen)
 
     if (flags.debug) {
       Debug.enable('hydra-typegen:*')
     }
 
-    // TODO: we can in fact replace metadata and typedefs
-    // for popular chains with just chain spec
-    let customTypes
+    let config: IConfig | undefined
+
+    if (args.config) {
+      config = parseConfigFile(path.resolve(args.config))
+    } else {
+      config = this.parseFlags(flags)
+    }
+
+    await this.generate(config)
+  }
+
+  parseFlags(flags: Flags): IConfig {
+    let customTypes: CustomTypes | undefined
     if (flags.typedefs) {
       if (flags.typelib === undefined) {
         throw new Error(
@@ -101,9 +131,8 @@ types don't much the metadata definiton`,
         )
       }
       customTypes = {
-        defs: registerCustomTypes(flags.typedefs),
         lib: flags.typelib,
-        typedefsLoc: path.join(process.cwd(), flags.typedefs),
+        typedefsLoc: path.resolve(flags.typedefs),
       }
     }
 
@@ -120,34 +149,43 @@ types don't much the metadata definiton`,
       )
     }
 
-    const config: IConfig = {
+    return {
       events,
       calls,
-      dest: path.join(process.cwd(), flags.outDir),
-      metadata: await getMetadata({
+      outDir: flags.outDir,
+      metadata: {
         source: flags.metadata,
         blockHash: flags.blockHash,
-      }),
+      },
       strict: flags.strict,
       customTypes,
-    }
-
-    this.generate(config)
+    } as IConfig
   }
 
-  generate(config: IConfig): void {
-    const { dest, customTypes } = config
+  async buildGeneratorConfig(config: IConfig): Promise<GeneratorConfig> {
+    const { outDir, customTypes } = config
+
+    if (customTypes) {
+      registerCustomTypes(customTypes.typedefsLoc)
+    }
+
+    const modules = await extractMeta(config)
+
+    return {
+      customTypes,
+      importsRegistry: buildImportsRegistry(customTypes),
+      modules,
+      validateArgs: config.strict || false, // do not enforce validation by default
+      dest: path.resolve(outDir),
+    }
+  }
+
+  async generate(config: IConfig): Promise<void> {
+    const generatorConfig = await this.buildGeneratorConfig(config)
+    const { dest } = generatorConfig
 
     debug(`Output dir: ${dest}`)
     fs.mkdirSync(dest, { recursive: true })
-
-    const generatorConfig: GeneratorConfig = {
-      customTypes,
-      importsRegistry: buildImportsRegistry(customTypes),
-      modules: extractMeta(config),
-      validateArgs: config.strict,
-      dest,
-    }
 
     generateModuleTypes(generatorConfig)
     generateIndex(generatorConfig)

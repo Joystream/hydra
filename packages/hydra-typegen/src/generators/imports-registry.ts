@@ -2,6 +2,7 @@ import { ImportsRegistry } from './types'
 import { CustomTypes } from '../commands/typegen'
 import { warn } from '../log'
 import { builtInClasses, builtInInterfaceDefs } from '../metadata/default-types'
+import { registerCustomTypes } from '../metadata'
 
 const debug = require('debug')('hydra-typegen:imports-registry')
 
@@ -87,7 +88,9 @@ function addCustomTypes(
   importsRegistry: ImportsRegistry,
   customTypes: CustomTypes
 ) {
-  const { defs, lib } = customTypes
+  const { lib, typedefsLoc } = customTypes
+
+  const defs = registerCustomTypes(typedefsLoc)
 
   Object.keys(defs).forEach((type) => {
     if (importsRegistry[type]) {

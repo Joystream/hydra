@@ -1,5 +1,5 @@
 import { IConfig } from '../commands/typegen'
-import { registry } from './metadata'
+import { getMetadata, registry } from './metadata'
 import { uniq, compact } from 'lodash'
 import { Vec } from '@polkadot/types/codec'
 import { Text } from '@polkadot/types/primitive'
@@ -16,15 +16,17 @@ import { builtInClasses } from './default-types'
 
 const debug = require('debug')('hydra-typegen:extract')
 
-export function extractMeta({
-  metadata,
+export async function extractMeta({
+  metadata: metadataSource,
   events,
   calls,
-}: IConfig): ModuleMeta[] {
+}: IConfig): Promise<ModuleMeta[]> {
   const modules: Record<string, Module> = {}
   const moduleEvents: Record<string, Event[]> = {}
   const moduleCalls: Record<string, Call[]> = {}
   const moduleTypes: Record<string, string[]> = {}
+
+  const metadata = await getMetadata(metadataSource)
 
   for (const e of events) {
     const [module, event] = findEvent(metadata, e)

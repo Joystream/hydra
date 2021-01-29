@@ -10,17 +10,14 @@ export function readTemplate(template: string): string {
     .toString()
 }
 
-export function readFile(source: string, root: string = process.cwd()): string {
-  const location = path.join(root, source)
+export function readFile(source: string): string {
+  const location = path.resolve(source)
   log(`Reading: ${location}`)
-  return fs.readFileSync(path.join(root, source), 'utf-8')
+  return fs.readFileSync(location, 'utf-8')
 }
 
-export function readJson(
-  source: string,
-  root: string = process.cwd()
-): Record<string, unknown> {
-  return JSON.parse(readFile(source, root))
+export function readJson(source: string): Record<string, unknown> {
+  return JSON.parse(readFile(source))
 }
 
 export function writeFile(dest: string, generator: () => string): void {
