@@ -1,5 +1,6 @@
 import express from 'express'
 import { register, validateMetricName } from 'prom-client'
+import { conf } from '../start/config'
 
 export function startPromEndpoint(): void {
   const server = express()
@@ -31,7 +32,7 @@ export function startPromEndpoint(): void {
     }
   })
 
-  const port = process.env.PROMETHEUS_PORT || 3000
+  const port = conf.PROMETHEUS_PORT
   console.log(
     `Server listening to ${port}, metrics exposed on /metrics endpoint`
   )

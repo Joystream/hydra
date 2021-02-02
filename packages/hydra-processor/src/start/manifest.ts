@@ -1,6 +1,7 @@
 import YAML from 'yaml'
 import YamlValidator from 'yaml-validator'
 import fs from 'fs'
+import path from 'path'
 import semver from 'semver'
 
 import { camelCase, countBy, endsWith } from 'lodash'
@@ -23,6 +24,7 @@ const manifestValidatorOptions = {
       chain: 'string',
       indexerVersion: 'string',
     },
+    entities: ['string'],
     mappings: {
       hydraCommonVersion: 'string',
       mappingsModule: 'string',
@@ -68,7 +70,7 @@ interface MappingsDefInput {
 export interface MappingsDef {
   hydraCommonVersion: string
   mappingsModule: Record<string, unknown>
-  blockInterval?: BlockInterval
+  blockInterval: BlockInterval
   eventHandlers: Record<string, MappingHandler>
   extrinsicHandlers: Record<string, MappingHandler>
   preBlockHooks: MappingHandler[]
@@ -76,8 +78,8 @@ export interface MappingsDef {
 }
 
 export interface BlockInterval {
-  from?: number
-  to?: number
+  from: number
+  to: number
 }
 
 export interface MappingHandler {
@@ -88,6 +90,7 @@ export interface MappingHandler {
 
 export interface ProcessorManifest {
   version: string
+  entities: string[]
   description?: string
   repository?: string
   dataSource: DataSource
@@ -107,20 +110,19 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
   }
   const parsed = YAML.parse(fs.readFileSync(manifestLoc, 'utf8')) as {
     version: string
+    entities: string[]
     description?: string
     repository?: string
     dataSource: DataSource
     mappings: MappingsDefInput
   }
 
-  const { version, description, repository, dataSource, mappings } = parsed
+  const { mappings, entities } = parsed
   validate(mappings)
 
   return {
-    version,
-    description,
-    repository,
-    dataSource,
+    ...parsed,
+    entities: entities.map((e) => path.resolve(e.trim())),
     mappings: inferDefaults(mappings),
   }
 }
@@ -299,9 +301,12 @@ function resolveHandler(
 
 export function parseBlockInterval(
   blockInterval: string | undefined
-): BlockInterval | undefined {
+): BlockInterval {
   if (blockInterval === undefined) {
-    return undefined
+    return {
+      from: 0,
+      to: Number.MAX_SAFE_INTEGER,
+    }
   }
   // accepted formats:
   //   [1,2]
@@ -315,8 +320,9 @@ export function parseBlockInterval(
     )
   }
   // the parts array must be in the form ["", from, to, ""]
-  const from = parts[1].length > 0 ? Number.parseInt(parts[1]) : undefined
-  const to = parts[2].length > 0 ? Number.parseInt(parts[2]) : undefined
+  const from = parts[1].length > 0 ? Number.parseInt(parts[1]) : 0
+  const to =
+    parts[2].length > 0 ? Number.parseInt(parts[2]) : Number.MAX_SAFE_INTEGER
 
   return { from, to }
 }

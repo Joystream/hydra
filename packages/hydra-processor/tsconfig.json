@@ -12,8 +12,10 @@
 		"skipLibCheck": true,
         "sourceMap": true,
         "esModuleInterop": true,
-		"inlineSources": false
-	},
-	"include": ["src/**/*"],
+        "inlineSources": false,
+        "allowSyntheticDefaultImports": true,
+        "types": [ "node", "@types/node", "mocha", "@types/mocha", "chai" ]
+    },
+    "include": ["src/**/*"],
 	"exclude": ["node_modules"]
 }

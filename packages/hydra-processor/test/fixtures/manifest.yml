@@ -5,6 +5,8 @@ dataSource:
   kind: substrate 
   chain: node-template
   indexerVersion: '0.0.4'
+entities:
+  - ./../../test/fixtures/test-entities.ts
 mappings:
   hydraCommonVersion: '0.0.3'
   mappingsModule: ./../../test/fixtures/test-mappings.ts
