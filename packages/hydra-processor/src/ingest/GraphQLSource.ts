@@ -1,10 +1,8 @@
-import { IProcessorSource, EventFilter } from './'
+import { IProcessorSource, EventQuery } from './'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
-import { ProcessorOptions } from '../start'
 import { GraphQLClient } from 'graphql-request'
-import { Inject } from 'typedi'
 import Debug from 'debug'
-import { EventEmitter } from 'events'
+import { conf } from '../start/config'
 
 const debug = Debug('index-builder:processor')
 
@@ -45,16 +43,11 @@ query {
 }
 `
 
-export class GraphQLSource extends EventEmitter implements IProcessorSource {
+export class GraphQLSource implements IProcessorSource {
   private graphClient: GraphQLClient
 
-  constructor(@Inject('ProcessorOptions') protected options: ProcessorOptions) {
-    super()
-    const _endpoint =
-      options.indexerEndpointURL || process.env.INDEXER_ENDPOINT_URL
-    if (!_endpoint) {
-      throw new Error(`Indexer endpoint is not provided`)
-    }
+  constructor() {
+    const _endpoint = conf.INDEXER_ENDPOINT_URL
     debug(`Using Indexer API endpoint ${_endpoint}`)
     this.graphClient = new GraphQLClient(_endpoint)
   }
@@ -72,19 +65,16 @@ export class GraphQLSource extends EventEmitter implements IProcessorSource {
     return status.indexerStatus.head
   }
 
-  async nextBatch(
-    filter: EventFilter,
-    size: number
-  ): Promise<SubstrateEvent[]> {
+  async nextBatch(filter: EventQuery, size: number): Promise<SubstrateEvent[]> {
     debug(`Filter: ${JSON.stringify(filter, null, 2)}`)
     const data = await this.graphClient.request<{
       substrateEventsAfter: SubstrateEvent[]
     }>(GET_EVENTS_AFTER_QUERY, {
       size,
       names: filter.names,
-      afterID: filter.afterID,
-      fromBlock: filter.fromBlock,
-      toBlock: filter.toBlock,
+      afterID: filter.id_gt,
+      fromBlock: filter.block_gte,
+      toBlock: filter.block_lte,
     })
     debug(`Fetched ${data.substrateEventsAfter.length} events`)
     debug(`Events: ${JSON.stringify(data, null, 2)} events`)
