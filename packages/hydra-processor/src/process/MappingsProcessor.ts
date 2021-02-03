@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import Debug from 'debug'
 import { makeDatabaseManager } from '@dzlzv/hydra-db-utils'
 import { IProcessorSource, GraphQLSource, EventQuery } from '../ingest'
 import { HandlerLookupService } from './HandlerLookupService'
 import { getConnection, EntityManager } from 'typeorm'
-import { logError, waitFor, formatEventId } from '@dzlzv/hydra-common'
+import { logError, formatEventId } from '@dzlzv/hydra-common'
+import delay from 'delay'
+import pWaitFor from 'p-wait-for'
+import Debug from 'debug'
+
 import {
   IProcessorState,
   IProcessorStateHandler,
@@ -23,6 +26,7 @@ export class MappingsProcessor {
   globalFilterConfig: GlobalFilterConfig
   state!: IProcessorState
   private _started = false
+  private _stopped = false
   indexerHead!: number // current indexer head we are aware of
 
   constructor(
@@ -36,39 +40,42 @@ export class MappingsProcessor {
       events: Object.keys(mappings.eventHandlers),
       blockWindow: conf.BLOCK_WINDOW,
     }
+  }
+
+  async start(): Promise<void> {
+    info('Starting the processor')
+    this._started = true
+
+    this.state = await this.stateHandler.init()
+    this.indexerHead = await this.eventsSource.indexerHead()
+    await this.handlerLookup.load()
+
+    await pWaitFor(() => {
+      info(`Waiting for the indexer head to be initialized`)
+      return this.indexerHead >= 0
+    })
+    await Promise.all([this.pollIndexer(), this.processingLoop()])
+  }
+
+  stop(): void {
+    this._started = false
+  }
+
+  get stopped(): boolean {
+    return this._stopped
+  }
+
+  async pollIndexer(): Promise<void> {
     // TODO: uncomment this block when eventSource will emit
     // this.eventsSource.on('NewIndexerHead', (h: number) => {
     //   debug(`New Indexer Head: ${h}`)
     //   this.indexerHead = h
     // });
     // For now, simply update indexerHead regularly
-    setInterval(() => {
-      this.eventsSource
-        .indexerHead()
-        .then((h) => {
-          debug(`New indexer head: ${h}`)
-          this.indexerHead = h
-        })
-        .catch((e) => debug(`Error fetching new indexer head: ${logError(e)}`))
-    }, conf.POLL_INTERVAL_MS) // every minute
-  }
-
-  async start(): Promise<void> {
-    info('Starting the processor')
-
-    this.state = await this.stateHandler.init()
-    this.indexerHead = await this.eventsSource.indexerHead()
-
-    this._started = true
-    await waitFor(() => {
-      debug(`Waiting for the indexer head to be initialized`)
-      return this.indexerHead >= 0
-    })
-    await this.processingLoop()
-  }
-
-  stop(): void {
-    this._started = false
+    while (this._started) {
+      this.indexerHead = await this.eventsSource.indexerHead()
+      await delay(conf.POLL_INTERVAL_MS)
+    }
   }
 
   private async awaitIndexer(): Promise<void> {
@@ -79,10 +86,10 @@ export class MappingsProcessor {
     // here we should eventually listen only to the events
     // For now, we simply wait until the indexer go for at least {MINIMUM_BLOCKS_AHEAD}
     // blocks ahead of the last scanned block
-    await waitFor(
+    await pWaitFor(
       () =>
-        this.indexerHead - this.state.lastScannedBlock > conf.MIN_BLOCKS_AHEAD,
-      () => !this._started
+        this.indexerHead - this.state.lastScannedBlock >
+          conf.MIN_BLOCKS_AHEAD || !this._started
     )
   }
 
@@ -116,7 +123,6 @@ export class MappingsProcessor {
         // Even if there were no events, update the last scanned block
         this.state = nextState(this.state, filter)
         await this.stateHandler.persist(this.state)
-
       } catch (e) {
         error(`Stopping the proccessor due to errors: ${logError(e)}`)
         this.stop()
@@ -130,6 +136,7 @@ export class MappingsProcessor {
         2
       )}`
     )
+    this._stopped = true
   }
 
   private shouldWork(): boolean {

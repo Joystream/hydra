@@ -6,9 +6,11 @@ import { log } from 'console'
 import { createDBConnection } from '../db/dal'
 import { ProcessorPromClient, startPromEndpoint } from '../prometheus'
 import { getManifest } from './config'
-import { info } from '../util/log'
+import { error, info } from '../util/log'
+import pWaitFor from 'p-wait-for'
+import { Server } from 'http'
 
-const debug = Debug('index-builder:manager')
+const debug = Debug('hydra-processor:runner')
 
 // Respondible for creating, starting up and shutting down the query node.
 // Currently this class is a bit thin, but it will almost certainly grow
@@ -17,6 +19,9 @@ const debug = Debug('index-builder:manager')
 // anonymous code in root file scope.
 export class ProcessorRunner {
   private connection: Connection | undefined
+  private processor: MappingsProcessor | undefined
+  private promServer: Server | undefined
+
   constructor() {
     // TODO: a bit hacky, but okay for now
     debug(
@@ -26,7 +31,12 @@ export class ProcessorRunner {
     )
     // Hook into application
     // eslint-disable-next-line
-    process.on('exit', () => this.cleanUp().catch((e) => log(`${logError(e)}`)))
+    process.on('exit', () =>
+      this.shutDown().catch((e) => log(`${logError(e)}`))
+    )
+    process.on('SIGINT', () =>
+      this.shutDown().catch((e) => log(`${logError(e)}`))
+    )
   }
 
   /**
@@ -36,30 +46,39 @@ export class ProcessorRunner {
    */
   async process(): Promise<void> {
     const manifest = getManifest()
+    info('Establishing a database connection')
     this.connection = await createDBConnection(manifest.entities)
 
-    const processor = new MappingsProcessor()
+    this.processor = new MappingsProcessor()
 
     try {
       const promClient = new ProcessorPromClient()
       promClient.init()
-      startPromEndpoint()
+      this.promServer = startPromEndpoint()
     } catch (e) {
-      console.error(`Can't start Prometheus endpoint: ${logError(e)}`)
+      error(`Can't start Prometheus endpoint: ${logError(e)}`)
     }
 
-    try {
-      await processor.start()
-    } finally {
-      await this.cleanUp()
-    }
+    await this.processor.start()
   }
 
-  async cleanUp(): Promise<void> {
-    if (this.connection) {
-      debug('Closing the database connection...')
-      await this.connection.close()
-      debug('Done')
+  async shutDown(): Promise<void> {
+    if (this.processor) {
+      this.processor.stop()
+      await pWaitFor(() => (this.processor as MappingsProcessor).stopped)
     }
+
+    if (this.connection && this.connection.isConnected) {
+      info('Closing the database connection...')
+      await this.connection.close()
+      debug('Done closing the connection')
+    }
+
+    if (this.promServer) {
+      this.promServer.close()
+    }
+    debug(`Exiting`)
+    // force all pending promises and open ports to exit
+    process.exit()
   }
 }

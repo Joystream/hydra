@@ -1,0 +1,29 @@
+version: '0.1'
+description: Test manifest
+repository: https://github.com/
+dataSource:
+  kind: substrate 
+  chain: node-template
+  indexerVersion: '0.0.4'
+entities:
+  - mappings/lib/generated/**/*.model.js
+mappings:
+  hydraCommonVersion: '0.0.3'
+  # from 1M onwards
+  blockInterval: '[1000000,]'
+  mappingsModule: mappings/lib/mappings
+  imports:
+    - mappings/lib/mappings/generated/types
+  eventHandlers:
+    - event: balances.Transfer 
+      handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
+    #- event: Sudo.batchCall
+    #  handler: handleSudoEvent(DatabaseManager,SubstrateEvent)
+  extrinsicHandlers:
+    # infer defaults here
+    #- extrinsic: Balances.Transfer 
+    #- extrinsic: Sudo.batchCall 
+    #  handler: handleSudoCall(DatabaseManager,SubstrateEvent)
+  preBlockHooks:
+  postBlockHooks:
+  

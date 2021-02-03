@@ -1,0 +1,6 @@
+metadata:
+  source: wss://kusama-rpc.polkadot.io
+  blockHash: '0x6fed053123651a2927714d19790f5e683201aa2c5bea91ab81ab5121e4545274'
+events:
+  - Balances.Transfer
+outDir: ./mappings/generated/types

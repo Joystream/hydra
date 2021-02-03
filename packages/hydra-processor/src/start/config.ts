@@ -2,6 +2,7 @@
 import { cleanEnv, str, num } from 'envalid'
 import { parseManifest, ProcessorManifest } from './manifest'
 import Debug from 'debug'
+import { setWarthogEnvs } from '../db/ormconfig'
 
 export const conf = cleanEnv(process.env, {
   MANIFEST_PATH: str({ default: 'manifest.yml' }),
@@ -32,4 +33,5 @@ export function getManifest(): ProcessorManifest {
   return manifest
 }
 
+setWarthogEnvs()
 Debug.enable(conf.DEBUG)
