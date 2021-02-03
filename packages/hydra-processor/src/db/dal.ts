@@ -4,13 +4,12 @@ import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 import Debug from 'debug'
 import config from './ormconfig'
 
-const debug = Debug('index-builder:helper')
+const debug = Debug('hydra-processor:dal')
 
 export async function createDBConnection(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entities: any[] = []
 ): Promise<Connection> {
-  // const connectionOptions = await getConnectionOptions();
   const _config = config()
   entities.map((e) => _config.entities?.push(e))
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)

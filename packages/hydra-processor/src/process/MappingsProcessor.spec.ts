@@ -67,5 +67,5 @@ describe('MappingsProcessor', () => {
     expect(state.lastScannedBlock).equals(5, 'should update last scanned block')
   })
 
-  it('should update state after processing an event', () => {})
+  it('updates the state after processing an event', () => {})
 })

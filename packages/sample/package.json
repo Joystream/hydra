@@ -21,7 +21,7 @@
     "db:drop": "yarn workspace query-node db:drop",
     "db:prepare": "yarn workspace query-node db:create && yarn workspace query-node db:sync",
     "db:schema:migrate": "yarn workspace query-node db:migrate",
-    "db:processor:migrate": "yarn workspace sample-hydra-processor db:migrate",
+    "db:processor:migrate": "hydra-processor migrate",
     "db:migrate": "yarn db:schema:migrate && yarn db:processor:migrate",
     "bootstrap": "hydra-cli codegen --createDb",
     "codegen:all": "hydra-cli codegen",
@@ -45,7 +45,7 @@
     "@dzlzv/hydra-cli": "0.1.5-3",
     "@dzlzv/hydra-common": "~0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
-    "@dzlzv/hydra-processor": "^0.0.7",
+    "@dzlzv/hydra-processor": "~0.1.0",
     "hydra-typegen": "~0.0.1"
   }
 }

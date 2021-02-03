@@ -11,6 +11,7 @@ import { resolvePackageVersion } from '../util/utils'
 import { warn } from '../util/log'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
+export const CONTEXT_CLASS_NAME = 'SubstrateEvent'
 export const EVENT_SUFFIX = 'Event'
 export const CALL_SUFFIX = 'Call'
 
@@ -28,6 +29,7 @@ const manifestValidatorOptions = {
     mappings: {
       hydraCommonVersion: 'string',
       mappingsModule: 'string',
+      'imports?': ['string'],
       'blockInterval?': 'string',
       'eventHandlers?': [
         {
@@ -61,6 +63,7 @@ interface MappingsDefInput {
   hydraCommonVersion: string
   mappingsModule: string
   blockInterval?: string
+  imports?: string[]
   eventHandlers?: Array<{ event: string; handler?: string }>
   extrinsicHandlers?: Array<{ extrinsic: string; handler?: string }>
   preBlockHooks?: string[]
@@ -70,6 +73,7 @@ interface MappingsDefInput {
 export interface MappingsDef {
   hydraCommonVersion: string
   mappingsModule: Record<string, unknown>
+  imports: string[]
   blockInterval: BlockInterval
   eventHandlers: Record<string, MappingHandler>
   extrinsicHandlers: Record<string, MappingHandler>
@@ -151,13 +155,17 @@ function inferDefaults(parsed: MappingsDefInput): MappingsDef {
     extrinsicHandlers,
     preBlockHooks,
     postBlockHooks,
+    imports,
   } = parsed
 
   if (mappingsModule === undefined) {
     throw new Error(`Cannot resolve mappings module ${mappingsModule}`)
   }
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const resolvedModule = require(mappingsModule) as Record<string, unknown>
+  const resolvedModule = require(path.resolve(mappingsModule)) as Record<
+    string,
+    unknown
+  >
 
   const parseHandler = function (def: {
     input?: string
@@ -177,6 +185,7 @@ function inferDefaults(parsed: MappingsDefInput): MappingsDef {
   return {
     hydraCommonVersion,
     mappingsModule: resolvedModule,
+    imports: [mappingsModule, ...(imports || [])].map((p) => path.resolve(p)),
     blockInterval: parseBlockInterval(blockInterval),
     eventHandlers: eventHandlers
       ? eventHandlers.reduce((acc, item) => {

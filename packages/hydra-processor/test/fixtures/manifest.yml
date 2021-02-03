@@ -10,6 +10,8 @@ entities:
 mappings:
   hydraCommonVersion: '0.0.3'
   mappingsModule: ./../../test/fixtures/test-mappings.ts
+  imports:
+    - ./../../test/fixtures/test-types.ts
   eventHandlers:
     # inver defaults here
     - event: Balances.Transfer 
