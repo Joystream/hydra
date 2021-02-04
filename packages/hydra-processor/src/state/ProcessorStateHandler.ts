@@ -5,9 +5,7 @@ import { IProcessorStateHandler } from './IProcessorStateHandler'
 import { IProcessorState } from './IProcessorState'
 import Debug from 'debug'
 import { eventEmitter, STATE_CHANGE } from '../start/events'
-import { conf, getManifest } from '../start/config'
-import { BlockInterval } from '../start/manifest'
-
+import { conf } from '../start/config'
 import assert = require('assert')
 
 const debug = Debug('index-builder:processor-state-handler')

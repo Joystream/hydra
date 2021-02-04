@@ -22,5 +22,4 @@ describe('manifest', () => {
       'Has 2 post block hooks'
     )
   })
-
 })
