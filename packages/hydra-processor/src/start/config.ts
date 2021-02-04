@@ -21,7 +21,7 @@ export const conf = cleanEnv(process.env, {
   // between the updates and the load to the database
   POLL_INTERVAL_MS: num({ default: 60 * 1000 }),
   // Wait for the indexer head block to be ahead for at least that number of blocks
-  MIN_BLOCKS_AHEAD: num({ default: 2 }),
+  MIN_BLOCKS_AHEAD: num({ default: 0 }),
 })
 
 let manifest: ProcessorManifest | undefined

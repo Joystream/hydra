@@ -37,11 +37,14 @@ services:
       - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:4000/graphql
       - NODE_URL=ws://substrate:9944
       - PROCESSOR_POLL_INTERVAL=300 # refresh every second 
-      - DEBUG=index-builder:*
+      - DEBUG=hydra-processor:*
+    ports:
+      - "3000:3000"
     depends_on:
       - hydra-indexer-gateway
     command: >
       sh -c "yarn workspace sample query-node:configure && \
+             yarn workspace sample db:drop && \
              yarn workspace sample db:prepare && \
              yarn workspace sample db:migrate && \
              yarn workspace sample mappings:build && \

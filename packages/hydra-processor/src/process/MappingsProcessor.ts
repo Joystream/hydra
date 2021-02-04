@@ -47,11 +47,11 @@ export class MappingsProcessor {
     this._started = true
 
     this.state = await this.stateHandler.init()
-    this.indexerHead = await this.eventsSource.indexerHead()
     await this.handlerLookup.load()
 
-    await pWaitFor(() => {
+    await pWaitFor(async () => {
       info(`Waiting for the indexer head to be initialized`)
+      this.indexerHead = await this.eventsSource.indexerHead()
       return this.indexerHead >= 0
     })
     await Promise.all([this.pollIndexer(), this.processingLoop()])

@@ -1,13 +1,12 @@
 {
   "name": "@dzlzv/hydra-processor",
   "version": "0.1.0",
-  "description": "Hydra Processor tool",
+  "description": "Hydra Processor CLI",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib",
     "bin",
-    "templates",
     "README.md"
   ],
   "bin": {
@@ -27,8 +26,8 @@
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
     "run-dev": "node ./bin/run",
-    "prepack": "rm -rf lib && tsc -b && cp -R ./templates ./lib",
-    "build": "rm -rf lib && tsc --build tsconfig.json && cp -R ./templates ./lib",
+    "prepack": "rm -rf lib && tsc -b ",
+    "build": "rm -rf lib && tsc --build tsconfig.json",
     "test-build": "rm -rf test-lib && tsc --build ./test/tsconfig.json",
     "lint": "eslint . --cache --ext .ts",
     "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
