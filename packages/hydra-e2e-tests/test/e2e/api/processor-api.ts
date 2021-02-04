@@ -1,5 +1,6 @@
 import { GraphQLClient } from 'graphql-request'
 import Container from 'typedi'
+import fetch from 'node-fetch'
 
 import {
   FTS_COMMENT_QUERY,
@@ -53,4 +54,27 @@ export async function fetchDateTimeFieldFromTransfer(): Promise<Date> {
   }>(FETCH_INSERTED_AT_FIELD_FROM_TRANSFER)
 
   return new Date(result.transfers[0].insertedAt)
+}
+
+export async function getMetric(metric: string): Promise<string> {
+  const url = `${process.env.PROCESSOR_METRICS_ENDPOINT}/${metric}`
+
+  const plain = await (await fetch(url)).text()
+  const regex = `^(${metric})\\s+(\\w+)`
+
+  const match = plain.match(new RegExp(regex, 'm'))
+
+  if (match === null || match.length < 3) {
+    throw new Error(`Can't match the regex: ${JSON.stringify(match, null, 2)}`)
+  }
+  return match[2]
+}
+
+export async function getNumberMetric(metric: string): Promise<Number> {
+  const metricString = await getMetric(metric)
+  return Number.parseInt(metricString)
+}
+
+export async function getProcessorHead(): Promise<Number> {
+  return getNumberMetric('hydra_processor_last_scanned_block')
 }

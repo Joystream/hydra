@@ -1,0 +1,5 @@
+metadata:
+  source: ws://localhost:9944
+events:
+  - balances.Transfer
+outDir: ./mappings/generated/types
