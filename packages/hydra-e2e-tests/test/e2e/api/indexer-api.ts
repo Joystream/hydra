@@ -14,7 +14,6 @@ export async function indexerHead(): Promise<number> {
   return status.indexerStatus.head
 }
 
-
 export async function blockTimestamp(): Promise<number> {
   const indexerClient = Container.get<GraphQLClient>('IndexerClient')
   const event = await indexerClient.request<{

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any  */
 import Debug from 'debug'
 import { getManifest } from '../start/config'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
@@ -59,7 +60,7 @@ export class HandlerLookupService {
 
     const args = createArgs(argTypes, ctxArgs, this.prototypes)
 
-    await handlerFunc.apply(null, args)
+    await handlerFunc(...args)
   }
 }
 
@@ -113,5 +114,5 @@ export function resolveArgType(
       throw new Error(`Cannot load type ${argType}:${module}`)
     }
   }
-  return obj as Object
+  return obj
 }

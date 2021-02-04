@@ -6,6 +6,8 @@ module.exports = {
   rules: {
     "@typescript-eslint/no-unused-vars": "error",
     "no-useless-constructor": "off",
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/naming-convention": [
       "warn",
       {

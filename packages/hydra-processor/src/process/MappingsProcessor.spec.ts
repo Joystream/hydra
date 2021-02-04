@@ -2,19 +2,9 @@ import { formatEventId } from '@dzlzv/hydra-common'
 import { expect } from 'chai'
 import { nextEventQuery, nextState } from '.'
 
-const blockInterval1 = {
-  from: 3,
-  to: Number.MAX_SAFE_INTEGER,
-}
-
 const blockInterval2 = {
   from: 3,
   to: 10,
-}
-
-const blockIntervalDef = {
-  from: 0,
-  to: Number.MAX_SAFE_INTEGER,
 }
 
 const blockWindow = 20
@@ -67,5 +57,5 @@ describe('MappingsProcessor', () => {
     expect(state.lastScannedBlock).equals(5, 'should update last scanned block')
   })
 
-  it('updates the state after processing an event', () => {})
+  // it('updates the state after processing an event', () => {})
 })

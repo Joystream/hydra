@@ -70,11 +70,11 @@ export async function getMetric(metric: string): Promise<string> {
   return match[2]
 }
 
-export async function getNumberMetric(metric: string): Promise<Number> {
+export async function getNumberMetric(metric: string): Promise<number> {
   const metricString = await getMetric(metric)
   return Number.parseInt(metricString)
 }
 
-export async function getProcessorHead(): Promise<Number> {
+export async function getProcessorHead(): Promise<number> {
   return getNumberMetric('hydra_processor_last_scanned_block')
 }
