@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.6
+
+- Fixed preview feature
+
 ## 0.0.24
 
 - bugfix: QueryRunner connection leaks in full-text search queries
@@ -18,7 +22,7 @@ Major upgrade
 
 - Hydra Indexer is run as an independent docker image
 - Changed docker-compose and processor templates
-- Updated migrations workflow 
+- Updated migrations workflow
 
 ## 0.0.19
 
