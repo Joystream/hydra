@@ -32,6 +32,9 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
   })
   section?: string
 
+  @Column({ nullable: true })
+  extrinsicName?: string
+
   @Column()
   method!: string
 
@@ -104,8 +107,11 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
       extr.blockNumber = q.blockNumber
       extr.signature = e.signature.toString()
       extr.signer = e.signer.toString()
+
       extr.method = e.method.methodName || 'NO_METHOD'
       extr.section = e.method.sectionName || 'NO_SECTION'
+      _entity.extrinsicName = `${extr.method}.${extr.section}`
+
       extr.meta = (e.meta.toJSON() || {}) as AnyJson
       extr.hash = e.hash.toString()
       extr.isSigned = e.isSigned
