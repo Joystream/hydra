@@ -1,6 +1,5 @@
 {
-  "name": "hydra-typegen",
-  "scope": "@dzlzv",
+  "name": "@dzlzv/hydra-typegen",
   "version": "0.0.1",
   "description": "\"Hydra-cli pluging for generating typed events\"",
   "main": "lib/index.js",

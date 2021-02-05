@@ -6,12 +6,12 @@ dataSource:
   chain: node-template
   indexerVersion: '0.0.4'
 entities:
-  - ./../../test/fixtures/test-entities.ts
+  - test/fixtures/test-entities.ts
 mappings:
   hydraCommonVersion: '0.0.3'
-  mappingsModule: ./../../test/fixtures/test-mappings.ts
+  mappingsModule: test/fixtures/test-mappings.ts
   imports:
-    - ./../../test/fixtures/test-types.ts
+    - test/fixtures/test-types.ts
   eventHandlers:
     # inver defaults here
     - event: Balances.Transfer 

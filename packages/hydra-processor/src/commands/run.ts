@@ -7,6 +7,7 @@ import { logError } from '@dzlzv/hydra-common'
 export default class Run extends Command {
   static flags = {
     manifest: flags.string({
+      char: 'm',
       description: 'Manifest file',
     }),
     indexer: flags.string({
