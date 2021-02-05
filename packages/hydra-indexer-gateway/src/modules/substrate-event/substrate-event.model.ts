@@ -40,6 +40,11 @@ export class SubstrateEvent extends BaseModel {
   })
   section?: string
 
+  @StringField({
+    nullable: true,
+  })
+  extrinsicName?: string
+
   @StringField()
   method!: string
 

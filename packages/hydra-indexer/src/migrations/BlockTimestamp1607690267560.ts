@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
 
-export class BlockTimestamp implements MigrationInterface {
+export class BlockTimestamp1607690267560 implements MigrationInterface {
   name = 'BlockTimestamp1607690267560'
 
   public async up(queryRunner: QueryRunner): Promise<void> {
