@@ -53,7 +53,7 @@ describe('End-to-end tests', () => {
     expect(date.getTime()).to.be.lessThan(Date.now())
   })
 
-  it('performs full-text-search with filtering options', async () => {
+  it('performs full-text-search with filtering options with no result', async () => {
     const transfers = await findTransfersByCommentAndWhereCondition(
       'Transfer',
       '4364776e52',
@@ -62,6 +62,19 @@ describe('End-to-end tests', () => {
     expect(transfers.length).equal(
       0,
       'Full text search with filtering should not find comment'
+    )
+  })
+
+  it('performs full-text-search with filtering options with some result', async () => {
+    const aliceAddressAsBytes = Buffer.from(ALICE).toString(`hex`)
+    const transfers = await findTransfersByCommentAndWhereCondition(
+      'Transfer',
+      aliceAddressAsBytes
+    )
+    console.log(transfers)
+    expect(transfers.length).gt(
+      0,
+      'Full text search with filtering should find some comment'
     )
   })
 })

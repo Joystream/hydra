@@ -82,7 +82,10 @@ describe('FTSQueryRenderer', () => {
     expect(rendered).to.include(`wherePost?: PostWhereInput`)
     expect(rendered).to.include(`[text, limit, skip]`)
     expect(rendered).to.include(
-      `this.postRepository.metadata.columns.map(v => v.propertyName)`
+      `private async processWheres(wheres: any[]): Promise<[string, any[], number]>`
+    )
+    expect(rendered).to.include(
+      `AND origin_table || '_' || id IN (SELECT unique_id FROM selected_ids)`
     )
   })
 })
