@@ -432,6 +432,9 @@ export enum SubstrateEventOrderByEnum {
   section_ASC = "section_ASC",
   section_DESC = "section_DESC",
 
+  extrinsicName_ASC = "extrinsicName_ASC",
+  extrinsicName_DESC = "extrinsicName_DESC",
+
   method_ASC = "method_ASC",
   method_DESC = "method_DESC",
 
@@ -439,7 +442,10 @@ export enum SubstrateEventOrderByEnum {
   blockNumber_DESC = "blockNumber_DESC",
 
   index_ASC = "index_ASC",
-  index_DESC = "index_DESC"
+  index_DESC = "index_DESC",
+
+  blockTimestamp_ASC = "blockTimestamp_ASC",
+  blockTimestamp_DESC = "blockTimestamp_DESC"
 }
 
 registerEnumType(SubstrateEventOrderByEnum, {
@@ -551,6 +557,21 @@ export class SubstrateEventWhereInput {
   section_in?: string[];
 
   @TypeGraphQLField({ nullable: true })
+  extrinsicName_eq?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicName_contains?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicName_startsWith?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicName_endsWith?: string;
+
+  @TypeGraphQLField(() => [String], { nullable: true })
+  extrinsicName_in?: string[];
+
+  @TypeGraphQLField({ nullable: true })
   method_eq?: string;
 
   @TypeGraphQLField({ nullable: true })
@@ -606,6 +627,24 @@ export class SubstrateEventWhereInput {
 
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   params_json?: JsonObject;
+
+  @TypeGraphQLField(() => Float, { nullable: true })
+  blockTimestamp_eq?: number;
+
+  @TypeGraphQLField(() => Float, { nullable: true })
+  blockTimestamp_gt?: number;
+
+  @TypeGraphQLField(() => Float, { nullable: true })
+  blockTimestamp_gte?: number;
+
+  @TypeGraphQLField(() => Float, { nullable: true })
+  blockTimestamp_lt?: number;
+
+  @TypeGraphQLField(() => Float, { nullable: true })
+  blockTimestamp_lte?: number;
+
+  @TypeGraphQLField(() => [Float], { nullable: true })
+  blockTimestamp_in?: number[];
 }
 
 @TypeGraphQLInputType()
@@ -622,6 +661,9 @@ export class SubstrateEventCreateInput {
   @TypeGraphQLField({ nullable: true })
   section?: string;
 
+  @TypeGraphQLField({ nullable: true })
+  extrinsicName?: string;
+
   @TypeGraphQLField()
   method!: string;
 
@@ -636,6 +678,9 @@ export class SubstrateEventCreateInput {
 
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   params?: JsonObject;
+
+  @TypeGraphQLField()
+  blockTimestamp!: number;
 }
 
 @TypeGraphQLInputType()
@@ -645,6 +690,9 @@ export class SubstrateEventUpdateInput {
 
   @TypeGraphQLField({ nullable: true })
   section?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicName?: string;
 
   @TypeGraphQLField({ nullable: true })
   method?: string;
@@ -660,6 +708,9 @@ export class SubstrateEventUpdateInput {
 
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   params?: JsonObject;
+
+  @TypeGraphQLField({ nullable: true })
+  blockTimestamp?: number;
 }
 
 @ArgsType()
