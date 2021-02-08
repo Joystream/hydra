@@ -1,5 +1,9 @@
 # Changelog of major updates
 
+## 0.1.5  
+
+- Added `extrinsicName` field to events
+
 ## 0.1.4
 
 - Added blocktimestamp

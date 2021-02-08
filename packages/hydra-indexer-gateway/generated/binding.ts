@@ -53,12 +53,16 @@ export type SubstrateEventOrderByInput =   'createdAt_ASC' |
   'name_DESC' |
   'section_ASC' |
   'section_DESC' |
+  'extrinsicName_ASC' |
+  'extrinsicName_DESC' |
   'method_ASC' |
   'method_DESC' |
   'blockNumber_ASC' |
   'blockNumber_DESC' |
   'index_ASC' |
-  'index_DESC'
+  'index_DESC' |
+  'blockTimestamp_ASC' |
+  'blockTimestamp_DESC'
 
 export type SubstrateExtrinsicOrderByInput =   'createdAt_ASC' |
   'createdAt_DESC' |
@@ -114,21 +118,25 @@ export interface BaseWhereInput {
 export interface SubstrateEventCreateInput {
   name: String
   section?: String | null
+  extrinsicName?: String | null
   method: String
   phase: JSONObject
   blockNumber: Float
   index: Float
   params?: JSONObject | null
+  blockTimestamp: Float
 }
 
 export interface SubstrateEventUpdateInput {
   name?: String | null
   section?: String | null
+  extrinsicName?: String | null
   method?: String | null
   phase?: JSONObject | null
   blockNumber?: Float | null
   index?: Float | null
   params?: JSONObject | null
+  blockTimestamp?: Float | null
 }
 
 export interface SubstrateEventWhereInput {
@@ -166,6 +174,11 @@ export interface SubstrateEventWhereInput {
   section_startsWith?: String | null
   section_endsWith?: String | null
   section_in?: String[] | String | null
+  extrinsicName_eq?: String | null
+  extrinsicName_contains?: String | null
+  extrinsicName_startsWith?: String | null
+  extrinsicName_endsWith?: String | null
+  extrinsicName_in?: String[] | String | null
   method_eq?: String | null
   method_contains?: String | null
   method_startsWith?: String | null
@@ -185,6 +198,12 @@ export interface SubstrateEventWhereInput {
   index_lte?: Int | null
   index_in?: Int[] | Int | null
   params_json?: JSONObject | null
+  blockTimestamp_eq?: Float | null
+  blockTimestamp_gt?: Float | null
+  blockTimestamp_gte?: Float | null
+  blockTimestamp_lt?: Float | null
+  blockTimestamp_lte?: Float | null
+  blockTimestamp_in?: Float[] | Float | null
 }
 
 export interface SubstrateEventWhereUniqueInput {
@@ -384,12 +403,14 @@ export interface SubstrateEvent extends BaseGraphQLObject {
   version: Int
   name: String
   section?: String | null
+  extrinsicName?: String | null
   method: String
   phase: JSONObject
   blockNumber: Int
   index: Int
   params?: Array<EventParam> | null
   extrinsic?: SubstrateExtrinsic | null
+  blockTimestamp: BigInt
 }
 
 export interface SubstrateEventConnection {
@@ -412,7 +433,7 @@ export interface SubstrateExtrinsic extends BaseGraphQLObject {
   deletedAt?: DateTime | null
   deletedById?: String | null
   version: Int
-  tip: BigNumber
+  tip: BigInt
   blockNumber: Int
   versionInfo: String
   meta: JSONObject
@@ -430,7 +451,7 @@ export interface SubstrateExtrinsic extends BaseGraphQLObject {
 /*
 GraphQL representation of BigNumber
 */
-export type BigNumber = string
+export type BigInt = string
 
 /*
 The `Boolean` scalar type represents `true` or `false`.
