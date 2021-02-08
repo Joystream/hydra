@@ -66,12 +66,14 @@ describe('End-to-end tests', () => {
   })
 
   it('performs full-text-search with filtering options with some result', async () => {
-    const aliceAddressAsBytes = Buffer.from(ALICE).toString(`hex`)
+    const aliceAddressAsBytes =
+      '307864343335393363373135666464333163363131343161626430346139396664363832326338353538383534636364653339613536383465376135366461323764'
+
     const transfers = await findTransfersByCommentAndWhereCondition(
       'Transfer',
       aliceAddressAsBytes
     )
-    console.log(transfers)
+
     expect(transfers.length).gt(
       0,
       'Full text search with filtering should find some comment'
