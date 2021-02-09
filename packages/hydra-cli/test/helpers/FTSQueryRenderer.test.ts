@@ -85,7 +85,7 @@ describe('FTSQueryRenderer', () => {
       `private async processWheres(wheres: any[]): Promise<[string, any[], number]>`
     )
     expect(rendered).to.include(
-      `AND origin_table || '_' || id IN (SELECT unique_id FROM selected_ids)`
+      `AND unique_id IN (SELECT unique_id FROM selected_ids)`
     )
   })
 })
