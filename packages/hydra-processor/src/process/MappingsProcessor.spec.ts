@@ -54,7 +54,22 @@ describe('MappingsProcessor', () => {
       { block_lte: 5 }
     )
     expect(state.lastProcessedEvent).equals(formatEventId(0, 5))
-    expect(state.lastScannedBlock).equals(5, 'should update last scanned block')
+    expect(state.lastScannedBlock).equals(
+      0,
+      'should update last scanned block to the one of the event'
+    )
+
+    state = nextState(
+      {
+        lastProcessedEvent: formatEventId(6, 5),
+        lastScannedBlock: 4,
+      },
+      { block_lte: 5 }
+    )
+    expect(state.lastScannedBlock).equals(
+      5,
+      'should update last scanned block to min of block_lte and the of the event'
+    )
   })
 
   // it('updates the state after processing an event', () => {})

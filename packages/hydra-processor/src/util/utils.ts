@@ -1,4 +1,5 @@
 import Debug from 'debug'
+import e from 'express'
 import fs from 'fs'
 
 const debug = Debug('hydra-processor:util')
@@ -28,4 +29,21 @@ export function resolvePackageVersion(pkgName: string): string {
   }
 
   throw new Error(`Can't resolve ${pkgName} version`)
+}
+
+export function parseEventId(
+  eventId: string
+): { blockHeight: number; eventId: number } {
+  const parts = eventId.split('-')
+
+  if (parts.length !== 2) {
+    throw new Error(
+      `Event ID ${eventId} does not match the format <blockHeight>-<eventId>`
+    )
+  }
+
+  return {
+    blockHeight: parseInt(parts[0], 10),
+    eventId: parseInt(parts[1], 10),
+  }
 }

@@ -19,6 +19,7 @@ import { conf, getManifest } from '../start/config'
 import { eventEmitter, PROCESSED_EVENT } from '../start/events'
 import { BlockInterval } from '../start/manifest'
 import { error, info } from '../util/log'
+import { parseEventId } from '../util/utils'
 
 const debug = Debug('hydra-processor:mappings-processor')
 
@@ -164,8 +165,10 @@ export function nextState(
   state: IProcessorState,
   filter: { block_lte: number }
 ): IProcessorState {
+  const lastProcessedEvent = state.lastProcessedEvent || formatEventId(0, 0)
+  const { blockHeight } = parseEventId(lastProcessedEvent)
   return {
-    lastScannedBlock: filter.block_lte,
+    lastScannedBlock: Math.min(filter.block_lte, blockHeight),
     lastProcessedEvent: state.lastProcessedEvent || formatEventId(0, 0),
   }
 }
