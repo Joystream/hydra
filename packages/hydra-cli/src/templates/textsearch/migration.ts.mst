@@ -27,13 +27,14 @@ export class {{query.typePrefix}}Migration{{query.ts}} implements MigrationInter
             STORED;
         `);
         await queryRunner.query(`CREATE INDEX {{index_name}} ON {{table}} USING GIN ({{tsvColumn}})`);
+        await queryRunner.query(`CREATE INDEX {{table}}_id_idx ON {{table}} (('{{table}}' || '_' || id))`);
     {{/query.documents}}
 
         await queryRunner.query(`
             CREATE VIEW {{query.viewName}} AS
         {{#query.documents}}    
             SELECT 
-                text '{{table}}' AS origin_table, id, {{tsvColumn}} AS tsv, {{docColumn}} AS document 
+                text '{{table}}' AS origin_table, '{{table}}' || '_' || id AS unique_id, id, {{tsvColumn}} AS tsv, {{docColumn}} AS document 
             FROM
                 {{table}}
             {{^last}}    
@@ -48,6 +49,7 @@ export class {{query.typePrefix}}Migration{{query.ts}} implements MigrationInter
         await queryRunner.query(`DROP VIEW {{query.viewName}}`);
     {{#query.documents}}    
         await queryRunner.query(`DROP INDEX {{index_name}}`);
+        await queryRunner.query(`DROP INDEX {{table}}_id_idx`);
         await queryRunner.query(`ALTER TABLE {{table}} DROP COLUMN {{tsvColumn}}`);
         await queryRunner.query(`ALTER TABLE {{table}} DROP COLUMN {{docColumn}}`);
     {{/query.documents}}    

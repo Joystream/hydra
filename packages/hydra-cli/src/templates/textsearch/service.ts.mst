@@ -45,7 +45,7 @@ export class {{query.typePrefix}}FTSService {
 
       const generateSqlQuery = (table: string, where: string) =>
         `
-  SELECT '${table}_' || id as unique_id FROM "${table}" ` + where;
+  SELECT '${table}_' || id AS unique_id FROM "${table}" ` + where;
 
       wheres.map((w, index) => {
         if (w) {
