@@ -57,6 +57,8 @@ export type SubstrateEventOrderByInput =   'createdAt_ASC' |
   'extrinsicName_DESC' |
   'method_ASC' |
   'method_DESC' |
+  'extrinsicHash_ASC' |
+  'extrinsicHash_DESC' |
   'blockNumber_ASC' |
   'blockNumber_DESC' |
   'index_ASC' |
@@ -121,6 +123,9 @@ export interface SubstrateEventCreateInput {
   extrinsicName?: String | null
   method: String
   phase: JSONObject
+  data: JSONObject
+  extrinsicArgs: JSONObject
+  extrinsicHash?: String | null
   blockNumber: Float
   index: Float
   params?: JSONObject | null
@@ -133,6 +138,9 @@ export interface SubstrateEventUpdateInput {
   extrinsicName?: String | null
   method?: String | null
   phase?: JSONObject | null
+  data?: JSONObject | null
+  extrinsicArgs?: JSONObject | null
+  extrinsicHash?: String | null
   blockNumber?: Float | null
   index?: Float | null
   params?: JSONObject | null
@@ -185,6 +193,13 @@ export interface SubstrateEventWhereInput {
   method_endsWith?: String | null
   method_in?: String[] | String | null
   phase_json?: JSONObject | null
+  data_json?: JSONObject | null
+  extrinsicArgs_json?: JSONObject | null
+  extrinsicHash_eq?: String | null
+  extrinsicHash_contains?: String | null
+  extrinsicHash_startsWith?: String | null
+  extrinsicHash_endsWith?: String | null
+  extrinsicHash_in?: String[] | String | null
   blockNumber_eq?: Int | null
   blockNumber_gt?: Int | null
   blockNumber_gte?: Int | null
@@ -406,6 +421,9 @@ export interface SubstrateEvent extends BaseGraphQLObject {
   extrinsicName?: String | null
   method: String
   phase: JSONObject
+  data: JSONObject
+  extrinsicArgs: JSONObject
+  extrinsicHash?: String | null
   blockNumber: Int
   index: Int
   params?: Array<EventParam> | null

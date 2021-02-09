@@ -438,6 +438,9 @@ export enum SubstrateEventOrderByEnum {
   method_ASC = "method_ASC",
   method_DESC = "method_DESC",
 
+  extrinsicHash_ASC = "extrinsicHash_ASC",
+  extrinsicHash_DESC = "extrinsicHash_DESC",
+
   blockNumber_ASC = "blockNumber_ASC",
   blockNumber_DESC = "blockNumber_DESC",
 
@@ -589,6 +592,27 @@ export class SubstrateEventWhereInput {
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   phase_json?: JsonObject;
 
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  data_json?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  extrinsicArgs_json?: JsonObject;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicHash_eq?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicHash_contains?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicHash_startsWith?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicHash_endsWith?: string;
+
+  @TypeGraphQLField(() => [String], { nullable: true })
+  extrinsicHash_in?: string[];
+
   @TypeGraphQLField(() => Int, { nullable: true })
   blockNumber_eq?: number;
 
@@ -670,6 +694,15 @@ export class SubstrateEventCreateInput {
   @TypeGraphQLField(() => GraphQLJSONObject)
   phase!: JsonObject;
 
+  @TypeGraphQLField(() => GraphQLJSONObject)
+  data!: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject)
+  extrinsicArgs!: JsonObject;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicHash?: string;
+
   @TypeGraphQLField()
   blockNumber!: number;
 
@@ -699,6 +732,15 @@ export class SubstrateEventUpdateInput {
 
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   phase?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  data?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  extrinsicArgs?: JsonObject;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicHash?: string;
 
   @TypeGraphQLField({ nullable: true })
   blockNumber?: number;

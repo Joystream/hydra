@@ -35,6 +35,14 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
   @Column({ nullable: true })
   extrinsicName?: string
 
+  @Column({
+    type: 'jsonb',
+  })
+  extrinsicArgs!: AnyJson
+
+  @Column({ nullable: true })
+  extrinsicHash?: string
+
   @Column()
   method!: string
 
@@ -58,6 +66,11 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
     type: 'jsonb',
   })
   params!: EventParam[]
+
+  @Column({
+    type: 'jsonb',
+  })
+  data!: AnyJson
 
   @OneToOne(
     () => SubstrateExtrinsicEntity,
@@ -83,21 +96,29 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
     _entity.phase = (q.eventRecord.phase.toJSON() || {}) as AnyJson
 
     _entity.params = []
+    _entity.data = {} as AnyJson
 
     const { event } = q.eventRecord
 
     if (event.data.length) {
       q.eventRecord.event.data.forEach((data, index) => {
+        const type = event.typeDef[index].type
+        const name =
+          event.typeDef[index].name ||
+          event.typeDef[index].displayName ||
+          `param${index}`
+        const value = data ? data.toJSON() : {}
+
+        _entity.data[name] = { type, value } as AnyJson
         _entity.params.push({
-          type: event.typeDef[index].type,
-          name:
-            event.typeDef[index].name ||
-            event.typeDef[index].displayName ||
-            'NO_NAME',
-          value: data ? data.toJSON() : {},
+          type,
+          name,
+          value,
         } as EventParam)
       })
     }
+
+    const extrinsicArgs: AnyJson = {}
 
     if (q.extrinsic) {
       const e = q.extrinsic
@@ -110,10 +131,12 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
 
       extr.method = e.method.methodName || 'NO_METHOD'
       extr.section = e.method.sectionName || 'NO_SECTION'
-      _entity.extrinsicName = `${extr.method}.${extr.section}`
+      _entity.extrinsicName = `${extr.section}.${extr.method}`
 
       extr.meta = (e.meta.toJSON() || {}) as AnyJson
       extr.hash = e.hash.toString()
+      _entity.extrinsicHash = extr.hash
+
       extr.isSigned = e.isSigned
       extr.tip = new BN(e.tip.toString())
       extr.versionInfo = e.version.toString()
@@ -123,13 +146,21 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
       extr.args = []
 
       e.method.args.forEach((data, index) => {
+        const name = e.meta.args[index].name.toString()
+        const value = (data.toJSON() || '') as AnyJsonField
+        const type = data.toRawType()
+
         extr.args.push({
-          type: data.toRawType(),
-          value: (data.toJSON() || '') as AnyJsonField,
-          name: e.meta.args[index].name.toString(),
+          type,
+          value,
+          name,
         })
+        extrinsicArgs[name] = { type, value }
       })
     }
+
+    _entity.extrinsicArgs = extrinsicArgs
+
     // debug(`Event entity: ${JSON.stringify(_entity, null, 2)}`);
 
     return _entity
