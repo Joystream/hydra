@@ -138,7 +138,7 @@ export class {{query.typePrefix}}FTSService {
               WHERE phraseto_tsquery('english', $${parameterCounter + 1}) @@ tsv
               ${
                 queries !== ``
-                  ? `AND origin_table || '_' || id IN (SELECT unique_id FROM selected_ids)`
+                  ? `AND unique_id IN (SELECT unique_id FROM selected_ids)`
                   : ``
               } 
               ORDER BY rank DESC
