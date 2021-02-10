@@ -1,3 +1,5 @@
+import { gql } from 'graphql-request'
+
 // to be replaced with a ws subsription
 export const GET_INDEXER_HEAD = `
 query {
@@ -40,4 +42,13 @@ query {
     insertedAt
   }  
 }
+`
+
+export const FTS_COMMENT_QUERY_WITH_WHERE_CONDITION = gql`
+  query Search($text: String!, $skip: Int, $from: Bytes!) {
+    commentSearch(text: $text, skip: $skip, whereTransfer: { from_eq: $from }) {
+      highlight
+      rank
+    }
+  }
 `

@@ -17,6 +17,7 @@ interface MustacheQuery {
     documents: MustacheQueryDocument[] // all text fields in a table are grouped into documents
     ts: number // migration timestamp
   }
+  whereInputs: boolean // import *WhereInput classes from 'generated'
 }
 
 interface MustacheOrmEnitity {
@@ -109,6 +110,7 @@ export class FTSQueryRenderer {
         documents,
         ts: this._context.ts ? (this._context.ts as number) : Date.now(),
       },
+      whereInputs: !!entities.length,
     }
   }
 
