@@ -23,12 +23,10 @@
     "db:schema:migrate": "yarn workspace query-node db:migrate",
     "db:processor:migrate": "hydra-processor migrate -e .env",
     "db:migrate": "yarn db:schema:migrate && yarn db:processor:migrate",
-    "bootstrap": "hydra-cli codegen --createDb",
-    "codegen:all": "hydra-cli codegen",
-    "codegen:processor": "hydra-cli codegen --no-graphql",
-    "codegen:query-node": "hydra-cli codegen --no-processor",
-    "codegen:mappings-types": "hydra-typegen typegen --outDir ./mappings/generated/types --no-strict --metadata ${NODE_URL} --events ${EVENTS:-Balances.Transfer} --calls ${CALLS:-Balances.transfer} --debug",
-    "mappings:build": "rm -rf ./mappings/generated && yarn codegen:mappings-types && yarn workspace sample-mappings build",
+    "bootstrap": "yarn codegen && yarn db:prepare && yarn db:migrate",
+    "codegen": "hydra-cli codegen --no-processor",
+    "typegen": "hydra-typegen typegen --outDir ./mappings/generated/types --no-strict --metadata ${NODE_URL} --events ${EVENTS:-Balances.Transfer} --calls ${CALLS:-Balances.transfer} --debug",
+    "mappings:build": "rm -rf ./mappings/generated && yarn typegen && yarn workspace sample-mappings build",
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
     "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 hydra-kit:latest yarn db:migrate",
@@ -45,7 +43,7 @@
     "@dzlzv/hydra-cli": "0.1.6",
     "@dzlzv/hydra-common": "~0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
-    "@dzlzv/hydra-processor": "~0.1.0",
+    "@dzlzv/hydra-processor": "~0.1.1",
     "@dzlzv/hydra-typegen": "~0.0.1"
   }
 }

@@ -2,4 +2,6 @@ metadata:
   source: ws://localhost:9944
 events:
   - balances.Transfer
+calls:
+  - timestamp.set
 outDir: ./mappings/generated/types

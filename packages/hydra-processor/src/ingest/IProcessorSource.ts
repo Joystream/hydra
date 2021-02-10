@@ -9,13 +9,14 @@ import { SubstrateEvent } from '@dzlzv/hydra-common'
  */
 export interface EventQuery {
   id_gt?: string
-  names: string[]
+  events: string[]
+  extrinsics?: string[]
   block_gte: number
   block_lte: number
 }
 
 export interface IProcessorSource {
-  nextBatch(query: EventQuery, limit: number): Promise<SubstrateEvent[]>
+  nextBatch(query: EventQuery[], limit: number): Promise<SubstrateEvent[]>
 
   indexerHead(): Promise<number>
 

@@ -47,3 +47,12 @@ export function parseEventId(
     eventId: parseInt(parts[1], 10),
   }
 }
+
+/**
+ * Takes each string in the array, puts into quotes and joins with a comma
+ * [a,b,c] -> "a","b","c"
+ *
+ */
+export function quotedJoin(toQuote: string[]): string {
+  return toQuote.map((s) => `"${s}"`).join()
+}

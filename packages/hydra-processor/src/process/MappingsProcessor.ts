@@ -27,7 +27,6 @@ export class MappingsProcessor {
   globalFilterConfig: GlobalFilterConfig
   state!: IProcessorState
   private _started = false
-  private _stopped = false
   indexerHead!: number // current indexer head we are aware of
 
   constructor(
@@ -39,6 +38,7 @@ export class MappingsProcessor {
     this.globalFilterConfig = {
       blockInterval: mappings.blockInterval,
       events: Object.keys(mappings.eventHandlers),
+      extrinsics: Object.keys(mappings.extrinsicHandlers),
       blockWindow: conf.BLOCK_WINDOW,
     }
   }
@@ -63,7 +63,7 @@ export class MappingsProcessor {
   }
 
   get stopped(): boolean {
-    return this._stopped
+    return !this._started
   }
 
   async pollIndexer(): Promise<void> {
@@ -89,8 +89,8 @@ export class MappingsProcessor {
     // blocks ahead of the last scanned block
     await pWaitFor(
       () =>
-        this.indexerHead - this.state.lastScannedBlock >
-          conf.MIN_BLOCKS_AHEAD || !this._started
+        !this._started ||
+        this.indexerHead - this.state.lastScannedBlock > conf.MIN_BLOCKS_AHEAD
     )
   }
 
@@ -99,10 +99,10 @@ export class MappingsProcessor {
     while (this.shouldWork()) {
       try {
         await this.awaitIndexer()
-        const filter = nextEventQuery(this)
+        const queries = nextEventQueries(this)
 
         const events = await this.eventsSource.nextBatch(
-          filter,
+          queries,
           conf.BATCH_SIZE
         )
 
@@ -122,7 +122,7 @@ export class MappingsProcessor {
         }
 
         // Even if there were no events, update the last scanned block
-        this.state = nextState(this.state, filter)
+        this.state = nextState(this.state, queries)
         await this.stateHandler.persist(this.state)
       } catch (e) {
         error(`Stopping the proccessor due to errors: ${logError(e)}`)
@@ -137,7 +137,6 @@ export class MappingsProcessor {
         2
       )}`
     )
-    this._stopped = true
   }
 
   private shouldWork(): boolean {
@@ -152,7 +151,7 @@ export interface GlobalFilterConfig {
   blockWindow: number
   blockInterval: BlockInterval
   events: string[]
-  // TODO: add extrinsics
+  extrinsics: string[]
 }
 
 export interface ProcessorContext {
@@ -163,13 +162,13 @@ export interface ProcessorContext {
 
 export function nextState(
   state: IProcessorState,
-  filter: { block_lte: number }
+  filter: { block_lte: number }[]
 ): IProcessorState {
   const lastProcessedEvent = state.lastProcessedEvent || formatEventId(0, 0)
   const { blockHeight } = parseEventId(lastProcessedEvent)
   return {
-    lastScannedBlock: Math.min(filter.block_lte, blockHeight),
-    lastProcessedEvent: state.lastProcessedEvent || formatEventId(0, 0),
+    lastScannedBlock: Math.min(...filter.map((f) => f.block_lte), blockHeight),
+    lastProcessedEvent,
   }
 }
 
@@ -190,10 +189,10 @@ export async function processEvent(
   }
 }
 
-export function nextEventQuery(context: ProcessorContext): EventQuery {
+export function nextEventQueries(context: ProcessorContext): EventQuery[] {
   const { state, indexerHead, globalFilterConfig } = context
-  const { blockInterval, events, blockWindow } = globalFilterConfig
-  return {
+  const { blockInterval, events, extrinsics, blockWindow } = globalFilterConfig
+  const globalBlock = {
     id_gt: state.lastProcessedEvent,
     block_gte: Math.max(state.lastScannedBlock, blockInterval.from),
     block_lte: Math.min(
@@ -201,6 +200,17 @@ export function nextEventQuery(context: ProcessorContext): EventQuery {
       indexerHead,
       blockInterval.to
     ),
-    names: events,
   }
+
+  return [
+    {
+      ...globalBlock,
+      events,
+    },
+    {
+      ...globalBlock,
+      events: ['system.ExtrinsicSuccess'], // TODO: make success-only configurable
+      extrinsics,
+    },
+  ]
 }

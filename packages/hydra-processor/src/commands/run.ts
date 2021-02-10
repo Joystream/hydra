@@ -50,6 +50,7 @@ export default class Run extends Command {
       error(`${logError(e)}`)
       process.exitCode = 1
     } finally {
+      info(`Shutting down...`)
       await processor.shutDown()
     }
   }

@@ -48,10 +48,6 @@ describe('manifest', () => {
   })
 
   it('validate handler args', () => {
-    expect(() => validateArgTypes({ handler: 'test', argTypes: [] })).to.throw(
-      'at least one argument'
-    )
-
     expect(() =>
       validateArgTypes({
         handler: 'test',
@@ -72,5 +68,12 @@ describe('manifest', () => {
         argTypes: ['DatabaseManager', 'XCall', 'YCall'],
       })
     ).to.throw('multiple arguments of call type')
+  })
+
+  it('Parse handler definitions', () => {
+    expect(parseHandlerDef('test()').argTypes.length).to.equal(
+      0,
+      'Should parse empty arg list'
+    )
   })
 })

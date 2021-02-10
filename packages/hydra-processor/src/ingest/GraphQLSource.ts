@@ -3,36 +3,37 @@ import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
 import { conf } from '../start/config'
+import { quotedJoin } from '../util/utils'
 
 const debug = Debug('index-builder:processor')
 
-const GET_EVENTS_AFTER_QUERY = `
-query GetEventsAfterID( $afterID: ID, $names: [String!]!, $fromBlock: Int, $toBlock: Int, $size: Int) {
-  substrateEventsAfter(where: { name_in: $names, blockNumber_gte: $fromBlock, blockNumber_lte: $toBlock }, afterID: $afterID, limit: $size) {
-    id
-    name 
-    method
-    params {
-      name
-      type
-      value
-    }
-    index 
-    blockNumber
-    blockTimestamp
-    extrinsic {
-      method
-      section
-      versionInfo
-      signer
-      args
-      signature
-      hash
-      tip
-    }
-  }
-}
-`
+// const GET_EVENTS_AFTER_QUERY = `
+// query GetEventsAfterID( $afterID: ID, $events: [String!]!, $fromBlock: Int, $toBlock: Int, $size: Int) {
+//   substrateEventsAfter(where: { name_in: $events, $blockNumber_gte: $fromBlock, blockNumber_lte: $toBlock }, afterID: $afterID, limit: $size) {
+//     id
+//     name
+//     method
+//     params {
+//       name
+//       type
+//       value
+//     }
+//     index
+//     blockNumber
+//     blockTimestamp
+//     extrinsic {
+//       method
+//       section
+//       versionInfo
+//       signer
+//       args
+//       signature
+//       hash
+//       tip
+//     }
+//   }
+// }
+// `
 
 // to be replaced with a ws subsription
 const GET_INDEXER_HEAD = `
@@ -65,19 +66,71 @@ export class GraphQLSource implements IProcessorSource {
     return status.indexerStatus.head
   }
 
-  async nextBatch(filter: EventQuery, size: number): Promise<SubstrateEvent[]> {
-    debug(`Filter: ${JSON.stringify(filter, null, 2)}`)
-    const data = await this.graphClient.request<{
-      substrateEventsAfter: SubstrateEvent[]
-    }>(GET_EVENTS_AFTER_QUERY, {
-      size,
-      names: filter.names,
-      afterID: filter.id_gt,
-      fromBlock: filter.block_gte,
-      toBlock: filter.block_lte,
-    })
-    debug(`Fetched ${data.substrateEventsAfter.length} events`)
+  async nextBatch(
+    queries: EventQuery[],
+    size: number
+  ): Promise<SubstrateEvent[]> {
+    const query = collectQueries(
+      queries.map((f) => getEventsGraphQLQuery(f, size))
+    )
+    debug(`GraphqQL Query: ${query}`)
+
+    const raw = await this.graphClient.request<
+      Record<string, SubstrateEvent[]>
+    >(query)
+
+    const data: SubstrateEvent[] = Object.keys(raw)
+      .reduce((acc: SubstrateEvent[], key) => [...acc, ...raw[key]], [])
+      .sort((a, b) => (a.id < b.id ? -1 : 1))
+  
+    debug(`Fetched ${data.length} events`)
     debug(`Events: ${JSON.stringify(data, null, 2)} events`)
-    return data.substrateEventsAfter
+    return data
   }
+}
+
+export function collectQueries(queries: string[]) {
+  // we need to do this hack to be able to run multiple queries in a single request
+  return `query {
+    ${queries.map((q, i) => `query${i}: ${q}`).join('\n')}
+  }`
+}
+
+export function getEventsGraphQLQuery(
+  { events, extrinsics, block_gte, block_lte, id_gt }: EventQuery,
+  limit: number
+): string {
+  const eventsFilter =
+    events.length > 0 ? `name_in: [${quotedJoin(events)}],` : ''
+  const extrinsicsFilter =
+    extrinsics && extrinsics.length > 0
+      ? `extrinsicName_in: [${quotedJoin(extrinsics)}],`
+      : ''
+  const idFilter = id_gt ? `afterID: "${id_gt}",` : ''
+
+  return `
+  substrateEventsAfter(where: { ${eventsFilter}${extrinsicsFilter} blockNumber_gte: ${block_gte}, blockNumber_lte: ${block_lte} }, ${idFilter} limit: ${limit}) {
+    id
+    name 
+    method 
+    params {
+      name
+      type
+      value
+    }
+    index 
+    blockNumber
+    blockTimestamp
+    extrinsic {
+      method
+      section
+      versionInfo
+      signer
+      args
+      signature
+      hash
+      tip
+    }
+  }
+`
 }
