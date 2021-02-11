@@ -14,7 +14,7 @@ import pWaitFor from 'p-wait-for'
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 
-describe('End-to-end tests', () => {
+describe('end-to-end transfer tests', () => {
   let amount: number
   let blockHeight: number
 

@@ -8,7 +8,7 @@
   "version": "1.0.0",
   "description": "GraphQL-based query node and Substrate processor. Generated with ♥ by Hydra-CLI",
   "scripts": {
-    "build": "yarn clean && yarn codegen:all",
+    "build": "yarn clean && yarn codegen",
     "rebuild": "yarn db:drop && yarn clean:query-node && yarn codegen:query-node && yarn db:prepare && yarn db:migrate",
     "lint": "echo \"Skippinng\"",
     "clean": "rm -rf ./generated",
@@ -25,8 +25,9 @@
     "db:migrate": "yarn db:schema:migrate && yarn db:processor:migrate",
     "bootstrap": "yarn codegen && yarn db:prepare && yarn db:migrate",
     "codegen": "hydra-cli codegen --no-processor",
-    "typegen": "hydra-typegen typegen --outDir ./mappings/generated/types --no-strict --metadata ${NODE_URL} --events ${EVENTS:-Balances.Transfer} --calls ${CALLS:-Balances.transfer} --debug",
-    "mappings:build": "rm -rf ./mappings/generated && yarn typegen && yarn workspace sample-mappings build",
+    "typegen:configure": "NODE_URL=${NODE_URL:-ws://localhost:9000} envsub typegen.template.yml typegen.yml",
+    "typegen": "rm -rf ./mappings/generated && hydra-typegen typegen typegen.yml --debug",
+    "mappings:build": "yarn workspace sample-mappings build",
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
     "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 hydra-kit:latest yarn db:migrate",
@@ -40,6 +41,7 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
+    "envsub": "^4.0.7",
     "@dzlzv/hydra-cli": "0.1.6",
     "@dzlzv/hydra-common": "~0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
