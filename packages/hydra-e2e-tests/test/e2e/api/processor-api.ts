@@ -74,7 +74,7 @@ export async function findTransfersByCommentAndWhereCondition(
   return result.commentSearch
 }
 
-export async function lastTimestamp(): Promise<Number | undefined> {
+export async function lastTimestamp(): Promise<number | undefined> {
   const result = await getGQLClient().request<{
     blockTimestamps: {
       timestamp: number

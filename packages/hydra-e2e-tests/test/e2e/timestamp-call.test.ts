@@ -1,6 +1,6 @@
 import { expect } from 'chai'
-import pWaitFor = require('p-wait-for')
 import { getProcessorHead, lastTimestamp } from './api/processor-api'
+import pWaitFor = require('p-wait-for')
 
 describe('End-to-end timesamp call tests', () => {
   before(async () => {

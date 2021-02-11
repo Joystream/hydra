@@ -1,5 +1,4 @@
 import Debug from 'debug'
-import e from 'express'
 import fs from 'fs'
 
 const debug = Debug('hydra-processor:util')

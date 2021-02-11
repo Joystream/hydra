@@ -78,7 +78,7 @@ export class HandlerLookupService {
   }
 
   lookupHander({ context }: GlobalArgs): MappingHandler {
-    let handler = undefined
+    let handler
     if (EXTRINSIC_EVENTS.includes(context.name)) {
       if (context.extrinsic === undefined) {
         throw new Error(

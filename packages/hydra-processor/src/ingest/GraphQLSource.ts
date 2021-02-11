@@ -82,7 +82,7 @@ export class GraphQLSource implements IProcessorSource {
     const data: SubstrateEvent[] = Object.keys(raw)
       .reduce((acc: SubstrateEvent[], key) => [...acc, ...raw[key]], [])
       .sort((a, b) => (a.id < b.id ? -1 : 1))
-  
+
     debug(`Fetched ${data.length} events`)
     debug(`Events: ${JSON.stringify(data, null, 2)} events`)
     return data

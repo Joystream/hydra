@@ -18,5 +18,4 @@ describe('HandlerLookupsService', () => {
   it('resolves imports and finds a prototype', async () => {
     expect(balancesTransferType.prototype).not.to.be.an('undefined')
   })
-
 })
