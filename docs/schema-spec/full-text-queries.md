@@ -25,7 +25,7 @@ The generated output schema will define the required output type and the query:
 type SearchResult {
    item: Post | Comment,
    rank: number, 
-   highligt: String
+   highlight: String
 }
 
 type Query {
