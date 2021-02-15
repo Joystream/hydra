@@ -9,4 +9,5 @@ export interface ProcessorOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entities?: any[]
   indexerEndpointURL?: string
+  manifest?: string
 }
