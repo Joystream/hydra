@@ -1,5 +1,7 @@
 metadata:
-  source: ws://localhost:9944
+  source: ${NODE_URL}
 events:
   - balances.Transfer
+calls:
+  - timestamp.set
 outDir: ./mappings/generated/types

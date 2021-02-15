@@ -29,3 +29,29 @@ export function resolvePackageVersion(pkgName: string): string {
 
   throw new Error(`Can't resolve ${pkgName} version`)
 }
+
+export function parseEventId(
+  eventId: string
+): { blockHeight: number; eventId: number } {
+  const parts = eventId.split('-')
+
+  if (parts.length !== 2) {
+    throw new Error(
+      `Event ID ${eventId} does not match the format <blockHeight>-<eventId>`
+    )
+  }
+
+  return {
+    blockHeight: parseInt(parts[0], 10),
+    eventId: parseInt(parts[1], 10),
+  }
+}
+
+/**
+ * Takes each string in the array, puts into quotes and joins with a comma
+ * [a,b,c] -> "a","b","c"
+ *
+ */
+export function quotedJoin(toQuote: string[]): string {
+  return toQuote.map((s) => `"${s}"`).join()
+}

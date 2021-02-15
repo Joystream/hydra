@@ -17,9 +17,8 @@ mappings:
       handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
   extrinsicHandlers:
     # infer defaults
-    #- extrinsic: Balances.Transfer 
-    #- extrinsic: Sudo.batchCall 
-    #  handler: handleSudoCall(DatabaseManager,SubstrateEvent)
+    - extrinsic: timestamp.set 
+      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
   preBlockHooks:
   postBlockHooks:
   

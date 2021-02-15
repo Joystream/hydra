@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import semver from 'semver'
 
-import { camelCase, countBy, endsWith } from 'lodash'
+import { camelCase, countBy, endsWith, compact } from 'lodash'
 
 import { HandlerFunc } from './QueryEventProcessingPack'
 import { resolvePackageVersion } from '../util/utils'
@@ -41,6 +41,7 @@ const manifestValidatorOptions = {
         {
           extrinsic: 'string',
           'handler?': 'string',
+          'success?': 'boolean',
         },
       ],
       'preBlockHooks?': ['string'],
@@ -65,7 +66,11 @@ interface MappingsDefInput {
   blockInterval?: string
   imports?: string[]
   eventHandlers?: Array<{ event: string; handler?: string }>
-  extrinsicHandlers?: Array<{ extrinsic: string; handler?: string }>
+  extrinsicHandlers?: Array<{
+    extrinsic: string
+    handler?: string
+    success?: boolean
+  }>
   preBlockHooks?: string[]
   postBlockHooks?: string[]
 }
@@ -76,7 +81,7 @@ export interface MappingsDef {
   imports: string[]
   blockInterval: BlockInterval
   eventHandlers: Record<string, MappingHandler>
-  extrinsicHandlers: Record<string, MappingHandler>
+  extrinsicHandlers: Record<string, ExtrinsicHandler>
   preBlockHooks: MappingHandler[]
   postBlockHooks: MappingHandler[]
 }
@@ -90,6 +95,10 @@ export interface MappingHandler {
   // blockInterval?: BlockInterval TODO: do we need per-handler block intervals?
   handlerFunc: HandlerFunc
   argTypes: string[]
+}
+
+export interface ExtrinsicHandler extends MappingHandler {
+  success: boolean
 }
 
 export interface ProcessorManifest {
@@ -199,13 +208,16 @@ function inferDefaults(parsed: MappingsDefInput): MappingsDef {
       : {},
     extrinsicHandlers: extrinsicHandlers
       ? extrinsicHandlers.reduce((acc, item) => {
-          acc[item.extrinsic] = parseHandler({
-            ...item,
-            input: item.extrinsic,
-            suffix: CALL_SUFFIX,
-          })
+          acc[item.extrinsic] = {
+            success: item.success || true,
+            ...parseHandler({
+              ...item,
+              input: item.extrinsic,
+              suffix: CALL_SUFFIX,
+            }),
+          }
           return acc
-        }, {} as Record<string, MappingHandler>)
+        }, {} as Record<string, ExtrinsicHandler>)
       : {},
     preBlockHooks: preBlockHooks
       ? preBlockHooks.map((handler) => parseHandler({ handler }))
@@ -229,7 +241,7 @@ export function parseHandlerDef(
   }
   const name = split[0]
 
-  const argTypes = split[1].split(/,/).map((s) => s.trim())
+  const argTypes = compact(split[1].split(/,/).map((s) => s.trim())) // remove empty
 
   validateArgTypes({ handler, argTypes })
 
@@ -244,7 +256,8 @@ export function validateArgTypes({
   argTypes: string[]
 }): void {
   if (argTypes.length === 0) {
-    throw new Error(`Handler ${handler} must have at least one argument`)
+    warn(`Handler ${handler} has no arguments`)
+    return
   }
 
   const typeOccurrences = countBy(argTypes)

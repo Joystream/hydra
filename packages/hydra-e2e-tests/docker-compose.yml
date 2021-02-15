@@ -47,6 +47,8 @@ services:
              yarn workspace sample db:drop && \
              yarn workspace sample db:prepare && \
              yarn workspace sample db:migrate && \
+             yarn workspace sample typegen:configure && \
+             yarn workspace sample typegen && \
              yarn workspace sample mappings:build && \
              yarn workspace sample processor:start"
   

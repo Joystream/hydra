@@ -1,7 +1,7 @@
 FROM hydra-builder:latest
 
 
-RUN yarn workspace sample codegen:query-node
+RUN yarn workspace sample codegen
 RUN yarn workspace query-node install
 #RUN yarn workspace sample-hydra-processor install
 

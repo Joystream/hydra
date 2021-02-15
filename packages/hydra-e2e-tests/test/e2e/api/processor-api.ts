@@ -7,6 +7,7 @@ import {
   FIND_TRANSFER_BY_VALUE,
   FETCH_INSERTED_AT_FIELD_FROM_TRANSFER,
   FTS_COMMENT_QUERY_WITH_WHERE_CONDITION,
+  LAST_BLOCK_TIMESTAMP,
 } from './graphql-queries'
 
 export interface Transfer {
@@ -71,6 +72,18 @@ export async function findTransfersByCommentAndWhereCondition(
     }[]
   }>(FTS_COMMENT_QUERY_WITH_WHERE_CONDITION, { text, skip, from })
   return result.commentSearch
+}
+
+export async function lastTimestamp(): Promise<number | undefined> {
+  const result = await getGQLClient().request<{
+    blockTimestamps: {
+      timestamp: number
+    }[]
+  }>(LAST_BLOCK_TIMESTAMP)
+  console.log(`Result: ${JSON.stringify(result)}`)
+  return result.blockTimestamps.length > 0
+    ? result.blockTimestamps[0].timestamp
+    : undefined
 }
 
 export async function getMetric(metric: string): Promise<string> {
