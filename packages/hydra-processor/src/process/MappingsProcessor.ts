@@ -1,96 +1,84 @@
-import Debug from 'debug'
-import { makeDatabaseManager, doInTransaction } from '@dzlzv/hydra-db-utils'
-import { ProcessorOptions } from '../start'
-import { Inject, Service } from 'typedi'
-import { IProcessorSource, GraphQLSource, EventFilter } from '../ingest'
+/* eslint-disable @typescript-eslint/naming-convention */
+import { makeDatabaseManager } from '@dzlzv/hydra-db-utils'
+import { IProcessorSource, GraphQLSource, EventQuery } from '../ingest'
 import { HandlerLookupService } from './HandlerLookupService'
-import { QueryRunner } from 'typeorm'
-import {
-  logError,
-  waitFor,
-  SubstrateEvent,
-  formatEventId,
-} from '@dzlzv/hydra-common'
-import { IProcessorState, ProcessorStateHandler } from '../state'
+import { getConnection, EntityManager } from 'typeorm'
+import { logError, formatEventId } from '@dzlzv/hydra-common'
+import delay from 'delay'
+import pWaitFor from 'p-wait-for'
+import Debug from 'debug'
 
 import {
-  BATCH_SIZE,
-  BLOCK_WINDOW,
-  DEFAULT_PROCESSOR_NAME,
-  MINIMUM_BLOCKS_AHEAD,
-  PROCESSOR_POLL_INTERVAL,
-} from './processor-consts'
-import { EventEmitter } from 'events'
+  IProcessorState,
+  IProcessorStateHandler,
+  ProcessorStateHandler,
+} from '../state'
 
-const debug = Debug('index-builder:processor')
+import { conf, getManifest } from '../start/config'
 
-@Service('MappingsProcessor')
-export class MappingsProcessor extends EventEmitter {
-  // private _lastEventIndex: string | undefined;
-  private state!: IProcessorState
+import { eventEmitter, PROCESSED_EVENT } from '../start/events'
+import { BlockInterval } from '../start/manifest'
+import { error, info } from '../util/log'
+
+const debug = Debug('hydra-processor:mappings-processor')
+
+export class MappingsProcessor {
+  globalFilterConfig: GlobalFilterConfig
+  state!: IProcessorState
   private _started = false
-  private currentFilter!: EventFilter
-  private indexerHead!: number // current indexer head we are aware of
-
-  private _name = DEFAULT_PROCESSOR_NAME
+  private _stopped = false
+  indexerHead!: number // current indexer head we are aware of
 
   constructor(
-    @Inject('ProcessorOptions') protected options: ProcessorOptions,
-    @Inject('ProcessorSource')
-    protected eventsSource: IProcessorSource = new GraphQLSource(options),
-    @Inject() protected handlerLookup = new HandlerLookupService(options),
-    @Inject('ProcessorStateHandler')
-    protected stateHandler = new ProcessorStateHandler(
-      options.name || DEFAULT_PROCESSOR_NAME
-    )
+    protected eventsSource: IProcessorSource = new GraphQLSource(),
+    protected handlerLookup = new HandlerLookupService(),
+    protected stateHandler: IProcessorStateHandler = new ProcessorStateHandler(),
+    protected mappings = getManifest().mappings
   ) {
-    super()
+    this.globalFilterConfig = {
+      blockInterval: mappings.blockInterval,
+      events: Object.keys(mappings.eventHandlers),
+      blockWindow: conf.BLOCK_WINDOW,
+    }
+  }
+
+  async start(): Promise<void> {
+    info('Starting the processor')
+    this._started = true
+
+    this.state = await this.stateHandler.init()
+    await this.handlerLookup.load()
+
+    await pWaitFor(async () => {
+      info(`Waiting for the indexer head to be initialized`)
+      this.indexerHead = await this.eventsSource.indexerHead()
+      return this.indexerHead >= 0
+    })
+    await Promise.all([this.pollIndexer(), this.processingLoop()])
+  }
+
+  stop(): void {
+    this._started = false
+  }
+
+  get stopped(): boolean {
+    return this._stopped
+  }
+
+  async pollIndexer(): Promise<void> {
     // TODO: uncomment this block when eventSource will emit
     // this.eventsSource.on('NewIndexerHead', (h: number) => {
     //   debug(`New Indexer Head: ${h}`)
     //   this.indexerHead = h
     // });
     // For now, simply update indexerHead regularly
-    setInterval(() => {
-      this.eventsSource
-        .indexerHead()
-        .then((h) => {
-          debug(`New indexer head: ${h}`)
-          this.indexerHead = h
-        })
-        .catch((e) => debug(`Error fetching new indexer head: ${logError(e)}`))
-    }, PROCESSOR_POLL_INTERVAL) // every minute
-  }
-
-  async start(): Promise<void> {
-    debug('Spawned the processor')
-
-    this.state = await this.stateHandler.init(this.options.atBlock)
-    this.indexerHead = await this.eventsSource.indexerHead()
-
-    this.currentFilter = {
-      afterID: this.state.lastProcessedEvent,
-      fromBlock: this.state.lastScannedBlock,
-      toBlock: Math.min(
-        this.state.lastScannedBlock + BLOCK_WINDOW,
-        this.indexerHead
-      ),
-      names: this.handlerLookup.eventsToHandle(),
+    while (this._started) {
+      this.indexerHead = await this.eventsSource.indexerHead()
+      await delay(conf.POLL_INTERVAL_MS)
     }
-
-    this._started = true
-    await waitFor(() => {
-      debug(`Waiting for the indexer head to be initialized`)
-      return this.indexerHead >= 0
-    })
-    await this.processingLoop()
   }
 
-  public stop(): void {
-    this._started = false
-  }
-
-  private async nextFilter(): Promise<EventFilter> {
+  private async awaitIndexer(): Promise<void> {
     debug(
       `Indexer Head: ${this.indexerHead} Last Scanned Block: ${this.state.lastScannedBlock}`
     )
@@ -98,74 +86,118 @@ export class MappingsProcessor extends EventEmitter {
     // here we should eventually listen only to the events
     // For now, we simply wait until the indexer go for at least {MINIMUM_BLOCKS_AHEAD}
     // blocks ahead of the last scanned block
-    await waitFor(
+    await pWaitFor(
       () =>
-        this.indexerHead - this.state.lastScannedBlock > MINIMUM_BLOCKS_AHEAD,
-      () => !this._started
+        this.indexerHead - this.state.lastScannedBlock >
+          conf.MIN_BLOCKS_AHEAD || !this._started
     )
-
-    this.currentFilter.fromBlock = this.state.lastScannedBlock
-    this.currentFilter.toBlock = Math.min(
-      this.currentFilter.fromBlock + BLOCK_WINDOW,
-      this.indexerHead
-    )
-    this.currentFilter.afterID = this.state.lastProcessedEvent
-
-    // debug(`Next filter: ${JSON.stringify(this.currentFilter, null, 2)}`);
-    return this.currentFilter
   }
 
   // Long running loop where events are fetched and the mappings are applied
-  async processingLoop(): Promise<void> {
-    while (this._started) {
+  private async processingLoop(): Promise<void> {
+    while (this.shouldWork()) {
       try {
-        const nextFilter = await this.nextFilter()
+        await this.awaitIndexer()
+        const filter = nextEventQuery(this)
 
-        const events = await this.eventsSource.nextBatch(nextFilter, BATCH_SIZE)
+        const events = await this.eventsSource.nextBatch(
+          filter,
+          conf.BATCH_SIZE
+        )
+
         debug(`Processing new batch of events of size: ${events.length}`)
-        if (events.length > 0) {
-          await this.processEventBlock(events)
-        } else {
-          // If there is nothing to process, wait and update the indexer head
-          // TODO: we should really subsribe to new indexer heads here and update accordingly
-          this.state.lastScannedBlock = this.currentFilter.toBlock
-          // if we haven't found anything matching just take the genesis
-          this.state.lastProcessedEvent =
-            this.state.lastProcessedEvent || formatEventId(0, 0)
-          await this.stateHandler.persist(this.state)
+
+        for (const event of events) {
+          await getConnection().transaction(async (manager: EntityManager) => {
+            this.state = await processEvent(event, () =>
+              this.handlerLookup.lookupAndCall({
+                dbStore: makeDatabaseManager(manager),
+                context: event,
+              })
+            )
+            await this.stateHandler.persist(this.state, manager)
+          })
+          eventEmitter.emit(PROCESSED_EVENT, event)
         }
+
+        // Even if there were no events, update the last scanned block
+        this.state = nextState(this.state, filter)
+        await this.stateHandler.persist(this.state)
       } catch (e) {
-        console.error(`Stopping the proccessor due to errors: ${logError(e)}`)
+        error(`Stopping the proccessor due to errors: ${logError(e)}`)
         this.stop()
         throw new Error(e)
       }
     }
-    debug(`The processor has been stopped`)
+    debug(
+      `The processor has stopped at state: ${JSON.stringify(
+        this.state,
+        null,
+        2
+      )}`
+    )
+    this._stopped = true
   }
 
-  async processEventBlock(queryEventBlock: SubstrateEvent[]): Promise<void> {
-    for (const event of queryEventBlock) {
-      await doInTransaction(async (queryRunner: QueryRunner) => {
-        debug(`Processing event ${event.name}, 
-          id: ${event.id}`)
-
-        debug(`JSON: ${JSON.stringify(event, null, 2)}`)
-
-        const handler = this.handlerLookup.lookupHandler(event.name)
-        await handler(makeDatabaseManager(queryRunner.manager), event)
-
-        this.state.lastProcessedEvent = event.id
-        this.state.lastScannedBlock = event.blockNumber
-
-        await this.stateHandler.persist(this.state)
-
-        debug(`Event ${event.id} done`)
-      })
-      this.emit('PROCESSED_EVENT', event)
-    }
+  private shouldWork(): boolean {
+    return (
+      this._started &&
+      this.state.lastScannedBlock <= this.globalFilterConfig.blockInterval.to
+    )
   }
+}
 
-  get name(): string {
-    return this._name
+export interface GlobalFilterConfig {
+  blockWindow: number
+  blockInterval: BlockInterval
+  events: string[]
+  // TODO: add extrinsics
+}
+
+export interface ProcessorContext {
+  state: IProcessorState
+  indexerHead: number
+  globalFilterConfig: GlobalFilterConfig
+}
+
+export function nextState(
+  state: IProcessorState,
+  filter: { block_lte: number }
+): IProcessorState {
+  return {
+    lastScannedBlock: filter.block_lte,
+    lastProcessedEvent: state.lastProcessedEvent || formatEventId(0, 0),
+  }
+}
+
+export async function processEvent(
+  event: { id: string; blockNumber: number },
+  handler: () => Promise<void>
+): Promise<IProcessorState> {
+  debug(`Processing event ${event.id}`)
+
+  debug(`JSON: ${JSON.stringify(event, null, 2)}`)
+  await handler()
+
+  debug(`Event ${event.id} done`)
+
+  return {
+    lastProcessedEvent: event.id,
+    lastScannedBlock: event.blockNumber,
+  }
+}
+
+export function nextEventQuery(context: ProcessorContext): EventQuery {
+  const { state, indexerHead, globalFilterConfig } = context
+  const { blockInterval, events, blockWindow } = globalFilterConfig
+  return {
+    id_gt: state.lastProcessedEvent,
+    block_gte: Math.max(state.lastScannedBlock, blockInterval.from),
+    block_lte: Math.min(
+      state.lastScannedBlock + blockWindow,
+      indexerHead,
+      blockInterval.to
+    ),
+    names: events,
   }
 }

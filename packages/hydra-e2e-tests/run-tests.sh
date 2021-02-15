@@ -20,11 +20,11 @@ docker build ../hydra-indexer-gateway -t hydra-indexer-gateway:latest
 
 docker-compose up -d
 
-# wait for the indexer api to start 
+# wait for the processor to start grinding 
 attempt_counter=0
 max_attempts=10
 
-until $(curl -s --head  --request GET http://localhost:4000/graphql | grep "400" > /dev/null);  do
+until $(curl -s --head  --request GET http://localhost:3000/metrics/hydra_processor_last_scanned_block | grep "200" > /dev/null);  do
     if [ ${attempt_counter} -eq ${max_attempts} ];then
       echo "Max attempts reached"
       exit 1

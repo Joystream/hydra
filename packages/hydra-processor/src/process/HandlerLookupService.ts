@@ -1,50 +1,118 @@
-import { Inject, Service } from 'typedi'
-import {
-  ProcessorOptions,
-  QueryEventProcessingPack,
-  EventHandlerFunc,
-} from '../start'
+/* eslint-disable @typescript-eslint/no-explicit-any  */
 import Debug from 'debug'
-// Get the even name from the mapper name. By default, we assume the handlers
-// are of the form <section>_<method> which is translated into the canonical event name of the
-// form <section>.<method>
-const DEFAULT_MAPPINGS_TRANSLATOR = (m: string) =>
-  `${m.split('_')[0]}.${m.split('_')[1]}`
+import { getManifest } from '../start/config'
+import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import { CONTEXT_CLASS_NAME, STORE_CLASS_NAME } from '../start/manifest'
 
-const debug = Debug('index-builder:processor')
+const debug = Debug('hydra-processor:handler-lookup-service')
 
-@Service()
 export class HandlerLookupService {
-  private _events: string[] = []
-  private _event2mapping: { [e: string]: EventHandlerFunc } = {}
-  private _processingPack: QueryEventProcessingPack
-  private _translator = DEFAULT_MAPPINGS_TRANSLATOR
+  private events: string[]
+  private prototypes: Record<string, any> = {}
 
-  constructor(@Inject('ProcessorOptions') protected options: ProcessorOptions) {
-    this._processingPack = this.options.processingPack
-    this._translator =
-      this.options.mappingToEventTranslator || DEFAULT_MAPPINGS_TRANSLATOR
-    this._events = Object.keys(this._processingPack).map((mapping: string) =>
-      this._translator(mapping)
-    )
-    Object.keys(this._processingPack).map((m) => {
-      this._event2mapping[this._translator(m)] = this._processingPack[m]
-    })
+  constructor(protected mappings = getManifest().mappings) {
+    this.events = Object.keys(this.mappings.eventHandlers)
 
     debug(
       `The following events will be processed: ${JSON.stringify(
-        this._events,
+        this.events,
+        null,
+        2
+      )}`
+    )
+
+    debug(
+      `The following extrinsics will be processed: ${JSON.stringify(
+        Object.keys(this.mappings.extrinsicHandlers),
         null,
         2
       )}`
     )
   }
 
-  eventsToHandle(): string[] {
-    return this._events
+  async load(): Promise<void> {
+    const resolvedImports = await resolveImports(this.mappings.imports)
+
+    Object.values(this.mappings.eventHandlers).forEach((h) => {
+      h.argTypes.forEach((argType) => {
+        if (![CONTEXT_CLASS_NAME, STORE_CLASS_NAME].includes(argType)) {
+          this.prototypes[argType] = resolveArgType(
+            argType,
+            resolvedImports
+          ).prototype
+        }
+      })
+    })
   }
 
-  lookupHandler(eventName: string): EventHandlerFunc {
-    return this._event2mapping[eventName]
+  eventsToHandle(): string[] {
+    return this.events
   }
+
+  async lookupAndCall(ctxArgs: ContextArgs): Promise<void> {
+    const { context } = ctxArgs
+    if (!(context.name in this.mappings.eventHandlers)) {
+      throw new Error(`No mapping is defined for ${context.name}`)
+    }
+
+    const { handlerFunc, argTypes } = this.mappings.eventHandlers[context.name]
+
+    const args = createArgs(argTypes, ctxArgs, this.prototypes)
+
+    await handlerFunc(...args)
+  }
+}
+
+export interface ContextArgs {
+  dbStore: DatabaseManager
+  context: SubstrateEvent
+}
+
+export function createArgs(
+  argTypes: string[],
+  { dbStore, context }: ContextArgs,
+  prototypes: Record<string, any>
+): any[] {
+  return argTypes.map((argType) => {
+    if (argType === CONTEXT_CLASS_NAME) {
+      return context
+    }
+    if (argType === STORE_CLASS_NAME) {
+      return dbStore
+    }
+    const instance = Object.create(prototypes[argType])
+    return new instance.constructor(context)
+  })
+}
+
+export async function resolveImports(
+  imports: string[]
+): Promise<Record<string, unknown>> {
+  let resolved = {}
+  for (const importPath of imports) {
+    const resolvedImport = await import(importPath)
+    resolved = {
+      ...resolvedImport,
+      ...resolved,
+    }
+  }
+  return resolved as Record<string, unknown>
+}
+
+export function resolveArgType(
+  argType: string,
+  imports: Record<string, unknown>
+): any {
+  const modules = argType.split('.').map((s) => s.trim())
+
+  let obj = imports
+
+  for (const module of modules) {
+    obj = obj[module] as Record<string, unknown>
+    if (obj === undefined) {
+      throw new Error(`Cannot load type ${argType}:${module}`)
+    }
+  }
+  return obj
 }

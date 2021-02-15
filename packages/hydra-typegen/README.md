@@ -39,6 +39,21 @@ A minimal example for generating classes for the `Balances.Transfer` and `Treasu
 hydra-typegen --metadata wss://kusama-rpc.polkadot.io Balances.Transfer,Treasury.Deposit
 ```
 
+Hydra-typegen also supports config files like the one below:
+
+```yml
+metadata:
+  source: wss://kusama-rpc.polkadot.io
+  blockHash: '0x45eb7ddd324361adadd4f8cfafadbfb7e0a26393a70a70e5bee6204fc46af62e'
+events:
+  - Balances.Transfer
+calls:
+  - Balances.transfer
+outDir: ./generated
+```
+
+Simply run `hydra-typegen <path-to-config-file>`
+
 ## Custom types
 
 Hydra Typegen supports custom substrate types via the `--typedefs` flag. The provided `.json` file should include type definitions
