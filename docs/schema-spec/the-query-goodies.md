@@ -8,7 +8,7 @@ description: >-
 
 ## Filtering
 
-All the scalar entity types enjoy first-class support in the output schema when it comes to filtering. The standard is known as [OpenCRUD](https://www.opencrud.org/) and dictates who filtering should look like depending on the field type. For example, if the input schema defines the following type:
+All the scalar entity types enjoy first-class support in the output schema when it comes to filtering. The standard is known as [OpenCRUD](https://www.opencrud.org/) and dictates what the filtering should look like depending on the field type. For example, if the input schema defines the following type:
 
 ```graphql
 type Person @entity {
@@ -45,7 +45,7 @@ query {
 
 ## Ordering
 
-The results can also be ordered by any property with natural ordering. `_DESC`an `_ASC` suffixes indicate the direction:
+The results can also be ordered by any property with natural ordering. The `_DESC`and `_ASC` suffixes indicate the direction:
 
 ```graphql
 query {

@@ -49,5 +49,11 @@ It may be convenient to create an alias for quick access to `hydra-cli` e.g.
 ```text
 alias hydra-cli='npx @dzlzv/hydra-cli'
 ```
+
+Or on Windows you can use:
+
+```text
+doskey hydra-cli=npx @dzlzv/hydra-cli
+```
 {% endhint %}
 
