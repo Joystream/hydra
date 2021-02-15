@@ -3,7 +3,7 @@
 Enums are natively supported as described the GraphQL schema [spec](https://spec.graphql.org/June2018/#sec-Enums). Here is an illustrative example:
 
 ```text
-enum {
+enum ProposalStatus {
   NONE
   REJECTED
   APPROVED
