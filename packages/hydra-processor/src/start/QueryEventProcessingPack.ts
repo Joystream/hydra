@@ -12,5 +12,3 @@ export type EventHandlerFunc = (
 export interface QueryEventProcessingPack {
   [index: string]: EventHandlerFunc
 }
-
-export type HandlerFunc = (...args: any[]) => void | Promise<void>

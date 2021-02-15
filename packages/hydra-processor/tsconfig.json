@@ -10,8 +10,7 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"skipLibCheck": true,
-        "sourceMap": true,
-        "esModuleInterop": true,
+		"sourceMap": true,
 		"inlineSources": false
 	},
 	"include": ["src/**/*"],

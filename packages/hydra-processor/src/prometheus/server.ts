@@ -1,12 +1,12 @@
-import express from 'express'
+import * as express from 'express'
 import { register, validateMetricName } from 'prom-client'
 
 export function startPromEndpoint(): void {
   const server = express()
 
   // Setup server to Prometheus scrapes:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  server.get('/metrics', (req: any, res: any) => {
+
+  server.get('/metrics', (req, res) => {
     try {
       res.set('Content-Type', register.contentType)
       res.end(register.metrics())
@@ -15,8 +15,7 @@ export function startPromEndpoint(): void {
     }
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  server.get('/metrics/:metricName', (req: any, res: any) => {
+  server.get('/metrics/:metricName', (req, res) => {
     try {
       res.set('Content-Type', register.contentType)
       if (

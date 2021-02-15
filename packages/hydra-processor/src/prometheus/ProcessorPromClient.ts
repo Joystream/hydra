@@ -27,7 +27,7 @@ export class ProcessorPromClient {
     Container.set('ProcessorPromClient', this)
   }
 
-  init(): void {
+  init() {
     collectDefaultMetrics({ prefix: 'hydra_processor_system_' })
     this.stateHandler = Container.get<IProcessorStateHandler>(
       'ProcessorStateHandler'
