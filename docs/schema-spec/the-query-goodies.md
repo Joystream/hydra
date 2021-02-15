@@ -45,7 +45,7 @@ query {
 
 ## Ordering
 
-The results can also be ordered by any property with natural ordering. `_DESC`an `_ASC` suffixes indicate the direction:
+The results can also be ordered by any property with natural ordering. The `_DESC`and `_ASC` suffixes indicate the direction:
 
 ```graphql
 query {
