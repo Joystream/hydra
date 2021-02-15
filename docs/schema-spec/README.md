@@ -14,3 +14,10 @@ Hydra input schema is a dialect of the GraphQL schema definition language enrich
 $ hydra-cli preview && cat apipreview.graphql
 ```
 
+In windows, you should run:
+
+```text
+$ hydra-cli preview && type apipreview.graphql
+```
+
+
