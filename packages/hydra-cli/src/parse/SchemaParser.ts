@@ -20,6 +20,7 @@ import { SCHEMA_DEFINITIONS_PREAMBLE } from './constant'
 import { SchemaDirective } from './SchemaDirective'
 import { FTSDirective } from './FTSDirective'
 import path from 'path'
+import * as glob from 'glob'
 
 const debug = Debug('qnode-cli:schema-parser')
 
@@ -84,7 +85,10 @@ export class GraphQLSchemaParser {
     let schemaString = ''
     if (fs.lstatSync(schemaPath).isDirectory()) {
       fs.readdirSync(schemaPath).forEach((file) => {
-        if (fs.lstatSync(path.resolve(schemaPath, file)).isFile()) {
+        if (
+          fs.lstatSync(path.resolve(schemaPath, file)).isFile() &&
+          path.extname(file) === '.graphql'
+        ) {
           schemaString = schemaString.concat(
             fs.readFileSync(path.resolve(schemaPath, file), 'utf8'),
             '\n\n'

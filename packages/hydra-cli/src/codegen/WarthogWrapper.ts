@@ -29,6 +29,7 @@ export default class WarthogWrapper {
     this.prod = prod
     this.schemaResolvedPath = path.resolve(
       process.cwd(),
+      '../../',
       this.flags.schema as string
     )
     if (!fs.existsSync(this.schemaResolvedPath)) {
