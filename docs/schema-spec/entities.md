@@ -42,7 +42,7 @@ type Person @entity {
     name: String!
     married: Boolean
     age: Int
-    "one person, one account, one live"
+    "one person, one account, one life"
     account: Bytes! @unique
     salary: BigInt
     interests: [String]

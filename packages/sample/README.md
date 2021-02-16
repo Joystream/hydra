@@ -10,7 +10,7 @@ Experiment by modifying `schema.graphql` and the mapping files in the `mappings`
 Run
 
 ```bash
-yarn codegen:all
+yarn codegen
 ```
 
 to generate the model files as defined in `schema.graphql`
@@ -21,15 +21,10 @@ A separate tool Hydra Typegen can be used for generating Typescript classes for 
 Run
 
 ```bash
-yarn codegen:event-types --metadata wss://<node endpoint> <comma-separated list of events>
+yarn typegen
 ```
+to run the [typegen](./../hydra-typegen/README.md) for events and extrinsics defined in `typegen.yml` (by default, it fetches the metadata from a substrate node run at localhost). 
 
-For custom substrate types use the additional flags `--typedefs` and `--typelib`.
-For a full list of flags, run
-
-``` bash
-yarn hydra-typegen typegen --help
-```
 
 ## DB Migrations
 
@@ -40,12 +35,13 @@ yarn db:prepare
 yarn db:migrate
 ```
 
-Note, that any schema changes in `schema.graphql` would require a fresh database. You may drop the old one by
-running
+Note, that any schema changes in `schema.graphql` would require a fresh database. You may drop the old one database and rerun the model generation and schema migrations using a single command
 
 ```bash
-yarn db:drop
+yarn rebuild
 ```
+
+NB! Don't use in production, as it will delete all the existing records.
 
 ## Run the processor and the GraphQL server
 
@@ -58,7 +54,7 @@ yarn processor:start
 and the GraphQL server (opens a GraphQL playground at localhost by default):
 
 ```bash
-yarn server:start:dev
+yarn query-node:start:dev
 ```
 
 ## Custom chains

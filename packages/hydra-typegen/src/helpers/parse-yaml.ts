@@ -15,8 +15,8 @@ const options = {
       lib: 'string',
       typedefs: 'string',
     },
-    events: ['string'],
-    calls: ['string'],
+    'events?': ['string'],
+    'calls?': ['string'],
     outDir: 'string',
     'strict?': 'boolean',
   },
@@ -36,5 +36,10 @@ export function parseConfigFile(location: string): IConfig {
       )}`
     )
   }
-  return YAML.parse(fs.readFileSync(location, 'utf8')) as IConfig
+  const parsed = YAML.parse(fs.readFileSync(location, 'utf8'))
+  return {
+    ...parsed,
+    events: parsed.events || [],
+    calls: parsed.calls || [],
+  } as IConfig
 }

@@ -24,4 +24,6 @@ RUN yarn workspace @dzlzv/hydra-common build
 RUN yarn workspace @dzlzv/hydra-db-utils build
 RUN yarn workspace @dzlzv/hydra-indexer build 
 
-CMD yarn workspace @dzlzv/hydra-indexer start:prod
+WORKDIR /home/hydra/packages/hydra-indexer
+
+CMD yarn start:prod
