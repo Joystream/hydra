@@ -1,14 +1,16 @@
 import { MappingsProcessor } from '../process/MappingsProcessor'
-import { ProcessorOptions } from './ProcessorOptions'
 import { Connection } from 'typeorm'
 import Debug from 'debug'
 import { logError } from '@dzlzv/hydra-common'
 import { log } from 'console'
 import { createDBConnection } from '../db/dal'
-import Container from 'typedi'
 import { ProcessorPromClient, startPromEndpoint } from '../prometheus'
+import { getManifest } from './config'
+import { error, info } from '../util/log'
+import pWaitFor from 'p-wait-for'
+import { Server } from 'http'
 
-const debug = Debug('index-builder:manager')
+const debug = Debug('hydra-processor:runner')
 
 // Respondible for creating, starting up and shutting down the query node.
 // Currently this class is a bit thin, but it will almost certainly grow
@@ -16,6 +18,10 @@ const debug = Debug('index-builder:manager')
 // evolves, and that will pay abstraction overhead off in terms of testability of otherwise
 // anonymous code in root file scope.
 export class ProcessorRunner {
+  private connection: Connection | undefined
+  private processor: MappingsProcessor | undefined
+  private promServer: Server | undefined
+
   constructor() {
     // TODO: a bit hacky, but okay for now
     debug(
@@ -26,7 +32,10 @@ export class ProcessorRunner {
     // Hook into application
     // eslint-disable-next-line
     process.on('exit', () =>
-      ProcessorRunner.cleanUp().catch((e) => log(`${logError(e)}`))
+      this.shutDown().catch((e) => log(`${logError(e)}`))
+    )
+    process.on('SIGINT', () =>
+      this.shutDown().catch((e) => log(`${logError(e)}`))
     )
   }
 
@@ -35,38 +44,41 @@ export class ProcessorRunner {
    *
    * @param options options passed to create the mappings
    */
-  async process(options: ProcessorOptions): Promise<void> {
-    const extraEntities = options.entities ? options.entities : []
-    await createDBConnection(extraEntities)
+  async process(): Promise<void> {
+    const manifest = getManifest()
+    info('Establishing a database connection')
+    this.connection = await createDBConnection(manifest.entities)
 
-    Container.set('ProcessorOptions', options)
+    this.processor = new MappingsProcessor()
 
-    const processor = new MappingsProcessor(options)
-    Container.set('MappingsProcessor', processor)
     try {
       const promClient = new ProcessorPromClient()
       promClient.init()
-      startPromEndpoint()
+      this.promServer = startPromEndpoint()
     } catch (e) {
-      console.error(`Can't start Prometheus endpoint: ${logError(e)}`)
+      error(`Can't start Prometheus endpoint: ${logError(e)}`)
     }
-    await processor.start()
+
+    await this.processor.start()
   }
 
-  /**
-   * Run migrations in the "migrations" folder;
-   */
-  static async migrate(): Promise<void> {
-    let connection: Connection | undefined
-    try {
-      connection = await createDBConnection()
-      if (connection) await connection.runMigrations()
-    } finally {
-      if (connection) await connection.close()
+  async shutDown(): Promise<void> {
+    if (this.processor) {
+      this.processor.stop()
+      await pWaitFor(() => (this.processor as MappingsProcessor).stopped)
     }
-  }
 
-  static async cleanUp(): Promise<void> {
-    debug('Nothing to clean up')
+    if (this.connection && this.connection.isConnected) {
+      info('Closing the database connection...')
+      await this.connection.close()
+      debug('Done closing the connection')
+    }
+
+    if (this.promServer) {
+      this.promServer.close()
+    }
+    debug(`Exiting`)
+    // force all pending promises and open ports to exit
+    process.exit()
   }
 }

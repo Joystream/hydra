@@ -1,5 +1,16 @@
 # Changelog of major updates
 
+## 0.1.6
+
+Added fields to SubstrateEvent entity:
+    - `data`: JSONified event parameters
+    - `extrinsicArgs`: JSONified extrinsic arguments
+    - `extrinsicHash`: Extrinsic hash (if present)
+
+## 0.1.5  
+
+- Added `extrinsicName` field to events
+
 ## 0.1.4
 
 - Added blocktimestamp

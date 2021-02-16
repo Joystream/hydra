@@ -23,6 +23,6 @@ jobs:
           yarn workspace @dzlzv/hydra-processor build
           yarn workspace @dzlzv/hydra-cli build
           yarn workspace @dzlzv/apps-config build
-          yarn workspace hydra-typegen build 
+          yarn workspace @dzlzv/hydra-typegen build 
           yarn e2e-test
  

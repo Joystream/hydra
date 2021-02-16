@@ -79,13 +79,14 @@ async function runIndexer(opts: Record<string, unknown>) {
   const node = new QueryNodeManager()
   const atBlock = process.env.BLOCK_HEIGHT
 
-  const typesPath = path.join(
-    process.cwd(),
-    (process.env.TYPES_JSON || opts.typedefs || '') as string
-  )
+  const typesPath = process.env.TYPES_JSON || opts.typedefs
+
   const types = typesPath
     ? // eslint-disable-next-line @typescript-eslint/no-var-requires
-      (require(typesPath) as Record<string, Record<string, string>>)
+      (require(path.resolve(typesPath as string)) as Record<
+        string,
+        Record<string, string>
+      >)
     : {}
 
   const wsProviderURI = (process.env.WS_PROVIDER_ENDPOINT_URI ||
