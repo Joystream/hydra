@@ -20,7 +20,6 @@ import { SCHEMA_DEFINITIONS_PREAMBLE } from './constant'
 import { SchemaDirective } from './SchemaDirective'
 import { FTSDirective } from './FTSDirective'
 import path from 'path'
-import * as glob from 'glob'
 
 const debug = Debug('qnode-cli:schema-parser')
 
