@@ -175,3 +175,12 @@ To run it locally, inspect the settings in `.env` and run
 $ yarn configure:dev
 $ yarn server:start:dev
 ```
+
+## Contributing
+Thank you for you interest in contributing to Hydra CLI and the Joy Stream ecosystem. Please don't hesitate to reach out to us on our [telegram channel](https://t.me/HydraDevs) if you have any questions about contributing. 
+
+All changes should be submited on a pull request. Before submitting a pull request you should run the linting and test commands:
+```
+yarn lint
+yarn test
+```
