@@ -52,3 +52,11 @@ export const FTS_COMMENT_QUERY_WITH_WHERE_CONDITION = gql`
     }
   }
 `
+
+export const LAST_BLOCK_TIMESTAMP = `
+query {
+  blockTimestamps(limit: 1, orderBy: blockNumber_DESC ) {
+    timestamp
+  }
+}
+`

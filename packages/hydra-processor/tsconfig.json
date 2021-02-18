@@ -10,9 +10,12 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"skipLibCheck": true,
-		"sourceMap": true,
-		"inlineSources": false
-	},
-	"include": ["src/**/*"],
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "inlineSources": false,
+        "allowSyntheticDefaultImports": true,
+        "types": [ "node", "@types/node", "mocha", "@types/mocha", "chai" ]
+    },
+    "include": ["src/**/*"],
 	"exclude": ["node_modules"]
 }

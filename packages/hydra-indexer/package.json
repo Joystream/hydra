@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-indexer",
   "description": "Block index builder for substrate based chains",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
-    "docker:build": "docker build -t joystream/hydra-indexer:latest .",
+    "docker:build": "docker build ./../../ -f ../hydra-indexer/Dockerfile -t joystream/hydra-indexer:latest ",
     "docker:tag-latest": "docker tag joystream/hydra-indexer:latest joystream/hydra-indexer:${TAG}",
     "docker:publish": "export TAG=$(node -p 'require(\"./package.json\").version') && yarn docker:build && yarn docker:tag-latest && docker push joystream/hydra-indexer",
     "build": "rm -rf lib && tsc --build tsconfig.json",

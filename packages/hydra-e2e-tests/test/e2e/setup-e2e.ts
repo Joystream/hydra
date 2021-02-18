@@ -1,4 +1,4 @@
-import { ApiPromise, Keyring } from '@polkadot/api'
+import { ApiPromise } from '@polkadot/api'
 import { createApi } from './api/substrate-api'
 import * as dotenv from 'dotenv'
 import Container from 'typedi'

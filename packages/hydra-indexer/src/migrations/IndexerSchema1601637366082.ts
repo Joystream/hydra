@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
 
-export class IndexerSchema implements MigrationInterface {
+export class IndexerSchema1601637366082 implements MigrationInterface {
   name = 'IndexerSchema1601637366082'
 
   public async up(queryRunner: QueryRunner): Promise<void> {

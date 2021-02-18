@@ -1,17 +1,14 @@
 import { Gauge, collectDefaultMetrics } from 'prom-client'
-import Container from 'typedi'
-import { MappingsProcessor } from '../process'
-import { IProcessorState, IProcessorStateHandler } from '../state'
+import { IProcessorState } from '../state'
 import { SubstrateEvent, logError } from '@dzlzv/hydra-common'
 import Debug from 'debug'
 import { countProcessedEvents } from '../db'
+import { eventEmitter, PROCESSED_EVENT, STATE_CHANGE } from '../start/events'
+import { conf } from '../start/config'
 
 const debug = Debug('index-builder:processor-prom-client')
 
 export class ProcessorPromClient {
-  protected stateHandler!: IProcessorStateHandler
-  protected processor!: MappingsProcessor
-
   protected lastScannedBlock = new Gauge({
     name: 'hydra_processor_last_scanned_block',
     help: 'Last block the processor has scanned for events',
@@ -23,25 +20,16 @@ export class ProcessorPromClient {
     labelNames: ['name'],
   })
 
-  constructor() {
-    Container.set('ProcessorPromClient', this)
-  }
-
-  init() {
+  init(): void {
     collectDefaultMetrics({ prefix: 'hydra_processor_system_' })
-    this.stateHandler = Container.get<IProcessorStateHandler>(
-      'ProcessorStateHandler'
-    )
-
-    this.processor = Container.get<MappingsProcessor>('MappingsProcessor')
 
     this.initValues()
       .then(() => {
-        this.stateHandler.on('STATE_CHANGE', (state: IProcessorState) => {
+        eventEmitter.on(STATE_CHANGE, (state: IProcessorState) => {
           this.lastScannedBlock.set(state.lastScannedBlock)
         })
 
-        this.processor.on('PROCESSED_EVENT', (event: SubstrateEvent) => {
+        eventEmitter.on(PROCESSED_EVENT, (event: SubstrateEvent) => {
           this.processedEvents.inc()
           this.processedEvents.inc({ name: event.name })
         })
@@ -50,7 +38,7 @@ export class ProcessorPromClient {
   }
 
   private async initValues(): Promise<void> {
-    const totalEvents = await countProcessedEvents(this.processor.name)
+    const totalEvents = await countProcessedEvents(conf.NAME)
     this.processedEvents.set(totalEvents)
   }
 }

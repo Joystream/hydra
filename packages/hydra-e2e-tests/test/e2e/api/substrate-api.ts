@@ -2,9 +2,9 @@ import { ApiPromise, WsProvider } from '@polkadot/api'
 import { createTestKeyring } from '@polkadot/keyring/testing'
 import { Hash } from '@polkadot/types/interfaces'
 import Container from 'typedi'
-import { waitFor } from '@dzlzv/hydra-common'
 import { typesSpec } from '@dzlzv/apps-config'
 import registry from './typeRegistry'
+import pWaitFor from 'p-wait-for'
 
 export async function transfer(
   from: string,
@@ -27,7 +27,7 @@ export async function transfer(
         blockHash = status.asFinalized
       }
     }),
-    await waitFor(() => blockHash !== undefined),
+    await pWaitFor(() => blockHash !== undefined),
   ])
 
   if (blockHash === undefined) {
