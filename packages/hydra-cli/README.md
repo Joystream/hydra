@@ -184,3 +184,9 @@ All changes should be submited on a pull request. Before submitting a pull reque
 yarn lint
 yarn test
 ```
+
+Other development scripts include: 
+`yarn build`
+`yarn postpack`
+`yarn prepack`
+`yarn version`
