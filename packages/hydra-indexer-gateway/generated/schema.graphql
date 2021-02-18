@@ -56,7 +56,7 @@ input BaseWhereInput {
 }
 
 """GraphQL representation of BigNumber"""
-scalar BigNumber
+scalar BigInt
 
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
@@ -127,12 +127,17 @@ type SubstrateEvent implements BaseGraphQLObject {
   version: Int!
   name: String!
   section: String
+  extrinsicName: String
   method: String!
   phase: JSONObject!
+  data: JSONObject!
+  extrinsicArgs: JSONObject!
+  extrinsicHash: String
   blockNumber: Int!
   index: Int!
   params: [EventParam!]
   extrinsic: SubstrateExtrinsic
+  blockTimestamp: BigInt!
 }
 
 type SubstrateEventConnection {
@@ -144,11 +149,16 @@ type SubstrateEventConnection {
 input SubstrateEventCreateInput {
   name: String!
   section: String
+  extrinsicName: String
   method: String!
   phase: JSONObject!
+  data: JSONObject!
+  extrinsicArgs: JSONObject!
+  extrinsicHash: String
   blockNumber: Float!
   index: Float!
   params: JSONObject
+  blockTimestamp: Float!
 }
 
 type SubstrateEventEdge {
@@ -167,22 +177,33 @@ enum SubstrateEventOrderByInput {
   name_DESC
   section_ASC
   section_DESC
+  extrinsicName_ASC
+  extrinsicName_DESC
   method_ASC
   method_DESC
+  extrinsicHash_ASC
+  extrinsicHash_DESC
   blockNumber_ASC
   blockNumber_DESC
   index_ASC
   index_DESC
+  blockTimestamp_ASC
+  blockTimestamp_DESC
 }
 
 input SubstrateEventUpdateInput {
   name: String
   section: String
+  extrinsicName: String
   method: String
   phase: JSONObject
+  data: JSONObject
+  extrinsicArgs: JSONObject
+  extrinsicHash: String
   blockNumber: Float
   index: Float
   params: JSONObject
+  blockTimestamp: Float
 }
 
 input SubstrateEventWhereInput {
@@ -220,12 +241,24 @@ input SubstrateEventWhereInput {
   section_startsWith: String
   section_endsWith: String
   section_in: [String!]
+  extrinsicName_eq: String
+  extrinsicName_contains: String
+  extrinsicName_startsWith: String
+  extrinsicName_endsWith: String
+  extrinsicName_in: [String!]
   method_eq: String
   method_contains: String
   method_startsWith: String
   method_endsWith: String
   method_in: [String!]
   phase_json: JSONObject
+  data_json: JSONObject
+  extrinsicArgs_json: JSONObject
+  extrinsicHash_eq: String
+  extrinsicHash_contains: String
+  extrinsicHash_startsWith: String
+  extrinsicHash_endsWith: String
+  extrinsicHash_in: [String!]
   blockNumber_eq: Int
   blockNumber_gt: Int
   blockNumber_gte: Int
@@ -239,6 +272,12 @@ input SubstrateEventWhereInput {
   index_lte: Int
   index_in: [Int!]
   params_json: JSONObject
+  blockTimestamp_eq: Float
+  blockTimestamp_gt: Float
+  blockTimestamp_gte: Float
+  blockTimestamp_lt: Float
+  blockTimestamp_lte: Float
+  blockTimestamp_in: [Float!]
 }
 
 input SubstrateEventWhereUniqueInput {
@@ -254,7 +293,7 @@ type SubstrateExtrinsic implements BaseGraphQLObject {
   deletedAt: DateTime
   deletedById: String
   version: Int!
-  tip: BigNumber!
+  tip: BigInt!
   blockNumber: Int!
   versionInfo: String!
   meta: JSONObject!

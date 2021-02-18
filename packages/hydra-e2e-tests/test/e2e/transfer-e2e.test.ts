@@ -1,19 +1,20 @@
 import { expect } from 'chai'
-import { waitForAsync } from '@dzlzv/hydra-common'
-import { indexerHead, blockTimestamp } from './api/indexer-api'
+import { blockTimestamp } from './api/indexer-api'
 import {
   fetchDateTimeFieldFromTransfer,
   findTransfersByComment,
   findTransfersByCommentAndWhereCondition,
   findTransfersByValue,
+  getProcessorHead,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
+import pWaitFor from 'p-wait-for'
 
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 
-describe('End-to-end tests', () => {
+describe('end-to-end transfer tests', () => {
   let amount: number
   let blockHeight: number
 
@@ -21,11 +22,15 @@ describe('End-to-end tests', () => {
     amount = 213423
     blockHeight = await transfer(ALICE, BOB, amount)
     console.log(`Transfer of ${amount} schmeks done at height ${blockHeight}`)
-    // wait until the indexer indexes the block
-    await waitForAsync(
-      async () => (await indexerHead()) > blockHeight.valueOf() + 5
+    // wait until the indexer indexes the block and the processor picks it up
+    await pWaitFor(
+      async () => {
+        const head = await getProcessorHead()
+        return head > blockHeight.valueOf()
+      },
+      { interval: 50 }
     )
-    console.log(`Indexer processed block ${blockHeight}`)
+    console.log(`The processor processed block ${blockHeight}`)
   })
 
   it('indexes and finds transfers', async () => {

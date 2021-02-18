@@ -1,12 +1,15 @@
-import * as express from 'express'
+import express from 'express'
+import { Server } from 'http'
 import { register, validateMetricName } from 'prom-client'
+import { conf } from '../start/config'
+import { info } from '../util/log'
 
-export function startPromEndpoint(): void {
+export function startPromEndpoint(): Server {
   const server = express()
 
   // Setup server to Prometheus scrapes:
-
-  server.get('/metrics', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  server.get('/metrics', (req: any, res: any) => {
     try {
       res.set('Content-Type', register.contentType)
       res.end(register.metrics())
@@ -15,7 +18,8 @@ export function startPromEndpoint(): void {
     }
   })
 
-  server.get('/metrics/:metricName', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  server.get('/metrics/:metricName', (req: any, res: any) => {
     try {
       res.set('Content-Type', register.contentType)
       if (
@@ -30,9 +34,10 @@ export function startPromEndpoint(): void {
     }
   })
 
-  const port = process.env.PROMETHEUS_PORT || 3000
-  console.log(
-    `Server listening to ${port}, metrics exposed on /metrics endpoint`
+  const port = conf.PROMETHEUS_PORT
+  const app = server.listen(port)
+  info(
+    `Prometheus server is listening on port ${port}. Hydra-Processor metrics are available at localhost:${port}/metrics`
   )
-  server.listen(port)
+  return app
 }

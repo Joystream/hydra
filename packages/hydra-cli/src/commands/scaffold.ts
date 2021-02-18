@@ -216,7 +216,7 @@ export default class Scaffold extends Command {
       return ctx
     }
     const typesJSON = (await cli.prompt(
-      'Please provide the localtion of the type definitions JSON, relative to ./generated/indexer',
+      'Please provide the location of the type definitions JSON, relative to ./generated/indexer',
       { default: '../../typedefs.json' }
     )) as string
     return { ...ctx, typesJSON }

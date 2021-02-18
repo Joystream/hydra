@@ -40,11 +40,25 @@ export class SubstrateEvent extends BaseModel {
   })
   section?: string
 
+  @StringField({
+    nullable: true,
+  })
+  extrinsicName?: string
+
   @StringField()
   method!: string
 
   @JSONField()
   phase!: AnyJson
+
+  @JSONField()
+  data!: AnyJson
+
+  @JSONField()
+  extrinsicArgs!: AnyJson
+
+  @StringField({ nullable: true })
+  extrinsicHash?: string
 
   @IntField()
   blockNumber!: number

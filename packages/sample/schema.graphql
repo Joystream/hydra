@@ -8,3 +8,8 @@ type Transfer @entity {
   insertedAt: DateTime!
 } 
 
+" Tracks block timestamps "
+type BlockTimestamp @entity {
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}  
