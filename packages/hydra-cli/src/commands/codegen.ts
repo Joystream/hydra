@@ -18,7 +18,7 @@ export default class Codegen extends Command {
   static flags = {
     schema: flags.string({
       char: 's',
-      description: 'Schema path',
+      description: 'Schema path, can be file or directory',
       default: '../../schema.graphql',
     }),
     // pass --no-indexer to skip indexer generation

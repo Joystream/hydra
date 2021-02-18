@@ -19,6 +19,7 @@ import { cloneDeep } from 'lodash'
 import { SCHEMA_DEFINITIONS_PREAMBLE } from './constant'
 import { SchemaDirective } from './SchemaDirective'
 import { FTSDirective } from './FTSDirective'
+import path from 'path'
 
 const debug = Debug('qnode-cli:schema-parser')
 
@@ -67,7 +68,7 @@ export class GraphQLSchemaParser {
     if (!fs.existsSync(schemaPath)) {
       throw new Error('Schema not found')
     }
-    const contents = fs.readFileSync(schemaPath, 'utf8')
+    const contents = this.getUnifiedSchema(schemaPath)
     this.schema = GraphQLSchemaParser.buildSchema(contents)
     this.namedTypes = [
       ...Object.values(this.schema.getTypeMap()).filter(
@@ -77,6 +78,28 @@ export class GraphQLSchemaParser {
     this._objectTypeDefinations = GraphQLSchemaParser.createObjectTypeDefinations(
       this.schema
     )
+  }
+
+  private getUnifiedSchema(schemaPath: string): string {
+    let schemaString = ''
+    if (fs.lstatSync(schemaPath).isDirectory()) {
+      fs.readdirSync(schemaPath).forEach((file) => {
+        if (
+          fs.lstatSync(path.resolve(schemaPath, file)).isFile() &&
+          path.extname(file) === '.graphql'
+        ) {
+          schemaString = schemaString.concat(
+            fs.readFileSync(path.resolve(schemaPath, file), 'utf8'),
+            '\n\n'
+          )
+        }
+      })
+    } else if (fs.lstatSync(schemaPath).isFile()) {
+      schemaString = fs.readFileSync(schemaPath, 'utf8')
+    } else {
+      throw new Error('Error reading schema file(s)')
+    }
+    return schemaString
   }
 
   private static buildPreamble(): string {
