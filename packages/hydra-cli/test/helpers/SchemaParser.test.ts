@@ -101,6 +101,11 @@ describe('SchemaParser', () => {
     )
   })
 
+  it('should load multiple files', () => {
+    const parser = new GraphQLSchemaParser('test/fixtures/schema-folder/')
+    expect(parser.getObjectDefinations()).length(4, 'Should detect 4 types')
+  })
+
   it('should visit directives', () => {
     const parser = new GraphQLSchemaParser('test/fixtures/single-type.graphql')
     const names: string[] = []

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.7
+
+- `codegen --schema` now supports passing folders instead of single schema file
+
 ## 0.1.6
 
 - Fixed preview feature

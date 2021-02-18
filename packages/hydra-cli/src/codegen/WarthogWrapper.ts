@@ -33,7 +33,7 @@ export default class WarthogWrapper {
     )
     if (!fs.existsSync(this.schemaResolvedPath)) {
       throw new Error(
-        `Cannot open the schema file ${this.schemaResolvedPath}. Check if it exists.`
+        `Cannot open the schema file or folder: ${this.schemaResolvedPath}. Check if it exists.`
       )
     }
   }
