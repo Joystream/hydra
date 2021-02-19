@@ -38,7 +38,7 @@ export class ProcessorPromClient {
   }
 
   private async initValues(): Promise<void> {
-    const totalEvents = await countProcessedEvents(conf.NAME)
+    const totalEvents = await countProcessedEvents(conf.ID)
     this.processedEvents.set(totalEvents)
   }
 }
