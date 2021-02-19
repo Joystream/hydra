@@ -1,7 +1,6 @@
 import { ConnectionOptions } from 'typeorm'
 import { SnakeNamingStrategy } from '@dzlzv/hydra-db-utils'
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
-import { ProcessorSchema } from '../migrations/ProcessorSchema'
 
 const config: () => ConnectionOptions = () => {
   // ugly, but we need to set the warthog envs, otherwise it fails
@@ -17,7 +16,7 @@ const config: () => ConnectionOptions = () => {
     password: process.env.TYPEORM_PASSWORD || process.env.DB_PASS,
     database: process.env.TYPEORM_DATABASE || process.env.DB_NAME,
     entities: [ProcessedEventsLogEntity, process.env.TYPEORM_ENTITIES],
-    migrations: [ProcessorSchema],
+    migrations: [`${__dirname}/../**/migrations/*.{ts,js}`],
     cli: {
       migrationsDir: 'migrations',
     },
