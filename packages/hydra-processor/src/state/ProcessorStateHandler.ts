@@ -6,8 +6,8 @@ import { IProcessorState } from './IProcessorState'
 import Debug from 'debug'
 import { eventEmitter, STATE_CHANGE } from '../start/events'
 import { conf } from '../start/config'
-import assert = require('assert')
 import { IndexerStatus } from '../ingest'
+import assert = require('assert')
 
 const debug = Debug('index-builder:processor-state-handler')
 

@@ -231,7 +231,7 @@ export function nextEventQueries(context: ProcessorContext): EventQuery[] {
     ),
   }
 
-  let queries: EventQuery[] = []
+  const queries: EventQuery[] = []
 
   if (events.length > 0) {
     queries.push({

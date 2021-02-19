@@ -7,7 +7,6 @@ import { quotedJoin } from '../util/utils'
 
 const debug = Debug('hydra-processor:graphql-source')
 
-
 // to be replaced with a ws subsription
 const GET_INDEXER_STATUS = `
 query {

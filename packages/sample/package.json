@@ -45,7 +45,7 @@
     "@dzlzv/hydra-cli": "0.1.6",
     "@dzlzv/hydra-common": "~0.0.3",
     "@dzlzv/hydra-db-utils": "^0.0.2",
-    "@dzlzv/hydra-processor": "~0.1.1",
+    "@dzlzv/hydra-processor": "~0.1.2",
     "@dzlzv/hydra-typegen": "~0.0.3-1"
   }
 }
