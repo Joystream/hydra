@@ -60,3 +60,14 @@ query {
   }
 }
 `
+
+export const PROCESSOR_SUBSCRIPTION = `
+subscription {
+  stateSubscription {
+    indexerHead
+    chainHead
+    lastProcessedEvent
+    lastCompleteBlock
+  }
+}
+`

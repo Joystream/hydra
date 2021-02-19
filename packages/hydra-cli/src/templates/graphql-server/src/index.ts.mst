@@ -6,7 +6,8 @@ import { snakeCase } from 'typeorm/util/StringUtils';
 import { loadConfig } from '../src/config';
 import { Logger } from '../src/logger';
 
-import { getServer } from './server';
+import { buildServerSchema, getServer } from './server';
+import { startPgSubsribers } from './pubsub';
 
 
 class CustomNamingStrategy extends SnakeNamingStrategy {
@@ -30,7 +31,8 @@ async function bootstrap() {
     await server.establishDBConnection();
     process.exit(0);
   }
-
+  await buildServerSchema(server);
+  await startPgSubsribers();
   await server.start();
 }
 

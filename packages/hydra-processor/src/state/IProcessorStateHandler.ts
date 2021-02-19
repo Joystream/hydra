@@ -1,8 +1,13 @@
 import { IProcessorState } from './IProcessorState'
 import { EntityManager } from 'typeorm'
+import { IndexerStatus } from '../ingest'
 
 export interface IProcessorStateHandler {
-  persist(state: IProcessorState, em?: EntityManager): Promise<void>
+  persist(
+    state: IProcessorState,
+    indexerStatus: IndexerStatus,
+    em?: EntityManager
+  ): Promise<void>
   init(blockInterval?: { from: number }): Promise<IProcessorState>
   /**
    * Explicity expose 'on' method from EventEmitter to ensure listeners can listen to events

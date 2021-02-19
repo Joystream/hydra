@@ -5,11 +5,10 @@ import {
   findTransfersByComment,
   findTransfersByCommentAndWhereCondition,
   findTransfersByValue,
-  getProcessorHead,
+  getProcessorStatus,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
 import pWaitFor from 'p-wait-for'
-
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
@@ -25,8 +24,9 @@ describe('end-to-end transfer tests', () => {
     // wait until the indexer indexes the block and the processor picks it up
     await pWaitFor(
       async () => {
-        const head = await getProcessorHead()
-        return head > blockHeight.valueOf()
+        return (
+          (await getProcessorStatus()).lastCompleteBlock > blockHeight.valueOf()
+        )
       },
       { interval: 50 }
     )

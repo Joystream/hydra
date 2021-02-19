@@ -8,7 +8,10 @@ import {
   FETCH_INSERTED_AT_FIELD_FROM_TRANSFER,
   FTS_COMMENT_QUERY_WITH_WHERE_CONDITION,
   LAST_BLOCK_TIMESTAMP,
+  PROCESSOR_SUBSCRIPTION,
 } from './graphql-queries'
+import { SubscriptionClient } from 'graphql-subscriptions-client'
+import pWaitFor = require('p-wait-for')
 
 export interface Transfer {
   value: string
@@ -17,7 +20,18 @@ export interface Transfer {
   block: number
 }
 
+export interface ProcessorStatus {
+  lastCompleteBlock: number
+  lastProcessedEvent: string
+  indexerHead: number
+  chainHead: number
+}
+
+export let processorStatus: ProcessorStatus | undefined
+
 const getGQLClient = () => Container.get<GraphQLClient>('ProcessorClient')
+const getSubClient = () =>
+  Container.get<SubscriptionClient>('SubscriptionClient')
 
 export async function findTransfersByComment(text: string): Promise<string[]> {
   const result = await getGQLClient().request<{
@@ -105,6 +119,21 @@ export async function getNumberMetric(metric: string): Promise<number> {
   return Number.parseInt(metricString)
 }
 
-export async function getProcessorHead(): Promise<number> {
-  return getNumberMetric('hydra_processor_last_scanned_block')
+export function subscribeToProcessorStatus(): void {
+  getSubClient()
+    .request({ query: PROCESSOR_SUBSCRIPTION })
+    .subscribe({
+      next({ data }: unknown) {
+        if (data) {
+          processorStatus = (data as {
+            stateSubscription: ProcessorStatus
+          }).stateSubscription
+        }
+      },
+    })
+}
+
+export async function getProcessorStatus(): Promise<ProcessorStatus> {
+  await pWaitFor(() => processorStatus !== undefined)
+  return processorStatus as ProcessorStatus
 }
