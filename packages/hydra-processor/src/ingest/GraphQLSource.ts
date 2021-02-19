@@ -1,11 +1,11 @@
-import { IProcessorSource, EventQuery } from './'
+import { IProcessorSource, EventQuery, IndexerStatus } from './'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
 import { conf } from '../start/config'
 import { quotedJoin } from '../util/utils'
 
-const debug = Debug('index-builder:processor')
+const debug = Debug('hydra-processor:graphql-source')
 
 // const GET_EVENTS_AFTER_QUERY = `
 // query GetEventsAfterID( $afterID: ID, $events: [String!]!, $fromBlock: Int, $toBlock: Int, $size: Int) {
@@ -36,10 +36,11 @@ const debug = Debug('index-builder:processor')
 // `
 
 // to be replaced with a ws subsription
-const GET_INDEXER_HEAD = `
+const GET_INDEXER_STATUS = `
 query {
   indexerStatus {
     head
+    chainHeight
   }
 }
 `
@@ -59,11 +60,11 @@ export class GraphQLSource implements IProcessorSource {
     throw new Error('Method not implemented.')
   }
 
-  async indexerHead(): Promise<number> {
+  async indexerStatus(): Promise<IndexerStatus> {
     const status = await this.graphClient.request<{
-      indexerStatus: { head: number }
-    }>(GET_INDEXER_HEAD)
-    return status.indexerStatus.head
+      indexerStatus: IndexerStatus
+    }>(GET_INDEXER_STATUS)
+    return status.indexerStatus
   }
 
   async nextBatch(
@@ -73,7 +74,7 @@ export class GraphQLSource implements IProcessorSource {
     const query = collectQueries(
       queries.map((f) => getEventsGraphQLQuery(f, size))
     )
-    debug(`GraphqQL Query: ${query}`)
+    if (conf.VERBOSE) debug(`GraphqQL Query: ${query}`)
 
     const raw = await this.graphClient.request<
       Record<string, SubstrateEvent[]>
@@ -84,7 +85,9 @@ export class GraphQLSource implements IProcessorSource {
       .sort((a, b) => (a.id < b.id ? -1 : 1))
 
     debug(`Fetched ${data.length} events`)
-    debug(`Events: ${JSON.stringify(data, null, 2)} events`)
+
+    if (conf.VERBOSE) debug(`Events: ${JSON.stringify(data, null, 2)} events`)
+
     return data
   }
 }
