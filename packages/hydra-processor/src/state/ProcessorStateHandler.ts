@@ -7,16 +7,24 @@ import Debug from 'debug'
 import { eventEmitter, STATE_CHANGE } from '../start/events'
 import { conf } from '../start/config'
 import assert = require('assert')
+import { IndexerStatus } from '../ingest'
 
 const debug = Debug('index-builder:processor-state-handler')
 
 export class ProcessorStateHandler implements IProcessorStateHandler {
-  async persist(state: IProcessorState, em?: EntityManager): Promise<void> {
+  async persist(
+    state: IProcessorState,
+    { head, chainHeight: chainHead }: IndexerStatus,
+    em?: EntityManager
+  ): Promise<void> {
     assert(state.lastProcessedEvent, 'Cannot persist undefined event ID')
     const processed = new ProcessedEventsLogEntity()
     processed.processor = conf.ID
     processed.eventId = state.lastProcessedEvent
     processed.lastScannedBlock = state.lastScannedBlock
+    processed.indexerHead = head
+    processed.chainHead = chainHead
+
     const repository = em
       ? em.getRepository('ProcessedEventsLogEntity')
       : getRepository('ProcessedEventsLogEntity')
