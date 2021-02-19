@@ -7,33 +7,6 @@ import { quotedJoin } from '../util/utils'
 
 const debug = Debug('hydra-processor:graphql-source')
 
-// const GET_EVENTS_AFTER_QUERY = `
-// query GetEventsAfterID( $afterID: ID, $events: [String!]!, $fromBlock: Int, $toBlock: Int, $size: Int) {
-//   substrateEventsAfter(where: { name_in: $events, $blockNumber_gte: $fromBlock, blockNumber_lte: $toBlock }, afterID: $afterID, limit: $size) {
-//     id
-//     name
-//     method
-//     params {
-//       name
-//       type
-//       value
-//     }
-//     index
-//     blockNumber
-//     blockTimestamp
-//     extrinsic {
-//       method
-//       section
-//       versionInfo
-//       signer
-//       args
-//       signature
-//       hash
-//       tip
-//     }
-//   }
-// }
-// `
 
 // to be replaced with a ws subsription
 const GET_INDEXER_STATUS = `
@@ -88,7 +61,7 @@ export class GraphQLSource implements IProcessorSource {
 
     if (conf.VERBOSE) debug(`Events: ${JSON.stringify(data, null, 2)} events`)
 
-    return data
+    return data.slice(0, size)
   }
 }
 
