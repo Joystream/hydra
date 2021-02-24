@@ -76,7 +76,7 @@ jobs:
           node-version: 12.x
           registry-url: 'https://registry.npmjs.org'
           always-auth: true
-      - run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && yarn workspace @dzlzv/hydra-cli publish
+      - run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc && yarn workspace @dzlzv/hydra-cli publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         
