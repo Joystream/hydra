@@ -1,5 +1,7 @@
 name: hydra-e2e-tests
-on: [pull_request]
+on: 
+  pull_request:
+    types: [open]
   
 jobs:
   run_e2e_tests:
