@@ -74,7 +74,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 12.x
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: 'https://registry.npmjs.org/@dzlzv'
           always-auth: true
       - run: yarn
       - run: yarn workspace @dzlzv/hydra-cli build
