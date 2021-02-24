@@ -2,10 +2,17 @@ name: publish
 on:
   # When Release Pull Request is merged
   workflow_dispatch:
+    inputs:
+      manual_release:
+        description: 'Manually release current version of hydra-cli'     
+        required: true
+        default: 'false'
+
   pull_request:
     branches:
       - master
       - hydra_v1
+      - ci-test
     types: [closed]
 
 env:
@@ -14,50 +21,62 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-18.04
+    if: github.event.pull_request.merged == true || github.event.inputs.manual_release == 'true'
     steps:
-      ## Check if the PR was labeled with 'release:hydra-cli'
-      - name: Get hydra-cli release label 
-        uses: Dreamcodeio/pr-has-label-action@master
-        id: checkLabel
-        with:
-          label: release:hydra-cli
-      - name: Checking release:hydra-cli PR label
-        run: echo "${{ steps.checkLabel.outputs.hasLabel }}" 
       - name: Checkout
-        if: steps.checkLabel.outputs.hasLabel == 'true'
         uses: actions/checkout@v2
-      - name: Setup Node ${{ matrix.node_version }}
-        if: steps.checkLabel.outputs.hasLabel == 'true'
-        uses: actions/setup-node@v1
+      - name: Check version changes
+        uses: EndBug/version-check@v1
+        id: check
         with:
-          node-version: 12
-          registry-url: 'https://npm.pkg.github.com'
+          diff-search: true
+          file-name: ./packages/hydra-cli/package.json
+      - name: Log when changed
+        if: steps.check.outputs.changed == 'true'
+        run: 'echo "Hydra-cli version change found in commit ${{ steps.check.outputs.commit }}! New version: ${{ steps.check.outputs.version }} (${{ steps.check.outputs.type }})"'
+       
+      #- name: Git Identity
+      #  if: steps.check.outputs.changed == 'true'
+      #  run: |
+      #    git config --global user.name 'github-actions'
+      #    git config --global user.email 'github-actions@github.com'
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Set Release Version
+      # if: steps.check.outputs.changed == 'true'
+      # shell: bash -ex {0}
+      # run: |
+      #   RELEASE_VERSION=$(node -p 'require("./packages/hydra-cli/package.json").version')
+      #   echo "::set-output name=RELEASE_VERSION::${RELEASE_VERSION}"
+      #- name: Create Git Tag
+      #  if: steps.check.outputs.changed == 'true'
+      #  uses: azu/action-package-version-to-git-tag@v1
+      #  with:
+      #    version: ${{ env.RELEASE_VERSION }}
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    github_repo: ${{ github.repository }}
+      #    git_commit_sha: ${{ github.sha }}
+      #    git_tag_prefix: "hydra-cli-v"
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: Hydra-cli release ${{ github.ref }}
+      #     body: |
+      #       Changes in this Release
+      #       - First Change
+      #       - Second Change
+      #     draft: false
+      #     prerelease: false
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+          registry-url: 'https://registry.npmjs.org'
           always-auth: true
-      - name: Git Identity
-        if: steps.checkLabel.outputs.hasLabel == 'true'
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+      - run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && yarn workspace @dzlzv/hydra-cli publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set Release Version
-        if: steps.checkLabel.outputs.hasLabel == 'true'
-        shell: bash -ex {0}
-        run: |
-          RELEASE_VERSION=$(node -p 'require("./packages/hydra-cli/package.json").version')
-          echo "RELEASE_VERSION=${RELEASE_VERSION}" >> $GITHUB_ENV
-      - name: Create Git Tag
-        if: steps.checkLabel.outputs.hasLabel == 'true' && github.event.pull_request.merged == true
-        uses: azu/action-package-version-to-git-tag@v1
-        with:
-          version: ${{ env.RELEASE_VERSION }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          github_repo: ${{ github.repository }}
-          git_commit_sha: ${{ github.sha }}
-          git_tag_prefix: "hydra-cli-v"
-      - name: Publish
-        if: steps.checkLabel.outputs.hasLabel == 'true' && github.event.pull_request.merged == true
-        run: |
-          yarn workspace @dzlzv/hydra-cli publish --non-interactive
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
