@@ -24,7 +24,7 @@
     "db:processor:migrate": "hydra-processor migrate -e .env",
     "db:migrate": "yarn db:schema:migrate && yarn db:processor:migrate",
     "bootstrap": "yarn codegen && yarn db:prepare && yarn db:migrate",
-    "codegen": "hydra-cli codegen --no-processor",
+    "codegen": "hydra-cli codegen",
     "typegen:configure": "NODE_URL=${NODE_URL:-ws://localhost:9000} envsub typegen.template.yml typegen.yml",
     "typegen": "rm -rf ./mappings/generated && hydra-typegen typegen typegen.yml --debug",
     "mappings:build": "yarn workspace sample-mappings build",
