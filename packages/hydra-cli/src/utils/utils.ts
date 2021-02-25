@@ -94,3 +94,22 @@ export function readModuleFile(path: string): string {
   const resolved = require.resolve(path)
   return fs.readFileSync(resolved, 'utf-8')
 }
+
+/**
+ * Parse stderr for warthog command `warthog codegen` (child process) and search for errors. If there is an error in the
+ * generated/graphql-server/src/* then the command fails.
+ * @param stderr string
+ * @param regexExpr string
+ */
+export function parseWarthogCodegenStderr(
+  stderr: string,
+  regexExpr = /src\/modules\/\S*.ts/g
+): void {
+  const m = stderr.match(regexExpr)
+  if (m !== null) {
+    throw Error(
+      `Failed to generate Graphql API due to errors: \n` +
+        stderr.slice(stderr.indexOf(m[0]))
+    )
+  }
+}
