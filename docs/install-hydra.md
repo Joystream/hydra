@@ -3,6 +3,7 @@
 ## Prerequisites
 
 * A unix based operating system (Mac or Linux), you may experience issues on Windows.  
+* node 12.X is recomended, there are known compatibility issues with 14.X  
 * Both Hydra-CLI and the generated project files have dependencies that require Node v10.16 or higher
 * `npm` and \(optional, but recommended\) [`npx`](https://www.npmjs.com/package/npx)
 * Hydra stores the substrate data in an external PostgresSQL 12 instance. The scaffolding tool provides a convenient shortcut for running the database instance from a Docker image. In this case the standard docker environment \(`docker` and `docker-compose`\) should be available.
