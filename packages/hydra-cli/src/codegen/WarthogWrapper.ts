@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv'
 import { run } from 'warthog/dist/cli/cli'
 
 import { WarthogModelBuilder } from '../parse/WarthogModelBuilder'
-import { getTemplatePath } from '../utils/utils'
+import { getTemplatePath, parseWarthogCodegenStderr } from '../utils/utils'
 import Debug from 'debug'
 import { SourcesGenerator } from '../generate/SourcesGenerator'
 import { CodegenFlags } from '../commands/codegen'
@@ -225,7 +225,8 @@ export default class WarthogWrapper {
   }
 
   async codegen(): Promise<void> {
-    await execa('yarn', ['warthog', 'codegen'])
+    const { stderr } = await execa('yarn', ['warthog', 'codegen'])
+    parseWarthogCodegenStderr(stderr)
     if (this.prod) await execa('yarn', ['dotenv:generate'])
   }
 
