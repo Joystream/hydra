@@ -1,0 +1,47 @@
+version: "3.4"
+
+services:
+  indexer:
+    image: joystream/hydra-indexer:latest
+    restart: unless-stopped
+    env_file:
+      - .env 
+    environment:
+      - INDEXER_WORKERS=5
+    # Also provide DB_USER, DB_PASS, DB_PORT
+      - REDIS_URI=redis://redis:6379/0
+      - DEBUG=index*
+    # - BLOCK_HEIGHT=0 <- Block height the indexer starts from. 0 by default
+    # - WS_PROVIDER_ENDPOINT_URI=wss://<node RPC endpoint>
+    # Provide type definitions if the node runtime uses non-standard types.
+    # - TYPES_JSON=type-defs.json
+    #volumes:
+    #  - <host path to type defs>:/home/hydra/packages/hydra-indexer/type-defs.json
+    depends_on: 
+      - db
+    command: > 
+      sh -c "yarn db:bootstrap && yarn start:prod" 
+  
+  indexer-api-gateway:
+    image: joystream/hydra-indexer-gateway:latest
+    restart: unless-stopped
+    environment:
+      - WARTHOG_STARTER_DB_DATABASE=indexer-db
+      - WARTHOG_STARTER_DB_HOST=db 
+      - WARTHOG_STARTER_DB_PASSWORD=${DB_PASS}
+      - WARTHOG_STARTER_DB_PORT=${DB_PORT}
+      - WARTHOG_STARTER_DB_USERNAME=${DB_USER}
+      - WARTHOG_STARTER_REDIS_URI=redis://redis:6379/0 
+      - PORT=4000
+    ports:
+      - "4001:4000"
+    depends_on:
+      - redis
+      - db
+      - indexer
+    
+  redis:
+    image: redis:6.0-alpine
+    restart: always
+    ports:
+      - "6379"

@@ -1,31 +1,73 @@
 import { Command, flags } from '@oclif/command'
 import * as fs from 'fs-extra'
 import * as path from 'path'
-import * as utils from './../utils/utils'
 import cli from 'cli-ux'
-import { getTemplatePath } from '../utils/utils'
-import Mustache = require('mustache')
-import dotenv = require('dotenv')
-import execa = require('execa')
+import Mustache from 'mustache'
+import Debug from 'debug'
+
+import {
+  getTemplatePath,
+  createDir,
+  resolvePackageVersion,
+  getWarthogDependency,
+} from '../utils/utils'
+
+import select = require('@inquirer/select')
+import input = require('@inquirer/input')
+import password = require('@inquirer/password')
 import glob = require('glob')
 
-const DEFAULT_WS_API_ENDPOINT = 'wss://kusama-rpc.polkadot.io/'
-const KUSAMA_INDEXER = 'https://indexer-kusama.joystream.app/graphql'
+const debug = Debug('qnode-cli:scaffold')
+
+// TODO: fetch from a well-known source?
+const INDEXERS = [
+  {
+    name: 'local',
+    value: 'localhost',
+    description: 'Self-hosted indexer at localhost:4001',
+    url: 'http://localhost:4001/graphql',
+  },
+  {
+    name: 'subsocial',
+    value: 'subsocial',
+    description: 'Ready-to use indexer of Subsocial, hosted by Joystream',
+    url: 'https://subsocial-indexer.joystream.app/graphql',
+  },
+  {
+    name: 'other',
+    value: 'other',
+    description:
+      'Skip for now, I will manually set INDEXER_ENDPOINT_URL later on',
+    url: '',
+  },
+]
 
 export default class Scaffold extends Command {
   static description = `Starter kit: generates a directory layout and a sample schema file`
 
   static flags = {
-    projectName: flags.string({ char: 'n', description: 'Project name' }),
-    wsProviderUrl: flags.string({
-      char: 'w',
-      description: 'Substrate WS provider endpoint',
-      default: DEFAULT_WS_API_ENDPOINT,
+    name: flags.string({
+      char: 'n',
+      description: 'Project name',
+      default: 'hydra-scaffold',
     }),
+
     indexerUrl: flags.string({
       char: 'i',
       description: 'Hydra Indexer endpoint',
-      default: KUSAMA_INDEXER,
+      default: INDEXERS.find((e) => e.name === 'polkadot')?.url,
+    }),
+    dir: flags.string({
+      char: 'd',
+      description: 'Project folder',
+      default: process.cwd(),
+    }),
+    rewrite: flags.boolean({
+      description: 'Clear the folder before scaffolding',
+    }),
+    silent: flags.boolean({
+      description:
+        'If present, the scaffolder is non-interactive and uses only provided CLI flags',
     }),
     // pass --no-mappings to skip default mappings and schema
     mappings: flags.boolean({
@@ -69,25 +111,58 @@ export default class Scaffold extends Command {
   async run(): Promise<void> {
     const { flags } = this.parse(Scaffold)
 
-    await fs.writeFile(
-      path.join(process.cwd(), '.env'),
-      flags.projectName
-        ? await this.dotenvFromFlags(flags)
-        : await this.promptDotEnv()
-    )
+    debug(`Flags: ${JSON.stringify(flags, null, 2)}`)
 
-    dotenv.config()
+    let ctx = {}
 
-    this.log('Your settings have been saved to .env, feel free to edit')
+    if (flags.silent) {
+      ctx = { ...flags, dbName: flags.name }
+    } else {
+      ctx = await this.promptDotEnv()
+    }
+
+    ctx = withDependenciesResolutions(ctx)
 
     cli.action.start('Scaffolding')
 
-    if (flags.mappings) {
-      await this.setupMappings()
-    }
+    const destRoot = path.resolve(flags.dir)
+    createDir(destRoot, flags.rewrite, true)
 
-    await this.setupNodeProject()
-    await this.setupDocker()
+    debug(`Writing files to ${destRoot}`)
+
+    const templatesRoot: string = path.resolve(
+      __dirname,
+      '..',
+      'templates',
+      'scaffold'
+    )
+
+    glob('**/*', { cwd: templatesRoot, dot: true }, (error, files) => {
+      if (error) {
+        throw new Error(`An error occured during scaffolding: ${error.message}`)
+      }
+      files.forEach((sourceFile) => {
+        let destPath = path.join(destRoot, sourceFile)
+        const sourcePath = path.join(templatesRoot, sourceFile)
+
+        if (fs.lstatSync(sourcePath).isDirectory()) {
+          createDir(destPath)
+          return
+        }
+
+        debug(`Writing ${destPath}`)
+
+        const source = fs.readFileSync(sourcePath, 'utf-8')
+
+        if (sourcePath.endsWith('.mst')) {
+          // if it's a template, use the context
+          destPath = destPath.slice(0, -4)
+          fs.writeFileSync(destPath, Mustache.render(source, ctx))
+        } else {
+          fs.writeFileSync(destPath, source)
+        }
+      })
+    })
 
     cli.action.stop()
   }
@@ -102,186 +177,75 @@ export default class Scaffold extends Command {
     return Mustache.render(template, { ...flags, dbName: flags.projectName })
   }
 
-  async promptDotEnv(): Promise<string> {
+  async promptDotEnv(): Promise<Record<string, string>> {
     let ctx: Record<string, string> = {}
 
-    const projectName = (await cli.prompt('Enter your project name', {
-      required: true,
+    const projectName = (await input({
+      message: 'Enter your project name',
     })) as string
     ctx = { ...ctx, projectName }
 
-    ctx = { ...ctx, ...(await this.promptIndexerEnvs(ctx)) }
-    ctx = { ...ctx, ...(await this.promptProcessorEnvs(ctx)) }
+    ctx = { ...ctx, ...(await this.promptIndexerURL(ctx)) }
 
-    const dbName = (await cli.prompt('Database name', {
+    const dbName = (await input({
+      message: 'Database name',
       default: projectName,
     })) as string
     ctx = { ...ctx, dbName }
-    const dbHost = (await cli.prompt('Database host', {
+
+    const dbHost = (await input({
+      message: 'Database host',
       default: 'localhost',
     })) as string
     ctx = { ...ctx, dbHost }
-    const dbPort = (await cli.prompt('Database port', {
+
+    const dbPort = (await input({
+      message: 'Database port',
       default: '5432',
     })) as string
     ctx = { ...ctx, dbPort }
-    const dbUser = (await cli.prompt('Database user', {
+
+    const dbUser = (await input({
+      message: 'Database user',
       default: 'postgres',
     })) as string
     ctx = { ...ctx, dbUser }
-    const dbPassword = (await cli.prompt('Database user password', {
+
+    const dbPassword = (await password({
+      message: 'Database user password',
       type: 'mask',
       default: 'postgres',
     })) as string
     ctx = { ...ctx, dbPassword }
 
-    const template = await fs.readFile(
-      getTemplatePath('scaffold/.env'),
-      'utf-8'
-    )
-
-    return Mustache.render(template, ctx)
-  }
-
-  async promptProcessorEnvs(
-    ctx: Record<string, string>
-  ): Promise<Record<string, string>> {
-    const proceed = await cli.confirm(
-      'Are you going to run an mappings processor?'
-    )
-    if (!proceed) {
-      return ctx
-    }
-    const indexerUrl = (await cli.prompt(
-      'Provide an indexer GraphQL API endpoint to source events from',
-      {
-        default: KUSAMA_INDEXER,
-      }
-    )) as string
-    ctx = { ...ctx, indexerUrl }
-
-    const appPort = (await cli.prompt('Processor GraphQL server port', {
-      default: '4000',
-    })) as string
-    ctx = { ...ctx, appPort }
-
     return ctx
   }
 
-  async promptIndexerEnvs(
+  async promptIndexerURL(
     ctx: Record<string, string>
   ): Promise<Record<string, string>> {
-    const proceed = await cli.confirm('Are you going to run an indexer?')
-    if (!proceed) {
-      return ctx
-    }
-    ctx = { ...ctx }
-    const wsProviderUrl = (await cli.prompt('Substrate WS provider endpoint', {
-      default: DEFAULT_WS_API_ENDPOINT,
-    })) as string
+    const answer = await select({
+      message: 'Select a Hydra Indexer to be used by the mappings processor',
+      choices: INDEXERS,
+    })
 
-    ctx = { ...ctx, wsProviderUrl }
-
-    const blockHeight = (await cli.prompt(
-      'What is the block height the indexer should start from?',
-      {
-        default: '0',
-      }
-    )) as string
-    if (isNaN(parseInt(blockHeight))) {
-      throw new Error('Starting block height must be an integer')
-    }
-    ctx = { ...ctx, blockHeight }
-
-    const redisUri = (await cli.prompt(
-      'Please provide a Redis instance connection string',
-      {
-        default: 'redis://localhost:6379/0',
-      }
-    )) as string
-    ctx = { ...ctx, redisUri }
-
-    ctx = await this.promptCustomTypes(ctx)
-
+    ctx = { ...ctx, indexerUrl: answer.url }
     return ctx
   }
+}
 
-  async promptCustomTypes(
-    ctx: Record<string, string>
-  ): Promise<Record<string, string>> {
-    const proceed = await cli.confirm(
-      'Are there any non-standard types or modules in the substrate runtime?'
-    )
-    if (!proceed) {
-      return ctx
-    }
-    const typesJSON = (await cli.prompt(
-      'Please provide the location of the type definitions JSON, relative to ./generated/indexer',
-      { default: '../../typedefs.json' }
-    )) as string
-    return { ...ctx, typesJSON }
-  }
-
-  // For now, we simply copy the hardcoded templates from the mappings dir
-  async setupMappings(): Promise<void> {
-    await utils.copyTemplateToCWD('scaffold/schema.graphql', 'schema.graphql')
-
-    await fs.ensureDir('mappings')
-    const mappingFiles = glob.sync(
-      path.join(__dirname, '..', '/templates/scaffold/mappings/**/*.ts')
-    )
-    // TODO: make this generic and move to utils
-    for (const f of mappingFiles) {
-      const pathParts = f.split(path.sep)
-      // remove the trailing parts of the path up to ./scaffold
-      let topDir = pathParts.shift()
-      while (topDir !== 'scaffold') {
-        topDir = pathParts.shift()
-      }
-      const targetDir = path.join(...pathParts)
-
-      await utils.copyTemplateToCWD(path.join('scaffold', targetDir), targetDir)
-    }
-  }
-
-  async setupDocker(): Promise<void> {
-    await fs.ensureDir('docker')
-    await utils.copyTemplateToCWD(
-      'scaffold/docker-compose.yml',
-      'docker-compose.yml'
-    )
-
-    await utils.copyTemplateToCWD(
-      'scaffold/docker/Dockerfile.hydra',
-      path.join('docker', 'Dockerfile.hydra')
-    )
-
-    await utils.copyTemplateToCWD('scaffold/.dockerignore', '.dockerignore')
-  }
-
-  async setupNodeProject(): Promise<void> {
-    const template = await fs.readFile(
-      getTemplatePath('scaffold/package.json'),
-      'utf-8'
-    )
-
-    await fs.writeFile(
-      path.join(process.cwd(), 'package.json'),
-      Mustache.render(template, {
-        projectName: process.env.PROJECT_NAME,
-        hydraVersion:
-          process.env.HYDRA_CLI_VERSION ||
-          utils.resolvePackageVersion('@dzlzv/hydra-cli'),
-        hydraCommonVersion: utils.resolvePackageVersion('@dzlzv/hydra-common'),
-        hydraDbUtilsVersion: utils.resolvePackageVersion(
-          '@dzlzv/hydra-db-utils'
-        ),
-        hydraProcessorVersion: utils.resolvePackageVersion(
-          '@dzlzv/hydra-processor'
-        ),
-      })
-    )
-
-    await execa('yarn', ['install'])
+export function withDependenciesResolutions(
+  ctx: Record<string, string>
+): Record<string, string> {
+  return {
+    ...ctx,
+    hydraVersion:
+      process.env.HYDRA_CLI_VERSION ||
+      resolvePackageVersion('@dzlzv/hydra-cli'),
+    hydraCommonVersion: resolvePackageVersion('@dzlzv/hydra-common'),
+    hydraDbUtilsVersion: resolvePackageVersion('@dzlzv/hydra-db-utils'),
+    hydraProcessorVersion: resolvePackageVersion('@dzlzv/hydra-processor'),
+    hydraTypegenVersion: resolvePackageVersion('@dzlzv/hydra-typegen'),
+    hydraWarthogVersion: getWarthogDependency(),
   }
 }

@@ -117,3 +117,17 @@ export function parseWarthogCodegenStderr(
     )
   }
 }
+
+export function getWarthogDependency(): string {
+  /* eslint-disable */
+  const warthogPackageJson = require('warthog/package.json') as Record<
+    string,
+    unknown
+  >
+  debug(`Warthog package json: ${JSON.stringify(warthogPackageJson, null, 2)}`)
+  // if there is a special 'hydra' property, use it as depenency, otherwise use hardcoded fallback
+  if (warthogPackageJson.hydra === undefined) {
+    throw new Error(`Cannot resolve warthog version`)
+  }
+  return warthogPackageJson.hydra as string
+}
