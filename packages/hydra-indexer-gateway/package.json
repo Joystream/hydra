@@ -1,6 +1,7 @@
 {
   "name": "@dzlzv/hydra-indexer-gateway",
   "version": "2.0.1-beta.0",
+  "private": "true",
   "description": "Generated Warthog Project",
   "license": "MIT",
   "scripts": {
