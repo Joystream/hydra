@@ -1,10 +1,11 @@
 version: '0.1'
 description: Test manifest
 repository: https://github.com/
+# TODO: replace with a single hydra version
 dataSource:
   kind: substrate 
   chain: node-template
-  indexerVersion: '0.0.4'
+  indexerVersion: '2.0.1-beta.0'
 entities:
   - mappings/lib/generated/**/*.model.js
 metadata:
@@ -16,7 +17,7 @@ calls:
   - timestamp.set
 outDir: ./mappings/generated/types
 mappings:
-  hydraCommonVersion: '0.0.3'
+  hydraCommonVersion: '2.0.1-beta.0'
   mappingsModule: mappings/lib/mappings
   imports:
     - mappings/lib/mappings/generated/types
