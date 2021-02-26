@@ -1,5 +1,6 @@
 {
   "name": "@dzlzv/hydra-indexer",
+  "private": "true",
   "description": "Block index builder for substrate based chains",
   "version": "2.0.1-beta.0",
   "main": "lib/index.js",
