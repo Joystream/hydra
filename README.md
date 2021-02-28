@@ -21,3 +21,12 @@ The monorepo contains the following sub-packages:
 * [Sample Project](https://github.com/dzhelezov/hydra/tree/d8c7f79fd26db49de753e0247ef561f5fcb7878f/packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
 * [Docs](docs/): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
 
+## Contributing
+
+Thank you for you interest in contributing to Hydra and the Joy Stream ecosystem. Please don't hesitate to reach out to us on our [telegram channel](https://t.me/HydraDevs) if you have any questions about contributing. 
+
+Each package has it's own README file which you should read before contributing. 
+
+The first step is to fork this repository and then clone your fork. All changes should be done on a seperate branch and then submitted for review on a pull request. 
+
+
