@@ -57,8 +57,14 @@ export function ownFields(o: ObjectType): Field[] {
   }
 
   const intrFields = o.interfaces[0].fields || []
-  return _.differenceBy(o.fields, intrFields, 'name')
+  const fields = _.differenceBy(o.fields, intrFields, 'name')
+  // Add non-scalar fields back to the object
+  _.intersectionBy(o.fields, intrFields, 'name').forEach((f) => {
+    if (!f.isBuildinType && f.relation) fields.push(f)
+  })
+  return fields
 }
+
 export function generateJoinColumnName(name: string): string {
   return snakeCase(name.concat('_id'))
 }
