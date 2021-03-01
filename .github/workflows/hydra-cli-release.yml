@@ -39,14 +39,14 @@ jobs:
       - name: Authenticate with Registry
         run: |
           yarn logout
-          echo "always-auth=true"
+          echo "always-auth=true" > .npmrc
           echo "@dzlzv:registry=https://registry.npmjs.org/" >> .npmrc
           echo "registry=https://registry.npmjs.org/" >> .npmrc
           echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' >> .npmrc
-          npm whoami
+          NPM_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm whoami
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-          
+
       - name: Lerna publish 
         run: |
           lerna publish --canary --preid beta --yes
@@ -85,14 +85,14 @@ jobs:
       #       - Second Change
       #     draft: false
       #     prerelease: false
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 12.x
-          registry-url: 'https://registry.npmjs.org'
-          always-auth: true
-      - run: yarn
-      - run: yarn workspace @dzlzv/hydra-cli build
-      - run: "echo $(npm whoami)"
-      - run: npm set //registry.npmjs.org/:_authToken ${NODE_AUTH_TOKEN}
-      - run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && cd ./packages/hydra-cli && npm publish --access public 
+      # - uses: actions/setup-node@v2
+      #   with:
+      #     node-version: 12.x
+      #     registry-url: 'https://registry.npmjs.org'
+      #     always-auth: true
+      # - run: yarn
+      # - run: yarn workspace @dzlzv/hydra-cli build
+      # - run: "echo $(npm whoami)"
+      # - run: npm set //registry.npmjs.org/:_authToken ${NODE_AUTH_TOKEN}
+      # - run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc && cd ./packages/hydra-cli && npm publish --access public 
   
