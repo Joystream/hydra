@@ -6,7 +6,6 @@ import cli from 'cli-ux'
 import Debug from 'debug'
 
 import { createDir } from '../utils/utils'
-import { createProcessor } from '../codegen/processor'
 import createGraphQLServer from '../codegen/graphql-server'
 
 const debug = Debug('qnode-cli:codegen')
@@ -20,20 +19,6 @@ export default class Codegen extends Command {
       char: 's',
       description: 'Schema path, can be file or directory',
       default: '../../schema.graphql',
-    }),
-    // pass --no-indexer to skip indexer generation
-    processor: flags.boolean({
-      char: 'i',
-      allowNo: true,
-      description: 'Generate Hydra Processor',
-      default: true,
-    }),
-    // pass --no-graphql to skip graphql generation
-    graphql: flags.boolean({
-      char: 'g',
-      allowNo: true,
-      description: 'Generate GraphQL server',
-      default: true,
     }),
 
     createDb: flags.boolean({
@@ -67,18 +52,9 @@ export default class Codegen extends Command {
     process.chdir(generatedFolderPath)
 
     // Create warthog graphql server
-    if (flags.graphql) {
-      cli.action.start('Generating the GraphQL server')
-      await createGraphQLServer(flags)
-      cli.action.stop()
-    }
-
-    // Create Hydra processor
-    if (flags.processor) {
-      cli.action.start('Generating Hydra Processor')
-      await createProcessor(flags)
-      cli.action.stop()
-    }
+    cli.action.start('Generating the GraphQL server')
+    await createGraphQLServer(flags)
+    cli.action.stop()
   }
 }
 
