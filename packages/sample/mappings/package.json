@@ -1,6 +1,6 @@
 {
   "name": "sample-mappings",
-  "version": "0.0.1",
+  "version": "2.1.0-beta.0",
   "description": "Mappings for hydra-processor",
   "main": "lib/mappings/index.js",
   "license": "MIT",

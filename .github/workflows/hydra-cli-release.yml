@@ -44,9 +44,9 @@ jobs:
           echo "registry=http://registry.npmjs.org/" >> .npmrc
           echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
           npm whoami
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      #- name: Git Identity
+      - name: Lerna publish 
+        run: |
+          lerna publish --canary --preid beta --yes
       #  if: steps.check.outputs.changed == 'true'
       #  run: |
       #    git config --global user.name 'github-actions'
