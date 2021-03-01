@@ -40,9 +40,10 @@ jobs:
       - name: Authenticate with Registry
         run: |
           yarn logout
-          echo "@dzlzv:registry=http://registry.npmjs.org/" > .npmrc
-          echo "registry=http://registry.npmjs.org/" >> .npmrc
-          echo '//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN' >> .npmrc
+          echo "always-auth=true"
+          echo "@dzlzv:registry=https://registry.npmjs.org/" >> .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' >> .npmrc
           npm whoami
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
