@@ -49,7 +49,7 @@ jobs:
 
       - name: Lerna publish 
         run: |
-          lerna publish --canary --preid beta --yes
+          yarn lerna publish --canary --preid beta --yes
       #  if: steps.check.outputs.changed == 'true'
       #  run: |
       #    git config --global user.name 'github-actions'
