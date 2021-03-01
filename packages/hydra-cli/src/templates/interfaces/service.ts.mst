@@ -39,7 +39,7 @@ export class {{className}}Service {
 		try {
       // fetching all the fields to allow type-dependent field resolutions
 			{{#subclasses}}
-        {{camelNamePlural}} = await this.{{camelName}}Service.find(where, ob, 0, _limit + _offset);
+        {{camelNamePlural}} = await this.{{camelName}}Service.find(where, ob, _limit + _offset, _offset);
       {{/subclasses}}
 		} finally {
 			await queryRunner.commitTransaction();
