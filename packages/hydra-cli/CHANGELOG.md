@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.1.0-beta.0](https://github.com/Joystream/hydra/compare/v0.1.2...v2.1.0-beta.0) (2021-03-01)
+
+**Note:** Version bump only for package @dzlzv/hydra-cli
+
+
+
+
+
 # CHANGELOG
 
 ## 0.1.7
@@ -60,4 +73,4 @@ Major upgrade
 
 - New default mappings: handle balance.Transfered events
 - Update scaffold prompts: additinal settings for indexing and processor set-ups
-- Cleaned up `./generated/indexer/index.ts` 
+- Cleaned up `./generated/indexer/index.ts`
