@@ -26,7 +26,6 @@
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
     "run-dev": "node ./bin/run",
-    "prepack": "rm -rf lib && tsc -b ",
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "test-build": "rm -rf test-lib && tsc --build ./test/tsconfig.json",
     "lint": "eslint . --cache --ext .ts",
