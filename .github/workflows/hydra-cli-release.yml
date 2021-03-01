@@ -42,8 +42,8 @@ jobs:
           echo "always-auth=true" > .npmrc
           echo "@dzlzv:registry=https://registry.npmjs.org/" >> .npmrc
           echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo '//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}' >> .npmrc
-          NPM_AUTH_TOKEN=${NPM_AUTH_TOKEN} npm whoami
+          echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
+          npm whoami
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
