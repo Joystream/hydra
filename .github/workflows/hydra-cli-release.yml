@@ -49,7 +49,7 @@ jobs:
 
       - name: Lerna publish 
         run: |
-          yarn
+          yarn install --frozen-lockfile
           yarn lerna publish --canary --preid beta --yes
       #  if: steps.check.outputs.changed == 'true'
       #  run: |
