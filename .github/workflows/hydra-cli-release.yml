@@ -46,11 +46,13 @@ jobs:
           npm whoami
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-      - name: Lerna publish 
+      - name: Lerna version 
         run: |
           yarn install --frozen-lockfile
-          yarn lerna publish --canary --preid beta --yes
+          lerna version --conventional-commits
+      - name: Lerna publish 
+        run: |
+          yarn lerna publish from-git --dist-tag next
       #  if: steps.check.outputs.changed == 'true'
       #  run: |
       #    git config --global user.name 'github-actions'
