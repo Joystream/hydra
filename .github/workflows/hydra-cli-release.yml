@@ -1,20 +1,12 @@
 name: publish
 on:
-  # When Release Pull Request is merged
-  workflow_dispatch:
-    inputs:
-      manual_release:
-        description: 'Manually release current version of hydra-cli'     
-        required: true
-        default: 'false'
-
-  pull_request:
+  push:
     branches:
       - master
-      - hydra_v1
+      - dev
       - ci-test
       - ci-lerna
-    types: [closed]
+      - ci-lerna-test
 
 env:
   CI: true
@@ -23,19 +15,14 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-18.04
-    if: github.event.pull_request.merged == true || github.event.inputs.manual_release == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Check version changes
-        uses: EndBug/version-check@v1
-        id: check
-        with:
-          diff-search: true
-          file-name: ./packages/hydra-cli/package.json
-      - name: Log when changed
-        if: steps.check.outputs.changed == 'true'
-        run: 'echo "Hydra-cli version change found in commit ${{ steps.check.outputs.commit }}! New version: ${{ steps.check.outputs.version }} (${{ steps.check.outputs.type }})"'
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - name: Authenticate with Registry
         run: |
           yarn logout
@@ -54,6 +41,7 @@ jobs:
           yarn lerna version --conventional-commits --yes
       - name: Lerna publish 
         run: |
+          echo "Branch name: ${{ steps.extrextract_branch.outputs.branch }}"
           yarn lerna publish from-git --dist-tag next --yes
       #  if: steps.check.outputs.changed == 'true'
       #  run: |
