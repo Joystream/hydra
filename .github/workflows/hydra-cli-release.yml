@@ -49,7 +49,7 @@ jobs:
       - name: Lerna version 
         run: |
           yarn install --frozen-lockfile
-          lerna version --conventional-commits
+          yarn lerna version --conventional-commits
       - name: Lerna publish 
         run: |
           yarn lerna publish from-git --dist-tag next
