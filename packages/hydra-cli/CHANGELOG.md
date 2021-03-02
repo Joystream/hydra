@@ -7,12 +7,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @dzlzv/hydra-cli
 
-
-
-
-
-# CHANGELOG
-
 ## 0.1.7
 
 - `codegen --schema` now supports passing folders instead of single schema file
