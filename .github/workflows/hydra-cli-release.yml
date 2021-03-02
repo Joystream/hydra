@@ -49,6 +49,8 @@ jobs:
       - name: Lerna version 
         run: |
           yarn install --frozen-lockfile
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
           yarn lerna version --conventional-commits --yes
       - name: Lerna publish 
         run: |
