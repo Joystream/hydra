@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/apps-config",
   "description": "A fork of @polkdatjs/apps-config suitable for vanilla ts imports",
-  "version": "2.1.0-beta.0",
+  "version": "2.1.0-beta.1",
   "main": "lib/index.js",
   "sideEffects": true,
   "repository": "github:polkadot-js/apps",
