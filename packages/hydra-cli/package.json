@@ -77,12 +77,6 @@
     "warthog": "https://github.com/metmirr/warthog/releases/download/v2.23.0/warthog-v2.23.0.tgz",
     "typeorm": "^0.2.31"
   },
-  "hydraDependencies": {
-    "@dzlzv/hydra-common": "0.0.3",
-    "@dzlzv/hydra-db-utils": "0.0.2",
-    "@dzlzv/hydra-processor": "0.1.1",
-    "@dzlzv/hydra-typegen": "0.0.3-1"
-  },
   "devDependencies": {
     "@oclif/dev-cli": "^1",
     "@oclif/test": "^1",
