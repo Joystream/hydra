@@ -77,7 +77,8 @@ export function resolvePackageVersion(pkgName: string): string {
 
   debug(`Resolved hydra-cli package.json: ${JSON.stringify(pkgJson, null, 2)}`)
 
-  if (pkgName === '@dzlzv/hydra-cli') {
+  // all hydra packages use the same version now
+  if (pkgName.startsWith('@dzlzv/hydra')) {
     return pkgJson.version as string
   }
 
