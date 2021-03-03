@@ -43,7 +43,7 @@ jobs:
       - name: Lerna publish next
         if: steps.extract_branch.outputs.branch != 'master'
         run: |
-          yarn lerna publish from-git --dist-tag dev --yes
+          yarn lerna publish from-git --dist-tag ${{ steps.extract_branch.outputs.branch }} --canary --preid ${{ steps.extract_branch.outputs.branch }} --yes
       - name: Lerna release from master
         if: steps.extract_branch.outputs.branch == 'master'
         run: |
