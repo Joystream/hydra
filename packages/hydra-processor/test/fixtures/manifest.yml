@@ -4,11 +4,11 @@ repository: https://github.com/
 dataSource:
   kind: substrate 
   chain: node-template
-  indexerVersion: '0.0.4'
+  indexerVersion: '2.0.1-beta.0'
 entities:
   - test/fixtures/test-entities.ts
 mappings:
-  hydraCommonVersion: '0.0.3'
+  hydraCommonVersion: '2.0.1-beta.0'
   mappingsModule: test/fixtures/test-mappings.ts
   imports:
     - test/fixtures/test-types.ts
