@@ -1,6 +1,6 @@
 {
   "name": "hydra-e2e-tests",
-  "version": "1.0.0",
+  "version": "2.0.1-beta.1",
   "description": "End-to-end tests for Hydra services",
   "main": "index.js",
   "license": "MIT",
