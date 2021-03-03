@@ -17,23 +17,31 @@
   },
   "scripts": {
     "e2e-test": "yarn workspace hydra-e2e-tests run e2e-test",
-    "lint": "yarn workspaces run lint"
+    "lint": "yarn workspaces run lint",
+    "postinstall": "is-ci || husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "^12.0.1",
+    "@commitlint/config-conventional": "^12.0.1",
     "@joystream/eslint-config": "^1.0.0",
     "@joystream/prettier-config": "^1.0.0",
+    "commitizen": "^4.2.3",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.6.0",
     "eslint-plugin-sonarjs": "^0.5.0",
-    "husky": "^4.3.0",
+    "husky": "^5.1.1",
+    "is-ci": "^3.0.0",
+    "lerna": "^3.22.1",
     "lint-staged": "^10.5.1",
     "prettier": "2.0.2"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.ts": "yarn lint --fix"
+  },
+  "name": "hydra",
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }
