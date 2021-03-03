@@ -39,11 +39,10 @@ jobs:
           yarn install --frozen-lockfile
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-      - name: Lerna publish next
+      - name: Lerna update prerelease version
         if: steps.extract_branch.outputs.branch != 'master'
         run: |
-          yarn lerna version --conventional-commits --preid ${{ steps.extract_branch.outputs.branch }} --yes
-          yarn lerna publish from-git --dist-tag ${{ steps.extract_branch.outputs.branch }} --canary --yes
+          yarn lerna version --conventional-commits --conventional-prerelease --preid ${{ steps.extract_branch.outputs.branch }} --yes
       - name: Lerna release from master
         if: steps.extract_branch.outputs.branch == 'master'
         run: |
