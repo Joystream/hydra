@@ -5,10 +5,10 @@ export class IndexerStatusFields1613643992000 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "processed_events_log" ADD COLUMN IF NOT EXISTS "indexer_head" numeric NOT NULL DEFAULT -1`
+      `ALTER TABLE "processed_events_log" ADD COLUMN IF NOT EXISTS "indexer_head" integer NOT NULL DEFAULT -1`
     )
     await queryRunner.query(
-      `ALTER TABLE "processed_events_log" ADD COLUMN IF NOT EXISTS "chain_head" numeric NOT NULL DEFAULT -1`
+      `ALTER TABLE "processed_events_log" ADD COLUMN IF NOT EXISTS "chain_head" integer NOT NULL DEFAULT -1`
     )
   }
 
