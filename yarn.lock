@@ -373,7 +373,11 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+<<<<<<< HEAD
 "@commitlint/cli@^12.0.0":
+=======
+"@commitlint/cli@^12.0.1":
+>>>>>>> ci: add action for lerna release
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/@commitlint/cli/-/cli-12.0.1.tgz#8960e34e8f1aed8b2ea50f223ee817fdf2264ffb"
   integrity sha512-V+cMYNHJOr40XT9Kvz3Vrz1Eh7QE1rjQrUbifawDAqcOrBJFuoXwU2SAcRtYFCSqFy9EhbreQGhZFs8dYb90KA==
@@ -389,7 +393,11 @@
     resolve-global "1.0.0"
     yargs "^16.2.0"
 
+<<<<<<< HEAD
 "@commitlint/config-conventional@^12.0.0":
+=======
+"@commitlint/config-conventional@^12.0.1":
+>>>>>>> ci: add action for lerna release
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/@commitlint/config-conventional/-/config-conventional-12.0.1.tgz#7bf3bbf68bda967c5165135ebe8f2055decf1a83"
   integrity sha512-1ZhB135lh47zVmf1orwcjxuKuam11fJIH/bdVxW9XiQv8XPwC6iIp19knfl8FcOT78AVBnes1z6EVxgUeP2/4Q==
@@ -409,6 +417,14 @@
   resolved "https://registry.yarnpkg.com/@commitlint/execute-rule/-/execute-rule-12.0.1.tgz#5bb2eba929270cafb2bd8191799d8b451de7fb7e"
   integrity sha512-JzyweYfZlFLtXpgP+btzSY3YAkGPg61TqUSYQqBr4+5IaVf1FruMm5v4D5eLu9dAJuNKUfHbM3AEfuEPiZ79pg==
 
+<<<<<<< HEAD
+=======
+"@commitlint/execute-rule@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@commitlint/execute-rule/-/execute-rule-12.0.1.tgz#5bb2eba929270cafb2bd8191799d8b451de7fb7e"
+  integrity sha512-JzyweYfZlFLtXpgP+btzSY3YAkGPg61TqUSYQqBr4+5IaVf1FruMm5v4D5eLu9dAJuNKUfHbM3AEfuEPiZ79pg==
+
+>>>>>>> ci: add action for lerna release
 "@commitlint/format@^12.0.1":
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/@commitlint/format/-/format-12.0.1.tgz#5164e5a9e8592c1983482cbd71e7ea86a645ff1b"
@@ -435,7 +451,34 @@
     "@commitlint/rules" "^12.0.1"
     "@commitlint/types" "^12.0.1"
 
+<<<<<<< HEAD
 "@commitlint/load@>6.1.1", "@commitlint/load@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@commitlint/load/-/load-12.0.1.tgz#4d180fc88e5b4cfcb476a245d899f85154137502"
+  integrity sha512-dX8KdCWn7w0bTkkk3zKQpe9X8vsTRa5EM+1ffF313wCX9b6tGa9vujhEHCkSzKAbbE2tFV64CHZygE7rtlHdIA==
+=======
+"@commitlint/load@>6.1.1":
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/@commitlint/load/-/load-12.0.0.tgz#d0cd58bd6c3f5184ae542b6fbcdea37c5c671e32"
+  integrity sha512-B7rwRGWE3j+4dWsLD4s82fIbIJP1xGOJYfAvKDWOa/FnAb8s8ZQOK8HHuDC8BD/MU3Ierl8KJMfzGiO63d1rlA==
+>>>>>>> ci: add action for lerna release
+  dependencies:
+    "@commitlint/execute-rule" "^12.0.1"
+    "@commitlint/resolve-extends" "^12.0.1"
+    "@commitlint/types" "^12.0.1"
+    chalk "^4.0.0"
+    cosmiconfig "^7.0.0"
+    lodash "^4.17.19"
+    resolve-from "^5.0.0"
+
+<<<<<<< HEAD
+"@commitlint/message@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@commitlint/message/-/message-12.0.1.tgz#caff6743db78c30a063809501cf4b835c3ce7fa6"
+  integrity sha512-fXuoxRC+NT1wEQi6p8oHfT7wvWIRgTk+udlRJnWTjmMpiYzVnMmmZfasdShirWr4TtxQtMyL+5DVgh7Y98kURw==
+
+=======
+"@commitlint/load@^12.0.1":
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/@commitlint/load/-/load-12.0.1.tgz#4d180fc88e5b4cfcb476a245d899f85154137502"
   integrity sha512-dX8KdCWn7w0bTkkk3zKQpe9X8vsTRa5EM+1ffF313wCX9b6tGa9vujhEHCkSzKAbbE2tFV64CHZygE7rtlHdIA==
@@ -453,6 +496,7 @@
   resolved "https://registry.yarnpkg.com/@commitlint/message/-/message-12.0.1.tgz#caff6743db78c30a063809501cf4b835c3ce7fa6"
   integrity sha512-fXuoxRC+NT1wEQi6p8oHfT7wvWIRgTk+udlRJnWTjmMpiYzVnMmmZfasdShirWr4TtxQtMyL+5DVgh7Y98kURw==
 
+>>>>>>> ci: add action for lerna release
 "@commitlint/parse@^12.0.1":
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/@commitlint/parse/-/parse-12.0.1.tgz#ba8641f53e15b523808ba2eaa48c1bf0129c91c4"
@@ -482,6 +526,7 @@
     resolve-from "^5.0.0"
     resolve-global "^1.0.0"
 
+<<<<<<< HEAD
 "@commitlint/rules@^12.0.1":
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/@commitlint/rules/-/rules-12.0.1.tgz#1c81345f468597656141338a493d5e426e44dab9"
@@ -497,12 +542,46 @@
   resolved "https://registry.yarnpkg.com/@commitlint/to-lines/-/to-lines-12.0.1.tgz#586d89b9f9ff99ef93b3c8aa3d77faffbe3ffedc"
   integrity sha512-XwcJ1jY7x2fhudzbGMpNQkTSMVrxWrI8bRMbVe3Abuu7RfYpFf7VXAlhtnLfxBoagaK7RxjC2+eRidp/3txQBg==
 
+=======
+"@commitlint/resolve-extends@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@commitlint/resolve-extends/-/resolve-extends-12.0.1.tgz#77509f386e08bd30262ec9a75c783d8f4f028fd2"
+  integrity sha512-Mvg0GDi/68Cqw893ha8uhxE8myHfPmiSSSi7d1x4VJNR4hoS37lBdX89kyx4i9NPmLfviY2cUJKTyK8ZrFznZw==
+  dependencies:
+    import-fresh "^3.0.0"
+    lodash "^4.17.19"
+    resolve-from "^5.0.0"
+    resolve-global "^1.0.0"
+
+"@commitlint/rules@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@commitlint/rules/-/rules-12.0.1.tgz#1c81345f468597656141338a493d5e426e44dab9"
+  integrity sha512-A5O0ubNGugZR9WWxk5IVOLo07lpdUwhG5WkAW2lYpgZ7Z/2U4PLob9b4Ih1eHbQu+gnVeFr91k7F0DrpM7B8EQ==
+  dependencies:
+    "@commitlint/ensure" "^12.0.1"
+    "@commitlint/message" "^12.0.1"
+    "@commitlint/to-lines" "^12.0.1"
+    "@commitlint/types" "^12.0.1"
+
+"@commitlint/to-lines@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@commitlint/to-lines/-/to-lines-12.0.1.tgz#586d89b9f9ff99ef93b3c8aa3d77faffbe3ffedc"
+  integrity sha512-XwcJ1jY7x2fhudzbGMpNQkTSMVrxWrI8bRMbVe3Abuu7RfYpFf7VXAlhtnLfxBoagaK7RxjC2+eRidp/3txQBg==
+
+>>>>>>> ci: add action for lerna release
 "@commitlint/top-level@^12.0.1":
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/@commitlint/top-level/-/top-level-12.0.1.tgz#9c7efd319a4f8d29001f011ba8b0e21fad6044f6"
   integrity sha512-rHdgt7U24GEau2/9i2vEAbksxkBRiVjHj5ECFL5dd0AJOIvaK++vMg4EF/ME0X/1yd9qVTHTNOl2Q4tTFK7VBQ==
   dependencies:
     find-up "^5.0.0"
+
+"@commitlint/types@^12.0.1":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@commitlint/types/-/types-12.0.1.tgz#04a0cbb8aa56b7c004f8939c2d1ef8892ec68327"
+  integrity sha512-FsNDMV0W7D19/ZbR412klpqAilXASx75Neqh7jPtK278IEwdukOg3vth1r5kTm+BjDScM7wMUEOwIW3NNfAtwg==
+  dependencies:
+    chalk "^4.0.0"
 
 "@commitlint/types@^12.0.1":
   version "12.0.1"
