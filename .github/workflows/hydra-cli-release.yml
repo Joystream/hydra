@@ -34,17 +34,18 @@ jobs:
           npm whoami
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      - name: Lerna version 
+      - name: Install  
         run: |
           yarn install --frozen-lockfile
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          yarn lerna version --conventional-commits --yes
       - name: Lerna publish next
         if: steps.extract_branch.outputs.branch != 'master'
         run: |
-          yarn lerna publish from-git --dist-tag ${{ steps.extract_branch.outputs.branch }} --canary --preid ${{ steps.extract_branch.outputs.branch }} --yes
+          yarn lerna version --conventional-commits --preid ${{ steps.extract_branch.outputs.branch }} --yes
+          yarn lerna publish from-git --dist-tag ${{ steps.extract_branch.outputs.branch }} --canary --yes
       - name: Lerna release from master
         if: steps.extract_branch.outputs.branch == 'master'
         run: |
+          yarn lerna version --conventional-commits --yes
           yarn lerna publish from-git --dist-tag latest --yes
