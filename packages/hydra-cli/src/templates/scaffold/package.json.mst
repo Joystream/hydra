@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "yarn clean && yarn codegen",
-    "rebuild": "yarn db:drop && yarn clean:query-node && yarn codegen:query-node && yarn db:prepare && yarn db:migrate",
+    "rebuild": "yarn clean:query-node && yarn bootstrap",
     "lint": "echo \"Skippinng\"",
     "clean": "rm -rf ./generated",
     "clean:query-node": "rm -rf ./generated/graphql-server",
