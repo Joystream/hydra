@@ -1,6 +1,12 @@
 name: publish
 on:
   workflow_dispatch: # manually run 
+    inputs:
+      graduate:
+        description: 'Graduate from prerelease'     
+        required: false
+        default: 'false'
+      
 
 env:
   CI: true
@@ -29,13 +35,13 @@ jobs:
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
       - name: Lerna graduate
+        if: github.event.inputs.graduate == 'true'
         run: |
           yarn lerna version --conventional-commits --conventional-graduate --yes
 
       - name: Lerna publish
         run: |
-          yarn lerna publish from-git --dist-tag latest --yes
-
+          yarn lerna publish from-git --dist-tag latest --yes --conventional-commits 
       - name: Docker login 
         uses: docker/login-action@v1
         with:
