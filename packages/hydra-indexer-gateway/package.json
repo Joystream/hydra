@@ -5,7 +5,7 @@
   "description": "Generated Warthog Project",
   "license": "MIT",
   "scripts": {
-    "docker:build": "docker build . -t joystream/hydra-indexer-gateway:latest -t joystream/hydra-indexer-gateway:${TAG:-latest}",
+    "docker:build": "docker build . -t joystream/hydra-indexer-gateway:latest -t joystream/hydra-indexer-gateway:${TAG:-latest} -t hydra-indexer-gateway:latest",
     "docker:push": "docker push joystream/hydra-indexer-gateway",
     "docker:publish": "export TAG=$(node -p 'require(\"./package.json\").version') && yarn docker:build && yarn docker:push",
     "bootstrap": "yarn bootstrap:dev",
