@@ -1,7 +1,8 @@
 {
   "name": "@dzlzv/hydra-indexer",
+  "private": "true",
   "description": "Block index builder for substrate based chains",
-  "version": "0.1.6",
+  "version": "2.0.1-beta.1",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
@@ -14,7 +15,7 @@
   ],
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
-    "docker:build": "docker build ./../../ -f ../hydra-indexer/Dockerfile -t joystream/hydra-indexer:latest ",
+    "docker:build": "docker build . -t joystream/hydra-indexer:latest -t hydra-indexer:latest",
     "docker:tag-latest": "docker tag joystream/hydra-indexer:latest joystream/hydra-indexer:${TAG}",
     "docker:publish": "export TAG=$(node -p 'require(\"./package.json\").version') && yarn docker:build && yarn docker:tag-latest && docker push joystream/hydra-indexer",
     "build": "rm -rf lib && tsc --build tsconfig.json",
@@ -32,11 +33,11 @@
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only --exclude \"test/integration/**/*.test.ts\"  \"test/**/*.test.ts\" \"src/**/*.test.ts\""
   },
   "dependencies": {
-    "@dzlzv/bn-typeorm": "^0.0.1",
-    "@dzlzv/hydra-common": "^0.0.3",
-    "@dzlzv/hydra-db-utils": "^0.0.2",
+    "@dzlzv/apps-config": "^2.0.1-beta.1",
+    "@dzlzv/bn-typeorm": "^2.0.1-beta.1",
+    "@dzlzv/hydra-common": "^2.0.1-beta.1",
+    "@dzlzv/hydra-db-utils": "^2.0.1-beta.1",
     "@polkadot/api": "~2.10.2-7",
-    "@dzlzv/apps-config": "^0.70.2-11",
     "@types/express": "^4.17.8",
     "@types/ioredis": "^4.17.4",
     "@types/lodash": "^4.14.161",

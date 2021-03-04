@@ -1,10 +1,11 @@
 {
   "name": "@dzlzv/hydra-indexer-gateway",
-  "version": "0.1.4",
+  "private": "true",
+  "version": "2.0.1-beta.1",
   "description": "Generated Warthog Project",
   "license": "MIT",
   "scripts": {
-    "docker:build": "docker build . -t joystream/hydra-indexer-gateway:latest -t joystream/hydra-indexer-gateway:${TAG:-latest}",
+    "docker:build": "docker build . -t joystream/hydra-indexer-gateway:latest -t joystream/hydra-indexer-gateway:${TAG:-latest} -t hydra-indexer-gateway:latest",
     "docker:push": "docker push joystream/hydra-indexer-gateway",
     "docker:publish": "export TAG=$(node -p 'require(\"./package.json\").version') && yarn docker:build && yarn docker:push",
     "bootstrap": "yarn bootstrap:dev",
@@ -38,11 +39,10 @@
     "test": "DEBUG= jest --verbose --coverage",
     "test:watch": "DEBUG= jest --watch"
   },
-
   "dependencies": {
-    "@dzlzv/bn-typeorm": "^0.0.1",
-    "@dzlzv/hydra-common": "^0.0.2",
-    "@dzlzv/hydra-db-utils": "^0.0.2",
+    "@dzlzv/bn-typeorm": "2.0.1-beta.1",
+    "@dzlzv/hydra-common": "2.0.1-beta.1",
+    "@dzlzv/hydra-db-utils": "2.0.1-beta.1",
     "@types/ioredis": "^4.17.4",
     "bn.js": "^5.1.3",
     "dotenv": "^8.2.0",

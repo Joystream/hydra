@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "0.1.8-1",
+  "version": "2.0.1-beta.1",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
   "license": "MIT",
   "bin": {
@@ -76,12 +76,6 @@
     "pg-listen": "^1.7.0",
     "warthog": "https://github.com/metmirr/warthog/releases/download/v2.23.0/warthog-v2.23.0.tgz",
     "typeorm": "^0.2.31"
-  },
-  "hydraDependencies": {
-    "@dzlzv/hydra-common": "0.0.3",
-    "@dzlzv/hydra-db-utils": "0.0.2",
-    "@dzlzv/hydra-processor": "0.1.1",
-    "@dzlzv/hydra-typegen": "0.0.3-1"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1",
