@@ -1,22 +1,5 @@
 # [](https://github.com/dzhelezov/hydra/compare/v2.0.1-beta.2...v) (2021-03-04)
 
-
-
-## [2.0.1-beta.2](https://github.com/dzhelezov/hydra/compare/v0.1.2...v2.0.1-beta.2) (2021-03-04)
-
-
-### Bug Fixes
-
-* **hydra-cli:** fix query name in the fts service template ([bc70e02](https://github.com/dzhelezov/hydra/commit/bc70e02fd2027b7d9c760a831342baeb97738e17))
-
-
-### Features
-
-* **hydra-cli:** subscriptions for processor state updates + hydra-cli dep management ([#224](https://github.com/dzhelezov/hydra/issues/224)) ([e828ab4](https://github.com/dzhelezov/hydra/commit/e828ab4ffcf608fee130b41245493c1a8b7293ab))
-* add block timestamp to substrate event ([b4f6cd9](https://github.com/dzhelezov/hydra/commit/b4f6cd95aec8f78f6e442a190e7d92ba49753a57))
-
-
-
 ## [0.1.2](https://github.com/dzhelezov/hydra/compare/v0.0.4...v0.1.2) (2020-11-16)
 
 

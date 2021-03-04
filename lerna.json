@@ -4,5 +4,11 @@
   ],
   "npmClient": "yarn",
   "version": "2.0.1-beta.2",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "command": {
+    "version": {
+      "conventionalCommits": true,
+      "changelogPreset": "conventionalcommits"
+    }
+  }
 }
