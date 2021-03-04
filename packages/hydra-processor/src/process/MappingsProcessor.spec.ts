@@ -1,6 +1,6 @@
 import { formatEventId } from '@dzlzv/hydra-common'
 import { expect } from 'chai'
-import { nextEventQueries, nextState } from '.'
+import { nextEventQueries, onBatchComplete } from '.'
 
 const blockInterval2 = {
   from: 3,
@@ -37,8 +37,8 @@ describe('MappingsProcessor', () => {
     expect(nextQuery.block_lte).equals(10, 'should take global filter config')
   })
 
-  it('creates next state', () => {
-    let state = nextState(
+  it('creates should update the state on complete batch', () => {
+    let state = onBatchComplete(
       {
         lastProcessedEvent: undefined,
         lastScannedBlock: 0,
@@ -46,8 +46,9 @@ describe('MappingsProcessor', () => {
       [{ block_lte: 5 }, { block_lte: 6 }]
     )
     expect(state.lastProcessedEvent).equals(formatEventId(0, 0))
+    expect(state.lastScannedBlock).equals(5)
 
-    state = nextState(
+    state = onBatchComplete(
       {
         lastProcessedEvent: formatEventId(0, 5),
         lastScannedBlock: 4,
@@ -56,11 +57,11 @@ describe('MappingsProcessor', () => {
     )
     expect(state.lastProcessedEvent).equals(formatEventId(0, 5))
     expect(state.lastScannedBlock).equals(
-      0,
+      5,
       'should update last scanned block to the one of the event'
     )
 
-    state = nextState(
+    state = onBatchComplete(
       {
         lastProcessedEvent: formatEventId(6, 5),
         lastScannedBlock: 4,

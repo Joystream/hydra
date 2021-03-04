@@ -42,6 +42,16 @@ export function getTemplatePath(template: string): string {
 }
 
 /**
+ * Load package.json of the current hydra-cli version
+ */
+export function resolveHydraCliPkgJson(): Record<string, unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const path = require.resolve('@dzlzv/hydra-cli/package.json')
+
+  return JSON.parse(fs.readFileSync(path, 'utf-8')) as Record<string, unknown>
+}
+
+/**
  * Copies the template to the current directory of the process under the <filename>
  *
  * @param template Template file int templates/<templateName>
@@ -63,13 +73,7 @@ export async function copyTemplateToCWD(
  * @param pkgName dependency to loockup
  */
 export function resolvePackageVersion(pkgName: string): string {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const path = require.resolve('@dzlzv/hydra-cli/package.json')
-
-  const pkgJson = JSON.parse(fs.readFileSync(path, 'utf-8')) as Record<
-    string,
-    unknown
-  >
+  const pkgJson = resolveHydraCliPkgJson()
 
   debug(`Resolved hydra-cli package.json: ${JSON.stringify(pkgJson, null, 2)}`)
 

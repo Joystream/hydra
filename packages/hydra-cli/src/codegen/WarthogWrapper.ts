@@ -4,15 +4,16 @@ import * as dotenv from 'dotenv'
 import { run } from 'warthog/dist/cli/cli'
 
 import { WarthogModelBuilder } from '../parse/WarthogModelBuilder'
-import { getTemplatePath, parseWarthogCodegenStderr } from '../utils/utils'
+import {
+  getTemplatePath,
+  parseWarthogCodegenStderr,
+  resolveHydraCliPkgJson,
+} from '../utils/utils'
 import Debug from 'debug'
 import { SourcesGenerator } from '../generate/SourcesGenerator'
 import { CodegenFlags } from '../commands/codegen'
 import execa = require('execa')
 import Listr = require('listr')
-
-const FALLBACK_WARTHOG_LIB =
-  'https://github.com/metmirr/warthog/releases/download/v2.19/warthog-v2.19.tgz'
 
 const debug = Debug('qnode-cli:warthog-wrapper')
 
@@ -70,7 +71,7 @@ export default class WarthogWrapper {
         title: 'Install dependencies',
         skip: skipIfNoDeps,
         task: async () => {
-          await this.installDependecies()
+          await execa('yarn', ['install'])
         },
       },
       {
@@ -150,17 +151,27 @@ export default class WarthogWrapper {
     await run(['new', `${projectName}`])
     console.log = consoleFn
 
-    // Override warthog's index.ts file for custom naming strategy
-    fs.copyFileSync(
-      getTemplatePath('graphql-server/graphql-server.index.mst'),
-      path.resolve(process.cwd(), 'src/index.ts')
-    )
-    fs.copyFileSync(
-      getTemplatePath(`graphql-server/graphql-server.tsconfig.json`),
-      path.resolve(process.cwd(), 'tsconfig.json')
-    )
+    this.copySourceFiles()
 
     await this.updateDotenv()
+  }
+
+  copySourceFiles(): void {
+    // source -> dest
+    const sourceFiles = [
+      'src/index.ts',
+      'src/server.ts',
+      'src/pubsub.ts',
+      'src/processor.resolver.ts',
+      'tsconfig.json',
+    ]
+
+    sourceFiles.forEach((destPath) =>
+      fs.copyFileSync(
+        getTemplatePath(`graphql-server/${destPath}.mst`),
+        path.resolve(process.cwd(), `${destPath}`)
+      )
+    )
   }
 
   prepareProjectFiles(): void {
@@ -170,9 +181,12 @@ export default class WarthogWrapper {
       )
     }
 
-    const pkgFile = JSON.parse(
-      fs.readFileSync('package.json', 'utf8')
-    ) as Record<string, Record<string, unknown>>
+    const pkgFile = JSON.parse(fs.readFileSync('package.json', 'utf8')) as {
+      scripts: Record<string, string>
+      dependencies: Record<string, string>
+      devDependencies: Record<string, string>
+    }
+
     pkgFile.scripts['db:sync'] =
       'SYNC=true WARTHOG_DB_SYNCHRONIZE=true ts-node --type-check src/index.ts'
 
@@ -182,33 +196,45 @@ export default class WarthogWrapper {
     // Node does not run the compiled code, so we use ts-node in production...
     pkgFile.scripts['start:prod'] =
       'WARTHOG_ENV=production yarn dotenv:generate && ts-node src/index.ts'
-    pkgFile.dependencies.warthog = this.getWarthogDependency()
+
+    const extraDependencies = this.readExtraDependencies()
+
+    pkgFile.dependencies = {
+      // this should overwrite warthog dep as well
+      ...pkgFile.dependencies,
+      ...extraDependencies,
+    }
+
+    debug(`Writing package.json: ${JSON.stringify(pkgFile, null, 2)}`)
+
     fs.writeFileSync('package.json', JSON.stringify(pkgFile, null, 2))
   }
 
-  async installDependecies(): Promise<void> {
-    debug('Installing the dependencies')
-    await execa('yarn', ['add', 'lodash']) // add lodash dep
-    await execa('yarn', ['add', '-D', 'typeorm']) // dev dependency
-    await execa('yarn', ['install'])
+  readExtraDependencies(): Record<string, string> {
+    const hydraCliPkgJson = resolveHydraCliPkgJson()
+
+    const queryNodeDeps = (hydraCliPkgJson.queryNodeDependencies ||
+      {}) as Record<string, string>
+
+    const hydraCliDeps = (hydraCliPkgJson.dependencies || {}) as Record<
+      string,
+      string
+    >
+
+    // overwrite with hydra-cli own dependency if present
+    Object.keys(queryNodeDeps).forEach((dep) => {
+      if (hydraCliDeps[dep]) {
+        debug(`Rewriting the dependency ${dep} to ${hydraCliDeps[dep]}`)
+        queryNodeDeps[dep] = hydraCliDeps[dep]
+      }
+    })
+
+    return queryNodeDeps
   }
 
   async createDB(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await run(['db:create'])
-  }
-
-  getWarthogDependency(): string {
-    /* eslint-disable */
-    const warthogPackageJson = require('warthog/package.json') as Record<
-      string,
-      unknown
-    >
-    debug(
-      `Warthog package json: ${JSON.stringify(warthogPackageJson, null, 2)}`
-    )
-    // if there is a special 'hydra' property, use it as depenency, otherwise use hardcoded fallback
-    return (warthogPackageJson.hydra || FALLBACK_WARTHOG_LIB) as string
   }
 
   /**
@@ -249,20 +275,18 @@ export default class WarthogWrapper {
     const envConfig = dotenv.parse(fs.readFileSync('.env'))
 
     // Override DB_NAME, PORT, ...
-    envConfig['WARTHOG_DB_DATABASE'] =
-      process.env.DB_NAME || envConfig['WARTHOG_DB_DATABASE']
-    envConfig['WARTHOG_DB_USERNAME'] =
-      process.env.DB_USER || envConfig['WARTHOG_DB_USERNAME']
-    envConfig['WARTHOG_DB_PASSWORD'] =
-      process.env.DB_PASS || envConfig['WARTHOG_DB_PASSWORD']
-    envConfig['WARTHOG_DB_HOST'] =
-      process.env.DB_HOST || envConfig['WARTHOG_DB_HOST']
-    envConfig['WARTHOG_DB_PORT'] =
-      process.env.DB_PORT || envConfig['WARTHOG_DB_PORT']
-    envConfig['WARTHOG_APP_PORT'] =
-      process.env.GRAPHQL_SERVER_PORT || envConfig['WARTHOG_APP_PORT']
-    envConfig['WARTHOG_APP_HOST'] =
-      process.env.GRAPHQL_SERVER_HOST || envConfig['WARTHOG_APP_HOST']
+    envConfig.WARTHOG_DB_DATABASE =
+      process.env.DB_NAME || envConfig.WARTHOG_DB_DATABASE
+    envConfig.WARTHOG_DB_USERNAME =
+      process.env.DB_USER || envConfig.WARTHOG_DB_USERNAME
+    envConfig.WARTHOG_DB_PASSWORD =
+      process.env.DB_PASS || envConfig.WARTHOG_DB_PASSWORD
+    envConfig.WARTHOG_DB_HOST = process.env.DB_HOST || envConfig.WARTHOG_DB_HOST
+    envConfig.WARTHOG_DB_PORT = process.env.DB_PORT || envConfig.WARTHOG_DB_PORT
+    envConfig.WARTHOG_APP_PORT =
+      process.env.GRAPHQL_SERVER_PORT || envConfig.WARTHOG_APP_PORT
+    envConfig.WARTHOG_APP_HOST =
+      process.env.GRAPHQL_SERVER_HOST || envConfig.WARTHOG_APP_HOST
 
     const newEnvConfig = Object.keys(envConfig)
       .map((key) => `${key}=${envConfig[key]}`)

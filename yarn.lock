@@ -3332,7 +3332,7 @@ child-process-promise@^2.2.0:
     node-version "^1.0.0"
     promise-polyfill "^6.0.1"
 
-chokidar@3.5.1, chokidar@^3.4.0:
+chokidar@3.5.1, chokidar@^3.4.0, chokidar@^3.5.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.1.tgz#ee9ce7bbebd2b79f49f304799d5468e31e14e68a"
   integrity sha512-9+s+Od+W0VJJzawDma/gvBNQqkTiqYTWLuZoyAsivsI4AaWTCzHG06/TMjsf1cYe9Cb97UCEhjz7HvnPk2p/tw==
@@ -4701,7 +4701,7 @@ event-emitter@^0.3.5:
     d "1"
     es5-ext "~0.10.14"
 
-eventemitter3@^3.1.0:
+eventemitter3@^3.1.0, eventemitter3@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
@@ -5597,6 +5597,15 @@ graphql-scalars@^1.2.6:
   integrity sha512-CCL9aaZdK1VD2jYFCF0ONB1cT5brK9DXymSuu/E/JoYLmAaLwGgjdzY66mT2ZI5oOIrSrJqWTf4y20qdSaE4MQ==
   dependencies:
     tslib "~2.0.3"
+
+graphql-subscriptions-client@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/graphql-subscriptions-client/-/graphql-subscriptions-client-0.16.0.tgz#47242439e049e40fa24bbfad337676798226f9bf"
+  integrity sha512-z4bkRIvzHdnpydHUlgKlYIXFm/9kjG1hFBozQXSvfUEhqYshNk3/nyWJ7D/tChyDCSB9lZG4YE5uRWEy5+boTA==
+  dependencies:
+    backo2 "^1.0.2"
+    eventemitter3 "^3.1.2"
+    symbol-observable "^1.2.0"
 
 graphql-subscriptions@^1.0.0, graphql-subscriptions@^1.1.0:
   version "1.2.0"
@@ -9131,10 +9140,24 @@ pg-connection-string@^2.4.0:
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.4.0.tgz#c979922eb47832999a204da5dbe1ebf2341b6a10"
   integrity sha512-3iBXuv7XKvxeMrIgym7njT+HlZkwZqqGX4Bu9cci8xHZNT+Um1gWKqCsAzcC0d95rcKMU5WBg6YRUcHyV0HZKQ==
 
+pg-format@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/pg-format/-/pg-format-1.0.4.tgz#27734236c2ad3f4e5064915a59334e20040a828e"
+  integrity sha1-J3NCNsKtP05QZJFaWTNOIAQKgo4=
+
 pg-int8@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/pg-int8/-/pg-int8-1.0.1.tgz#943bd463bf5b71b4170115f80f8efc9a0c0eb78c"
   integrity sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==
+
+pg-listen@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/pg-listen/-/pg-listen-1.7.0.tgz#5a5c68a1cabf88d2b78ed9cf133667f597d3b860"
+  integrity sha512-MKDwKLm4ryhy7iq1yw1K1MvUzBdTkaT16HZToddX9QaT8XSdt3Kins5mYH6DLECGFzFWG09VdXvWOIYogjXrsg==
+  dependencies:
+    debug "^4.1.1"
+    pg-format "^1.0.4"
+    typed-emitter "^0.1.0"
 
 pg-packet-stream@^1.1.0:
   version "1.1.0"
@@ -10724,7 +10747,7 @@ supports-hyperlinks@^2.0.0, supports-hyperlinks@^2.1.0:
     has-flag "^4.0.0"
     supports-color "^7.0.0"
 
-symbol-observable@^1.0.4, symbol-observable@^1.1.0:
+symbol-observable@^1.0.4, symbol-observable@^1.1.0, symbol-observable@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
   integrity sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==
@@ -10999,6 +11022,23 @@ ts-node-dev@^1.0.0-pre.40, ts-node-dev@^1.0.0-pre.63:
     ts-node "^9.0.0"
     tsconfig "^7.0.0"
 
+ts-node-dev@^1.0.0-pre.60:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/ts-node-dev/-/ts-node-dev-1.1.6.tgz#ee2113718cb5a92c1c8f4229123ad6afbeba01f8"
+  integrity sha512-RTUi7mHMNQospArGz07KiraQcdgUVNXKsgO2HAi7FoiyPMdTDqdniB6K1dqyaIxT7c9v/VpSbfBZPS6uVpaFLQ==
+  dependencies:
+    chokidar "^3.5.1"
+    dateformat "~1.0.4-1.2.3"
+    dynamic-dedupe "^0.3.0"
+    minimist "^1.2.5"
+    mkdirp "^1.0.4"
+    resolve "^1.0.0"
+    rimraf "^2.6.1"
+    source-map-support "^0.5.12"
+    tree-kill "^1.2.2"
+    ts-node "^9.0.0"
+    tsconfig "^7.0.0"
+
 ts-node@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-7.0.1.tgz#9562dc2d1e6d248d24bc55f773e3f614337d9baf"
@@ -11013,7 +11053,7 @@ ts-node@^7.0.1:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
-ts-node@^8:
+ts-node@^8, ts-node@^8.10:
   version "8.10.2"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.10.2.tgz#eee03764633b1234ddd37f8db9ec10b75ec7fb8d"
   integrity sha512-ISJJGgkIpDdBhWVu3jufsWpK3Rzo7bdiIXJjQc0ynKxVOVcg2oIrf2H2cejminGrptVc6q6/uynAHNCuWGbpVA==
@@ -11171,6 +11211,11 @@ type@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/type/-/type-2.2.0.tgz#3edd448793f517d8b9dd108b486a043f5befd91f"
   integrity sha512-M/u37b4oSGlusaU8ZB96BfFPWQ8MbsZYXB+kXGMiDj6IKinkcNaQvmirBuWj8mAXqP6LYn1rQvbTYum3yPhaOA==
+
+typed-emitter@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/typed-emitter/-/typed-emitter-0.1.0.tgz#ca532f100ccbf850e3a73b8ebf43d43e4f1f3849"
+  integrity sha512-Tfay0l6gJMP5rkil8CzGbLthukn+9BN/VXWcABVFPjOoelJ+koW8BuPZYk+h/L+lEeIp1fSzVRiWRPIjKVjPdg==
 
 typedarray-to-buffer@^3.1.5:
   version "3.1.5"
@@ -11487,6 +11532,69 @@ warthog@^2.19.0:
 "warthog@https://github.com/metmirr/warthog/releases/download/v2.22.0/warthog-v2.22.0.tgz":
   version "2.22.0"
   resolved "https://github.com/metmirr/warthog/releases/download/v2.22.0/warthog-v2.22.0.tgz#33162a65e2897c79f9b5c6c214565e85685108d3"
+  dependencies:
+    "@types/app-root-path" "^1.2.4"
+    "@types/bn.js" "^4.11.6"
+    "@types/caller" "^1.0.0"
+    "@types/cosmiconfig" "^6.0.0"
+    "@types/debug" "^4.1.5"
+    "@types/dotenv" "^8.2.0"
+    "@types/express" "^4.17.2"
+    "@types/graphql" "^14.5.0"
+    "@types/graphql-fields" "^1.3.2"
+    "@types/graphql-iso-date" "^3.3.3"
+    "@types/graphql-type-json" "^0.3.2"
+    "@types/isomorphic-fetch" "^0.0.35"
+    "@types/lodash" "^4.14.148"
+    "@types/mkdirp" "^0.5.2"
+    "@types/node" "^12.12.8"
+    "@types/node-emoji" "^1.8.1"
+    "@types/open" "^6.2.1"
+    "@types/pg" "^7.11.2"
+    "@types/prettier" "^1.18.3"
+    "@types/shortid" "^0.0.29"
+    "@types/ws" "^6.0.3"
+    apollo-link-error "^1.1.12"
+    apollo-link-http "^1.5.16"
+    apollo-server "^2.9.9"
+    apollo-server-express "^2.9.9"
+    app-root-path "^3.0.0"
+    caller "^1.0.1"
+    class-transformer "^0.2.3"
+    class-validator "^0.11.0"
+    cosmiconfig "^6.0.0"
+    cross-fetch "^3.0.4"
+    dataloader "^1.4.0"
+    debug "^4.1.1"
+    execa "^4.0.3"
+    express "^4.17.1"
+    gluegun "^4.1.0"
+    graphql "^14.5.8"
+    graphql-binding "^2.5.2"
+    graphql-fields "^2.0.3"
+    graphql-import-node "^0.0.4"
+    graphql-iso-date "^3.6.1"
+    graphql-scalars "^1.2.6"
+    graphql-tools "^4.0.6"
+    graphql-type-json "^0.3.0"
+    lodash "^4.17.15"
+    mkdirp "^0.5.1"
+    node-emoji "^1.10.0"
+    open "^7.0.0"
+    pg "^7.12.1"
+    pgtools "^0.3.0"
+    prettier "^1.19.1"
+    reflect-metadata "^0.1.13"
+    shortid "^2.2.15"
+    type-graphql "^0.17.5"
+    typedi "^0.8.0"
+    typeorm "^0.2.25"
+    typeorm-typedi-extensions "^0.2.3"
+    typescript "^3.9.7"
+
+"warthog@https://github.com/metmirr/warthog/releases/download/v2.23.0/warthog-v2.23.0.tgz":
+  version "2.23.0"
+  resolved "https://github.com/metmirr/warthog/releases/download/v2.23.0/warthog-v2.23.0.tgz#4582fc35554580e0af0f43a9b3725aad2eb808c6"
   dependencies:
     "@types/app-root-path" "^1.2.4"
     "@types/bn.js" "^4.11.6"
