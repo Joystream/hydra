@@ -7,6 +7,7 @@ cleanup()
   (echo "## Indexer Logs ##" && docker logs hydra-e2e-tests_hydra-indexer_1 --tail 50) || :  
   (echo "## Indexer API Server ##" && docker logs hydra-e2e-tests_hydra-indexer-gateway_1 --tail 50) || :  
   yarn post-e2e-test
+  rm -rf ./hydra-test
 }
 
 set -e
@@ -14,7 +15,9 @@ set -e
 trap cleanup ERR EXIT SIGINT SIGTERM
 
 docker build ../../ -t hydra-builder:latest
+yarn hydra-cli scaffold --dir hydra-test --name hydra-test --silent
 docker build . -t hydra-test:latest
+
 (cd ../ && yarn workspace @dzlzv/hydra-indexer docker:build)
 (cd ../ && yarn workspace @dzlzv/hydra-indexer-gateway docker:build)
 

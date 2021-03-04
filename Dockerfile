@@ -29,5 +29,5 @@ RUN yarn workspace @dzlzv/hydra-processor build
 RUN yarn workspace @dzlzv/hydra-cli build
 RUN yarn workspace @dzlzv/hydra-typegen build
 
-ADD --chown=node:node ./packages/sample ./packages/sample
-RUN yarn
+#ADD --chown=node:node ./packages/sample ./packages/sample
+#RUN yarn
