@@ -16,6 +16,12 @@ export class ProcessedEventsLogEntity {
   @Index()
   eventId!: string
 
+  @Column()
+  indexerHead!: number
+
+  @Column()
+  chainHead!: number
+
   // last block the processor has scanned
   @Column()
   lastScannedBlock!: number

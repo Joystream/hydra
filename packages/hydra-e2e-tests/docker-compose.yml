@@ -16,7 +16,7 @@ services:
       - "4000:4000"
     depends_on:
       - hydra-processor
-    command: ["yarn", "workspace", "sample", "query-node:start:prod"]
+    command: ["yarn", "query-node:start:prod"]
 
   hydra-processor:
     image: hydra-test:latest
@@ -43,14 +43,11 @@ services:
     depends_on:
       - hydra-indexer-gateway
     command: >
-      sh -c "yarn workspace sample query-node:configure && \
-             yarn workspace sample db:drop && \
-             yarn workspace sample db:prepare && \
-             yarn workspace sample db:migrate && \
-             yarn workspace sample typegen:configure && \
-             yarn workspace sample typegen && \
-             yarn workspace sample mappings:build && \
-             yarn workspace sample processor:start"
+      sh -c "yarn query-node:configure && \
+             yarn bootstrap && \
+             yarn typegen && \
+             yarn mappings:build && \
+             yarn processor:start"
   
   hydra-indexer:
     image: hydra-indexer:latest

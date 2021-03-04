@@ -74,3 +74,14 @@ export const INTERFACE_TYPES_WITH_RELATIONSHIP = gql`
     }
   }
 `
+
+export const PROCESSOR_SUBSCRIPTION = gql`
+  subscription {
+    stateSubscription {
+      indexerHead
+      chainHead
+      lastProcessedEvent
+      lastCompleteBlock
+    }
+  }
+`

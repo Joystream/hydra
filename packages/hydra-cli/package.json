@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "0.1.8",
+  "version": "2.0.1-beta.2",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
   "license": "MIT",
   "bin": {
@@ -43,6 +43,9 @@
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
+    "@inquirer/input": "^0.0.13-alpha.0",
+    "@inquirer/password": "^0.0.12-alpha.0",
+    "@inquirer/select": "^0.0.13-alpha.0",
     "@oclif/command": "^1.5.20",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.3.3",
@@ -68,10 +71,11 @@
     "tslib": "1.11.2",
     "warthog": "https://github.com/metmirr/warthog/releases/download/v2.23.0/warthog-v2.23.0.tgz"
   },
-  "hydraDependencies": {
-    "@dzlzv/hydra-common": "0.0.3",
-    "@dzlzv/hydra-db-utils": "0.0.2",
-    "@dzlzv/hydra-processor": "0.0.7"
+  "queryNodeDependencies": {
+    "lodash": "^4.17.20",
+    "pg-listen": "^1.7.0",
+    "warthog": "https://github.com/metmirr/warthog/releases/download/v2.23.0/warthog-v2.23.0.tgz",
+    "typeorm": "^0.2.31"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1",

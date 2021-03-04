@@ -15,10 +15,15 @@ export interface EventQuery {
   block_lte: number
 }
 
+export interface IndexerStatus {
+  head: number
+  chainHeight: number
+}
+
 export interface IProcessorSource {
   nextBatch(query: EventQuery[], limit: number): Promise<SubstrateEvent[]>
 
-  indexerHead(): Promise<number>
+  indexerStatus(): Promise<IndexerStatus>
 
   subscribe(events: string[]): Promise<void>
 }

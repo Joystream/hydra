@@ -42,6 +42,16 @@ export function getTemplatePath(template: string): string {
 }
 
 /**
+ * Load package.json of the current hydra-cli version
+ */
+export function resolveHydraCliPkgJson(): Record<string, unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const path = require.resolve('@dzlzv/hydra-cli/package.json')
+
+  return JSON.parse(fs.readFileSync(path, 'utf-8')) as Record<string, unknown>
+}
+
+/**
  * Copies the template to the current directory of the process under the <filename>
  *
  * @param template Template file int templates/<templateName>
@@ -63,17 +73,12 @@ export async function copyTemplateToCWD(
  * @param pkgName dependency to loockup
  */
 export function resolvePackageVersion(pkgName: string): string {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const path = require.resolve('@dzlzv/hydra-cli/package.json')
-
-  const pkgJson = JSON.parse(fs.readFileSync(path, 'utf-8')) as Record<
-    string,
-    unknown
-  >
+  const pkgJson = resolveHydraCliPkgJson()
 
   debug(`Resolved hydra-cli package.json: ${JSON.stringify(pkgJson, null, 2)}`)
 
-  if (pkgName === '@dzlzv/hydra-cli') {
+  // all hydra packages use the same version now
+  if (pkgName.startsWith('@dzlzv/hydra')) {
     return pkgJson.version as string
   }
 
@@ -112,4 +117,18 @@ export function parseWarthogCodegenStderr(
         stderr.slice(stderr.indexOf(m[0]))
     )
   }
+}
+
+export function getWarthogDependency(): string {
+  /* eslint-disable */
+  const warthogPackageJson = require('warthog/package.json') as Record<
+    string,
+    unknown
+  >
+  debug(`Warthog package json: ${JSON.stringify(warthogPackageJson, null, 2)}`)
+  // if there is a special 'hydra' property, use it as depenency, otherwise use hardcoded fallback
+  if (warthogPackageJson.hydra === undefined) {
+    throw new Error(`Cannot resolve warthog version`)
+  }
+  return warthogPackageJson.hydra as string
 }

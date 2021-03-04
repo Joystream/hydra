@@ -150,7 +150,7 @@ function validate(parsed: MappingsDefInput): void {
 
   const oursHydraCommonVersion = resolvePackageVersion('@dzlzv/hydra-common')
   if (!semver.satisfies(parsed.hydraCommonVersion, oursHydraCommonVersion)) {
-    throw new Error(`The hydra-common version ${parsed.hydraCommonVersion} does \\
+    warn(`The hydra-common version ${parsed.hydraCommonVersion} does \\
 not satisfy the version of the processor (${oursHydraCommonVersion})`)
   }
 }

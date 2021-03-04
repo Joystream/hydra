@@ -134,7 +134,7 @@ export class {{query.typePrefix}}FTSService {
                   ts_rank(tsv, phraseto_tsquery('english', $${parameterCounter + 1})) as rank,
                   ts_headline(document, phraseto_tsquery('english', $${parameterCounter +
                     1})) as highlight
-              FROM comment_search_view
+              FROM {{{query.viewName}}}
               WHERE phraseto_tsquery('english', $${parameterCounter + 1}) @@ tsv
               ${
                 queries !== ``

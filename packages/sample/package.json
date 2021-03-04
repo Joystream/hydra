@@ -5,7 +5,7 @@
     "./generated/*",
     "./mappings"
   ],
-  "version": "1.0.0",
+  "version": "2.0.1-beta.2",
   "description": "GraphQL-based query node and Substrate processor. Generated with ♥ by Hydra-CLI",
   "scripts": {
     "build": "yarn clean && yarn codegen",
@@ -26,7 +26,7 @@
     "bootstrap": "yarn codegen && yarn db:prepare && yarn db:migrate",
     "codegen": "hydra-cli codegen",
     "typegen:configure": "NODE_URL=${NODE_URL:-ws://localhost:9000} envsub typegen.template.yml typegen.yml",
-    "typegen": "rm -rf ./mappings/generated && hydra-typegen typegen typegen.yml --debug",
+    "typegen": "rm -rf ./mappings/generated && hydra-typegen typegen manifest.yml --debug",
     "mappings:build": "yarn workspace sample-mappings build",
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
@@ -41,11 +41,11 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
-    "envsub": "^4.0.7",
-    "@dzlzv/hydra-cli": "0.1.8",
-    "@dzlzv/hydra-common": "~0.0.3",
-    "@dzlzv/hydra-db-utils": "^0.0.2",
-    "@dzlzv/hydra-processor": "~0.1.1",
-    "@dzlzv/hydra-typegen": "~0.0.3-1"
+    "@dzlzv/hydra-cli": "^2.0.1-beta.2",
+    "@dzlzv/hydra-common": "^2.0.1-beta.2",
+    "@dzlzv/hydra-db-utils": "^2.0.1-beta.2",
+    "@dzlzv/hydra-processor": "^2.0.1-beta.2",
+    "@dzlzv/hydra-typegen": "^2.0.1-beta.2",
+    "envsub": "^4.0.7"
   }
 }
