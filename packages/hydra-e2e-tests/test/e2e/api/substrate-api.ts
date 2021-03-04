@@ -2,9 +2,15 @@ import { ApiPromise, WsProvider } from '@polkadot/api'
 import { createTestKeyring } from '@polkadot/keyring/testing'
 import { Hash } from '@polkadot/types/interfaces'
 import Container from 'typedi'
-import { typesSpec } from '@dzlzv/apps-config'
 import registry from './typeRegistry'
 import pWaitFor from 'p-wait-for'
+
+const typesSpec = {
+  'node-template': {
+    Address: 'AccountId',
+    LookupSource: 'AccountId',
+  },
+}
 
 export async function transfer(
   from: string,

@@ -46,7 +46,6 @@ jobs:
         continue-on-error: true
       - name: Publish hydra-indexer image
         run: |
-          yarn workspace @dzlzv/hydra-indexer build
           yarn workspace @dzlzv/hydra-indexer docker:publish 
 
       - name: Publish hydra-indexer-gateway image
