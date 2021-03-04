@@ -8,6 +8,7 @@ import {
   FETCH_INSERTED_AT_FIELD_FROM_TRANSFER,
   FTS_COMMENT_QUERY_WITH_WHERE_CONDITION,
   LAST_BLOCK_TIMESTAMP,
+  INTERFACE_TYPES_WITH_RELATIONSHIP,
 } from './graphql-queries'
 
 export interface Transfer {
@@ -107,4 +108,10 @@ export async function getNumberMetric(metric: string): Promise<number> {
 
 export async function getProcessorHead(): Promise<number> {
   return getNumberMetric('hydra_processor_last_scanned_block')
+}
+
+export async function queryInterface(): Promise<{ events: [] }> {
+  return await getGQLClient().request<{
+    events: []
+  }>(INTERFACE_TYPES_WITH_RELATIONSHIP)
 }

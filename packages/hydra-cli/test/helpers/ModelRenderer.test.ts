@@ -444,6 +444,37 @@ describe('ModelRenderer', () => {
     expect(rendered).to.include('@InterfaceType')
   })
 
+  it('should render interface without relation fields', () => {
+    const model = fromStringSchema(`
+        type Extrinsic @entity {
+          hash: String!
+        }
+        interface Event @entity {
+          indexInBlock: Int!
+          inExtrinsic: Extrinsic!
+        }
+        type BoughtMemberEvent implements Event @entity {
+          memberId: Int!
+          indexInBlock: Int!
+          inExtrinsic: Extrinsic!
+    }`)
+    generator = new ModelRenderer(
+      model,
+      model.lookupInterface('Event'),
+      enumCtxProvider
+    )
+    let rendered = generator.render(modelTemplate)
+    expect(rendered).to.not.include('inExtrinsic')
+
+    generator = new ModelRenderer(
+      model,
+      model.lookupEntity('BoughtMemberEvent'),
+      enumCtxProvider
+    )
+    rendered = generator.render(modelTemplate)
+    expect(rendered).to.include('inExtrinsic')
+  })
+
   it('should import unions', function () {
     const model = fromStringSchema(`
     union Poor = HappyPoor | Miserable

@@ -60,3 +60,17 @@ query {
   }
 }
 `
+
+export const INTERFACE_TYPES_WITH_RELATIONSHIP = gql`
+  query InterfaceQuery {
+    events {
+      indexInBlock
+      ... on BoughtMemberEvent {
+        inExtrinsic {
+          id
+          hash
+        }
+      }
+    }
+  }
+`
