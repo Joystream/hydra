@@ -26,7 +26,9 @@
     "@joystream/eslint-config": "^1.0.0",
     "@joystream/prettier-config": "^1.0.0",
     "commitizen": "^4.2.3",
+    "conventional-changelog-cli": "^2.1.1",
     "cz-conventional-changelog": "^3.3.0",
+    "cz-lerna-changelog": "^2.0.3",
     "eslint": "^7.6.0",
     "eslint-plugin-sonarjs": "^0.5.0",
     "husky": "^5.1.1",
@@ -41,7 +43,7 @@
   "name": "hydra",
   "config": {
     "commitizen": {
-      "path": "cz-conventional-changelog"
+      "path": "cz-lerna-changelog"
     }
   }
 }
