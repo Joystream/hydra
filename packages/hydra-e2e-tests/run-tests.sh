@@ -15,8 +15,8 @@ trap cleanup ERR EXIT SIGINT SIGTERM
 
 docker build ../../ -t hydra-builder:latest
 docker build . -t hydra-test:latest
-docker build ../../ -f ../hydra-indexer/Dockerfile -t hydra-indexer:latest
-docker build ../hydra-indexer-gateway -t hydra-indexer-gateway:latest
+(cd ../ && yarn workspace @dzlzv/hydra-indexer docker:build)
+(cd ../ && yarn workspace @dzlzv/hydra-indexer-gateway docker:build)
 
 docker-compose up -d
 
