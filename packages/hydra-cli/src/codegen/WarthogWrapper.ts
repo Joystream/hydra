@@ -211,12 +211,25 @@ export default class WarthogWrapper {
   }
 
   readExtraDependencies(): Record<string, string> {
-    return (
-      (resolveHydraCliPkgJson().queryNodeDependencies as Record<
-        string,
-        string
-      >) || {}
-    )
+    const hydraCliPkgJson = resolveHydraCliPkgJson()
+
+    const queryNodeDeps = (hydraCliPkgJson.queryNodeDependencies ||
+      {}) as Record<string, string>
+
+    const hydraCliDeps = (hydraCliPkgJson.dependencies || {}) as Record<
+      string,
+      string
+    >
+
+    // overwrite with hydra-cli own dependency if present
+    Object.keys(queryNodeDeps).forEach((dep) => {
+      if (hydraCliDeps[dep]) {
+        debug(`Rewriting the dependency ${dep} to ${hydraCliDeps[dep]}`)
+        queryNodeDeps[dep] = hydraCliDeps[dep]
+      }
+    })
+
+    return queryNodeDeps
   }
 
   async createDB(): Promise<void> {
