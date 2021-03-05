@@ -8,6 +8,7 @@ import {
   FETCH_INSERTED_AT_FIELD_FROM_TRANSFER,
   FTS_COMMENT_QUERY_WITH_WHERE_CONDITION,
   LAST_BLOCK_TIMESTAMP,
+  INTERFACE_TYPES_WITH_RELATIONSHIP,
   PROCESSOR_SUBSCRIPTION,
 } from './graphql-queries'
 import { SubscriptionClient } from 'graphql-subscriptions-client'
@@ -136,4 +137,10 @@ export function subscribeToProcessorStatus(): void {
 export async function getProcessorStatus(): Promise<ProcessorStatus> {
   await pWaitFor(() => processorStatus !== undefined)
   return processorStatus as ProcessorStatus
+}
+
+export async function queryInterface(): Promise<{ events: [] }> {
+  return await getGQLClient().request<{
+    events: []
+  }>(INTERFACE_TYPES_WITH_RELATIONSHIP)
 }

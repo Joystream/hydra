@@ -61,13 +61,27 @@ query {
 }
 `
 
-export const PROCESSOR_SUBSCRIPTION = `
-subscription {
-  stateSubscription {
-    indexerHead
-    chainHead
-    lastProcessedEvent
-    lastCompleteBlock
+export const INTERFACE_TYPES_WITH_RELATIONSHIP = gql`
+  query InterfaceQuery {
+    events {
+      indexInBlock
+      ... on BoughtMemberEvent {
+        inExtrinsic {
+          id
+          hash
+        }
+      }
+    }
   }
-}
+`
+
+export const PROCESSOR_SUBSCRIPTION = gql`
+  subscription {
+    stateSubscription {
+      indexerHead
+      chainHead
+      lastProcessedEvent
+      lastCompleteBlock
+    }
+  }
 `

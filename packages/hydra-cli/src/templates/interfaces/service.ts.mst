@@ -39,13 +39,13 @@ export class {{className}}Service {
 		try {
       // fetching all the fields to allow type-dependent field resolutions
 			{{#subclasses}}
-        {{camelNamePlural}} = await this.{{camelName}}Service.find(where, ob, 0, _limit + _offset);
+        {{camelNamePlural}} = await this.{{camelName}}Service.find(where, ob, _limit + _offset, 0);
       {{/subclasses}}
 		} finally {
 			await queryRunner.commitTransaction();
 		}
 
-		let collect = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];
+		let collect: any[] = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];
 		if (ob) {
 			// NB: copied from warthog's BaseService
 			// TODO: allow multiple sorts
