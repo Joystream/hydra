@@ -7,14 +7,15 @@ dataSource:
   indexerVersion: '0.0.4'
 entities:
   - mappings/lib/generated/**/*.model.js
-metadata:
-  source: wss://rpc.polkadot.io
-  blockHash: '0xab5c9230a7dde8bb90a6728ba4a0165423294dac14336b1443f865b796ff682c'
-events:
-  - balances.Transfer
-calls:
-  - timestamp.set
-outDir: ./mappings/generated/types
+typegen:
+  metadata:
+    source: wss://rpc.polkadot.io
+    blockHash: '0xab5c9230a7dde8bb90a6728ba4a0165423294dac14336b1443f865b796ff682c'
+  events:
+    - balances.Transfer
+  calls:
+    - timestamp.set
+  outDir: ./mappings/generated/types
 mappings:
   hydraCommonVersion: '0.0.3'
   mappingsModule: mappings/lib/mappings

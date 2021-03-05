@@ -7,18 +7,20 @@ import { IConfig } from '../commands/typegen'
 
 const options = {
   structure: {
-    metadata: {
-      source: 'string',
-      'blockHash?': 'string',
+    typegen: {
+      metadata: {
+        source: 'string',
+        'blockHash?': 'string',
+      },
+      'customTypes?': {
+        lib: 'string',
+        typedefs: 'string',
+      },
+      'events?': ['string'],
+      'calls?': ['string'],
+      outDir: 'string',
+      'strict?': 'boolean',
     },
-    'customTypes?': {
-      lib: 'string',
-      typedefs: 'string',
-    },
-    'events?': ['string'],
-    'calls?': ['string'],
-    outDir: 'string',
-    'strict?': 'boolean',
   },
   onWarning: function (error: unknown, filepath: unknown) {
     logError(filepath + ' has error: ' + error)
@@ -36,10 +38,10 @@ export function parseConfigFile(location: string): IConfig {
       )}`
     )
   }
-  const parsed = YAML.parse(fs.readFileSync(location, 'utf8'))
+  const { typegen } = YAML.parse(fs.readFileSync(location, 'utf8'))
   return {
-    ...parsed,
-    events: parsed.events || [],
-    calls: parsed.calls || [],
+    ...typegen,
+    events: typegen.events || [],
+    calls: typegen.calls || [],
   } as IConfig
 }

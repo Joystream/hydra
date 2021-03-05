@@ -1,7 +1,8 @@
-metadata:
-  source: ${NODE_URL}
-events:
-  - balances.Transfer
-calls:
-  - timestamp.set
-outDir: ./mappings/generated/types
+typegen:
+  metadata:
+    source: ${NODE_URL}
+  events:
+    - balances.Transfer
+  calls:
+    - timestamp.set
+  outDir: ./mappings/generated/types
