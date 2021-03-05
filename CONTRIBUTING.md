@@ -9,3 +9,11 @@ A pull request adding a new feature or fixing an existing bug should include a t
 ## Versioning and Releases
 
 The monorepo is organized with lerna, with a single version for all packages. Once a pull request is merged, the version is bumped to the new pre-release version following the conventional commits convention. When deemed mature, the `publish` action can be manuually triggered. It graduates the pre-release version and publishes to the npm registry and docker hub (for private packages `hydra-indexer` and `hydra-indexer-gateway`).
+
+## Publishing (for maintainers only)
+
+`Publish` Github action is supposed to be run manually. It has the following inputs:
+
+- `packages`: specify the list of packages to publish. If the list containts `hydra-indexer` and/or `hydra-indexer-gateway` then the corresponding Docker images will be published to Dockerhub. By default, it is set to `'*'` which means that both npm packages and Docker images will be published
+
+- `graduate`: Whether the current pre-release should be [graduated](https://github.com/lerna/lerna/blob/main/commands/version/README.md#--conventional-graduate) by Lerna. For examaple, `2.0.1-alpha.3` will be graduated to `2.0.1`. Graduated releases are published with the `latest` tag, while `pre-releases` has `next`.
