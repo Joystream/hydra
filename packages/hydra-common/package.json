@@ -1,6 +1,6 @@
 {
   "name": "@dzlzv/hydra-common",
-  "version": "2.0.1-beta.3",
+  "version": "2.0.1-beta.4",
   "description": "Common Hydra tools",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
