@@ -1,14 +1,13 @@
 version: '0.1'
 description: Test manifest
 repository: https://github.com/
+hydraVersion: "2"
 dataSource:
   kind: substrate 
   chain: node-template
-  indexerVersion: '2.0.1-beta.0'
 entities:
   - test/fixtures/test-entities.ts
 mappings:
-  hydraCommonVersion: '2.0.1-beta.0'
   mappingsModule: test/fixtures/test-mappings.ts
   imports:
     - test/fixtures/test-types.ts

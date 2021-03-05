@@ -7,7 +7,7 @@ import semver from 'semver'
 import { camelCase, countBy, endsWith, compact } from 'lodash'
 
 import { HandlerFunc } from './QueryEventProcessingPack'
-import { resolvePackageVersion } from '../util/utils'
+import { PROCESSOR_PACKAGE_NAME, resolvePackageVersion } from '../util/utils'
 import { warn } from '../util/log'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
@@ -20,14 +20,13 @@ const manifestValidatorOptions = {
     version: 'string',
     'description?': 'string',
     'repository?': 'string',
+    hydraVersion: 'string',
     dataSource: {
       kind: 'string',
       chain: 'string',
-      indexerVersion: 'string',
     },
     entities: ['string'],
     mappings: {
-      hydraCommonVersion: 'string',
       mappingsModule: 'string',
       'imports?': ['string'],
       'blockInterval?': 'string',
@@ -61,7 +60,6 @@ export interface DataSource {
 }
 
 interface MappingsDefInput {
-  hydraCommonVersion: string
   mappingsModule: string
   blockInterval?: string
   imports?: string[]
@@ -76,7 +74,6 @@ interface MappingsDefInput {
 }
 
 export interface MappingsDef {
-  hydraCommonVersion: string
   mappingsModule: Record<string, unknown>
   imports: string[]
   blockInterval: BlockInterval
@@ -103,6 +100,7 @@ export interface ExtrinsicHandler extends MappingHandler {
 
 export interface ProcessorManifest {
   version: string
+  hydraVersion: string
   entities: string[]
   description?: string
   repository?: string
@@ -124,13 +122,15 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
   const parsed = YAML.parse(fs.readFileSync(manifestLoc, 'utf8')) as {
     version: string
     entities: string[]
+    hydraVersion: string
     description?: string
     repository?: string
     dataSource: DataSource
     mappings: MappingsDefInput
   }
 
-  const { mappings, entities } = parsed
+  const { mappings, entities, hydraVersion } = parsed
+  validateHydraVersion(hydraVersion)
   validate(mappings)
 
   return {
@@ -147,17 +147,23 @@ function validate(parsed: MappingsDefInput): void {
   ) {
     throw new Error(`At least one event or extrinsic handler must be defined`)
   }
+}
 
-  const oursHydraCommonVersion = resolvePackageVersion('@dzlzv/hydra-common')
-  if (!semver.satisfies(parsed.hydraCommonVersion, oursHydraCommonVersion)) {
-    warn(`The hydra-common version ${parsed.hydraCommonVersion} does \\
-not satisfy the version of the processor (${oursHydraCommonVersion})`)
+function validateHydraVersion(hydraVersion: string) {
+  const oursHydraVersion = resolvePackageVersion(PROCESSOR_PACKAGE_NAME)
+  if (
+    !semver.satisfies(oursHydraVersion, hydraVersion, {
+      loose: true,
+      includePrerelease: true,
+    })
+  ) {
+    throw new Error(`The processor version ${oursHydraVersion} does \\
+not satisfy the required manifest version ${hydraVersion}`)
   }
 }
 
 function inferDefaults(parsed: MappingsDefInput): MappingsDef {
   const {
-    hydraCommonVersion,
     mappingsModule,
     blockInterval,
     eventHandlers,
@@ -192,7 +198,6 @@ function inferDefaults(parsed: MappingsDefInput): MappingsDef {
   }
 
   return {
-    hydraCommonVersion,
     mappingsModule: resolvedModule,
     imports: [mappingsModule, ...(imports || [])].map((p) => path.resolve(p)),
     blockInterval: parseBlockInterval(blockInterval),
