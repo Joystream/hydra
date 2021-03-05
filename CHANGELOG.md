@@ -1,3 +1,17 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+### 2.0.1-beta.3 (2021-03-05)
+
+
+### Bug Fixes
+
+* **hydra-cli:** support entity relations in interfaces ([#275](https://github.com/Joystream/hydra/issues/275)) ([122e593](https://github.com/Joystream/hydra/commit/122e5931e75780ebb5a203ba4c568a6ab76a2668))
+
+
+
 ## [2.0.1-beta.2](https://github.com/dzhelezov/hydra/compare/v0.1.2...v2.0.1-beta.2) (2021-03-04)
 
 
@@ -64,6 +78,3 @@
 * **indexer:** add getMany to return multiple result from db ([d1049aa](https://github.com/dzhelezov/hydra/commit/d1049aa181221dd786aa41ed3a54b184bd89c131))
 * **mappings:** add handlers for avatar and handle ([a99a0da](https://github.com/dzhelezov/hydra/commit/a99a0da67606a388105a180a844b353f410f33cb))
 * **mappings:** add mappings for rootAccount, controllerAccount ([652763e](https://github.com/dzhelezov/hydra/commit/652763e597415d9616086ed72d504366e0e2a20b))
-
-
-

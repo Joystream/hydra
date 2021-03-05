@@ -1,6 +1,6 @@
 {
   "name": "hydra-e2e-tests",
-  "version": "2.0.1-beta.2",
+  "version": "2.0.1-beta.3",
   "description": "End-to-end tests for Hydra services",
   "main": "index.js",
   "license": "MIT",
@@ -31,7 +31,7 @@
     "typedi": "^0.8.0"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "^2.0.1-beta.2",
+    "@dzlzv/hydra-cli": "^2.0.1-beta.3",
     "@types/chai": "^4.2.13",
     "@types/mocha": "^8.0.3",
     "chai": "^4.2.0",

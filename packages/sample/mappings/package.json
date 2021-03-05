@@ -1,6 +1,6 @@
 {
   "name": "sample-mappings",
-  "version": "2.0.1-beta.2",
+  "version": "2.0.1-beta.3",
   "description": "Mappings for hydra-processor",
   "main": "lib/mappings/index.js",
   "license": "MIT",
@@ -10,7 +10,7 @@
     "clean": "rm -rf lib"
   },
   "dependencies": {
-    "@dzlzv/hydra-common": "^2.0.1-beta.2",
+    "@dzlzv/hydra-common": "^2.0.1-beta.3",
     "@polkadot/types": "~2.10.2-7"
   },
   "devDependencies": {
