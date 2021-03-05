@@ -61,8 +61,6 @@ OPTIONS
   --[no-]install       Install dependencies
 ```
 
-_See code: [src/src/commands/codegen.ts](https://github.com/Joystream/hydra/blob/v2.0.1-beta.3/src/src/commands/codegen.ts)_
-
 ## `hydra-cli help [COMMAND]`
 
 display help for hydra-cli
@@ -256,8 +254,6 @@ OPTIONS
   -s, --schema=schema  [default: ../../schema.graphql] Schema path
 ```
 
-_See code: [src/src/commands/preview.ts](https://github.com/Joystream/hydra/blob/v2.0.1-beta.3/src/src/commands/preview.ts)_
-
 ## `hydra-cli scaffold`
 
 Starter kit: generates a directory layout and a sample schema file
@@ -269,17 +265,17 @@ USAGE
   $ hydra-cli scaffold
 
 OPTIONS
-  -a, --appPort=appPort              [default: 4000] GraphQL server port
-  -b, --blockHeight=blockHeight      [default: 0] Start block height
-  -h, --dbHost=dbHost                [default: localhost] Database host
-  -i, --indexerUrl=indexerUrl        [default: https://indexer-kusama.joystream.app/graphql] Hydra Indexer endpoint
-  -m, --[no-]mappings                Create schema and mappings
-  -n, --projectName=projectName      Project name
-  -p, --dbPort=dbPort                [default: 5432] Database port
-  -u, --dbUser=dbUser                [default: postgres] Database user
-  -w, --wsProviderUrl=wsProviderUrl  [default: wss://kusama-rpc.polkadot.io/] Substrate WS provider endpoint
-  -x, --dbPassword=dbPassword        [default: postgres] Database user password
+  -a, --appPort=appPort          [default: 4000] GraphQL server port
+  -b, --blockHeight=blockHeight  [default: 0] Start block height
+  -d, --dir=dir                  [default: /home/runner/work/hydra/hydra/packages/hydra-cli] Project folder
+  -h, --dbHost=dbHost            [default: localhost] Database host
+  -i, --indexerUrl=indexerUrl    Hydra Indexer endpoint
+  -m, --[no-]mappings            Create schema and mappings
+  -n, --name=name                [default: hydra-scaffold] Project name
+  -p, --dbPort=dbPort            [default: 5432] Database port
+  -u, --dbUser=dbUser            [default: postgres] Database user
+  -x, --dbPassword=dbPassword    [default: postgres] Database user password
+  --rewrite                      Clear the folder before scaffolding
+  --silent                       If present, the scaffolder is non-interactive and uses only provided CLI flags
 ```
-
-_See code: [src/src/commands/scaffold.ts](https://github.com/Joystream/hydra/blob/v2.0.1-beta.3/src/src/commands/scaffold.ts)_
 <!-- commandsstop -->
