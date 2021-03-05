@@ -7,9 +7,6 @@ RUN mkdir -p /home/hydra && chown -R node:node /home/hydra
 WORKDIR /home/hydra
 
 ## Add one by one for better caching
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/apps-config/lib ./packages/apps-config/lib
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/apps-config/*.json ./packages/apps-config/
-
 COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/bn-typeorm/lib ./packages/bn-typeorm/lib
 COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/bn-typeorm/*.json ./packages/bn-typeorm/
 

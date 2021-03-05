@@ -12,7 +12,6 @@ import { retry, waitFor } from '@dzlzv/hydra-common'
 import { SUBSTRATE_API_CALL_RETRIES } from '../indexer/indexer-consts'
 import { RedisRelayer } from '../indexer/RedisRelayer'
 
-import { typesBundle, typesChain, typesSpec } from '@dzlzv/apps-config'
 import registry from '../substrate/typeRegistry'
 
 const debug = Debug('index-builder:query-node')
@@ -81,9 +80,6 @@ export class QueryNode {
           provider,
           registry,
           types,
-          typesBundle,
-          typesChain,
-          typesSpec,
         }).isReadyOrError,
       SUBSTRATE_API_CALL_RETRIES
     )
