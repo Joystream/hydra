@@ -17,7 +17,7 @@ A Hydra query node ingests substrate events in a multi-step pipeline:
 Substrate Chain => Hydra Indexer => Indexer GraphQL gateway => Hydra Processor => Database => Query Node GraphQL endpoint 
 ```
 
-For popular chains, one can use an already in-sync publicly available Indexer endpoint (such as https://kusama-indexer.joystream.app/graphql). For other chains, a self-hosted [indexer](https://github.com/Joystream/hydra/tree/master/packages/hydra-indexer) should be set up.
+For popular chains, one can use an already in-sync publicly available Indexer endpoint. For other chains, a self-hosted [indexer](https://github.com/Joystream/hydra/tree/master/packages/hydra-indexer) should be set up.
 
 ## Hydra CLI quickstart
 
