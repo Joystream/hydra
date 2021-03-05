@@ -2,31 +2,7 @@
 
 A cli tool for running a [Hydra](https://joystream.org/hydra) query node
 
-USAGE
-
-```bash
-$ hydra-cli [COMMAND]
-```
-
-COMMANDS
-
-```bash
-scaffold  Generate a starter project with a sample schema file and mappings
-codegen   Generate a ready to run graphql server and block indexer
-preview   Preview the output schema served by the GraphQL server
-```
-
-## Architecture one-liner
-
-A Hydra query node ingests substrate events in a multi-step pipeline which looks as follows:
-```
-Substrate Chain => Hydra Indexer => Indexer GraphQL gateway => Hydra Processor => Database => Query Node GraphQL endnpoint 
-```
-
-For popular chains the processor may connect to a publicly available Indexer endpoint (such as https://kusama-indexer.joystream.app/graphql for Kusama), otherwise a self-hosted indexer should be run.
-
-
-## Using Hydra CLI
+## Install
 
 Using `npx`:
 
@@ -46,132 +22,264 @@ and then
 $ hydra-cli [COMMAND]
 ```
 
-## Getting Started
+## Quickstart
 
 Run
 
 ```text
-$ hydra-cli scaffold
+$ hydra-cli scaffold 
+```
+and answer the prompts. This will generate a sample project and README with setup instructions.
+
+
+## Commands
+<!-- commands -->
+* [`hydra-cli codegen`](#hydra-cli-codegen)
+* [`hydra-cli help [COMMAND]`](#hydra-cli-help-command)
+* [`hydra-cli plugins`](#hydra-cli-plugins)
+* [`hydra-cli plugins:inspect PLUGIN...`](#hydra-cli-pluginsinspect-plugin)
+* [`hydra-cli plugins:install PLUGIN...`](#hydra-cli-pluginsinstall-plugin)
+* [`hydra-cli plugins:link PLUGIN`](#hydra-cli-pluginslink-plugin)
+* [`hydra-cli plugins:uninstall PLUGIN...`](#hydra-cli-pluginsuninstall-plugin)
+* [`hydra-cli plugins:update`](#hydra-cli-pluginsupdate)
+* [`hydra-cli preview`](#hydra-cli-preview)
+* [`hydra-cli scaffold`](#hydra-cli-scaffold)
+
+## `hydra-cli codegen`
+
+Code generator
+
+```
+Code generator
+
+USAGE
+  $ hydra-cli codegen
+
+OPTIONS
+  -d, --createDb       Create the DB and install migrations
+  -s, --schema=schema  [default: ../../schema.graphql] Schema path, can be file or directory
+  --[no-]install       Install dependencies
 ```
 
-and answer the prompts. The scaffolder will generate the following files:
+_See code: [src/src/commands/codegen.ts](https://github.com/Joystream/hydra/blob/v2.0.1-beta.3/src/src/commands/codegen.ts)_
 
-```text
-├── .env
-├── docker-compose.yml
-├── docker
-├── mappings
-├── package.json
-└── schema.graphql
+## `hydra-cli help [COMMAND]`
+
+display help for hydra-cli
+
+```
+display help for <%= config.bin %>
+
+USAGE
+  $ hydra-cli help [COMMAND]
+
+ARGUMENTS
+  COMMAND  command to show help for
+
+OPTIONS
+  --all  see all commands in CLI
 ```
 
-The scaffolder auto-generates sample mappings and an input  schema file as a quick starter. The provided example simply tracks all the transfers in the chain and is not that interesting on its own.
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
 
-Make sure a PostgresDB is running in the background. You may start it with docker:
+## `hydra-cli plugins`
 
-```bash
-docker-compose up -d db
+list installed plugins
+
+```
+list installed plugins
+
+USAGE
+  $ hydra-cli plugins
+
+OPTIONS
+  --core  show core plugins
+
+EXAMPLE
+  $ hydra-cli plugins
 ```
 
-Then run all the nessary migrations and codegen in a single run:
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/index.ts)_
 
-```bash
-yarn bootstrap
+## `hydra-cli plugins:inspect PLUGIN...`
+
+displays installation properties of a plugin
+
+```
+displays installation properties of a plugin
+
+USAGE
+  $ hydra-cli plugins:inspect PLUGIN...
+
+ARGUMENTS
+  PLUGIN  [default: .] plugin to inspect
+
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
+
+EXAMPLE
+  $ hydra-cli plugins:inspect myplugin
 ```
 
-Now you can start Hydra processor running the mappings in `./mappings` against the indexer as configure in `.env`:
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/inspect.ts)_
 
-```bash
-yarn processor:start
+## `hydra-cli plugins:install PLUGIN...`
+
+installs a plugin into the CLI
+
+```
+installs a plugin into the CLI
+Can be installed from npm or a git url.
+
+Installation of a user-installed plugin will override a core plugin.
+
+e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in the CLI without the need to patch and update the whole CLI.
+
+
+USAGE
+  $ hydra-cli plugins:install PLUGIN...
+
+ARGUMENTS
+  PLUGIN  plugin to install
+
+OPTIONS
+  -f, --force    yarn install with force flag
+  -h, --help     show CLI help
+  -v, --verbose
+
+DESCRIPTION
+  Can be installed from npm or a git url.
+
+  Installation of a user-installed plugin will override a core plugin.
+
+  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command 
+  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in 
+  the CLI without the need to patch and update the whole CLI.
+
+ALIASES
+  $ hydra-cli plugins:add
+
+EXAMPLES
+  $ hydra-cli plugins:install myplugin 
+  $ hydra-cli plugins:install https://github.com/someuser/someplugin
+  $ hydra-cli plugins:install someuser/someplugin
 ```
 
-To run a GraphQL query node server run in a separate window:
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/install.ts)_
 
-```bash
-yarn server:start:dev
+## `hydra-cli plugins:link PLUGIN`
+
+links a plugin into the CLI for development
+
+```
+links a plugin into the CLI for development
+Installation of a linked plugin will override a user-installed or core plugin.
+
+e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello' command will override the user-installed or core plugin implementation. This is useful for development work.
+
+
+USAGE
+  $ hydra-cli plugins:link PLUGIN
+
+ARGUMENTS
+  PATH  [default: .] path to plugin
+
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
+
+DESCRIPTION
+  Installation of a linked plugin will override a user-installed or core plugin.
+
+  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello' 
+  command will override the user-installed or core plugin implementation. This is useful for development work.
+
+EXAMPLE
+  $ hydra-cli plugins:link myplugin
 ```
 
-A GraphQL playground will open up at `localhost:4000`. Try to query some Kusama transfers:
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/link.ts)_
 
-```gql
-query {
-  transfers(limit: 5, where: { value_gt: 1000000000000 }) {
-    block
-    value
-    from
-    to
-  }
-}
+## `hydra-cli plugins:uninstall PLUGIN...`
+
+removes a plugin from the CLI
+
+```
+removes a plugin from the CLI
+
+USAGE
+  $ hydra-cli plugins:uninstall PLUGIN...
+
+ARGUMENTS
+  PLUGIN  plugin to uninstall
+
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
+
+ALIASES
+  $ hydra-cli plugins:unlink
+  $ hydra-cli plugins:remove
 ```
 
-The schema and the queries can be inspected on the Schema and Docs tabs on the right.
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/uninstall.ts)_
 
-For an in-depth guide on how to create complex schemas and supported features like full-text search, interfaces, union and algebraic types and more, check the [Docs](./../../docs/README.md) and also visit [Hydra Webpage](https://joystream.org/hydra) for a one-pager.
+## `hydra-cli plugins:update`
 
-## Dockerized quickstart
+update installed plugins
 
-The easiest way to get the whole Hydra stack working inside a Docker container is to build a `hydra-kit` Docker image. The provided `docker-compose.yml` comes with a `node-template` image for a Substate chain and a Hydra indexer run against it.
+```
+update installed plugins
 
-First, build `hydra-kit`:
+USAGE
+  $ hydra-cli plugins:update
 
-```bash
-$ yarn docker:build
+OPTIONS
+  -h, --help     show CLI help
+  -v, --verbose
 ```
 
-Let's start the db and run the migrations. `hydra-kit` will connect to the network running the database container created by docker-compose.
-```bash
-$ yarn docker:db:up
-$ yarn db:prepare
-$ yarn docker:db:migrate
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/update.ts)_
+
+## `hydra-cli preview`
+
+Preview GraphQL API schema
+
+```
+Preview GraphQL API schema
+
+USAGE
+  $ hydra-cli preview
+
+OPTIONS
+  -s, --schema=schema  [default: ../../schema.graphql] Schema path
 ```
 
-Now everything is ready to run the whole stack locally:
+_See code: [src/src/commands/preview.ts](https://github.com/Joystream/hydra/blob/v2.0.1-beta.3/src/src/commands/preview.ts)_
+
+## `hydra-cli scaffold`
+
+Starter kit: generates a directory layout and a sample schema file
+
 ```
-$ yarn docker:up
-```
+Starter kit: generates a directory layout and a sample schema file
 
-After some warm-up time, the query node will be available at `localhost:4000` and the indexer gateway playground at `localhost:4001`
+USAGE
+  $ hydra-cli scaffold
 
-## Setting up the indexer
-
-To run a self-hosted indexer, we need to spin up a local indexer together with a GraphQL gateway. The setup requires a redis and a db instance and thus is more convenient to run with a docker-compose file:
-
-```bash
-$ docker-compose up -d redis
-$ docker-compose up -d indexer
-$ docker-compose up -d indexer-api-gateway
-```
-
-If everything set up correctly, it should be possible to inspect the Indexer gateway at `http://localhost:4001/graphql`
-
-## Running the processor
-
-### Dockerized
-
-When the indexer gateway is available (either locally or hosted elsewhere), the processor can be run againt it:
-
-```bash
-$ docker-compose up -d processor
+OPTIONS
+  -a, --appPort=appPort              [default: 4000] GraphQL server port
+  -b, --blockHeight=blockHeight      [default: 0] Start block height
+  -h, --dbHost=dbHost                [default: localhost] Database host
+  -i, --indexerUrl=indexerUrl        [default: https://indexer-kusama.joystream.app/graphql] Hydra Indexer endpoint
+  -m, --[no-]mappings                Create schema and mappings
+  -n, --projectName=projectName      Project name
+  -p, --dbPort=dbPort                [default: 5432] Database port
+  -u, --dbUser=dbUser                [default: postgres] Database user
+  -w, --wsProviderUrl=wsProviderUrl  [default: wss://kusama-rpc.polkadot.io/] Substrate WS provider endpoint
+  -x, --dbPassword=dbPassword        [default: postgres] Database user password
 ```
 
-For running against a hosted indexer gateway, simply change `INDEXER_ENDPOINT_URL` variable. For example, setting it to `https://indexer-kusama.joystream.app/graphql` will run the processor against events and extrinsincs in Kusama chain.
-
-### Running locally
-
-For running the processor locally, run `yarn processor:start`
-
-## Running the query node endpoint
-
-Finally, run the query node endpoint:
-
-```bash
-$ docker-compose up -d graphql-server
-```
-
-The query node is run at port 8080 by default.
-
-To run it locally, inspect the settings in `.env` and run
-```
-$ yarn configure:dev
-$ yarn server:start:dev
-```
+_See code: [src/src/commands/scaffold.ts](https://github.com/Joystream/hydra/blob/v2.0.1-beta.3/src/src/commands/scaffold.ts)_
+<!-- commandsstop -->
