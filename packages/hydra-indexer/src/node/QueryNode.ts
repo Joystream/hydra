@@ -79,7 +79,7 @@ export class QueryNode {
         new ApiPromise({
           provider,
           registry,
-          types
+          types,
         }).isReadyOrError,
       SUBSTRATE_API_CALL_RETRIES
     )
