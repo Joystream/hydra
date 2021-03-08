@@ -8,8 +8,4 @@ Simply run
 docker-compose up -d
 ```
 
-The indexer gateway will be available at 
-
-```
-http://localhost:4001
-```
+The indexer gateway will be available at `http://localhost:4001/graphql`
