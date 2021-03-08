@@ -1,0 +1,64 @@
+version: "3"
+
+services:
+  
+  hydra-indexer:
+    image: joystream/hydra-indexer:latest
+    restart: unless-stopped
+    environment:
+      - DB_NAME=indexer-db
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - NEW_BLOCK_TIMEOUT_SEC=150000
+      - WS_PROVIDER_ENDPOINT_URI=ws://substrate:9944/
+      - REDIS_URI=redis://redis:6379/0
+      - DEBUG=index-builder:*
+    command: > 
+      sh -c "yarn db:bootstrap && yarn start:prod" 
+    depends_on:
+      - substrate
+      - redis
+      - db
+    
+  hydra-indexer-gateway:
+    image: joystream/hydra-indexer-gateway:latest
+    restart: unless-stopped
+    environment:
+      - WARTHOG_STARTER_DB_DATABASE=indexer-db
+      - WARTHOG_STARTER_DB_HOST=db 
+      - WARTHOG_STARTER_DB_PASSWORD=postgres
+      - WARTHOG_STARTER_DB_PORT=5432 
+      - WARTHOG_STARTER_DB_USERNAME=postgres 
+      - WARTHOG_STARTER_REDIS_URI=redis://redis:6379/0 
+      - PORT=4000
+      - DEBUG=index-server:*
+    ports:
+      - "4001:4000"
+    depends_on:
+      - redis
+      - db
+    
+  ## node-template image
+  substrate:
+    image: paritytech/substrate-playground-template-node-template:sha-7212614
+    restart: unless-stopped
+    ports:
+      - "9944:9944"
+    command: ["./target/release/node-template", "--dev", "--tmp", "--ws-external"]
+
+  redis:
+    image: redis:6.0-alpine
+    restart: always
+    ports:
+      - "6379"
+
+  db:
+    image: postgres:12
+    restart: always
+    ports:
+      - "5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    
