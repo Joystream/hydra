@@ -4,6 +4,8 @@ import { Logger } from '../src/logger'
 import { getServer } from './server'
 import Debug from 'debug'
 import { shutdownServices, initServices } from './services'
+import { hydraVersion } from './version'
+
 const debug = Debug('index-server:index')
 
 async function bootstrap() {
@@ -12,6 +14,7 @@ async function bootstrap() {
   const server = getServer()
   debug('Server created!')
   initServices()
+  Logger.info(`Hydra version: ${hydraVersion}`)
   await server.start()
   debug('The server has started!')
 }

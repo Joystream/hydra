@@ -3,6 +3,9 @@ import * as IORedis from 'ioredis'
 import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 import { IndexerStatus } from './indexer-status.resolver'
 import Debug from 'debug'
+import { hydraVersion } from '../../version'
+import { Logger } from '../../logger'
+import { logError } from '@dzlzv/hydra-common'
 
 const debug = Debug('index-server:indexer-status-service')
 
@@ -11,27 +14,22 @@ const INDEXER_HEAD_BLOCK = 'hydra:indexer:head'
 
 @Service('IndexerStatusService')
 export class IndexerStatusService {
-  // for subscriptions
-  private redisSub: IORedis.Redis
   // for normal ops
   private redisClient: IORedis.Redis
 
   constructor() {
     const factory = Container.get<RedisClientFactory>('RedisClientFactory')
-    this.redisSub = factory.getClient()
     this.redisClient = factory.getClient()
   }
 
-  async currentIndexerHead(): Promise<number> {
-    const head = await this.redisClient.get(INDEXER_HEAD_BLOCK)
-    if (head == null) {
-      return -1
-    }
-    return Number.parseInt(head as string)
-  }
-
   async currentStatus(): Promise<IndexerStatus> {
-    const result = await this.redisClient.hgetall(INDEXER_STATUS_KEY)
+    let result
+    try {
+      result = await this.redisClient.hgetall(INDEXER_STATUS_KEY)
+    } catch (e) {
+      Logger.error(`Error connecting to redis: ${logError(e)}`)
+      throw new Error(`Server errror: Redis service is unavailable`)
+    }
 
     debug(`Got status: ${JSON.stringify(result)}`)
 
@@ -42,6 +40,8 @@ export class IndexerStatusService {
     status.lastComplete = this.getNumberOrDefault(result, 'LAST_COMPLETE')
     status.maxComplete = this.getNumberOrDefault(result, 'MAX_COMPLETE')
 
+    status.inSync = status.chainHeight === status.head && status.head > 0
+    status.hydraVersion = hydraVersion
     return status
   }
 

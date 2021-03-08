@@ -15,6 +15,12 @@ export class IndexerStatus {
 
   @Field(() => Int, { nullable: false })
   chainHeight!: number
+
+  @Field()
+  inSync!: boolean
+
+  @Field({ nullable: true })
+  hydraVersion?: string
 }
 
 @Resolver(IndexerStatus)
