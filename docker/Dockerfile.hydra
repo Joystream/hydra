@@ -1,0 +1,8 @@
+FROM node:12-alpine
+
+COPY schema.graphql .
+COPY ./mappings ./mappings
+COPY .env .
+ADD *.json .
+
+RUN yarn && yarn codegen:all
