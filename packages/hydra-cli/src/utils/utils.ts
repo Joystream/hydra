@@ -101,21 +101,21 @@ export function readModuleFile(path: string): string {
 }
 
 /**
- * Parse stderr for warthog command `warthog codegen` (child process) and search for errors. If there is an error in the
- * generated/graphql-server/src/* then the command fails.
+ * Parse stderr for warthog command `warthog codegen` (child process).
  * @param stderr string
- * @param regexExpr string
  */
-export function parseWarthogCodegenStderr(
-  stderr: string,
-  regexExpr = /src\/modules\/\S*.ts/g
-): void {
-  const m = stderr.match(regexExpr)
+export function parseWarthogCodegenStderr(stderr: string): void {
+  // String to look if there is any graphql error
+  const graphqlErrors = `GeneratingSchemaError: Generating schema error`
+  // Pattern to search if any file under the generated/graphql-server/src/* has problems
+  const sourceCodeErrors = /src\/modules\/\S*.ts/g
+  const errorMsg = `Failed to generate Graphql API due to errors: \n`
+
+  const m = stderr.match(sourceCodeErrors)
   if (m !== null) {
-    throw Error(
-      `Failed to generate Graphql API due to errors: \n` +
-        stderr.slice(stderr.indexOf(m[0]))
-    )
+    throw Error(errorMsg + stderr.slice(stderr.indexOf(m[0])))
+  } else if (stderr.includes(graphqlErrors)) {
+    throw Error(errorMsg + stderr)
   }
 }
 
