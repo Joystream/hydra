@@ -11,7 +11,7 @@ import {
   buildImportsRegistry,
   generateIndex,
 } from '../../generators'
-import { parseConfigFile } from '../../helpers/parse-yaml'
+import { parseConfigFile } from '../../config/parse-yaml'
 
 export type CustomTypes = {
   lib: string // package with types. All custom types will be imported from there
