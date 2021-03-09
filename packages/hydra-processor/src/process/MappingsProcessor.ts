@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { makeDatabaseManager } from '@dzlzv/hydra-db-utils'
+import { makeDatabaseManager } from '../db'
 import {
   IProcessorSource,
   GraphQLSource,

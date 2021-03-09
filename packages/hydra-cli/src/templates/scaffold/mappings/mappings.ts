@@ -1,4 +1,4 @@
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import { DatabaseManager } from '@dzlzv/hydra-common'
 import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model'
 import { BlockTimestamp } from '../generated/graphql-server/src/modules/block-timestamp/block-timestamp.model'
 

@@ -1,5 +1,12 @@
-import { getRepository, Connection, createConnection } from 'typeorm'
-
+import {
+  getRepository,
+  Connection,
+  EntityManager,
+  createConnection,
+  FindOneOptions,
+} from 'typeorm'
+import { DatabaseManager, DeepPartial } from '@dzlzv/hydra-common'
+import { fillRequiredWarthogFields } from '@dzlzv/hydra-db-utils'
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 import Debug from 'debug'
 import config from './ormconfig'
@@ -14,6 +21,32 @@ export async function createDBConnection(
   entities.map((e) => _config.entities?.push(e))
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
   return createConnection(_config)
+}
+
+export function makeDatabaseManager(
+  entityManager: EntityManager
+): DatabaseManager {
+  return {
+    save: async <T>(entity: DeepPartial<T>): Promise<void> => {
+      entity = fillRequiredWarthogFields(entity)
+      await entityManager.save(entity)
+    },
+    remove: async <T>(entity: DeepPartial<T>): Promise<void> => {
+      await entityManager.remove(entity)
+    },
+    get: async <T>(
+      entity: { new (...args: any[]): T },
+      options: FindOneOptions<T>
+    ): Promise<T | undefined> => {
+      return await entityManager.findOne(entity, options)
+    },
+    getMany: async <T>(
+      entity: { new (...args: any[]): T },
+      options: FindOneOptions<T>
+    ): Promise<T[]> => {
+      return await entityManager.find(entity, options)
+    },
+  } as DatabaseManager
 }
 
 /**

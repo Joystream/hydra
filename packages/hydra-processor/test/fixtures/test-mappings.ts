@@ -1,6 +1,5 @@
 /* eslint-disable */
-import { SubstrateEvent } from '@dzlzv/hydra-common'
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import { DatabaseManager, SubstrateEvent } from '@dzlzv/hydra-common'
 
 export function balances_TransferEvent(
   db: DatabaseManager,

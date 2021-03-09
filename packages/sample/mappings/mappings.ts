@@ -1,4 +1,4 @@
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import { DatabaseManager } from '@dzlzv/hydra-common'
 import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model'
 import { BlockTimestamp } from '../generated/graphql-server/src/modules/block-timestamp/block-timestamp.model'
 
@@ -21,6 +21,7 @@ export async function balancesTransfer(
   transfer.block = event.ctx.blockNumber
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
   transfer.insertedAt = new Date()
+
   await db.save<Transfer>(transfer)
 }
 

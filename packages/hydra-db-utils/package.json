@@ -16,7 +16,6 @@
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },
   "dependencies": {
-    "@dzlzv/hydra-common": "^2.0.1-beta.9",
     "@types/ioredis": "^4.17.4",
     "bn.js": "^5.1.3",
     "ioredis": "^4.17.3",

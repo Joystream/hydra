@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any  */
 import Debug from 'debug'
 import { getManifest } from '../start/config'
-import { SubstrateEvent } from '@dzlzv/hydra-common'
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import { DatabaseManager, SubstrateEvent } from '@dzlzv/hydra-common'
 import {
   CONTEXT_CLASS_NAME,
   MappingHandler,

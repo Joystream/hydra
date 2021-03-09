@@ -1,4 +1,3 @@
 # Common Hydra tools
 
-This package contain general purpose utility methods shared by Hydra packages
-
+This package contains core Hydra interfaces exposed to the mappings. It has minimal external dependencies.
