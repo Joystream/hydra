@@ -45,7 +45,7 @@ export class {{className}}Service {
 			await queryRunner.commitTransaction();
 		}
 
-		let collect = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];
+		let collect : any[] = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];
 		if (ob) {
 			// NB: copied from warthog's BaseService
 			// TODO: allow multiple sorts

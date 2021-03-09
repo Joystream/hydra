@@ -17,6 +17,9 @@ import {
         import { {{tsType}} } from '../enums/enums';
         export { {{tsType}} }
       {{/is.enum}}
+      {{#is.entity}}
+        import { {{tsType}} } from '../{{tsTypeNames.kebabName}}/{{tsTypeNames.kebabName}}.model';
+      {{/is.entity}}
   {{/fields}}
 {{/variants}}
 
@@ -25,7 +28,7 @@ import { ObjectType, Field, createUnionType } from 'type-graphql';
 {{#variants}}
 @ObjectType()
 export class {{name}} {
-	public isTypeOf: string = '{{name}}';
+    public isTypeOf: string = '{{name}}';
 
   {{#fields}}
 
@@ -45,13 +48,22 @@ export class {{name}} {
       {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}} 
     {{/is.enum}}
 
-
     {{#is.union}}
     @Field(type => {{tsType}}, { 
         {{^required}}nullable: true,{{/required}} 
         {{#description}}description: `{{{description}}}`{{/description}} })
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: typeof {{tsType}};
     {{/is.union}}
+
+    {{#is.entity}}
+        @Field(type => {{tsType}}, {
+            {{^required}}nullable: true,{{/required}}
+            {{#description}}description: `{{{description}}}`{{/description}} })
+        {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}};
+
+        @IntField({nullable: true})
+        {{camelName}}Id!:string;
+    {{/is.entity}}
 
   {{/fields}}
 }
