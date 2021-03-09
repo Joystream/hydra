@@ -1,7 +1,7 @@
 {
   "name": "@dzlzv/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "2.0.1-beta.5",
+  "version": "2.0.1-beta.6",
   "author": "metmirr @metmirr dzlzv @dzhelezov",
   "license": "MIT",
   "bin": {
