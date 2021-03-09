@@ -2,7 +2,7 @@ import Debug from 'debug'
 import fs from 'fs'
 
 const debug = Debug('hydra-processor:util')
-const PROCESSOR_PACKAGE_NAME = '@dzlzv/hydra-processor'
+export const PROCESSOR_PACKAGE_NAME = '@dzlzv/hydra-processor'
 
 /**
  * resolve a package version by resolving package.json

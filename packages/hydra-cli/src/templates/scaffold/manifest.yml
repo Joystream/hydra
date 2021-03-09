@@ -1,10 +1,10 @@
 version: '0.1'
 description: Test manifest
 repository: https://github.com/
+hydraVersion: "2"
 dataSource:
   kind: substrate 
   chain: node-template
-  indexerVersion: '0.0.4'
 entities:
   - mappings/lib/generated/**/*.model.js
 typegen:
@@ -17,7 +17,6 @@ typegen:
     - timestamp.set
   outDir: ./mappings/generated/types
 mappings:
-  hydraCommonVersion: '0.0.3'
   mappingsModule: mappings/lib/mappings
   imports:
     - mappings/lib/mappings/generated/types
