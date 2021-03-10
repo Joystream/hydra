@@ -5,13 +5,14 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "lib"
+    "/lib"
   ],
   "license": "MIT",
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "lint": "eslint . --cache --ext .ts",
+    "prepack": "yarn build",
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },
   "dependencies": {
