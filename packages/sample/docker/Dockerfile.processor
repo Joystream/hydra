@@ -1,0 +1,12 @@
+FROM node:12-alpine AS builder
+
+RUN mkdir -p /home/hydra-processor && chown -R node:node /home/hydra-processor
+
+WORKDIR /home/hydra-processor
+
+COPY ./generated/graphql-server/src ./generated/graphql-server/src
+COPY ./mappings ./mappings
+COPY ./*.yml ./
+COPY ./*.json ./
+COPY ./yarn.lock .
+
