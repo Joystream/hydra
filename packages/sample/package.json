@@ -23,6 +23,7 @@
     "db:schema:migrate": "yarn workspace query-node db:migrate",
     "db:processor:migrate": "hydra-processor migrate -e .env",
     "db:migrate": "yarn db:schema:migrate && yarn db:processor:migrate",
+    "db:bootstrap": "yarn db:prepare && yarn db:migrate",
     "bootstrap": "yarn codegen && yarn db:prepare && yarn db:migrate",
     "codegen": "hydra-cli codegen",
     "typegen:configure": "NODE_URL=${NODE_URL:-ws://localhost:9000} envsub typegen.template.yml typegen.yml",
@@ -30,7 +31,7 @@
     "mappings:build": "yarn workspace sample-mappings build",
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
-    "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 hydra-kit:latest yarn db:migrate",
+    "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 builder yarn db:bootstrap",
     "docker:up": "docker-compose up -d"
   },
   "author": "",
