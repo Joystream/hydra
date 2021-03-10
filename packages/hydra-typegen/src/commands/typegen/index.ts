@@ -44,13 +44,11 @@ const debug = Debug('hydra-typegen:typegen')
 export default class Typegen extends Command {
   static description = `Generate Typescript classes for the Substrate events`
 
-  static usage = 'typegen Balances.transfer,Treasury.depositCreated'
-
   static args = [
     {
       name: 'config',
       optional: true,
-      description: `Path to YML config file`,
+      description: `Path to YML config file. Overrides the flag options`,
     },
   ]
 

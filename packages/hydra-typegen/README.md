@@ -23,15 +23,70 @@ export async function balancesTransfer(
 }
 ```
 
+
+## Commands
+<!-- commands -->
+* [`hydra-typegen help [COMMAND]`](#hydra-typegen-help-command)
+* [`hydra-typegen typegen [CONFIG]`](#hydra-typegen-typegen-config)
+
+## `hydra-typegen help [COMMAND]`
+
+display help for hydra-typegen
+
+```
+USAGE
+  $ hydra-typegen help [COMMAND]
+
+ARGUMENTS
+  COMMAND  command to show help for
+
+OPTIONS
+  --all  see all commands in CLI
+```
+
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)_
+
+## `hydra-typegen typegen [CONFIG]`
+
+Generate Typescript classes for the Substrate events
+
+```
+USAGE
+  $ hydra-typegen typegen [CONFIG]
+
+ARGUMENTS
+  CONFIG  Path to YML config file. Overrides the flag options
+
+OPTIONS
+  -c, --calls=calls          Comma-separated list of substrate calls in the format <module>.<name>
+  -d, --debug                Output debug info
+  -e, --events=events        Comma-separated list of substrate events in the formation <module>.<name>
+
+  -h, --blockHash=blockHash  Hash of the block from which the metadata will be fetched. Only applied if metadata is
+                             pulled via an RPC call
+
+  -i, --typelib=typelib      A JavaScript module from which the custom types should be imported, e.g.
+                             '@joystream/types/augment'
+
+  -m, --metadata=metadata    [default: metadata.json] Chain metadata source. If starts with ws:// or wss:// the metadata
+                             is pulled by an RPC call to the provided endpoint. Otherwise a relative path to a json file
+                             matching the RPC call response is expected
+
+  -o, --outDir=outDir        [default: generated/types] A relative path the root folder where the generated files will
+                             be generated
+
+  -s, --[no-]strict          Strict mode. If on, the generated code throws an error if the input event argument types
+                             don't much the metadata definiton
+
+  -t, --typedefs=typedefs    A relative path to a file with JSON definitions for custom types used by the chain
+```
+
+_See code: [src/commands/typegen/index.ts](https://github.com/Joystream/hydra/blob/v2.0.1-beta.6/src/commands/typegen/index.ts)_
+<!-- commandsstop -->
+
 A full sample Hydra project can be found [here](https://github.com/Joystream/hydra/tree/master/packages/sample)
 
-## Usage
-
-For usage and a list of supported flags, type
-
-```bash
-hydra-typegen typegen --help
-```
+## Quickstart
 
 A minimal example for generating classes for the `Balances.Transfer` and `Treasury.Deposit` events in Kusama:
 
