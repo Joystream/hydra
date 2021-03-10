@@ -1,5 +1,6 @@
 {
   "name": "sample-mappings",
+  "private": true,
   "version": "2.0.1-beta.6",
   "description": "Mappings for hydra-processor",
   "main": "lib/mappings/index.js",
