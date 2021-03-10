@@ -68,17 +68,16 @@ export default class WarthogWrapper {
         },
       },
       {
+        title: 'Generate server sources',
+        task: () => {
+          this.generateWarthogSources()
+        },
+      },
+      {
         title: 'Install dependencies',
         skip: skipIfNoDeps,
         task: async () => {
           await execa('yarn', ['install'])
-        },
-      },
-      {
-        title: 'Generate server sources',
-        skip: skipIfNoDeps,
-        task: () => {
-          this.generateWarthogSources()
         },
       },
       {
