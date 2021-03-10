@@ -59,3 +59,34 @@ The simplest way to run an indexer locally is to run `docker-compose-indexer.yml
 - If non-standard types are being used by the Substrate runtime, map type definitions in the json format as an external volume
 
 Follow the links for more information about the [indexer](https://github.com/Joystream/hydra/tree/master/packages/hydra-indexer/README.md) service and [indexer-api-gateway](https://github.com/Joystream/hydra/tree/master/packages/hydra-indexer-gateway/README.md).
+
+## Running in Docker
+
+Docker files are located in `./docker`. First, build the builder image:
+
+```bash
+$ docker build . -f docker/Dockerfile.builder -t builder
+```
+
+Images for the GraphQL query node and the processor depend on the `builder` image which is now available. 
+Build with
+
+```bash
+$ docker build . -f docker/Dockerfile.query-node -t query-node:latest
+$ docker build . -f docker/Dockerfile.processor -t processor:latest
+```
+
+In order to run the docker-compose stack, we need to create the schema and run the database migrations. 
+
+```bash
+$ docker-compose up -d db 
+$ yarn docker:db:migrate
+```
+
+The last command runs `yarn db:bootstrap` in the `builder` image. A similar setup strategy may be used for Kubernetes (with `builder` as a starter container).
+
+Now everything is ready:
+
+```bash
+$ docker-compose up
+```
