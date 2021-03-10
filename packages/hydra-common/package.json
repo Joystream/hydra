@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "lib",
+    "/lib",
     "README.md"
   ],
   "license": "MIT",
@@ -13,6 +13,7 @@
     "pub": "yarn build && yarn publish --access public",
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "lint": "eslint . --cache --ext .ts",
+    "prepack": "yarn build",
     "test": "echo 'No tests' && exit 1"
   },
   "dependencies": {
