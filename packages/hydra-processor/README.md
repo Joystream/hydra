@@ -3,9 +3,64 @@
 Hydra processor is a client-side 'sink' tool used to fetch substrate events from a Hydra indexer.
 It sequentially applies the event handlers one by one in the order the events have been emitted.
 
-## Usage
+
+## Commands
+<!-- commands -->
+* [`hydra-processor help [COMMAND]`](#hydra-processor-help-command)
+* [`hydra-processor migrate`](#hydra-processor-migrate)
+* [`hydra-processor run`](#hydra-processor-run)
+
+## `hydra-processor help [COMMAND]`
+
+display help for hydra-processor
+
+```
+display help for <%= config.bin %>
+
+USAGE
+  $ hydra-processor help [COMMAND]
+
+ARGUMENTS
+  COMMAND  command to show help for
+
+OPTIONS
+  --all  see all commands in CLI
+```
+
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
+
+## `hydra-processor migrate`
+
+```
+undefined
+
+USAGE
+  $ hydra-processor migrate
+
+OPTIONS
+  -e, --env=env  Path to a file with environment variables
+```
+
+## `hydra-processor run`
+
+```
+undefined
+
+USAGE
+  $ hydra-processor run
+
+OPTIONS
+  -e, --env=env            Path to a file with environment variables
+  -m, --manifest=manifest  Manifest file
+  --id=id                  ID of the processor (useful for multi-processor setups)
+  --indexer=indexer        Indexer URL to source events
+```
+<!-- commandsstop -->
+
+## Qickstart
 
 Before the first run, the processor should set up auxiliary database tables required for its stable work:
+
 ```
 hydra-processor migrate 
 ```
@@ -16,9 +71,10 @@ Then `hydra-processor` can be run against the manifest file (by default, it look
 hydra-processor run -m <path/to/manifest> -e <path to a file with env variables>
 ```
 
+## Environment variables
+
 Hydra processor requires a manifest file and certain environment variables to be set.
 
-### Environment varibables
 
 | Variable        | Default           | Required  | Description |
 | -------|:------:| --------:| ---------------------------:|
@@ -38,7 +94,7 @@ The required variables can either be set externally or loaded from a file using 
 hydra-processor migrate -e .env
 ```
 
-### Manifest file
+## Manifest file
 
 The manifest file describes which and how the events and extrinsics should be processed.
 Here is an example for Kusama blockchain:
@@ -77,4 +133,4 @@ mappings:
     #  handler: handleSudoCall(DatabaseManager,SubstrateEvent)
   preBlockHooks:
   postBlockHooks:
-``` 
+```

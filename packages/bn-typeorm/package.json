@@ -5,13 +5,14 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "lib",
+    "/lib",
     "README.md"
   ],
   "license": "MIT",
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
     "build": "rm -rf lib && tsc --build tsconfig.json",
+    "prepack": "yarn build",
     "lint": "eslint . --cache --ext .ts"
   },
   "dependencies": {
