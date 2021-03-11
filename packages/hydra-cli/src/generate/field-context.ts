@@ -130,7 +130,7 @@ export function withTsTypeAndDecorator(f: Field): GeneratorContext {
 
   return {
     tsType: f.type,
-    tsTypeNames: util.names(f.type)
+    tsTypeNames: util.names(f.type),
   }
 }
 

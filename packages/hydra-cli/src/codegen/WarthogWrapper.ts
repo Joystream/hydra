@@ -259,13 +259,18 @@ export default class WarthogWrapper {
     const schemaPath = path.resolve(process.cwd(), this.flags.schema as string)
 
     // Create empty graphql file to append entities to
-    fs.writeFileSync(path.resolve(process.cwd(), 'schema.graphql'), '', {encoding: 'utf8'})
+    fs.writeFileSync(path.resolve(process.cwd(), 'schema.graphql'), '', {
+      encoding: 'utf8',
+    })
 
     fs.readdirSync(schemaPath).forEach((file) => {
       if (fs.lstatSync(path.resolve(schemaPath, file)).isFile()) {
         fs.appendFileSync(
-            path.resolve(process.cwd(), 'schema.graphql'),
-            fs.readFileSync(path.resolve(schemaPath, file)).toString().concat('\n\n')
+          path.resolve(process.cwd(), 'schema.graphql'),
+          fs
+            .readFileSync(path.resolve(schemaPath, file))
+            .toString()
+            .concat('\n\n')
         )
       }
     })
