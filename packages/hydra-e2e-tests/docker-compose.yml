@@ -50,7 +50,7 @@ services:
              yarn processor:start"
   
   hydra-indexer:
-    image: hydra-indexer:latest
+    image: hydra-indexer:v3-latest
     restart: unless-stopped
     environment:
       - DB_NAME=indexer-db
@@ -62,6 +62,9 @@ services:
       - WS_PROVIDER_ENDPOINT_URI=ws://substrate:9944/
       - REDIS_URI=redis://redis:6379/0
       - DEBUG=index-builder:*
+      - TYPES_JSON=typedefs.json
+    volumes:
+      - ./test/e2e/api/typedefs.json:/home/hydra/packages/hydra-indexer/typedefs.json
     command: > 
       sh -c "yarn db:bootstrap && yarn start:prod" 
     depends_on:

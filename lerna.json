@@ -9,7 +9,8 @@
     "version": {
       "conventionalCommits": true,
       "changelogPreset": "conventionalcommits",
-      "message": "chore: [ci skip] %s"
+      "message": "chore: [ci skip] %s",
+      "preid": "beta-v3"
     }
   }
 }

@@ -93,9 +93,7 @@ export class QueryEvent implements IQueryEvent {
     logger(
       `\t\t\tExtrinsic: ${
         this.extrinsic
-          ? this.extrinsic.method.sectionName +
-            '.' +
-            this.extrinsic.method.methodName
+          ? this.extrinsic.method.section + '.' + this.extrinsic.method.method
           : 'NONE'
       }`
     )
