@@ -7,6 +7,8 @@
       "packages/sample/mappings"
     ],
     "nohoist": [
+      "**/hydra-indexer",
+      "**/hydra-indexer/**",      
       "**/hydra-typegen",
       "**/sample/generated/graphql-server",
       "**/sample/generated/graphql-server/**",
