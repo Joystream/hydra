@@ -1,6 +1,10 @@
-import { QueryRunner, Connection, createConnection } from 'typeorm'
+import {
+  Connection,
+  createConnection,
+  getConnection,
+  EntityManager,
+} from 'typeorm'
 import { EVENT_TABLE_NAME } from '../entities/SubstrateEventEntity'
-import { doInTransaction } from '@dzlzv/hydra-db-utils'
 import Debug from 'debug'
 import config from './ormconfig'
 
@@ -18,8 +22,8 @@ export async function createDBConnection(
 }
 
 export async function getIndexerHead(): Promise<number> {
-  return await doInTransaction(async (qr: QueryRunner) => {
-    const raw = (await qr.query(`
+  return await getConnection().transaction(async (em: EntityManager) => {
+    const raw = (await em.query(`
       SELECT block_number 
       FROM ${EVENT_TABLE_NAME} e1 
       WHERE 
