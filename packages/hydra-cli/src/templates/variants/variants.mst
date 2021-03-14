@@ -19,6 +19,9 @@ import {
         import { {{tsType}} } from '../enums/enums';
         export { {{tsType}} }
       {{/is.enum}}
+      {{#is.entity}}
+        import { {{tsType}} } from '../{{tsTypeNames.kebabName}}/{{tsTypeNames.kebabName}}.model';
+      {{/is.entity}}
   {{/fields}}
 {{/variants}}
 
@@ -54,6 +57,16 @@ export class {{name}} {
         {{#description}}description: `{{{description}}}`{{/description}} })
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: typeof {{tsType}};
     {{/is.union}}
+
+    {{#is.entity}}
+        @Field(type => {{tsType}}, {
+            {{^required}}nullable: true,{{/required}}
+            {{#description}}description: `{{{description}}}`{{/description}} })
+        {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}};
+
+        @IntField({nullable: true})
+        {{camelName}}Id!:string;
+    {{/is.entity}}
 
   {{/fields}}
 }
