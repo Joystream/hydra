@@ -25,7 +25,6 @@ services:
       - REDIS_URI=redis://redis:6379/0
       - DEBUG=index*
       - BLOCK_HEIGHT=658170
-      - FORCE_BLOCK_HEIGHT=true
       - TYPES_JSON=typedefs.json
       - WS_PROVIDER_ENDPOINT_URI=ws://arch.subsocial.network:9944
     volumes:

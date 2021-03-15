@@ -34,7 +34,30 @@ yarn workspace sample-mappings install
 yarn mappings:build
 ```
 
-## 4. Run the processor and the GraphQL server
+## 4. Run local Hydra Indexer
+
+A stack of Hydra Indexer services is configured in `docker-compose-indexer.yml`. 
+Run
+
+```
+$ docker-compose -f docker-compose-indexer.yml up -d
+```
+
+and check the status at `localhost:4001` by quering
+
+```gql
+query {
+  indexerStatus {
+    chainHeight
+    head
+    hydraVersion
+  }
+}
+```
+
+Make sure that the last indexer block (head) and the last known finalized block (chainHeight) are both positive and `hydraVersion` is `2.x`.
+
+## 5. Run the processor and the GraphQL server
 
 Then run the processor:
 
@@ -42,23 +65,11 @@ Then run the processor:
 yarn processor:start
 ```
 
-Afterwards start the GraphQL server in a separate terminal (opens a GraphQL playground at localhost by default):
+Afterwards, start the GraphQL server in a separate terminal (opens a GraphQL playground at localhost by default):
 
 ```bash
 yarn query-node:start:dev
 ```
-
-## 5. Locally hosted indexer
-
-The Hydra Indexer endpoint used by Hydra processor is defined as environment variable `INDEXER_ENDPOINT_URL` sourced from `.env`. There are publicly available Hydra indexers for Polkadot and Subsocial. For other chains, a self-hosted indexer should be used.
-
-The simplest way to run an indexer locally is to run `docker-compose-indexer.yml` with `docker-compose`. The following environment variables must be provided:
-
-- Database connection settings: DB_NAME, DB_HOST, DB_PORT, DB_USER, DB_PASS
-- Chain RPC endpoint: WS_PROVIDER_ENDPOINT_URI
-- If non-standard types are being used by the Substrate runtime, map type definitions in the json format as an external volume
-
-Follow the links for more information about the [indexer](https://github.com/Joystream/hydra/tree/master/packages/hydra-indexer/README.md) service and [indexer-api-gateway](https://github.com/Joystream/hydra/tree/master/packages/hydra-indexer-gateway/README.md).
 
 ## Running in Docker
 
