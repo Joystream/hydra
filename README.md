@@ -40,5 +40,5 @@ The monorepo contains the following sub-packages:
 * [Hydra Processor](packages/hydra-processor/README.md): Processing part of the pipeline for transforming events into rich business-level objects
 * [Hydra Typegen](packages/hydra-typegen/README.md): A tool for generating typesafe typescript classes for events and extrinsics from the runtime metadata. No more manual deserialization of the event data.
 * [Sample Project](packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
-* [Docs](docs/): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
+* [Docs](https://app.gitbook.com/@dzhelezov/s/hydra/): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
 

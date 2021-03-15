@@ -126,12 +126,7 @@ $ docker-compose up
 
 ## What to do next?
 
-<<<<<<< HEAD
 * Explore more [examples](https://github.com/Joystream/hydra/tree/master/examples)
-=======
-* Explore more [examples](quick-start.md)
->>>>>>> GitBook: [master] one page modified
 * Describe your own [schema](schema-spec/) in `schema.graphql`
 * Write your indexer [mappings](mappings/)
 * Push your Hydra indexer and GraphQL Docker images to [Docker Hub](https://hub.docker.com/) and deploy  
-
