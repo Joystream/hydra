@@ -13,8 +13,9 @@ That's where Hydra gets you covered. Define your data model and the Hydra indexe
 ## Architecture one-liner
 
 A Hydra query node ingests substrate events in a multi-step pipeline:
-```
-Substrate Chain => Hydra Indexer => Indexer GraphQL gateway => Hydra Processor => Database => Query Node GraphQL endpoint 
+
+```text
+Substrate Chain => Hydra Indexer => Indexer GraphQL gateway => Hydra Processor => Database => Query Node GraphQL endpoint
 ```
 
 For popular chains, one can use an already in-sync publicly available Indexer endpoint. For other chains, a self-hosted [indexer](https://github.com/Joystream/hydra/tree/master/packages/hydra-indexer) should be set up.
@@ -24,24 +25,19 @@ For popular chains, one can use an already in-sync publicly available Indexer en
 Run
 
 ```text
-$ npx @dzlzv/hydra-cli scaffold 
+$ npx @dzlzv/hydra-cli scaffold
 ```
+
 and answer the prompts. It will generate a sample project and README with setup instructions.
 
 ## Monorepo structure
 
 The monorepo contains the following sub-packages:
 
-* [Hydra CLI](./packages/hydra-cli/README.md): Codegen tools to set up and run a Hydra pipeline
-
-* [Hydra Indexer](./packages/hydra-indexer/README.md): Hydra indexer for ingesting raw events and extrinsics
-
-* [Hydra Indexer Gateway](./packages/hydra-indexer-gateway/README.md): GraphQL interface for the Indexer
-
-* [Hydra Processor](./packages/hydra-processor/README.md): Processing part of the pipeline for transforming events into rich business-level objects
-
-* [Hydra Typegen](./packages/hydra-typegen/README.md): A tool for generating typesafe typescript classes for events and extrinsics from the runtime metadata. No more manual deserialization of the event data.
-
-* [Sample Project](./packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
+* [Hydra CLI](packages/hydra-cli/README.md): Codegen tools to set up and run a Hydra pipeline
+* [Hydra Indexer](packages/hydra-indexer/README.md): Hydra indexer for ingesting raw events and extrinsics
+* [Hydra Indexer Gateway](packages/hydra-indexer-gateway/README.md): GraphQL interface for the Indexer
+* [Hydra Processor](packages/hydra-processor/README.md): Processing part of the pipeline for transforming events into rich business-level objects
+* [Hydra Typegen](packages/hydra-typegen/README.md): A tool for generating typesafe typescript classes for events and extrinsics from the runtime metadata. No more manual deserialization of the event data.
+* [Sample Project](packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
 * [Docs](docs/): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
-
