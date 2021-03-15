@@ -7,6 +7,11 @@
     "./generated/*",
     "./mappings"
   ],
+  "nohoist": [
+    "mappings/**",
+    "**/mappings",
+    "**/mappings/**"
+  ],
   "scripts": {
     "build": "yarn clean && yarn codegen",
     "rebuild": "yarn clean:query-node && yarn bootstrap",
