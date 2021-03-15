@@ -6,7 +6,7 @@ WORKDIR /home/hydra-builder
 
 COPY ./mappings ./mappings
 COPY ./*.yml ./
-COPY ./package.json ./
+COPY ./*.json ./
 COPY ./*.graphql ./
 COPY ./.env ./
 
