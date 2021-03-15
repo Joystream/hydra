@@ -34,70 +34,97 @@ Answer the prompts and the scaffolder will generate a sample backbone for our Hy
 
 ## 2. Codegen
 
-Now all is set for generating the Graphql server and the indexer for Kusama proposals:
+Run
 
 ```bash
-hydra-cli codegen
+yarn && yarn bootstrap
 ```
 
-The codegen command creates two separate projects:
+It will generate the model files as defined in `schema.graphql`, create the database and run all the necessary migrations in one shot.
 
-* `./generated/graphql-server`: this is a GraphQL for querying the proposals
-* `./generated/indexer`: this is a background indexer tool that fetches the blocks from the Substrate chain \(in this case the public Kusama network\) and updates the database calling the mapping scripts
+NB! Use with caution in production, as it will delete all the existing records.
 
-## 3. Set up the database
+Under the fold, `yarn booststrap` creates a folder `generated/graphql-server` with an Apollo-based GraphQL server for the query node.
 
-Now it's time to set up the database:
+## 3. Typegen for events and extrinsics
+
+ List the events and extrinsics to be used by the mappings and generated type-safe classes using the typegen tool. One can define in a separate yml file or modify the `typegen` section in `manifest.yml` 
+
+Typegen fetches the metadata from the chain from the block with a given hash \(or from the top block if no hash is provided\)  
+
+```yaml
+typegen:
+  metadata:
+    source: ws://arch.subsocial.network:9944
+    blockHash: 0x....
+  events:
+    - posts.PostCreated
+  calls:
+    - posts.CreatePost
+  customTypes: 
+    lib: '@subsocial/types/substrate/interfaces'
+    typedefsLoc: typedefs.json
+  outDir: ./mappings/generated/types
+```
+
+## 4. Mappings and the manifest file
+
+Modify the default mappings in the mappings folder and make sure all the mapping functions are exported. Define the mappings in the `mappings` section 
+
+```yaml
+mappings:
+  # the transpiled js module with the mappings
+  mappingsModule: mappings/lib/mappings
+  imports:
+    # generated types to be loaded by the processor
+    - mappings/lib/mappings/generated/types
+  eventHandlers:
+      # event to handle
+    - event: posts.PostCreated
+      # handler function with argument types
+      handler: postCreated(DatabaseManager, Posts.PostCreatedEvent)
+  extrinsicHandlers:
+      # extrinsic to handle
+    - extrinsic: timestamp.set 
+      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
+ 
+```
+
+## 5. Dockerize
+
+Among other things, the scaffolder generates a `docker` folder with Dockerfiles. 
+
+First, build the builder image:
 
 ```bash
-yarn db:start
+$ docker build . -f docker/Dockerfile.builder -t builder
 ```
 
-This command simply spins up a Postgres Docker image.
+Now the images for the GraphQL query node and the processor can be built \(they use the builder image under the hood\)
 
 ```bash
-yarn db:bootstrap
+$ docker build . -f docker/Dockerfile.query-node -t query-node:latest
+$ docker build . -f docker/Dockerfile.processor -t processor:latest
 ```
 
-This creates a DB schema for our data model described in `schema.graphql`.
-
-## 4. Start Hydra Indexer
-
-Finally, we're ready to run the indexer and the GraphQL server:
+In order to run the docker-compose stack, we need to create the schema and run the database migrations.
 
 ```bash
-yarn indexer:start
+$ docker-compose up -d db 
+$ yarn docker:db:migrate
 ```
 
-Keep an eye on the output to keep track of the indexer's progress.
+The last command runs `yarn db:bootstrap` in the `builder` image. A similar setup strategy may be used for Kubernetes \(with `builder`as a starter container\).
 
-## 5. Start Hydra GraphQL server
-
-In a separate terminal window:
+Now everything is ready:
 
 ```bash
-yarn server:start:dev
+$ docker-compose up
 ```
-
-The last command starts the server in the dev mode and you will see a GraphQL playground opening in your browser \(if not, navigate manually to `localhost:4000/graphql`\). It's time to explore all the GraphQL queries supported out-of-the-box! Note, that depending on the starting block it may take a considerable time for the indexer to catch up with the Kusama network, and until then queries may return empty results.
-
-## 6. Dockerize
-
-Among other things, the scaffolder generates a top-level `package.json`with a bunch of convenient `yarn` targets. For example, putting your Hydra Indexer and GraphQL server is easy as running the following targets:
-
-```bash
-yarn docker:indexer:build
-```
-
-```bash
-yarn docker:server:build
-```
-
-This will create Docker images named `hydra-indexer` and `hydra-graphql-server`
 
 ## What to do next?
 
-* Explore more [examples]()
+* Explore more [examples](quick-start.md)
 * Describe your own [schema](schema-spec/) in `schema.graphql`
 * Write your indexer [mappings](mappings/)
 * Push your Hydra indexer and GraphQL Docker images to [Docker Hub](https://hub.docker.com/) and deploy  
