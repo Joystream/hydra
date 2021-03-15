@@ -18,7 +18,6 @@
   * [Query Node schema](docs/query-node-schema.md)
   * [Tutorial](docs/quick-start.md)
   * [GraphQL Entity Relationships](docs/entity-relationship.md)
-  * [indexer](docs/indexer.md)
   * [Architecture](docs/architecture.md)
 * [Migration to Hydra v2](migration-to-hydra-v2.md)
 

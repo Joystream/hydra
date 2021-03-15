@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-* A unix based operating system (Mac or Linux), you may experience issues on Windows.  
+* A unix based operating system \(Mac or Linux\), you may experience issues on Windows.  
 * node 12.X is recomended, there are known compatibility issues with 14.X  
 * Both Hydra-CLI and the generated project files have dependencies that require Node v10.16 or higher
 * `npm` and \(optional, but recommended\) [`npx`](https://www.npmjs.com/package/npx)
