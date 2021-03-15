@@ -20,4 +20,3 @@ In windows, you should run:
 $ hydra-cli preview && type apipreview.graphql
 ```
 
-

@@ -6,7 +6,7 @@ description: A guide for migrating your mapping from Hydra v1 to Hydra v2
 
 ## Versioning
 
-All 0.x Hydra packages \(a bit counter-intuitively\) are considered Hydra v1. Since Hydra v2 \(that is, versions 2.x\) all Hydra packages \(`hydra-cli`, `hydra-common`, `hydra-typegen`  etc\) recieve the same version on each release.  So, say, Hydra version 2.0.1 means that all the packages together with the Docker images `hydra-indexer` and `hydra-indexer-gateway` are taged `2.0.1`
+All 0.x Hydra packages \(a bit counter-intuitively\) are considered Hydra v1. Since Hydra v2 \(that is, versions 2.x\) all Hydra packages \(`hydra-cli`, `hydra-common`, `hydra-typegen` etc\) recieve the same version on each release. So, say, Hydra version 2.0.1 means that all the packages together with the Docker images `hydra-indexer` and `hydra-indexer-gateway` are taged `2.0.1`
 
 ## What's new in Hydra v2
 
@@ -25,13 +25,13 @@ See examples of Hydra v2 in action [here](https://github.com/Joystream/hydra/tre
 * Run `hydra-cli  scaffold --silent` to generate a stub of a v2 Hydra project
 * Run `yarn`
 
-#### Codegen
+### Codegen
 
 Nothing new here. Simply run `yarn codegen`
 
-#### Typegen for events
+### Typegen for events
 
-Update typegen section in  `manifest.yml` 
+Update typegen section in `manifest.yml`
 
 * List events and calls to which the types should be generated
 * Add `customTypes` if needed: 
@@ -42,7 +42,7 @@ Install the types library: `cd mappings && yarn add <type library>`
 
 Run `yarn typegen`
 
-#### Mapping files
+### Mapping files
 
 Change mappings arguments: `DB` should be converted to `DatabaseManager` imported from `@dzlzv/hydra-db-utils`
 
@@ -80,7 +80,7 @@ yarn workspace sample-mappings install
 yarn mappings:build
 ```
 
-#### Manifest file
+### Manifest file
 
 Inspect and update the default `manifest.yml`
 
@@ -88,9 +88,9 @@ Inspect and update the default `manifest.yml`
 * For each mapping, update the function name and the event it is handling
 * Add `extrinsicHandlers` if needed
 
-#### Indexer and Indexer-Gateway
+### Indexer and Indexer-Gateway
 
-Use the latest v2.x Docker images \(2.0.1-beta.9 at the time of writing\).  Check the indexer status by running the following GraphQL query:
+Use the latest v2.x Docker images \(2.0.1-beta.9 at the time of writing\). Check the indexer status by running the following GraphQL query:
 
 ```graphql
 query {

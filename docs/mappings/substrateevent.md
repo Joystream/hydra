@@ -48,5 +48,5 @@ export interface SubstrateEvent {
 }
 ```
 
-As can be seen above, the `SubstrareEvent`  also provides a reference to the extrinsic that has emitted the event.
+As can be seen above, the `SubstrareEvent` also provides a reference to the extrinsic that has emitted the event.
 

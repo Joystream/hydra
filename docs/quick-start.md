@@ -56,7 +56,9 @@ Typegen fetches the metadata from the chain from the block with a given hash \(o
 typegen:
   metadata:
     source: ws://arch.subsocial.network:9944
-    blockHash: 0x....
+    # add hash of the block if the metadata from a specific block
+    # should be used by typegen
+    # blockHash: 0x....
   events:
     - posts.PostCreated
   calls:
@@ -124,7 +126,7 @@ $ docker-compose up
 
 ## What to do next?
 
-* Explore more [examples](quick-start.md)
+* Explore more [examples](https://github.com/Joystream/hydra/tree/master/examples)
 * Describe your own [schema](schema-spec/) in `schema.graphql`
 * Write your indexer [mappings](mappings/)
 * Push your Hydra indexer and GraphQL Docker images to [Docker Hub](https://hub.docker.com/) and deploy  
