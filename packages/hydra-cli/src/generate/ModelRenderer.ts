@@ -1,4 +1,3 @@
-import * as path from 'path'
 import { ObjectType, WarthogModel, FieldResolver } from '../model'
 import Debug from 'debug'
 import { GeneratorContext } from './SourcesGenerator'
@@ -108,22 +107,15 @@ export class ModelRenderer extends AbstractRenderer {
 
   withImportProps(): GeneratorContext {
     const relatedEntityImports: Set<string> = new Set()
-
     this.objType.fields
       .filter((f) => f.relation)
       .forEach((f) => {
-        const columnType = f.relation?.columnType
-        if (!columnType) {
-          // should never happen
-          throw new Error(`Relation column type for ${f.name} is undefined`)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const { columnType } = f.relation!
+        // Check if it is not a self reference so we don't add the object to import list
+        if (columnType !== this.objType.name) {
+          relatedEntityImports.add(utils.generateEntityImport(columnType))
         }
-        relatedEntityImports.add(
-          path.join(
-            `import { ${columnType} } from  '..`,
-            utils.kebabCase(columnType),
-            `${utils.kebabCase(columnType)}.model'`
-          )
-        )
       })
     return {
       relatedEntityImports: Array.from(relatedEntityImports.values()),
@@ -145,7 +137,9 @@ export class ModelRenderer extends AbstractRenderer {
         rootArgName: 'r', // disable utils.camelCase(entityName) could be a reverved ts/js keyword ie `class`
         returnType: utils.generateResolverReturnType(returnTypeFunc, f.isList),
       })
-      fieldResolverImports.add(utils.generateEntityImport(returnTypeFunc))
+      if (f.type !== this.objType.name) {
+        fieldResolverImports.add(utils.generateEntityImport(returnTypeFunc))
+      }
     }
     const imports = Array.from(fieldResolverImports.values())
     // If there is at least one field resolver then add typeorm to imports
