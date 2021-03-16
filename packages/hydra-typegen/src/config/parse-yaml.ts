@@ -14,7 +14,7 @@ const options = {
       },
       'customTypes?': {
         lib: 'string',
-        typedefs: 'string',
+        typedefsLoc: 'string',
       },
       'events?': ['string'],
       'calls?': ['string'],

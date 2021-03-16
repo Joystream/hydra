@@ -12,6 +12,7 @@ import {
   generateIndex,
 } from '../../generators'
 import { parseConfigFile } from '../../config/parse-yaml'
+import { validate } from '../../config/validate'
 
 export type CustomTypes = {
   lib: string // package with types. All custom types will be imported from there
@@ -117,6 +118,8 @@ types don't much the metadata definiton`,
       config = this.parseFlags(flags)
     }
 
+    validate(config)
+
     await this.generate(config)
   }
 
@@ -140,12 +143,6 @@ types don't much the metadata definiton`,
     const calls: string[] = flags.calls
       ? flags.calls.split(',').map((c) => c.trim())
       : []
-
-    if (events.length === 0 && calls.length === 0) {
-      throw new Error(
-        `Nothing to generate: at least one event or call should be provided.`
-      )
-    }
 
     return {
       events,
