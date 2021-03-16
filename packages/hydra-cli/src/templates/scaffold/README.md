@@ -31,6 +31,7 @@ to run the [typegen](https://github.com/Joystream/hydra/tree/master/packages/hyd
 Mappings is a separated TypeScript module created in the mappings folder. The handlers exported by the module should match the ones defined in `manifest.yml` in the mappings section. Once the necessary files are generated, build it with
 
 ```bash
+yarn workspace sample-mappings install
 yarn mappings:build
 ```
 
