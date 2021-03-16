@@ -8,11 +8,14 @@ const debug = require('debug')('hydra-typegen:gen-index')
 
 const generateIndexTemplate = handlebars.compile(readTemplate('index'))
 
-export function generateIndex(config: GeneratorConfig): void {
-  const { modules, customTypes, dest } = config
-
-  if (customTypes && customTypes.typedefsLoc) {
-    fs.copyFileSync(customTypes.typedefsLoc, path.join(dest, `typedefs.json`))
+export function generateIndex({
+  modules,
+  customTypes,
+  dest,
+}: GeneratorConfig): void {
+  if (customTypes) {
+    const typedefsPath = path.resolve(customTypes.typedefsLoc)
+    fs.copyFileSync(typedefsPath, path.join(dest, `typedefs.json`))
   }
 
   writeFile(path.join(dest, `index.ts`), () =>

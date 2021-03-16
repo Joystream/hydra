@@ -6,4 +6,7 @@ typegen:
     - Balances.Transfer
   calls:
     - Balances.transfer
+  customTypes:
+    lib: 'testing'
+    typedefsLoc: test-typedefs.json
   outDir: ./generated

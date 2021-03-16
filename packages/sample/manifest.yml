@@ -1,10 +1,12 @@
 version: '0.1'
-description: Test manifest
+description: Sample manifest
 repository: https://github.com/
+## reserved but unused fields
 hydraVersion: "2"
 dataSource:
   kind: substrate 
   chain: node-template
+####
 entities:
   - mappings/lib/generated/**/*.model.js
 typegen:
@@ -16,6 +18,12 @@ typegen:
   calls:
     - timestamp.set
   outDir: ./mappings/generated/types
+  customTypes: 
+    #  lib is the location from where 
+    #  the custom types are impored in generated sources: 
+    #    `import { MyCustomType } from ${lib}`
+    # lib: ....
+    typedefsLoc: typedefs.json
 mappings:
   mappingsModule: mappings/lib/mappings
   imports:
@@ -24,7 +32,6 @@ mappings:
     - event: balances.Transfer 
       handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
   extrinsicHandlers:
-    # infer defaults
     - extrinsic: timestamp.set 
       handler: timestampCall(DatabaseManager, Timestamp.SetCall)
   preBlockHooks:
