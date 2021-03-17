@@ -1,2 +1,2 @@
 export * from './GraphQLSource'
-export * from './IProcessorSource'
+export * from './IEventsSource'

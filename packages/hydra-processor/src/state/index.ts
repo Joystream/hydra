@@ -1,3 +1,3 @@
 export * from './IProcessorState'
-export * from './IProcessorStateHandler'
-export * from './ProcessorStateHandler'
+export * from './IProcessorStateKeeper'
+export * from './ProcessorStateKeeper'
