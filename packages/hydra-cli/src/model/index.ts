@@ -1,7 +1,6 @@
 import { Field } from './Field'
 import {
   Relation,
-  makeRelation,
   FieldResolver,
   EntityRelationship,
   RelationType,
@@ -17,7 +16,6 @@ export {
   ObjectType,
   Field,
   Relation,
-  makeRelation,
   FieldResolver,
   EntityRelationship,
   RelationType,

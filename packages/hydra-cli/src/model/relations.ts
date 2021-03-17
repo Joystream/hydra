@@ -1,25 +1,31 @@
-import { EntityRelationship, Field, makeRelation, ObjectType } from '.'
+import {
+  EntityRelationship,
+  Field,
+  ObjectType,
+  Relation,
+  RelationType,
+} from '.'
 import {
   generateJoinColumnName,
   generateJoinTableName,
 } from '../generate/utils'
 
 function addMany2Many(rel: EntityRelationship): void {
-  const { field, relatedField, entityName, relatedEntityName } = rel
+  const { field, relatedField, entity, relatedEntity } = rel
   rel.field.relation = makeRelation(
-    'mtm',
+    RelationType.MTM,
     field.type,
     relatedField.name,
     field.nullable
   )
 
   rel.field.relation.joinTable = {
-    tableName: generateJoinTableName(entityName, relatedEntityName),
-    joinColumn: generateJoinColumnName(entityName),
-    inverseJoinColumn: generateJoinColumnName(relatedEntityName),
+    tableName: generateJoinTableName(entity.name, relatedEntity.name),
+    joinColumn: generateJoinColumnName(entity.name),
+    inverseJoinColumn: generateJoinColumnName(relatedEntity.name),
   }
   rel.relatedField.relation = makeRelation(
-    'mtm',
+    RelationType.MTM,
     relatedField.type,
     field.name,
     relatedField.nullable
@@ -30,35 +36,30 @@ function addOne2Many(rel: EntityRelationship): void {
   const { field, relatedField } = rel
 
   rel.field.relation = makeRelation(
-    'mto',
+    field.derivedFrom ? RelationType.OTM : RelationType.MTO,
     field.type,
     relatedField.name,
     field.nullable
   )
   rel.relatedField.relation = makeRelation(
-    'otm',
+    relatedField.derivedFrom ? RelationType.OTM : RelationType.MTO,
     relatedField.type,
     field.name,
     relatedField.nullable
   )
-  // Re-organize relation types if it is a self reference
-  if (field.type === relatedField.type && rel.field.isList) {
-    rel.field.relation.type = 'otm'
-    rel.relatedField.relation.type = 'mto'
-  }
 }
 
 function addOne2One(rel: EntityRelationship): void {
   const { field, relatedField } = rel
 
   rel.field.relation = makeRelation(
-    'oto',
+    RelationType.OTO,
     field.type,
     relatedField.name,
     field.nullable
   )
   rel.relatedField.relation = makeRelation(
-    'oto',
+    RelationType.OTO,
     relatedField.type,
     field.name,
     relatedField.nullable
@@ -84,6 +85,20 @@ function createAdditionalField(entity: ObjectType, field: Field): Field {
   )
   f.description = 'Addtional field required to build OneToMany relationship'
   return f
+}
+
+export function makeRelation(
+  type: string,
+  columnType: string,
+  relatedTsProp: string,
+  nullable: boolean
+): Relation {
+  return {
+    type,
+    columnType,
+    relatedTsProp,
+    nullable,
+  }
 }
 
 export const relations = {
