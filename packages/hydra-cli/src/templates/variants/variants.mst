@@ -59,10 +59,15 @@ export class {{name}} {
     {{#is.entity}}
         @Field(type => {{tsType}}, {
             {{^required}}nullable: true,{{/required}}
-            {{#description}}description: `{{{description}}}`{{/description}} })
-        {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}};
+            {{#description}}description: `{{{description}}}`{{/description}}
+        })
+        {{camelName}}?:{{tsType}};
 
-        @IntField({nullable: true})
+        @StringField({
+            nullable: true,
+            dbOnly: true
+            description: "This field is required to make the relationship possible and it is the id of the related entity"
+        })
         {{camelName}}Id!:string;
     {{/is.entity}}
 
