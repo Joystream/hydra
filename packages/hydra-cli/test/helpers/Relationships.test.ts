@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import * as fs from 'fs-extra'
 import { EnumContextProvider } from '../../src/generate/EnumContextProvider'
 import { ModelRenderer } from '../../src/generate/ModelRenderer'
+import { RelationshipGenerator } from '../../src/generate/RelationshipGenerator'
 import { fromStringSchema } from './model'
 
 describe('Entity Relationships', () => {
@@ -31,5 +32,23 @@ describe('Entity Relationships', () => {
     expect(rendered).to.not.include(
       `import { Member } from '../member/member.model.ts'`
     )
+  })
+
+  it('should include only one relationship', () => {
+    const model = fromStringSchema(`
+    type Channel @entity {
+      id: ID!
+      category: ChannelCategory
+    }
+
+    type ChannelCategory @entity {
+      id: ID!
+      channels: [Channel!] @derivedFrom(field: "category")
+    }
+    `)
+
+    const relGenerator = new RelationshipGenerator(model)
+    relGenerator.generate()
+    expect(relGenerator.relationships.length).to.be.equal(1)
   })
 })
