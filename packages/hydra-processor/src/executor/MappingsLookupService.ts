@@ -13,7 +13,7 @@ const debug = Debug('hydra-processor:handler-lookup-service')
 
 const EXTRINSIC_EVENTS = ['system.ExtrinsicSuccess']
 
-export class HandlerLookupService {
+export class MappingsLookupService {
   private events: string[]
 
   private argFactory: Record<string, (args: GlobalArgs) => unknown> = {}
