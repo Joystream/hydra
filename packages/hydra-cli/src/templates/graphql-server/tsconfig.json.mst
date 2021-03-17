@@ -20,6 +20,6 @@
     "types": ["isomorphic-fetch", "node"],
     "esModuleInterop": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "db/**/*"],
   "exclude": ["node_modules/**/*", "generated/**/*", "tools/**/*"]
 }
