@@ -42,7 +42,7 @@ function addOne2Many(rel: EntityRelationship): void {
     relatedField.nullable
   )
   // Re-organize relation types if it is a self reference
-  if (field.type === relatedField.type) {
+  if (field.type === relatedField.type && rel.field.isList) {
     rel.field.relation.type = 'otm'
     rel.relatedField.relation.type = 'mto'
   }
