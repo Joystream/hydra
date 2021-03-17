@@ -17,10 +17,10 @@ export interface EventQuery {
 
 export interface IndexerStatus {
   head: number
-  chainHeight: number
+  chainHead: number
 }
 
-export interface IProcessorSource {
+export interface IEventsSource {
   nextBatch(query: EventQuery[], limit: number): Promise<SubstrateEvent[]>
 
   indexerStatus(): Promise<IndexerStatus>

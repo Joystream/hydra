@@ -1,2 +1,2 @@
-export * from './HandlerLookupService'
+export * from './MappingsLookupService'
 export * from './MappingsProcessor'

@@ -1,42 +1,45 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { makeDatabaseManager } from '@dzlzv/hydra-db-utils'
 import {
-  IProcessorSource,
+  IEventsSource,
   GraphQLSource,
   EventQuery,
   IndexerStatus,
 } from '../ingest'
-import { HandlerLookupService } from './HandlerLookupService'
-import { getConnection, EntityManager } from 'typeorm'
-import { logError, formatEventId } from '@dzlzv/hydra-common'
+import { logError } from '@dzlzv/hydra-common'
 import delay from 'delay'
 import pWaitFor from 'p-wait-for'
 import Debug from 'debug'
 
 import {
   IProcessorState,
-  IProcessorStateHandler,
-  ProcessorStateHandler,
+  IProcessorStateKeeper,
+  ProcessorStateKeeper,
 } from '../state'
 
 import { conf, getManifest } from '../start/config'
 
-import { eventEmitter, PROCESSED_EVENT } from '../start/events'
 import { BlockInterval } from '../start/manifest'
 import { error, info } from '../util/log'
+import { MappingsExecutor } from './MappingsExecutor'
 
 const debug = Debug('hydra-processor:mappings-processor')
+
+export interface IProcessorState {
+  lastProcessedEvent: string | undefined
+  lastScannedBlock: number
+  indexerStatus?: IndexerStatus
+}
 
 export class MappingsProcessor {
   globalFilterConfig: GlobalFilterConfig
   state!: IProcessorState
   private _started = false
-  indexerStatus!: IndexerStatus // current indexer head we are aware of
+  //indexerStatus!: IndexerStatus // current indexer head we are aware of
 
   constructor(
-    protected eventsSource: IProcessorSource = new GraphQLSource(),
-    protected handlerLookup = new HandlerLookupService(),
-    protected stateHandler: IProcessorStateHandler = new ProcessorStateHandler(),
+    protected eventsSource: IEventsSource = new GraphQLSource(),
+    protected mappingsExecutor = new MappingsExecutor(),
+    protected stateKeeper: IProcessorStateKeeper = new ProcessorStateKeeper(),
     protected mappings = getManifest().mappings
   ) {
     this.globalFilterConfig = {
@@ -51,8 +54,8 @@ export class MappingsProcessor {
     info('Starting the processor')
     this._started = true
 
-    this.state = await this.stateHandler.init()
-    await this.handlerLookup.load()
+    this.state = await this.stateKeeper.init()
+    await this.mappingsExecutor.init()
 
     await pWaitFor(async () => {
       info(`Waiting for the indexer head to be initialized`)
@@ -100,7 +103,7 @@ export class MappingsProcessor {
     while (this.shouldWork()) {
       try {
         await this.awaitIndexer()
-        const queries = nextEventQueries({
+        const queries = prepareEventQueries({
           state: this.state,
           indexerHead: this.indexerStatus.head,
           globalFilterConfig: this.globalFilterConfig,
@@ -113,22 +116,16 @@ export class MappingsProcessor {
 
         debug(`Processing new batch of events of size: ${events.length}`)
 
-        await getConnection().transaction(async (manager: EntityManager) => {
-          for (const event of events) {
-            this.state = await processEvent(event, () =>
-              this.handlerLookup.lookupAndCall({
-                dbStore: makeDatabaseManager(manager),
-                context: event,
-              })
-            )
-            await this.stateHandler.persist(
-              this.state,
-              this.indexerStatus,
-              manager
-            )
-            eventEmitter.emit(PROCESSED_EVENT, event)
+        await this.mappingsExecutor.executeMappings(
+          events,
+          async ({ event, em }) => {
+            this.state = await this.stateKeeper.eventSuccess({
+              event,
+              indexerStatus: this.indexerStatus,
+              em,
+            })
           }
-        })
+        )
 
         if (events.length < conf.BATCH_SIZE) {
           // This means that we have exhausted all the events in the current
@@ -137,12 +134,16 @@ export class MappingsProcessor {
             debug(
               `Batch of size ${conf.BATCH_SIZE} complete: ${events.length} events`
             )
-          this.state = onBatchComplete(this.state, queries)
-          await this.stateHandler.persist(this.state, this.indexerStatus)
+
+          this.state = await this.stateKeeper.eventBatchComplete({
+            state: this.state,
+            indexerStatus: this.indexerStatus,
+            batchFilters: queries,
+          })
         }
 
         info(
-          `Indexer head: ${this.indexerStatus.head}; Chain head: ${this.indexerStatus.chainHeight}; Last Processed Block: ${this.state.lastScannedBlock}`
+          `Indexer head: ${this.indexerStatus.head}; Chain head: ${this.indexerStatus.chainHead}; Last Processed Block: ${this.state.lastScannedBlock}`
         )
       } catch (e) {
         error(`Stopping the proccessor due to errors: ${logError(e)}`)
@@ -180,45 +181,7 @@ export interface ProcessorContext {
   globalFilterConfig: GlobalFilterConfig
 }
 
-/**
- * When we have processed all the events in the current block interval,
- * it means that we have processed all the blocks up to the upper limit
- * of the event query filters.
- *
- *
- * @param state current processor state
- * @param filter the set of filters being used for the batch
- */
-export function onBatchComplete(
-  state: IProcessorState,
-  filter: { block_lte: number }[]
-): IProcessorState {
-  const lastProcessedEvent = state.lastProcessedEvent || formatEventId(0, 0)
-  return {
-    lastScannedBlock: Math.min(...filter.map((f) => f.block_lte)),
-    lastProcessedEvent,
-  }
-}
-
-export async function processEvent(
-  event: { id: string; blockNumber: number },
-  handler: () => Promise<void>
-): Promise<IProcessorState> {
-  debug(`Processing event ${event.id}`)
-
-  if (conf.VERBOSE) debug(`JSON: ${JSON.stringify(event, null, 2)}`)
-
-  await handler()
-
-  debug(`Event ${event.id} done`)
-
-  return {
-    lastProcessedEvent: event.id,
-    lastScannedBlock: event.blockNumber - 1,
-  }
-}
-
-export function nextEventQueries(context: ProcessorContext): EventQuery[] {
+export function prepareEventQueries(context: ProcessorContext): EventQuery[] {
   const { state, indexerHead, globalFilterConfig } = context
   const { blockInterval, events, extrinsics, blockWindow } = globalFilterConfig
   const eventFilter = {

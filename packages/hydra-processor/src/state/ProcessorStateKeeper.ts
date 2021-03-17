@@ -1,29 +1,67 @@
 import { loadState } from '../db/dal'
 import { ProcessedEventsLogEntity } from '../entities'
 import { getRepository, EntityManager } from 'typeorm'
-import { IProcessorStateHandler } from './IProcessorStateHandler'
-import { IProcessorState } from './IProcessorState'
+import {
+  EventBatchExecution,
+  EventExecution,
+  IProcessorStateKeeper,
+} from './IProcessorStateKeeper'
+
 import Debug from 'debug'
-import { eventEmitter, STATE_CHANGE } from '../start/events'
+import { eventEmitter, PROCESSED_EVENT, STATE_CHANGE } from '../start/events'
 import { conf } from '../start/config'
 import { IndexerStatus } from '../ingest'
 import assert = require('assert')
+import { formatEventId } from '@dzlzv/hydra-common'
+import { IProcessorState } from '../process'
 
 const debug = Debug('index-builder:processor-state-handler')
 
-export class ProcessorStateHandler implements IProcessorStateHandler {
-  async persist(
-    state: IProcessorState,
-    { head, chainHeight: chainHead }: IndexerStatus,
-    em?: EntityManager
-  ): Promise<void> {
+export class ProcessorStateKeeper implements IProcessorStateKeeper {
+  async eventSuccess({
+    event,
+    state,
+    em,
+  }: EventExecution): Promise<IProcessorState> {
+    const newState = {
+      lastProcessedEvent: event.id,
+      lastScannedBlock: event.blockNumber - 1,
+    } as IProcessorState
+
+    await this.persist(newState, em)
+    eventEmitter.emit(PROCESSED_EVENT, event)
+    return newState
+  }
+
+  async eventBatchComplete({
+    state,
+    batchFilters,
+  }: EventBatchExecution): Promise<IProcessorState> {
+    const lastProcessedEvent = state.lastProcessedEvent || formatEventId(0, 0)
+    const newState = {
+      lastScannedBlock: Math.min(...batchFilters.map((f) => f.block_lte)),
+      lastProcessedEvent,
+    }
+    await this.persist(newState)
+    return newState
+  }
+
+  async persist(state: IProcessorState, em?: EntityManager): Promise<void> {
     assert(state.lastProcessedEvent, 'Cannot persist undefined event ID')
     const processed = new ProcessedEventsLogEntity()
     processed.processor = conf.ID
     processed.eventId = state.lastProcessedEvent
     processed.lastScannedBlock = state.lastScannedBlock
-    processed.indexerHead = head
-    processed.chainHead = chainHead
+
+    if (state.indexerStatus) {
+      const { head, chainHead } = state.indexerStatus
+      processed.indexerHead = head
+      processed.chainHead = chainHead
+    } else {
+      // should never really happen
+      processed.indexerHead = -1
+      processed.chainHead = -1
+    }
 
     const repository = em
       ? em.getRepository('ProcessedEventsLogEntity')
@@ -36,7 +74,11 @@ export class ProcessorStateHandler implements IProcessorStateHandler {
   async init(blockInterval?: { from: number }): Promise<IProcessorState> {
     const lastState = await loadState(conf.ID)
 
-    const state = initState(blockInterval, lastState)
+    const state = {
+      chainHead: -1,
+      indexerHead: -1,
+      ...initState(blockInterval, lastState),
+    }
     eventEmitter.emit(STATE_CHANGE, state)
 
     return state

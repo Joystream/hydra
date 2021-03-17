@@ -1,4 +1,4 @@
-import { IProcessorSource, EventQuery, IndexerStatus } from './'
+import { IEventsSource, EventQuery, IndexerStatus } from './'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
@@ -17,7 +17,7 @@ query {
 }
 `
 
-export class GraphQLSource implements IProcessorSource {
+export class GraphQLSource implements IEventsSource {
   private graphClient: GraphQLClient
 
   constructor() {
