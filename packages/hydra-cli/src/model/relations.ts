@@ -84,6 +84,7 @@ function createAdditionalField(entity: ObjectType, field: Field): Field {
     true
   )
   f.description = 'Addtional field required to build OneToMany relationship'
+  f.derivedFrom = { argument: field.name }
   return f
 }
 
