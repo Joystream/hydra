@@ -10,6 +10,16 @@ export class VariantsRenderer extends AbstractRenderer {
     super(model, context)
   }
 
+  withImports(): { imports: string[] } {
+    const moduleImports = new Set<string>()
+    this.model.variants.forEach((v) => {
+      if (v.fields.find((f) => f.type === 'BigInt')) {
+        moduleImports.add(`import BN from 'bn.js'\n`)
+      }
+    })
+    return { imports: Array.from(moduleImports) }
+  }
+
   withVariants(): GeneratorContext {
     const variants: GeneratorContext[] = []
     for (const v of this.model.variants) {
@@ -40,6 +50,7 @@ export class VariantsRenderer extends AbstractRenderer {
     return {
       ...this.withUnions(),
       ...this.withVariants(),
+      ...this.withImports(),
     }
   }
 }
