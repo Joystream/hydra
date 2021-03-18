@@ -23,12 +23,9 @@ import {
 import { Column } from 'typeorm';
 import { Field } from 'type-graphql';
 import { WarthogField } from 'warthog';
-{{#fields}}
-  {{#is.union}}
-  import { {{tsType}} } from '../variants/variants.model';
-  {{/is.union}}
-{{/fields}}
 {{/has.union}}
+
+{{#variantImports}} {{{.}}} {{/variantImports}}
 
 {{#isInterface}}
 import { InterfaceType } from 'type-graphql';
