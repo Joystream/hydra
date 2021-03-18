@@ -68,4 +68,16 @@ describe('VariantsRenderer', () => {
       'Should import enums'
     )
   })
+
+  it('Should import BN module', () => {
+    const model = fromStringSchema(`
+    type Rich @variant {
+      balance: BigInt
+    }`)
+
+    const gen = new VariantsRenderer(model)
+    const rendered = gen.render(variantsTemplate)
+
+    expect(rendered).include(`import BN from 'bn.js'`)
+  })
 })
