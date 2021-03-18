@@ -1,4 +1,4 @@
-import { Field } from '.'
+import { Field, ObjectType } from '.'
 
 interface JoinTable {
   tableName: string
@@ -34,33 +34,30 @@ export interface FieldResolver {
   returnType: string
 }
 
-export function makeRelation(
-  type: string,
-  columnType: string,
-  relatedTsProp: string,
-  nullable: boolean
-): Relation {
-  return {
-    type,
-    columnType,
-    relatedTsProp,
-    nullable,
-  }
-}
-
 export interface EntityRelationship {
-  entityName: string
-  relatedEntityName: string
+  entity: ObjectType
+  relatedEntity: ObjectType
   field: Field
   relatedField: Field
   type: string
 }
 
+type EntityRelatedEntityField = {
+  entity: ObjectType
+  relatedEntity: ObjectType
+  field: Field
+}
+
 export enum RelationType {
   // OneToOne
   OTO = 'oto',
+
   // OneToMany
   OTM = 'otm',
+
   // ManyToMany
   MTM = 'mtm',
+
+  // ManyToOne
+  MTO = 'mto',
 }
