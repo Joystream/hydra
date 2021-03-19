@@ -606,4 +606,42 @@ describe('ModelRenderer', () => {
       `this.service.find(where, undefined, 1, 0, fields)`
     )
   })
+
+  it('Should import a variant only once', () => {
+    const model = fromStringSchema(`
+    union Poor = HappyPoor | Miserable
+
+    type HappyPoor @variant {
+      father: Poor!
+      mother: Poor!
+    }
+    
+    type Miserable @variant {
+      hates: String!
+    }
+    
+    type MyEntity @entity {
+      status: Poor!
+      anotherStatus: Poor!
+    }`)
+
+    generator = new ModelRenderer(
+      model,
+      model.lookupEntity('MyEntity'),
+      enumCtxProvider
+    )
+    const rendered = generator.render(modelTemplate)
+
+    expect(rendered).to.include(
+      `import { Poor } from '../variants/variants.model'`,
+      'Should import variant only once'
+    )
+
+    expect(rendered).to.not.include(
+      `
+import { Poor } from '../variants/variants.model';
+import { Poor } from '../variants/variants.model';`,
+      `Should not import same variant twice`
+    )
+  })
 })

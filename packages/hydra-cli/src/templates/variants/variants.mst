@@ -9,7 +9,9 @@ import {
   BytesField,
   EnumField,
   StringField
-} from 'warthog'; 
+} from 'warthog';
+
+{{#imports}} {{{.}}} {{/imports}}
 
 {{#variants}}
   {{#fields}}

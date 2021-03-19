@@ -107,18 +107,25 @@ export class ModelRenderer extends AbstractRenderer {
 
   withImportProps(): GeneratorContext {
     const relatedEntityImports: Set<string> = new Set()
-    this.objType.fields
-      .filter((f) => f.relation)
-      .forEach((f) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const { columnType } = f.relation!
+    const variantImports = new Set<string>()
+
+    this.objType.fields.forEach((f) => {
+      if (f.isUnion()) {
+        variantImports.add(
+          `import { ${f.type} } from '../variants/variants.model'`
+        )
+      }
+      if (f.relation) {
+        const { columnType } = f.relation
         // Check if it is not a self reference so we don't add the object to import list
         if (columnType !== this.objType.name) {
           relatedEntityImports.add(utils.generateEntityImport(columnType))
         }
-      })
+      }
+    })
     return {
       relatedEntityImports: Array.from(relatedEntityImports.values()),
+      variantImports: Array.from(variantImports),
     }
   }
 
