@@ -5,6 +5,7 @@ import { makeDatabaseManager } from '@dzlzv/hydra-db-utils'
 import { conf } from '../start/config'
 import Debug from 'debug'
 import { info } from '../util/log'
+import { EventContext } from '../queue'
 
 const debug = Debug('hydra-processor:mappings-executor')
 
@@ -17,19 +18,21 @@ export class MappingsExecutor {
   }
 
   async executeMappings(
-    events: SubstrateEvent[],
+    execCtxs: EventContext[],
     onMappingSuccess: (ctx: {
       event: SubstrateEvent
       em: EntityManager
     }) => Promise<void>
   ) {
     await getConnection().transaction(async (manager: EntityManager) => {
-      for (const event of events) {
+      for (const ctx of execCtxs) {
+        const { event } = ctx
         debug(`Processing event ${event.id}`)
 
         if (conf.VERBOSE) debug(`JSON: ${JSON.stringify(event, null, 2)}`)
 
         await this.mappingsLookup.lookupAndCall({
+          // TODO: pass the execution context
           dbStore: makeDatabaseManager(manager),
           context: event,
         })
