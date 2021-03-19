@@ -192,10 +192,6 @@ export default class WarthogWrapper {
     // Fix ts-node-dev error
     pkgFile.scripts['start:dev'] = 'ts-node --type-check src/index.ts'
 
-    // Node does not run the compiled code, so we use ts-node in production...
-    pkgFile.scripts['start:prod'] =
-      'WARTHOG_ENV=production yarn dotenv:generate && ts-node src/index.ts'
-
     const extraDependencies = this.readExtraDependencies()
 
     pkgFile.dependencies = {

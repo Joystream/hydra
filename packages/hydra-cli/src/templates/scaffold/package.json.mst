@@ -20,7 +20,8 @@
     "clean:query-node": "rm -rf ./generated/graphql-server",
     "processor:start": "DEBUG=${DEBUG} hydra-processor run -e .env",
     "query-node:start:dev": "yarn workspace query-node start:dev",
-    "query-node:start:prod": "yarn workspace query-node start:prod",
+    "query-node:build:prod": "yarn workspace query-node compile",
+    "query-node:start:prod": "dotenv -- yarn workspace query-node start:prod",
     "query-node:configure": "yarn workspace query-node config:dev",
     "db:up": "yarn docker:db:up",
     "db:create": "yarn workspace query-node db:create",
@@ -29,8 +30,8 @@
     "db:schema:migrate": "yarn workspace query-node db:migrate",
     "db:processor:migrate": "hydra-processor migrate -e .env",
     "db:migrate": "yarn db:schema:migrate && yarn db:processor:migrate",
-    "db:bootstrap": "yarn db:create ; yarn db:prepare && yarn db:migrate",
-    "bootstrap": "yarn codegen && yarn db:drop && yarn db:bootstrap",
+    "db:bootstrap": "yarn db:drop; yarn db:create ; yarn db:prepare && yarn db:migrate",
+    "bootstrap": "yarn codegen && yarn db:bootstrap",
     "codegen": "hydra-cli codegen",
     "typegen:configure": "NODE_URL=${NODE_URL:-ws://localhost:9000} envsub typegen.template.yml typegen.yml",
     "typegen": "rm -rf ./mappings/generated && hydra-typegen typegen manifest.yml --debug",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@dzlzv/hydra-cli": "{{{hydraVersion}}}",
     "@dzlzv/hydra-processor": "{{{hydraProcessorVersion}}}",
-    "@dzlzv/hydra-typegen": "{{{hydraTypegenVersion}}}"
+    "@dzlzv/hydra-typegen": "{{{hydraTypegenVersion}}}",
+    "dotenv-cli": "^4.0.0"
   }
 }
