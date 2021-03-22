@@ -10,13 +10,7 @@ import { error, info } from '../util/log'
 import { EventContext, getEventQueue, IEventQueue } from '../queue'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import pWhilst from 'p-whilst'
-import {
-  getMappingExecutor,
-  IMappingExecutor,
-  isTxAware,
-  TransactionalExecutor,
-} from '../executor'
-import { DummyExecutor } from '../executor/DummyExecutor'
+import { IMappingExecutor, isTxAware, TransactionalExecutor } from '../executor'
 
 const debug = Debug('hydra-processor:mappings-processor')
 
@@ -24,7 +18,7 @@ export class MappingsProcessor {
   private _started = false
 
   constructor(
-    protected mappingsExecutor: IMappingExecutor = new TransactionalExecutor(), //new DummyExecutor(),
+    protected mappingsExecutor: IMappingExecutor = new TransactionalExecutor(), // new DummyExecutor(),
     protected stateKeeper: IStateKeeper = getStateKeeper(),
     protected eventsQueue: IEventQueue = getEventQueue()
   ) {}

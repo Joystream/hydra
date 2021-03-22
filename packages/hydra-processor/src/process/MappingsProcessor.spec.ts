@@ -1,20 +1,18 @@
-import { formatEventId } from '@dzlzv/hydra-common'
-import { expect } from 'chai'
-//import { prepareEventQueries, onBatchComplete } from '.'
+// import { prepareEventQueries, onBatchComplete } from '.'
 
-const blockInterval2 = {
-  from: 3,
-  to: 10,
-}
+// const blockInterval2 = {
+//   from: 3,
+//   to: 10,
+// }
 
-const blockWindow = 20
+// const blockWindow = 20
 
-const globalFilterConfig = {
-  blockWindow,
-  blockInterval: blockInterval2,
-  events: ['event1', 'event2'],
-  extrinsics: ['extrinsic1', 'extrinsic2'],
-}
+// const globalFilterConfig = {
+//   blockWindow,
+//   blockInterval: blockInterval2,
+//   events: ['event1', 'event2'],
+//   extrinsics: ['extrinsic1', 'extrinsic2'],
+// }
 
 describe('MappingsProcessor', () => {
   // it('makes an event query based on the current state', () => {
