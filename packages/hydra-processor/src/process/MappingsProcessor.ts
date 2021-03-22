@@ -4,13 +4,19 @@ import Debug from 'debug'
 
 import { IStateKeeper, getStateKeeper } from '../state'
 
-import { conf, getManifest } from '../start/config'
+import { conf } from '../start/config'
 
 import { error, info } from '../util/log'
-import { MappingsExecutor } from './MappingsExecutor'
-import { getEventQueue, IEventQueue } from '../queue'
+import { EventContext, getEventQueue, IEventQueue } from '../queue'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import pWhilst from 'p-whilst'
+import {
+  getMappingExecutor,
+  IMappingExecutor,
+  isTxAware,
+  TransactionalExecutor,
+} from '../executor'
+import { DummyExecutor } from '../executor/DummyExecutor'
 
 const debug = Debug('hydra-processor:mappings-processor')
 
@@ -18,9 +24,8 @@ export class MappingsProcessor {
   private _started = false
 
   constructor(
-    protected mappingsExecutor = new MappingsExecutor(),
+    protected mappingsExecutor: IMappingExecutor = new TransactionalExecutor(), //new DummyExecutor(),
     protected stateKeeper: IStateKeeper = getStateKeeper(),
-    protected mappings = getManifest().mappings,
     protected eventsQueue: IEventQueue = getEventQueue()
   ) {}
 
@@ -63,12 +68,15 @@ export class MappingsProcessor {
 
         debug(`Processing new batch of events of size: ${eventCtxs.length}`)
 
-        await this.mappingsExecutor.executeMappings(
+        await this.mappingsExecutor.executeBatch(
           eventCtxs,
-          async ({ event, em }) => {
+          async (ctx: EventContext) => {
+            const { event } = ctx
+
             await this.stateKeeper.updateState(
               { lastProcessedEvent: event.id },
-              em
+              // update the state in the same transaction if the tx context is present
+              isTxAware(ctx) ? ctx.entityManager : undefined
             )
           }
         )

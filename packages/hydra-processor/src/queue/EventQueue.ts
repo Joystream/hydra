@@ -1,4 +1,3 @@
-import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { IEventsSource, IndexerQuery, getEventSource } from '../ingest'
 import { conf, getManifest } from '../start/config'
 import { info } from '../util/log'
@@ -17,15 +16,6 @@ import {
 } from './IEventQueue'
 
 const debug = Debug('hydra-processor:event-queue')
-
-let eventQueue: IEventQueue
-
-export const getEventQueue: () => IEventQueue = () => {
-  if (!eventQueue) {
-    eventQueue = new EventQueue()
-  }
-  return eventQueue
-}
 
 export class EventQueue implements IEventQueue {
   globalFilterConfig!: FilterConfig

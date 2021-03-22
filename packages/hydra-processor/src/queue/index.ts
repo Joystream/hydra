@@ -1,2 +1,13 @@
+import { EventQueue } from './EventQueue'
+import { IEventQueue } from './IEventQueue'
+
 export * from './IEventQueue'
-export * from './EventQueue'
+
+let eventQueue: IEventQueue
+
+export const getEventQueue: () => IEventQueue = () => {
+  if (!eventQueue) {
+    eventQueue = new EventQueue()
+  }
+  return eventQueue
+}
