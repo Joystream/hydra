@@ -63,6 +63,7 @@
     "@types/graphql": "^14.5.0",
     "@types/node": "^12",
     "chai-spies": "^1.0.0",
+    "p-immediate": "^3.2.0",
     "eslint": "^7.12.1",
     "ts-node": "^9.0.0",
     "tslib": "^2.0.3",
