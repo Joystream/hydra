@@ -11205,6 +11205,11 @@ p-finally@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-finally/-/p-finally-2.0.1.tgz#bd6fcaa9c559a096b680806f4d657b3f0f240561"
   integrity sha512-vpm09aKwq6H9phqRQzecoDpD8TmVyGw70qmWlyq5onxY7tqyTTFVvxMykxQSQKILBSFlbXpypIw2T1Ml7+DDtw==
 
+p-immediate@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/p-immediate/-/p-immediate-3.2.0.tgz#0cc2d006046a5d07f4e6d710ba589f475bc00f34"
+  integrity sha512-XMP80yYZPigpDbhOwICi1Vk2Tf4e42xQ6NIRpKnumZowvJh4ZgFOQuqUB0+hWY5PD9USrKY9rXOdSawnzr99+g==
+
 p-is-promise@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/p-is-promise/-/p-is-promise-2.1.0.tgz#918cebaea248a62cf7ffab8e3bca8c5f882fc42e"

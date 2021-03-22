@@ -35,3 +35,11 @@ export interface FilterConfig {
   extrinsics: string[]
   limit: number
 }
+
+export interface MappingFilter {
+  blockInterval: { from: number; to: number }
+  events: string[]
+  extrinsics: string[]
+  hasPreHooks: boolean
+  hasPostHooks: boolean
+}

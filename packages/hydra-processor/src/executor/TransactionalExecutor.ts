@@ -6,7 +6,7 @@ import Debug from 'debug'
 import { info } from '../util/log'
 import { EventContext } from '../queue'
 import { IMappingExecutor } from '.'
-import { DummyDatabaseManager } from './DummyDatabaseManager'
+
 const debug = Debug('hydra-processor:mappings-executor')
 
 /**
@@ -27,8 +27,6 @@ export interface TxAwareEventContext extends EventContext {
 export function isTxAware(ctx: EventContext): ctx is TxAwareEventContext {
   return (ctx as any).entityManager !== undefined
 }
-
-const dummyDB = new DummyDatabaseManager()
 
 export class TransactionalExecutor implements IMappingExecutor {
   constructor(protected mappingsLookup = new MappingsLookupService()) {}
@@ -51,7 +49,7 @@ export class TransactionalExecutor implements IMappingExecutor {
 
         await this.mappingsLookup.lookupAndCall({
           // TODO: pass the execution context
-          //dbStore: makeDatabaseManager(getConnection().manager),
+          // dbStore: makeDatabaseManager(getConnection().manager),
           dbStore: makeDatabaseManager(entityManager),
           context: event,
         })

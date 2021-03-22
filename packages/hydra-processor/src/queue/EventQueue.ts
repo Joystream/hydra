@@ -12,13 +12,33 @@ import {
   EventContext,
   FilterConfig,
   IEventQueue,
+  MappingFilter,
   MappingType,
 } from './IEventQueue'
 
 const debug = Debug('hydra-processor:event-queue')
 
+export function getMappingFilter(): MappingFilter {
+  const {
+    mappings: {
+      eventHandlers,
+      extrinsicHandlers,
+      blockInterval,
+      preBlockHooks,
+      postBlockHooks,
+    },
+  } = getManifest()
+  return {
+    events: Object.keys(eventHandlers),
+    extrinsics: Object.keys(extrinsicHandlers),
+    blockInterval,
+    hasPreHooks: preBlockHooks.length > 0,
+    hasPostHooks: postBlockHooks.length > 0,
+  }
+}
+
 export class EventQueue implements IEventQueue {
-  globalFilterConfig!: FilterConfig
+  currentFilter!: FilterConfig
   private _started = false
   indexerStatus!: IndexerStatus
   private queue: EventContext[] = []
@@ -26,7 +46,7 @@ export class EventQueue implements IEventQueue {
   constructor(
     protected stateKeeper: IStateKeeper = getStateKeeper(),
     protected eventsSource: IEventsSource = getEventSource(),
-    protected mappings = getManifest().mappings
+    protected globalFilter: MappingFilter = getMappingFilter()
   ) {}
 
   async init(): Promise<void> {
@@ -42,20 +62,21 @@ export class EventQueue implements IEventQueue {
       lastProcessedEvent,
     } = await this.stateKeeper.init()
 
-    this.globalFilterConfig = {
+    const { events, extrinsics, blockInterval } = this.globalFilter
+    this.currentFilter = {
       id: {
         gt: lastProcessedEvent,
       },
       block: {
-        gte: Math.max(lastScannedBlock, this.mappings.blockInterval.from),
+        gte: Math.max(lastScannedBlock, blockInterval.from),
         lte: Math.min(
           lastScannedBlock + conf.BLOCK_WINDOW,
           this.indexerStatus.head,
-          this.mappings.blockInterval.to
+          blockInterval.to
         ),
       },
-      events: Object.keys(this.mappings.eventHandlers),
-      extrinsics: Object.keys(this.mappings.extrinsicHandlers),
+      events,
+      extrinsics,
       limit: conf.QUEUE_BATCH_SIZE,
     }
   }
@@ -94,7 +115,7 @@ export class EventQueue implements IEventQueue {
   }
 
   hasNext(): boolean {
-    return this.globalFilterConfig.block.lte <= this.mappings.blockInterval.to
+    return this.currentFilter.block.lte <= this.globalFilter.blockInterval.to
   }
 
   async nextBatch(size: number): Promise<EventContext[]> {
@@ -106,8 +127,8 @@ export class EventQueue implements IEventQueue {
 
   lastScannedBlock(): number {
     return Math.max(
-      this.globalFilterConfig.block.gte - 1,
-      parseEventId(this.globalFilterConfig.id.gt).blockHeight - 1
+      this.currentFilter.block.gte - 1,
+      parseEventId(this.currentFilter.id.gt).blockHeight - 1
     )
   }
 
@@ -128,14 +149,14 @@ export class EventQueue implements IEventQueue {
         `Queue size: ${this.queue.length}, max capacity: ${conf.EVENT_QUEUE_MAX_CAPACITY}`
       )
 
-      let executions: EventContext[] = await this.fetchNextBatch()
+      const executions: EventContext[] = await this.fetchNextBatch()
 
       this.queue.push(...executions)
 
       debug(`Pushed ${executions.length} events to the queue`)
 
       if (executions.length > 0) {
-        this.globalFilterConfig.id.gt = last(executions)?.event.id as string
+        this.currentFilter.id.gt = last(executions)?.event.id as string
       }
 
       if (executions.length < conf.QUEUE_BATCH_SIZE) {
@@ -154,33 +175,33 @@ export class EventQueue implements IEventQueue {
         `Event queue state:
           \tIndexer head: ${this.indexerStatus.head}
           \tChain head: ${this.indexerStatus.chainHeight} 
-          \tLast Fetched Event: ${this.globalFilterConfig.id.gt}`
+          \tLast Fetched Event: ${this.currentFilter.id.gt}`
       )
     }
   }
 
   private updateLastScannedBlock() {
-    if (this.globalFilterConfig.block.lte === this.mappings.blockInterval.to) {
+    if (this.currentFilter.block.lte === this.globalFilter.blockInterval.to) {
       info(
-        `All the events up to block ${this.mappings.blockInterval.to} has been fetched. Stopping`
+        `All the events up to block ${this.globalFilter.blockInterval.to} has been fetched. Stopping`
       )
       this.stop()
     }
-    this.globalFilterConfig.block.gte = this.globalFilterConfig.block.lte
-    this.globalFilterConfig.block.lte = Math.min(
-      this.globalFilterConfig.block.lte + conf.BLOCK_WINDOW,
+    this.currentFilter.block.gte = this.currentFilter.block.lte
+    this.currentFilter.block.lte = Math.min(
+      this.currentFilter.block.lte + conf.BLOCK_WINDOW,
       this.indexerStatus.head,
-      this.mappings.blockInterval.to
+      this.globalFilter.blockInterval.to
     )
   }
 
   private async fetchNextBatch() {
-    const queries = prepareEventQueries(this.globalFilterConfig)
+    const queries = prepareEventQueries(this.currentFilter)
 
     const events = await this.eventsSource.nextBatch(queries)
 
     let executions: EventContext[] = []
-    for (let e in events) {
+    for (const e in events) {
       const type = e as keyof typeof events
       executions.push(
         ...(events[type] || []).map((event) => {

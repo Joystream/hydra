@@ -1,5 +1,4 @@
 import delay from 'delay'
-import events from 'events'
 import { IMappingExecutor } from '.'
 import { EventContext } from '../queue'
 
