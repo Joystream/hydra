@@ -66,7 +66,9 @@ export class GraphQLSource implements IEventsSource {
   }
 }
 
-export function collectQueries(queries: { [key: string]: IndexerQuery }) {
+export function collectQueries(queries: {
+  [key: string]: IndexerQuery
+}): string {
   // we need to do this hack to be able to run multiple queries in a single request
   return `query {
     ${Object.keys(queries)

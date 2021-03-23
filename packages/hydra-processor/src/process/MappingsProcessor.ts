@@ -10,31 +10,29 @@ import { error, info } from '../util/log'
 import { EventContext, getEventQueue, IEventQueue } from '../queue'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import pWhilst from 'p-whilst'
-import { IMappingExecutor, isTxAware, TransactionalExecutor } from '../executor'
+import { getMappingExecutor, IMappingExecutor, isTxAware } from '../executor'
 
 const debug = Debug('hydra-processor:mappings-processor')
 
 export class MappingsProcessor {
   private _started = false
-
-  constructor(
-    protected mappingsExecutor: IMappingExecutor = new TransactionalExecutor(), // new DummyExecutor(),
-    protected stateKeeper: IStateKeeper = getStateKeeper(),
-    protected eventsQueue: IEventQueue = getEventQueue()
-  ) {}
+  private eventQueue!: IEventQueue
+  private stateKeeper!: IStateKeeper
+  private mappingsExecutor!: IMappingExecutor
 
   async start(): Promise<void> {
     info('Starting the processor')
     this._started = true
 
-    await this.mappingsExecutor.init()
-    await this.eventsQueue.init()
+    this.mappingsExecutor = await getMappingExecutor()
+    this.eventQueue = await getEventQueue()
+    this.stateKeeper = await getStateKeeper()
 
-    await Promise.all([this.eventsQueue.start(), this.processingLoop()])
+    await Promise.all([this.eventQueue.start(), this.processingLoop()])
   }
 
   stop(): void {
-    this.eventsQueue.stop()
+    this.eventQueue.stop()
     this._started = false
   }
 
@@ -49,14 +47,14 @@ export class MappingsProcessor {
         // if the event queue is empty, there're no events for mappings
         // in the requested blocks, so we simply fast-forward `lastScannedBlock`
         await pWhilst(
-          () => this.eventsQueue.isEmpty(),
+          () => this.eventQueue.isEmpty(),
           () =>
             this.stateKeeper.updateState({
-              lastScannedBlock: this.eventsQueue.lastScannedBlock(),
+              lastScannedBlock: this.eventQueue.lastScannedBlock(),
             })
         )
 
-        const eventCtxs = await this.eventsQueue.nextBatch(
+        const eventCtxs = await this.eventQueue.nextBatch(
           conf.MAPPINGS_BATCH_SIZE
         )
 

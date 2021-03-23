@@ -16,8 +16,6 @@ export interface IStateKeeper {
     em?: EntityManager
   ): Promise<void>
 
-  init(blockInterval?: { from: number }): Promise<IProcessorState>
-
   getState(): IProcessorState
   getIndexerStatus(): IndexerStatus
 }
