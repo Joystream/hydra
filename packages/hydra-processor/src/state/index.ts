@@ -4,11 +4,12 @@ import { StateKeeper } from './StateKeeper'
 export * from './IStateKeeper'
 export * from './StateKeeper'
 
-let stateKeeper: IStateKeeper
+let stateKeeper: StateKeeper
 
-export const getStateKeeper: () => IStateKeeper = () => {
+export async function getStateKeeper(): Promise<IStateKeeper> {
   if (!stateKeeper) {
     stateKeeper = new StateKeeper()
+    await stateKeeper.init()
   }
   return stateKeeper
 }

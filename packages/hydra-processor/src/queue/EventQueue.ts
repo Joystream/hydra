@@ -39,42 +39,39 @@ export function getMappingFilter(): MappingFilter {
 
 export class EventQueue implements IEventQueue {
   currentFilter!: FilterConfig
-  private _started = false
+  _started = false
   indexerStatus!: IndexerStatus
-  private queue: EventContext[] = []
-
-  constructor(
-    protected stateKeeper: IStateKeeper = getStateKeeper(),
-    protected eventsSource: IEventsSource = getEventSource(),
-    protected globalFilter: MappingFilter = getMappingFilter()
-  ) {}
+  queue: EventContext[] = []
+  stateKeeper!: IStateKeeper
+  eventSource!: IEventsSource
+  globalFilter!: MappingFilter
 
   async init(): Promise<void> {
     info(`Waiting for the indexer head to be initialized`)
 
+    this.stateKeeper = await getStateKeeper()
+    this.eventSource = await getEventSource()
+    this.globalFilter = getMappingFilter()
+
     await pWaitFor(async () => {
-      this.indexerStatus = await this.eventsSource.indexerStatus()
+      this.indexerStatus = await this.eventSource.indexerStatus()
       return this.indexerStatus.head >= 0
     })
 
-    const {
-      lastScannedBlock,
-      lastProcessedEvent,
-    } = await this.stateKeeper.init()
+    this.currentFilter = this.getInitialFilter()
+  }
 
-    const { events, extrinsics, blockInterval } = this.globalFilter
-    this.currentFilter = {
+  getInitialFilter(): FilterConfig {
+    const { lastScannedBlock, lastProcessedEvent } = this.stateKeeper.getState()
+    const { events, extrinsics } = this.globalFilter
+    return {
       id: {
         gt: lastProcessedEvent,
       },
-      block: {
-        gte: Math.max(lastScannedBlock, blockInterval.from),
-        lte: Math.min(
-          lastScannedBlock + conf.BLOCK_WINDOW,
-          this.indexerStatus.head,
-          blockInterval.to
-        ),
-      },
+      block: this.nextBlockRange({
+        lte: lastScannedBlock,
+        gte: lastScannedBlock,
+      }),
       events,
       extrinsics,
       limit: conf.QUEUE_BATCH_SIZE,
@@ -105,7 +102,7 @@ export class EventQueue implements IEventQueue {
     // });
     // For now, simply update indexerHead regularly
     while (this._started) {
-      this.indexerStatus = await this.eventsSource.indexerStatus()
+      this.indexerStatus = await this.eventSource.indexerStatus()
       eventEmitter.emit(
         ProcessorEvents.INDEXER_STATUS_CHANGE,
         this.indexerStatus
@@ -149,21 +146,21 @@ export class EventQueue implements IEventQueue {
         `Queue size: ${this.queue.length}, max capacity: ${conf.EVENT_QUEUE_MAX_CAPACITY}`
       )
 
-      const executions: EventContext[] = await this.fetchNextBatch()
+      const events: EventContext[] = await this.fetchNextBatch()
 
-      this.queue.push(...executions)
+      this.queue.push(...events)
 
-      debug(`Pushed ${executions.length} events to the queue`)
+      debug(`Pushed ${events.length} events to the queue`)
 
-      if (executions.length > 0) {
-        this.currentFilter.id.gt = last(executions)?.event.id as string
+      if (events.length > 0) {
+        this.currentFilter.id.gt = last(events)?.event.id as string
       }
 
-      if (executions.length < conf.QUEUE_BATCH_SIZE) {
+      if (events.length < conf.QUEUE_BATCH_SIZE) {
         // This means that we have exhausted all the events up to lastScannedblock + WINDOW
         if (conf.VERBOSE)
           debug(
-            `Fully fetched the next batch of ${conf.QUEUE_BATCH_SIZE}: fetched only ${executions.length} events`
+            `Fully fetched the next batch of ${conf.QUEUE_BATCH_SIZE}: fetched only ${events.length} events`
           )
 
         this.updateLastScannedBlock()
@@ -181,24 +178,33 @@ export class EventQueue implements IEventQueue {
   }
 
   private updateLastScannedBlock() {
-    if (this.currentFilter.block.lte === this.globalFilter.blockInterval.to) {
+    if (this.currentFilter.block.lte >= this.globalFilter.blockInterval.to) {
       info(
         `All the events up to block ${this.globalFilter.blockInterval.to} has been fetched. Stopping`
       )
       this.stop()
     }
-    this.currentFilter.block.gte = this.currentFilter.block.lte
-    this.currentFilter.block.lte = Math.min(
-      this.currentFilter.block.lte + conf.BLOCK_WINDOW,
-      this.indexerStatus.head,
-      this.globalFilter.blockInterval.to
-    )
+    this.currentFilter.block = this.nextBlockRange(this.currentFilter.block)
+  }
+
+  nextBlockRange(current: {
+    lte: number
+    gte: number
+  }): { lte: number; gte: number } {
+    return {
+      gte: current.lte,
+      lte: Math.min(
+        current.lte + conf.BLOCK_WINDOW,
+        this.globalFilter.blockInterval.to,
+        this.indexerStatus.head
+      ),
+    }
   }
 
   private async fetchNextBatch() {
     const queries = prepareEventQueries(this.currentFilter)
 
-    const events = await this.eventsSource.nextBatch(queries)
+    const events = await this.eventSource.nextBatch(queries)
 
     let executions: EventContext[] = []
     for (const e in events) {

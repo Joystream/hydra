@@ -3,11 +3,12 @@ import { IEventQueue } from './IEventQueue'
 
 export * from './IEventQueue'
 
-let eventQueue: IEventQueue
+let eventQueue: EventQueue
 
-export const getEventQueue: () => IEventQueue = () => {
+export async function getEventQueue(): Promise<IEventQueue> {
   if (!eventQueue) {
     eventQueue = new EventQueue()
+    await eventQueue.init()
   }
   return eventQueue
 }

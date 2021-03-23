@@ -18,7 +18,7 @@ export interface IEventQueue {
   hasNext(): boolean
   isEmpty(): boolean
   lastScannedBlock(): number
-  init(): Promise<void>
+
   start(): Promise<void>
   stop(): void
 }

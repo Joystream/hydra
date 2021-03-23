@@ -1,14 +1,14 @@
-import { IMappingExecutor } from './IMappingExecutor'
 import { TransactionalExecutor } from './TransactionalExecutor'
 
-let mappingExecutor: IMappingExecutor
+let mappingExecutor: TransactionalExecutor
 
 export * from './IMappingExecutor'
 export * from './TransactionalExecutor'
 
-export const getMappingExecutor: () => IMappingExecutor = () => {
+export async function getMappingExecutor() {
   if (!mappingExecutor) {
     mappingExecutor = new TransactionalExecutor()
+    await mappingExecutor.init()
   }
   return mappingExecutor
 }

@@ -39,7 +39,7 @@ export class TransactionalExecutor implements IMappingExecutor {
   async executeBatch(
     eventCtx: EventContext[],
     onMappingSuccess: (ctx: EventContext) => Promise<void>
-  ) {
+  ): Promise<void> {
     await getConnection().transaction(async (entityManager: EntityManager) => {
       for (const ctx of eventCtx) {
         const { event } = ctx
