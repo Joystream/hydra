@@ -4,12 +4,12 @@ import { info } from '../util/log'
 import pWaitFor from 'p-wait-for'
 import delay from 'delay'
 import Debug from 'debug'
-import { last } from 'lodash'
+import { last, first } from 'lodash'
 import { IndexerStatus, IStateKeeper, getStateKeeper } from '../state'
-import { parseEventId } from '../util/utils'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import {
-  EventContext,
+  BlockContext,
+  MappingContext,
   FilterConfig,
   IEventQueue,
   MappingFilter,
@@ -42,7 +42,7 @@ export class EventQueue implements IEventQueue {
   _started = false
   _hasNext = true
   indexerStatus!: IndexerStatus
-  queue: EventContext[] = []
+  eventQueue: MappingContext[] = []
   stateKeeper!: IStateKeeper
   eventSource!: IEventsSource
   globalFilter!: MappingFilter
@@ -71,7 +71,6 @@ export class EventQueue implements IEventQueue {
       },
       block: this.nextBlockRange({
         lte: lastScannedBlock,
-        gte: lastScannedBlock,
       }),
       events,
       extrinsics,
@@ -84,7 +83,7 @@ export class EventQueue implements IEventQueue {
 
     info('Starting the event queue')
 
-    await Promise.all([this.pollIndexer(), this.queryIndexer()])
+    await Promise.all([this.pollIndexer(), this.fill()])
   }
 
   stop(): void {
@@ -113,42 +112,69 @@ export class EventQueue implements IEventQueue {
     return this._hasNext
   }
 
-  async nextBatch(size: number): Promise<EventContext[]> {
-    await pWaitFor(() => this.queue.length > 0 || !this.hasNext())
-    const toReturn = this.queue.splice(0, size)
-    eventEmitter.emit(ProcessorEvents.QUEUE_SIZE_CHANGE, this.queue.length)
-    return toReturn
+  private async poll(): Promise<MappingContext> {
+    await pWaitFor(() => this.eventQueue.length > 0 || !this.hasNext())
+    const out = this.eventQueue.shift() as MappingContext
+    if (this.eventQueue.length === 1) {
+      eventEmitter.emit(ProcessorEvents.QUEUE_DRAINED, out)
+    }
+    return out
   }
 
-  lastScannedBlock(): number {
-    return Math.max(
-      this.currentFilter.block.gte - 1,
-      parseEventId(this.currentFilter.id.gt).blockHeight - 1
-    )
+  async *blocks(): AsyncGenerator<BlockContext, void, void> {
+    const newBlock = (eventCtx: MappingContext): BlockContext => {
+      const { event } = eventCtx
+      return {
+        blockNumber: event.blockNumber,
+        eventCtxs: [eventCtx],
+      }
+    }
+    while (this._started) {
+      debug(`Sealing new block`)
+
+      let eventCtx = await this.poll()
+      const block = newBlock(eventCtx)
+
+      // wait until all the events up to blockNumber are fully fetched
+      pWaitFor(() => this.currentFilter.block.gt >= block.blockNumber)
+
+      while (
+        !this.isEmpty() &&
+        (first(this.eventQueue) as MappingContext).event.blockNumber ===
+          block.blockNumber
+      ) {
+        eventCtx = await this.poll()
+        block.eventCtxs.push(eventCtx)
+      }
+
+      // the event is from a new block, yield the current
+      debug(`Yielding block ${block.blockNumber}`)
+      yield block
+    }
   }
 
   isEmpty(): boolean {
-    return this.queue.length === 0
+    return this.eventQueue.length === 0
   }
 
-  // Long running loop where events are fetched and the mappings are applied
-  private async queryIndexer(): Promise<void> {
+  // Long running loop where events are fetched
+  private async fill(): Promise<void> {
     while (this._started) {
       await pWaitFor(
         () =>
-          this.queue.length <=
+          this.eventQueue.length <=
           conf().EVENT_QUEUE_MAX_CAPACITY - conf().QUEUE_BATCH_SIZE
       )
 
       debug(
-        `Queue size: ${this.queue.length}, max capacity: ${
+        `Queue size: ${this.eventQueue.length}, max capacity: ${
           conf().EVENT_QUEUE_MAX_CAPACITY
         }`
       )
 
-      const events: EventContext[] = await this.fetchNextBatch()
+      const events: MappingContext[] = await this.fetchNextBatch()
 
-      this.queue.push(...events)
+      this.eventQueue.push(...events)
 
       debug(`Pushed ${events.length} events to the queue`)
 
@@ -165,10 +191,13 @@ export class EventQueue implements IEventQueue {
             }: fetched only ${events.length} events`
           )
 
-        this.updateLastScannedBlock()
+        this.updateLastCompleteBlock()
       }
 
-      eventEmitter.emit(ProcessorEvents.QUEUE_SIZE_CHANGE, this.queue.length)
+      eventEmitter.emit(
+        ProcessorEvents.QUEUE_SIZE_CHANGE,
+        this.eventQueue.length
+      )
 
       debug(
         `Event queue state:
@@ -179,7 +208,7 @@ export class EventQueue implements IEventQueue {
     }
   }
 
-  private updateLastScannedBlock() {
+  private updateLastCompleteBlock() {
     if (this.currentFilter.block.lte >= this.globalFilter.blockInterval.to) {
       info(
         `All the events up to block ${this.globalFilter.blockInterval.to} has been fetched. Stopping`
@@ -187,14 +216,15 @@ export class EventQueue implements IEventQueue {
       this.stop()
     }
     this.currentFilter.block = this.nextBlockRange(this.currentFilter.block)
+    eventEmitter.emit(
+      ProcessorEvents.QUEUE_LAST_COMPLETE_BLOCK_CHANGE,
+      this.currentFilter.block.gt
+    )
   }
 
-  nextBlockRange(current: {
-    lte: number
-    gte: number
-  }): { lte: number; gte: number } {
+  nextBlockRange(current: { lte: number }): { lte: number; gt: number } {
     return {
-      gte: current.lte,
+      gt: current.lte,
       lte: Math.min(
         current.lte + conf().BLOCK_WINDOW,
         this.globalFilter.blockInterval.to,
@@ -206,9 +236,10 @@ export class EventQueue implements IEventQueue {
   private async fetchNextBatch() {
     const queries = prepareEventQueries(this.currentFilter)
 
+    debug(`Fetching next batch`)
     const events = await this.eventSource.nextBatch(queries)
 
-    let executions: EventContext[] = []
+    let executions: MappingContext[] = []
     for (const e in events) {
       const type = e as keyof typeof events
       executions.push(
@@ -247,5 +278,6 @@ export function prepareEventQueries(
     }
   }
 
+  debug(`Queries: ${JSON.stringify(queries, null, 2)}`)
   return queries
 }

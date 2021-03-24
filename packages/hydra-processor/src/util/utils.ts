@@ -55,3 +55,15 @@ export function parseEventId(
 export function quotedJoin(toQuote: string[]): string {
   return toQuote.map((s) => `"${s}"`).join()
 }
+
+/**
+ * Remove spaces and carriage returns from a string
+ * @param s
+ */
+export function stripSpaces(s: string): string {
+  return s.replace(/\s+/g, ' ').replace('( ', '(').replace(' )', ')').trim()
+}
+
+export function format(s: string): string {
+  return stripSpaces(s).replace('{ ', '{\n').replace(' }', '\n}\n')
+}
