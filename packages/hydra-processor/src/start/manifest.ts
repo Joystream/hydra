@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import semver from 'semver'
 
-import { camelCase, countBy, endsWith, compact } from 'lodash'
+import { camelCase, countBy, endsWith, compact, upperFirst } from 'lodash'
 
 import { HandlerFunc } from './QueryEventProcessingPack'
 import { PROCESSOR_PACKAGE_NAME, resolvePackageVersion } from '../util/utils'
@@ -14,6 +14,8 @@ export const STORE_CLASS_NAME = 'DatabaseManager'
 export const CONTEXT_CLASS_NAME = 'SubstrateEvent'
 export const EVENT_SUFFIX = 'Event'
 export const CALL_SUFFIX = 'Call'
+
+const pascalCase = (s: string) => upperFirst(camelCase(s))
 
 const manifestValidatorOptions = {
   structure: {
@@ -309,7 +311,10 @@ export function inferDefault(
 
   return {
     name: `${camelCase(module)}_${name}${suffix || ''}`,
-    argTypes: [STORE_CLASS_NAME, `${module}.${name}${suffix || ''}`],
+    argTypes: [
+      STORE_CLASS_NAME,
+      `${pascalCase(module)}.${pascalCase(name)}${suffix || ''}`,
+    ],
   }
 }
 
