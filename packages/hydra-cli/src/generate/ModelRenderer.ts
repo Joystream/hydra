@@ -112,7 +112,7 @@ export class ModelRenderer extends AbstractRenderer {
     this.objType.fields.forEach((f) => {
       if (f.isUnion()) {
         variantImports.add(
-          `import { ${f.type} } from '../variants/variants.model'`
+          `import { ${f.type} } from '../variants/variants.model';\n`
         )
       }
       if (f.relation) {
