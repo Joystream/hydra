@@ -40,6 +40,7 @@ export function getMappingFilter(): MappingFilter {
 export class EventQueue implements IEventQueue {
   currentFilter!: FilterConfig
   _started = false
+  _hasNext = true
   indexerStatus!: IndexerStatus
   queue: EventContext[] = []
   stateKeeper!: IStateKeeper
@@ -88,10 +89,7 @@ export class EventQueue implements IEventQueue {
 
   stop(): void {
     this._started = false
-  }
-
-  get stopped(): boolean {
-    return !this._started
+    this._hasNext = false
   }
 
   async pollIndexer(): Promise<void> {
@@ -112,11 +110,11 @@ export class EventQueue implements IEventQueue {
   }
 
   hasNext(): boolean {
-    return this.currentFilter.block.lte <= this.globalFilter.blockInterval.to
+    return this._hasNext
   }
 
   async nextBatch(size: number): Promise<EventContext[]> {
-    await pWaitFor(() => this.queue.length > 0)
+    await pWaitFor(() => this.queue.length > 0 || !this.hasNext())
     const toReturn = this.queue.splice(0, size)
     eventEmitter.emit(ProcessorEvents.QUEUE_SIZE_CHANGE, this.queue.length)
     return toReturn
@@ -135,7 +133,7 @@ export class EventQueue implements IEventQueue {
 
   // Long running loop where events are fetched and the mappings are applied
   private async queryIndexer(): Promise<void> {
-    while (this.shouldWork()) {
+    while (this._started) {
       await pWaitFor(
         () =>
           this.queue.length <=
@@ -221,10 +219,6 @@ export class EventQueue implements IEventQueue {
       .slice(0, conf.QUEUE_BATCH_SIZE)
 
     return executions
-  }
-
-  private shouldWork(): boolean {
-    return this._started && this.hasNext()
   }
 }
 
