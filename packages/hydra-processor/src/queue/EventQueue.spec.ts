@@ -28,7 +28,7 @@ describe('EventQueue', () => {
 
     const initFilter = eventQueue.getInitialFilter()
 
-    expect(initFilter.block.gte).equals(
+    expect(initFilter.block.gt).equals(
       1000,
       'should set the lower block limit to last scanned block'
     )
@@ -43,7 +43,7 @@ describe('EventQueue', () => {
 
     eventQueue.currentFilter = ({
       block: {
-        gte: 0,
+        gt: 0,
         lte: 100000,
       },
     } as unknown) as FilterConfig
@@ -57,7 +57,7 @@ describe('EventQueue', () => {
     eventQueue.indexerStatus = ({ head: 500000 } as unknown) as IndexerStatus
 
     const next = eventQueue.nextBlockRange(eventQueue.currentFilter.block)
-    expect(next.gte).equals(100000, 'should update the lower block limit')
+    expect(next.gt).equals(100000, 'should update the lower block limit')
     expect(next.lte).equals(
       150000,
       'should respect the upper limit of the global filter'
