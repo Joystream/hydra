@@ -86,6 +86,6 @@ export class MappingsProcessor {
   }
 
   private shouldWork(): boolean {
-    return this._started
+    return this._started && this.eventQueue.hasNext()
   }
 }
