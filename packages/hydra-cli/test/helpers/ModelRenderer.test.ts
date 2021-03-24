@@ -408,6 +408,47 @@ describe('ModelRenderer', () => {
     )
   })
 
+  it('should import two unions from variants', async function () {
+    const model = fromStringSchema(`
+        type A @entity {
+        firstUnion: unionOne!
+        secondUnion: unionTwo
+        }
+        union unionOne = variantOneUnionOne | variantTwoUnionOne
+        union unionTwo =  variantOneUnionTwo | variantTwoUnionTwo
+        
+        type variantOneUnionOne @variant {
+            id: ID!
+            propertah: String!
+        }
+        
+        type variantTwoUnionOne @variant {
+            id: ID!
+            propertah: String!
+        }
+        
+        type variantOneUnionTwo @variant {
+            id: ID!
+            propertah: String!
+        }
+        
+        type variantTwoUnionTwo @variant {
+            id: ID!
+            propertah: String!
+        }
+    `)
+    generator = new ModelRenderer(
+      model,
+      model.lookupEntity('A'),
+      enumCtxProvider
+    )
+    const rendered = generator.render(modelTemplate)
+    expect(rendered).to.include(
+      `import { unionOne } from '../variants/variants.model';`,
+      'should import two unions'
+    )
+  })
+
   it('should not include interface field', function () {
     const model = fromStringSchema(`
         interface IEntity @entity {
