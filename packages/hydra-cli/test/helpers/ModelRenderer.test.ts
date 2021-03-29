@@ -641,7 +641,10 @@ describe('ModelRenderer', () => {
 
     expect(rendered).to.include(`Query(() => Channel, { nullable: true })`)
     expect(rendered).to.include(
-      `async channel(@Arg('where') where: ChannelWhereUniqueInput, @Fields() fields: string[]): Promise<Channel | null>`
+      `async channelByUniqueInput(
+    @Arg('where') where: ChannelWhereUniqueInput,
+    @Fields() fields: string[]
+  ): Promise<Channel | null>`
     )
     expect(rendered).to.include(
       `this.service.find(where, undefined, 1, 0, fields)`

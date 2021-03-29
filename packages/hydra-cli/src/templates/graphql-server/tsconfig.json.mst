@@ -18,7 +18,8 @@
     "strict": true,
     "strictNullChecks": true,
     "types": ["isomorphic-fetch", "node"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "declaration": true
   },
   "include": ["src/**/*", "db/**/*"],
   "exclude": ["node_modules/**/*", "generated/**/*", "tools/**/*"]
