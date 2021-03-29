@@ -129,8 +129,8 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
       extr.signature = e.signature.toString()
       extr.signer = e.signer.toString()
 
-      extr.method = e.method.methodName || 'NO_METHOD'
-      extr.section = e.method.sectionName || 'NO_SECTION'
+      extr.method = e.method.method || 'NO_METHOD'
+      extr.section = e.method.section || 'NO_SECTION'
       _entity.extrinsicName = `${extr.section}.${extr.method}`
 
       extr.meta = (e.meta.toJSON() || {}) as AnyJson

@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@dzlzv/hydra-common": "^2.0.1-beta.16",
-    "@polkadot/types": "~2.10.2-7"
+    "@polkadot/types": "4.2.1"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",

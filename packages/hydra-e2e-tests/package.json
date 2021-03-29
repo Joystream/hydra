@@ -22,7 +22,7 @@
     "e2e-test": "bash run-tests.sh"
   },
   "dependencies": {
-    "@polkadot/api": "~2.10.2-7",
+    "@polkadot/api": "4.2.1",
     "@polkadot/keyring": "^5.5.2",
     "fetch": "^1.1.0",
     "graphql-request": "^3.3.0",
