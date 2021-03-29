@@ -7,18 +7,20 @@ export enum MappingType {
   BLOCK_POST_HOOK = 'BLOCK_POST_HOOK',
 }
 
-export interface EventContext {
+export interface MappingContext {
   // TODO: update interfaces in hydra-common
   event: SubstrateEvent
   type: MappingType
 }
 
-export interface IEventQueue {
-  nextBatch(size?: number): Promise<EventContext[]>
-  hasNext(): boolean
-  isEmpty(): boolean
-  lastScannedBlock(): number
+export interface BlockContext {
+  blockNumber: number
+  eventCtxs: MappingContext[]
+}
 
+export interface IEventQueue {
+  isEmpty(): boolean
+  blocks(): AsyncGenerator<BlockContext, void, void>
   start(): Promise<void>
   stop(): void
 }
@@ -28,7 +30,7 @@ export interface FilterConfig {
     gt: string
   }
   block: {
-    gte: number
+    gt: number
     lte: number
   }
   events: string[]

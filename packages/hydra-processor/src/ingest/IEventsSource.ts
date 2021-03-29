@@ -67,6 +67,12 @@ export interface IEventsSource {
     }
   ): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }>
 
+  executeQueries<T, R>(
+    queries: {
+      [K in keyof T]: GraphQLQuery<T[K]>
+    }
+  ): Promise<R>
+
   indexerStatus(): Promise<IndexerStatus>
 
   subscribe(events: string[]): Promise<void>
