@@ -67,7 +67,7 @@ async function fromChain(
   const blockHashParam = blockHash ? `"${blockHash}"` : ''
   return new Promise<string>((resolve, reject) => {
     try {
-      const websocket = new WS(endpoint)
+      const websocket = new WS.WebSocket(endpoint)
 
       websocket.onclose = (event: { code: number; reason: string }): void => {
         reject(
