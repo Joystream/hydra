@@ -4,8 +4,9 @@ import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
 import { conf } from '../start/config'
 import { quotedJoin } from '../util/utils'
-import { IndexerQuery } from './IEventsSource'
+import { GraphQLQuery, IndexerQuery } from './IEventsSource'
 import { IndexerStatus } from '../state'
+import { collectNamedQueries } from './graphql-query-builder'
 
 const debug = Debug('hydra-processor:graphql-source')
 
@@ -64,6 +65,15 @@ export class GraphQLSource implements IEventsSource {
 
     return raw as { [K in keyof typeof queries]: SubstrateEvent[] }
   }
+
+  executeQueries<T, R>(
+    queries: {
+      [K in keyof T]: GraphQLQuery<T[K]>
+    }
+  ): Promise<R> {
+    const bigNamedQuery = collectNamedQueries(queries)
+    return this.graphClient.request<R>(bigNamedQuery)
+  }
 }
 
 export function collectQueries(queries: {
@@ -87,22 +97,22 @@ export function getEventsGraphQLQuery({
 }: IndexerQuery): string {
   const event_in = event.in || []
   const eventsFilter =
-    event_in.length > 0 ? `name_in: [${quotedJoin(event_in)}],` : ''
+    event_in.length > 0 ? `name_in: [${quotedJoin(event_in as string[])}],` : ''
 
   const extrinsic_in = extrinsic ? extrinsic.in || [] : []
   const extrinsicsFilter =
     extrinsic_in.length > 0
-      ? `extrinsicName_in: [${quotedJoin(extrinsic_in)}],`
+      ? `extrinsicName_in: [${quotedJoin(extrinsic_in as string[])}],`
       : ''
 
   const idFilter = id.gt ? `afterID: "${id.gt}",` : ''
 
   // FIXME: very rough...
-  const block_gte = block.gte || 0
+  const block_gt = block.gt || 0
   const block_lte = block.lte || Number.MIN_SAFE_INTEGER
 
   return `
-  substrateEventsAfter(where: { ${eventsFilter}${extrinsicsFilter} blockNumber_gte: ${block_gte}, blockNumber_lte: ${block_lte} }, ${idFilter} limit: ${limit}) {
+  substrateEventsAfter(where: { ${eventsFilter}${extrinsicsFilter} blockNumber_gt: ${block_gt}, blockNumber_lte: ${block_lte} }, ${idFilter} limit: ${limit}) {
     id
     name 
     method 

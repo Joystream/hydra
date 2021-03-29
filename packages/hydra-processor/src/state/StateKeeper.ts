@@ -8,10 +8,10 @@ import pThrottle from 'p-throttle'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import { conf } from '../start/config'
 import { parseEventId } from '../util/utils'
-import { formatEventId } from '@dzlzv/hydra-common'
+import { formatEventId, SubstrateEvent } from '@dzlzv/hydra-common'
 import { IndexerStatus } from '.'
 import { info } from '../util/log'
-const debug = Debug('index-builder:processor-state-handler')
+const debug = Debug('hydra-processor:processor-state-handler')
 
 export class StateKeeper implements IStateKeeper {
   private processorState!: IProcessorState
@@ -41,11 +41,17 @@ export class StateKeeper implements IStateKeeper {
             } blocks behind`
           : `Connecting to the indexer...`
       info(
-        `Last processed event: ${this.processorState.lastProcessedEvent} \tSync status: ${syncStatus}`
+        `Last block: ${this.processorState.lastScannedBlock} \t: ${syncStatus}`
       )
     })
 
     // additionally log every status change
+    eventEmitter.on(
+      ProcessorEvents.PROCESSED_EVENT,
+      (event: SubstrateEvent) => {
+        this.processorState.lastProcessedEvent = event.id
+      }
+    )
     eventEmitter.on(ProcessorEvents.STATE_CHANGE, stateLog)
   }
 
@@ -53,6 +59,10 @@ export class StateKeeper implements IStateKeeper {
     newState: Partial<IProcessorState>,
     em?: EntityManager
   ): Promise<void> {
+    if (newState.lastScannedBlock === this.processorState.lastScannedBlock) {
+      return
+    }
+
     this.processorState = {
       lastProcessedEvent:
         newState.lastProcessedEvent || this.processorState.lastProcessedEvent,

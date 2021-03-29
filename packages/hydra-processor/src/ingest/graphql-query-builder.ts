@@ -1,14 +1,16 @@
 import { compact } from 'lodash'
-import { GraphQLQuery, QueryField, QueryFields, QueryWhere } from '.'
+import { GraphQLQuery, QueryFields, QueryWhere } from '.'
 import { format, stripSpaces } from '../util/utils'
 
 export type FilterValue = undefined | string | number | string[] | number[]
 
-export function isArray(f: FilterValue) {
+export function isArray(f: FilterValue): f is string[] | number[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return f !== undefined && (f as any).pop !== undefined
 }
 
 export function isString(f: string | number): f is string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (f as any).length !== undefined
 }
 
@@ -16,7 +18,7 @@ export function formatScalar(value: string | number): string {
   return isString(value) ? `"${value}"` : `${value}`
 }
 
-export function formatClause(name: string, value: FilterValue) {
+export function formatClause(name: string, value: FilterValue): string {
   if (value === undefined) return ''
   return `${name}: ${formatValue(value)}`
 }
@@ -106,4 +108,21 @@ export function buildQuery<T>({
   return stripSpaces(`${name}( ${parts.join(', ')} ) {
     ${buildFields(fields)}
   }`)
+}
+
+export function collectNamedQueries<T>(
+  queries: {
+    [K in keyof T]: GraphQLQuery<T[K]>
+  }
+): string {
+  return `query {
+    ${Object.keys(queries)
+      .map((name) => {
+        const query = queries[name as keyof typeof queries] as GraphQLQuery<
+          unknown
+        >
+        return `${name}: ${buildQuery(query)}`
+      })
+      .join('\n')}
+  }`
 }

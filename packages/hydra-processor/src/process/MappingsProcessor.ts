@@ -3,13 +3,9 @@ import { logError } from '@dzlzv/hydra-common'
 import Debug from 'debug'
 
 import { IStateKeeper, getStateKeeper } from '../state'
-
-import { conf } from '../start/config'
-
 import { error, info } from '../util/log'
-import { EventContext, getEventQueue, IEventQueue } from '../queue'
+import { BlockContext, getEventQueue, IEventQueue } from '../queue'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
-import pWhilst from 'p-whilst'
 import { getMappingExecutor, IMappingExecutor, isTxAware } from '../executor'
 
 const debug = Debug('hydra-processor:mappings-processor')
@@ -46,46 +42,46 @@ export class MappingsProcessor {
       try {
         // if the event queue is empty, there're no events for mappings
         // in the requested blocks, so we simply fast-forward `lastScannedBlock`
-        await pWhilst(
-          () => this.eventQueue.isEmpty(),
-          () =>
-            this.stateKeeper.updateState({
-              lastScannedBlock: this.eventQueue.lastScannedBlock(),
-            })
+        debug('awaiting')
+
+        const next = await this.eventQueue.blocks().next()
+
+        if (next.done === true) {
+          info('All the blocks from the queue have been processed')
+          break
+        }
+
+        const nextBlock = next.value
+
+        debug(
+          `Next block: ${nextBlock.blockNumber}, events count: ${nextBlock.eventCtxs.length} `
         )
 
-        const eventCtxs = await this.eventQueue.nextBatch(
-          conf.MAPPINGS_BATCH_SIZE
-        )
-
-        debug(`Processing new batch of events of size: ${eventCtxs.length}`)
-
-        await this.mappingsExecutor.executeBatch(
-          eventCtxs,
-          async (ctx: EventContext) => {
-            const { event } = ctx
-
+        await this.mappingsExecutor.executeBlock(
+          nextBlock,
+          async (ctx: BlockContext) => {
             await this.stateKeeper.updateState(
-              { lastProcessedEvent: event.id },
+              { lastScannedBlock: ctx.blockNumber },
               // update the state in the same transaction if the tx context is present
               isTxAware(ctx) ? ctx.entityManager : undefined
             )
           }
         )
         // emit all at once
-        eventCtxs.map((ctx) =>
+        nextBlock.eventCtxs.map((ctx) =>
           eventEmitter.emit(ProcessorEvents.PROCESSED_EVENT, ctx.event)
         )
+        debug(`Done block ${nextBlock.blockNumber}`)
       } catch (e) {
         error(`Stopping the proccessor due to errors: ${logError(e)}`)
         this.stop()
         throw new Error(e)
       }
     }
-    debug(`The processor has stopped`)
+    info(`Terminating the processor`)
   }
 
   private shouldWork(): boolean {
-    return this._started && this.eventQueue.hasNext()
+    return this._started
   }
 }
