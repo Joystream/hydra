@@ -30,10 +30,12 @@ mappings:
     - mappings/lib/mappings/generated/types
   eventHandlers:
     - event: balances.Transfer 
-      handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
+      handler: balancesTransfer
   extrinsicHandlers:
     - extrinsic: timestamp.set 
-      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
+      handler: timestampCall
   preBlockHooks:
+    - preHook
   postBlockHooks:
+    - postHook
   
