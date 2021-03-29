@@ -1,10 +1,5 @@
 import { expect } from 'chai'
-import {
-  inferDefault,
-  parseBlockInterval,
-  parseHandlerDef,
-  validateArgTypes,
-} from './manifest'
+import { defaultName, parseBlockInterval } from './manifest'
 
 describe('manifest', () => {
   it('parses block intervals', () => {
@@ -28,52 +23,9 @@ describe('manifest', () => {
     expect(both.to).equals(42, 'should read the from block')
   })
 
-  it('parses handlers', () => {
-    const { name, argTypes } = parseHandlerDef(
-      'balancesTransfer(DatabaseManager, SubstrateEvent) '
-    )
-    expect(name).equals('balancesTransfer')
-    expect(argTypes).contains('DatabaseManager')
-    expect(argTypes).contains('SubstrateEvent')
-    expect(argTypes.length).equals(2)
-  })
-
   it('infers default handler names', () => {
-    const { name, argTypes } = inferDefault('Balances.Transfer', 'Event')
+    const name = defaultName('Balances.Transfer', 'Event')
 
     expect(name).equals('balances_TransferEvent')
-    expect(argTypes).contains('DatabaseManager')
-    expect(argTypes).contains('Balances.TransferEvent')
-    expect(argTypes.length).equals(2)
-  })
-
-  it('validate handler args', () => {
-    expect(() =>
-      validateArgTypes({
-        handler: 'test',
-        argTypes: ['DatabaseManager', 'DatabaseManager'],
-      })
-    ).to.throw('multiple arguments')
-
-    expect(() =>
-      validateArgTypes({
-        handler: 'test',
-        argTypes: ['DatabaseManager', 'XEvent', 'YEvent'],
-      })
-    ).to.throw('multiple arguments of event type')
-
-    expect(() =>
-      validateArgTypes({
-        handler: 'test',
-        argTypes: ['DatabaseManager', 'XCall', 'YCall'],
-      })
-    ).to.throw('multiple arguments of call type')
-  })
-
-  it('Parse handler definitions', () => {
-    expect(parseHandlerDef('test()').argTypes.length).to.equal(
-      0,
-      'Should parse empty arg list'
-    )
   })
 })

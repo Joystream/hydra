@@ -3,19 +3,17 @@ import YamlValidator from 'yaml-validator'
 import fs from 'fs'
 import path from 'path'
 import semver from 'semver'
-
-import { camelCase, countBy, endsWith, compact, upperFirst } from 'lodash'
-
+import { camelCase } from 'lodash'
+import Debug from 'debug'
 import { HandlerFunc } from './QueryEventProcessingPack'
 import { PROCESSOR_PACKAGE_NAME, resolvePackageVersion } from '../util/utils'
-import { warn } from '../util/log'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
 export const CONTEXT_CLASS_NAME = 'SubstrateEvent'
 export const EVENT_SUFFIX = 'Event'
 export const CALL_SUFFIX = 'Call'
 
-const pascalCase = (s: string) => upperFirst(camelCase(s))
+const debug = Debug('hydra-processor:manifest')
 
 const manifestValidatorOptions = {
   structure: {
@@ -91,9 +89,9 @@ export interface BlockInterval {
 }
 
 export interface MappingHandler {
-  // blockInterval?: BlockInterval TODO: do we need per-handler block intervals?
+  blockInterval?: BlockInterval
   handlerFunc: HandlerFunc
-  argTypes: string[]
+  // argTypes: string[]
 }
 
 export interface ExtrinsicHandler extends MappingHandler {
@@ -138,7 +136,7 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
   return {
     ...parsed,
     entities: entities.map((e) => path.resolve(e.trim())),
-    mappings: inferDefaults(mappings),
+    mappings: buildMappingsDef(mappings),
   }
 }
 
@@ -164,7 +162,8 @@ not satisfy the required manifest version ${hydraVersion}`)
   }
 }
 
-function inferDefaults(parsed: MappingsDefInput): MappingsDef {
+function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
+  debug(`Parsed mappings def: ${JSON.stringify(parsed, null, 2)}`)
   const {
     mappingsModule,
     blockInterval,
@@ -184,17 +183,23 @@ function inferDefaults(parsed: MappingsDefInput): MappingsDef {
     unknown
   >
 
-  const parseHandler = function (def: {
-    input?: string
-    handler?: string
-    suffix?: string
-  }): MappingHandler {
-    const { input, handler, suffix } = def
-    const { name, argTypes } = handler
-      ? parseHandlerDef(handler)
-      : inferDefault(input || '', suffix)
+  const parseHandler = function (
+    def: (
+      | {
+          event: string
+        }
+      | { extrinsic: string }
+    ) & {
+      handler?: string
+      suffix?: string
+    }
+  ): MappingHandler {
+    const { handler, suffix } = def
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const input = (def as any).event || (def as any).extrinsic
+    const name = handler || defaultName(input || '', suffix)
+
     return {
-      argTypes,
       handlerFunc: resolveHandler(resolvedModule, name),
     }
   }
@@ -205,11 +210,7 @@ function inferDefaults(parsed: MappingsDefInput): MappingsDef {
     blockInterval: parseBlockInterval(blockInterval),
     eventHandlers: eventHandlers
       ? eventHandlers.reduce((acc, item) => {
-          acc[item.event] = parseHandler({
-            ...item,
-            input: item.event,
-            suffix: EVENT_SUFFIX,
-          })
+          acc[item.event] = parseHandler(item)
           return acc
         }, {} as Record<string, MappingHandler>)
       : {},
@@ -217,105 +218,28 @@ function inferDefaults(parsed: MappingsDefInput): MappingsDef {
       ? extrinsicHandlers.reduce((acc, item) => {
           acc[item.extrinsic] = {
             success: item.success || true,
-            ...parseHandler({
-              ...item,
-              input: item.extrinsic,
-              suffix: CALL_SUFFIX,
-            }),
+            ...parseHandler(item),
           }
           return acc
         }, {} as Record<string, ExtrinsicHandler>)
       : {},
     preBlockHooks: preBlockHooks
-      ? preBlockHooks.map((handler) => parseHandler({ handler }))
+      ? preBlockHooks.map((name) => ({
+          handlerFunc: resolveHandler(resolvedModule, name),
+        }))
       : [],
     postBlockHooks: postBlockHooks
-      ? postBlockHooks.map((handler) => parseHandler({ handler }))
+      ? postBlockHooks.map((name) => ({
+          handlerFunc: resolveHandler(resolvedModule, name),
+        }))
       : [],
   }
 }
 
-export function parseHandlerDef(
-  handler: string
-): { name: string; argTypes: string[] } {
-  // eslint-disable-next-line no-useless-escape
-  const split = handler.split(/[\(\)]/).map((s) => s.trim())
-  // name(arg1, arg2, arg3) -> ["name", "arg1,arg2,arg3"]
-  if (split.length !== 3) {
-    throw new Error(
-      `The mapping handler definition ${handler} does not match the pattern "name(type1, type2, ...)`
-    )
-  }
-  const name = split[0]
-
-  const argTypes = compact(split[1].split(/,/).map((s) => s.trim())) // remove empty
-
-  validateArgTypes({ handler, argTypes })
-
-  return { name, argTypes }
-}
-
-export function validateArgTypes({
-  handler,
-  argTypes,
-}: {
-  handler: string
-  argTypes: string[]
-}): void {
-  if (argTypes.length === 0) {
-    warn(`Handler ${handler} has no arguments`)
-    return
-  }
-
-  const typeOccurrences = countBy(argTypes)
-
-  if (!typeOccurrences[STORE_CLASS_NAME]) {
-    warn(
-      `Handler ${handler} does not have an argument of type ${STORE_CLASS_NAME}`
-    )
-  }
-
-  if (
-    typeOccurrences[STORE_CLASS_NAME] &&
-    typeOccurrences[STORE_CLASS_NAME] > 1
-  ) {
-    throw new Error(
-      `Handler ${handler} has multiple arguments of type ${STORE_CLASS_NAME}`
-    )
-  }
-
-  const eventTypeCnt = argTypes.reduce(
-    (acc, item: string) => (endsWith(item, EVENT_SUFFIX) ? acc + 1 : acc),
-    0
-  )
-
-  if (eventTypeCnt > 1) {
-    throw new Error(`Handler ${handler} has multiple arguments of event type`)
-  }
-
-  const callTypeCnt = argTypes.reduce(
-    (acc, item: string) => (endsWith(item, CALL_SUFFIX) ? acc + 1 : acc),
-    0
-  )
-
-  if (callTypeCnt > 1) {
-    throw new Error(`Handler ${handler} has multiple arguments of call type`)
-  }
-}
-
-export function inferDefault(
-  input: string,
-  suffix?: string
-): { name: string; argTypes: string[] } {
+export function defaultName(input: string, suffix?: string): string {
   const [module, name] = input.split('.').map((s) => s.trim())
 
-  return {
-    name: `${camelCase(module)}_${name}${suffix || ''}`,
-    argTypes: [
-      STORE_CLASS_NAME,
-      `${pascalCase(module)}.${pascalCase(name)}${suffix || ''}`,
-    ],
-  }
+  return `${camelCase(module)}_${name}${suffix || ''}`
 }
 
 function resolveHandler(
