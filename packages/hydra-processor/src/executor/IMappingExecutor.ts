@@ -1,8 +1,8 @@
-import { EventContext } from '../queue'
+import { BlockContext } from '../queue'
 
 export interface IMappingExecutor {
-  executeBatch(
-    eventCtxs: EventContext[],
-    onMappingSuccess: (ctx: EventContext) => Promise<void>
+  executeBlock(
+    blockCtx: BlockContext,
+    onSuccess: (ctx: BlockContext) => Promise<void>
   ): Promise<void>
 }
