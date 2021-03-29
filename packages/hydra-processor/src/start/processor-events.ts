@@ -13,4 +13,8 @@ export enum ProcessorEvents {
   INDEXER_STATUS_CHANGE = 'INDEXER_STATUS_CHANGE',
   // when the event queue is updated
   QUEUE_SIZE_CHANGE = 'QUEUE_SIZE_CHANGE',
+  // when the queue has completed fetching a new block
+  QUEUE_LAST_COMPLETE_BLOCK_CHANGE = 'QUEUE_LAST_COMPLETE_BLOCK_CHANGE',
+  // when the queue is drained (ie no pending events)
+  QUEUE_DRAINED = 'QUEUE_DRAINED',
 }
