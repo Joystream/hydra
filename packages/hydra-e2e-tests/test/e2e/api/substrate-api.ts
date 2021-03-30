@@ -2,7 +2,6 @@ import { ApiPromise, WsProvider } from '@polkadot/api'
 import { createTestKeyring } from '@polkadot/keyring/testing'
 import { Hash } from '@polkadot/types/interfaces'
 import Container from 'typedi'
-import registry from './typeRegistry'
 import pWaitFor from 'p-wait-for'
 
 const typesSpec = {
@@ -54,7 +53,7 @@ export async function createApi(wsProviderURI: string): Promise<ApiPromise> {
   const provider = new WsProvider(wsProviderURI)
 
   // Create the API and wait until ready
-  const apiPromise = new ApiPromise({ provider, registry, typesSpec })
+  const apiPromise = new ApiPromise({ provider, typesSpec })
   const api = await apiPromise.isReadyOrError
 
   Container.set('ApiPromise', apiPromise)

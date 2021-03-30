@@ -13,20 +13,3 @@ type BlockTimestamp @entity {
   blockNumber: BigInt!
   timestamp: BigInt!
 }
-
-############## Test purpose only @hydra-e2e-tests #################
-# To make sure graphql api is generated as expected
-type Extrinsic @entity {
-  id: ID!
-  hash: String!
-}
-interface Event @entity {
-  indexInBlock: Int!
-  inExtrinsic: Extrinsic!
-}
-type BoughtMemberEvent implements Event @entity {
-  id: ID!
-  indexInBlock: Int!
-  inExtrinsic: Extrinsic!
-}
-###################################################

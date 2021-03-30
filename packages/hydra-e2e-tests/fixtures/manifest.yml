@@ -1,0 +1,31 @@
+version: '0.1'
+description: Test manifest
+repository: https://github.com/
+hydraVersion: "2"
+dataSource:
+  kind: substrate 
+  chain: node-template
+entities:
+  - mappings/lib/generated/**/*.model.js
+typegen:
+  metadata:
+    source: ws://node-template:9944/
+  events:
+    - balances.Transfer
+  calls:
+    - timestamp.set
+  outDir: ./mappings/generated/types
+mappings:
+  mappingsModule: mappings/lib/mappings
+  imports:
+    - mappings/lib/mappings/generated/types
+  eventHandlers:
+    - event: balances.Transfer 
+      handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
+  extrinsicHandlers:
+    # infer defaults
+    - extrinsic: timestamp.set 
+      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
+  preBlockHooks:
+  postBlockHooks:
+  
