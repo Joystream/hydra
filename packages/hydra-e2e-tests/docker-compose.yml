@@ -35,7 +35,7 @@ services:
       - TYPEORM_HOST=db
       - TYPEORM_PORT=5432
       - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:4000/graphql
-      - NODE_URL=ws://substrate:9944
+      - NODE_URL=ws://node-template:9944
       - POLL_INTERVAL_MS=100 # refresh every second 
       - DEBUG=hydra-processor:*
     ports:
@@ -59,13 +59,16 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - NEW_BLOCK_TIMEOUT_SEC=150000
-      - WS_PROVIDER_ENDPOINT_URI=ws://substrate:9944/
+      - WS_PROVIDER_ENDPOINT_URI=ws://node-template:9944/
       - REDIS_URI=redis://redis:6379/0
       - DEBUG=index-builder:*
+      - TYPES_JSON=typedefs.json
+    volumes:
+      - ./fixtures/typedefs.json:/home/hydra/packages/hydra-indexer/typedefs.json
     command: > 
       sh -c "yarn db:bootstrap && yarn start:prod" 
     depends_on:
-      - substrate
+      - node-template
       - redis
       - db
     
@@ -88,7 +91,7 @@ services:
       - db
     
     
-  substrate:
+  node-template:
     image: paritytech/substrate-playground-template-node-template:sha-7212614
     restart: unless-stopped
     ports:
