@@ -1,7 +1,7 @@
 import express from 'express'
 import { Server } from 'http'
 import { register, validateMetricName } from 'prom-client'
-import { conf } from '../start/config'
+import { getConfig as conf } from '../start/config'
 import { info } from '../util/log'
 
 export function startPromEndpoint(): Server {
@@ -34,7 +34,7 @@ export function startPromEndpoint(): Server {
     }
   })
 
-  const port = conf.PROMETHEUS_PORT
+  const port = conf().PROMETHEUS_PORT
   const app = server.listen(port)
   info(
     `Prometheus server is listening on port ${port}. Hydra-Processor metrics are available at localhost:${port}/metrics`
