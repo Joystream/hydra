@@ -25,23 +25,34 @@ export interface IEventQueue {
   stop(): void
 }
 
-export interface FilterConfig {
+/**
+ * Describes a block range and id_gt filters for fetching events within a certain range
+ */
+export interface RangeFilter {
   id: {
-    gt: string
+    gt: string //  events after this event ID
   }
   block: {
+    // events in the block range (gt, lte]
     gt: number
     lte: number
   }
-  events: string[]
-  extrinsics: {
-    names: string[]
-    triggerEvents: string[]
-  }
-  blocks: number[]
-  limit: number
+  limit: number // fetch at most that many events
 }
 
+// export interface FilterConfig extends RangeFilter {
+//   events: string[]
+//   extrinsics: {
+//     names: string[]
+//     triggerEvents: string[]
+//   }
+//   blocks: number[]
+// }
+
+/**
+ * Describes a set of query filters derived from the
+ * mapping definition
+ */
 export interface MappingFilter {
   range: BlockRange
   events: string[]

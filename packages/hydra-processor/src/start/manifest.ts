@@ -307,7 +307,7 @@ export function parseRange(range: Partial<BlockRange> | undefined): BlockRange {
   }
   const { from, to } = range
   return {
-    from: from || 0,
-    to: to || Number.MAX_SAFE_INTEGER,
+    from: from ?? 0,
+    to: to ?? Number.MAX_SAFE_INTEGER,
   }
 }

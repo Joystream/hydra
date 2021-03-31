@@ -58,13 +58,13 @@ export class TransactionalExecutor implements IMappingExecutor {
 
       const { pre, post, mappings } = allMappings
 
-      const dbStore = makeDatabaseManager(entityManager)
+      const store = makeDatabaseManager(entityManager)
 
       for (const hook of pre) {
         await this.mappingsLookup.call(hook, {
           ...blockCtx,
-          store: dbStore,
-        } as BlockHookContext)
+          store,
+        })
       }
 
       let i = 0
@@ -76,7 +76,7 @@ export class TransactionalExecutor implements IMappingExecutor {
 
         await this.mappingsLookup.call(mapping, {
           ...ctx,
-          store: dbStore,
+          store: store,
         } as EventContext)
         i++
 
@@ -84,7 +84,7 @@ export class TransactionalExecutor implements IMappingExecutor {
       }
 
       for (const hook of post) {
-        await this.mappingsLookup.call(hook, { ...blockCtx, store: dbStore })
+        await this.mappingsLookup.call(hook, { ...blockCtx, store })
       }
 
       await onSuccess({ ...blockCtx, entityManager } as TxAwareBlockContext)
