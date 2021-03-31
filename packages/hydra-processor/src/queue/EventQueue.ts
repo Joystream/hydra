@@ -4,7 +4,7 @@ import { info } from '../util/log'
 import pWaitFor from 'p-wait-for'
 import delay from 'delay'
 import Debug from 'debug'
-import { last, first } from 'lodash'
+import { last, first, union } from 'lodash'
 import { IndexerStatus, IStateKeeper, getStateKeeper } from '../state'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import {
@@ -15,25 +15,33 @@ import {
   MappingFilter,
   MappingType,
 } from './IEventQueue'
+import { BlockRange, MappingsDef } from '../start/manifest'
 
 const debug = Debug('hydra-processor:event-queue')
 
-export function getMappingFilter(): MappingFilter {
+export function getMappingFilter(mappingsDef: MappingsDef): MappingFilter {
   const {
-    mappings: {
-      eventHandlers,
-      extrinsicHandlers,
-      blockInterval,
-      preBlockHooks,
-      postBlockHooks,
-    },
-  } = getManifest()
+    eventHandlers,
+    extrinsicHandlers,
+    range,
+    preBlockHooks,
+    postBlockHooks,
+  } = mappingsDef
+
   return {
-    events: Object.keys(eventHandlers),
-    extrinsics: Object.keys(extrinsicHandlers),
-    blockInterval,
-    hasPreHooks: preBlockHooks.length > 0,
-    hasPostHooks: postBlockHooks.length > 0,
+    events: eventHandlers.map((h) => h.event),
+    extrinsics: {
+      names: extrinsicHandlers.map((h) => h.extrinsic),
+      triggerEvents: extrinsicHandlers.reduce<string[]>(
+        (acc, h) => union(acc, h.triggerEvents),
+        [] as string[]
+      ),
+    },
+    range,
+    blockHooks: union(preBlockHooks, postBlockHooks).reduce<BlockRange[]>(
+      (acc, h) => union(acc, h.range ? [h.range] : []),
+      []
+    ),
   }
 }
 
@@ -52,7 +60,7 @@ export class EventQueue implements IEventQueue {
 
     this.stateKeeper = await getStateKeeper()
     this.eventSource = await getEventSource()
-    this.globalFilter = getMappingFilter()
+    this.globalFilter = getMappingFilter(getManifest().mappings)
 
     await pWaitFor(async () => {
       this.indexerStatus = await this.eventSource.indexerStatus()
@@ -74,6 +82,7 @@ export class EventQueue implements IEventQueue {
       }),
       events,
       extrinsics,
+      blocks: [], // TODO: get block range intersection
       limit: conf.QUEUE_BATCH_SIZE,
     }
   }
@@ -205,9 +214,9 @@ export class EventQueue implements IEventQueue {
   }
 
   private updateLastCompleteBlock() {
-    if (this.currentFilter.block.lte >= this.globalFilter.blockInterval.to) {
+    if (this.currentFilter.block.lte >= this.globalFilter.range.to) {
       info(
-        `All the events up to block ${this.globalFilter.blockInterval.to} has been fetched. Stopping`
+        `All the events up to block ${this.globalFilter.range.to} has been fetched. Stopping`
       )
       this.stop()
     }
@@ -223,7 +232,7 @@ export class EventQueue implements IEventQueue {
       gt: current.lte,
       lte: Math.min(
         current.lte + conf.BLOCK_WINDOW,
-        this.globalFilter.blockInterval.to,
+        this.globalFilter.range.to,
         this.indexerStatus.head
       ),
     }
@@ -266,11 +275,12 @@ export function prepareEventQueries(
     } as IndexerQuery
   }
 
-  if (extrinsics.length > 0) {
+  const { names, triggerEvents } = extrinsics
+  if (names.length > 0) {
     queries[MappingType.EXTRINSIC] = {
       ...filter,
-      event: { in: ['system.ExtrinsicSuccess'] }, // TODO: make success-only configurable
-      extrinsic: { in: extrinsics },
+      event: { in: triggerEvents },
+      extrinsic: { in: names },
     }
   }
 

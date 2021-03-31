@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any  */
 import Debug from 'debug'
-import { BlockInterval, MappingHandler, MappingsDef } from '../start/manifest'
+import {
+  BlockRange,
+  EventHandler,
+  ExtrinsicHandler,
+  MappingHandler,
+  MappingsDef,
+} from '../start/manifest'
 import {
   BlockHookContext,
   BlockMappings,
@@ -11,6 +17,7 @@ import {
 import { BlockContext, MappingContext, MappingType } from '../queue'
 import BN from 'BN.js'
 import pImmediate from 'p-immediate'
+import { conf } from '../start/config'
 
 const debug = Debug('hydra-processor:handler-lookup-service')
 
@@ -58,22 +65,32 @@ export class MappingsLookupService implements IMappingsLookup {
   }
 
   lookupHandlers(ctx: BlockContext): BlockMappings {
+    if (conf.VERBOSE)
+      debug(`Lookup handlers, block context: ${JSON.stringify(ctx, null, 2)}`)
     // in the future here we can do much more complex lookups here, e.g. based
     // on the block height or runtime metadata of the current block
     const { blockNumber } = ctx
     const filter = (mappings: MappingHandler[]) =>
-      mappings.filter((m) => isInInterval(blockNumber, m.blockInterval))
+      mappings.filter((m) => isInInterval(blockNumber, m.range))
 
-    return {
+    const filtered = {
       pre: filter(this.mappings.preBlockHooks || []),
       post: filter(this.mappings.postBlockHooks || []),
       mappings: filter(ctx.eventCtxs.map((ctx) => this.lookupMapping(ctx))),
     }
+
+    if (conf.VERBOSE)
+      debug(`Mappings for the block: ${JSON.stringify(filtered, null, 2)}`)
+
+    return filtered
   }
 
-  lookupMapping(ctx: MappingContext): MappingHandler {
+  lookupMapping(ctx: MappingContext): EventHandler | ExtrinsicHandler {
     if (ctx.type === MappingType.EVENT) {
-      return this.mappings.eventHandlers[ctx.event.name]
+      // TODO: optimize
+      return this.mappings.eventHandlers.find(
+        (h) => h.event === ctx.event.name
+      ) as EventHandler
     }
     if (ctx.type === MappingType.EXTRINSIC) {
       const extrinsic = ctx.event.extrinsic
@@ -83,7 +100,9 @@ export class MappingsLookupService implements IMappingsLookup {
         )
       }
       const extrinsicName = `${extrinsic.section}.${extrinsic.method}`
-      return this.mappings.extrinsicHandlers[extrinsicName]
+      return this.mappings.extrinsicHandlers.find(
+        (h) => h.extrinsic === extrinsicName
+      ) as ExtrinsicHandler
     }
     throw new Error(
       `Cannot find a handler for the execution context ${JSON.stringify(
@@ -95,7 +114,7 @@ export class MappingsLookupService implements IMappingsLookup {
   }
 
   async call(handler: MappingHandler, ctx: ExecContext): Promise<void> {
-    const { handlerFunc } = handler
+    const { handler: handlerFunc } = handler
 
     // TODO: these should be replaced with casts to hydra-common interfaces
     const arg = isBlockHookContext(ctx)
@@ -117,7 +136,7 @@ export class MappingsLookupService implements IMappingsLookup {
 
 export function isInInterval(
   blockNumber: number,
-  interval: BlockInterval | undefined
+  interval: BlockRange | undefined
 ): boolean {
   if (interval === undefined) {
     return true

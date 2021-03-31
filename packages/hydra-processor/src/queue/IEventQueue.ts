@@ -1,10 +1,10 @@
 import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { BlockRange } from '../start/manifest'
 
 export enum MappingType {
   EXTRINSIC = 'EXTRINSIC',
   EVENT = 'EVENT',
-  BLOCK_PRE_HOOK = 'BLOCK_PRE_HOOK',
-  BLOCK_POST_HOOK = 'BLOCK_POST_HOOK',
+  BLOCK = 'BLOCK',
 }
 
 export interface MappingContext {
@@ -34,14 +34,20 @@ export interface FilterConfig {
     lte: number
   }
   events: string[]
-  extrinsics: string[]
+  extrinsics: {
+    names: string[]
+    triggerEvents: string[]
+  }
+  blocks: number[]
   limit: number
 }
 
 export interface MappingFilter {
-  blockInterval: { from: number; to: number }
+  range: BlockRange
   events: string[]
-  extrinsics: string[]
-  hasPreHooks: boolean
-  hasPostHooks: boolean
+  extrinsics: {
+    names: string[]
+    triggerEvents: string[]
+  }
+  blockHooks: BlockRange[]
 }
