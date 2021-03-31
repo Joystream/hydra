@@ -3,7 +3,7 @@ import YamlValidator from 'yaml-validator'
 import fs from 'fs'
 import path from 'path'
 import semver from 'semver'
-import { camelCase } from 'lodash'
+import { camelCase, upperFirst } from 'lodash'
 import Debug from 'debug'
 import { HandlerFunc } from './QueryEventProcessingPack'
 import { PROCESSOR_PACKAGE_NAME, resolvePackageVersion } from '../util/utils'
@@ -29,22 +29,49 @@ const manifestValidatorOptions = {
     mappings: {
       mappingsModule: 'string',
       'imports?': ['string'],
-      'blockInterval?': 'string',
+      'range?': {
+        'from?': 'number',
+        'to?': 'number',
+      },
       'eventHandlers?': [
         {
           event: 'string',
           'handler?': 'string',
+          'range?': {
+            'from?': 'number',
+            'to?': 'number',
+          },
         },
       ],
       'extrinsicHandlers?': [
         {
           extrinsic: 'string',
           'handler?': 'string',
-          'success?': 'boolean',
+          'triggerEvents?': ['string'],
+          'range?': {
+            'from?': 'number',
+            'to?': 'number',
+          },
         },
       ],
-      'preBlockHooks?': ['string'],
-      'postBlockHooks?': ['string'],
+      'preBlockHooks?': [
+        {
+          handler: 'string',
+          'range?': {
+            'from?': 'number',
+            'to?': 'number',
+          },
+        },
+      ],
+      'postBlockHooks?': [
+        {
+          handler: 'string',
+          'range?': {
+            'from?': 'number',
+            'to?': 'number',
+          },
+        },
+      ],
     },
   },
 
@@ -59,43 +86,62 @@ export interface DataSource {
   indexerVersion: string
 }
 
+interface HandlerInput {
+  handler?: string
+  range?: Partial<BlockRange>
+}
+
 interface MappingsDefInput {
   mappingsModule: string
-  blockInterval?: string
+  range?: Partial<BlockRange>
   imports?: string[]
-  eventHandlers?: Array<{ event: string; handler?: string }>
-  extrinsicHandlers?: Array<{
-    extrinsic: string
-    handler?: string
-    success?: boolean
-  }>
-  preBlockHooks?: string[]
-  postBlockHooks?: string[]
+  eventHandlers?: Array<{ event: string } & HandlerInput>
+  extrinsicHandlers?: Array<
+    { extrinsic: string; triggerEvents?: string[] } & HandlerInput
+  >
+  preBlockHooks?: Array<{ handler: string } & HandlerInput>
+  postBlockHooks?: Array<{ handler: string } & HandlerInput>
 }
 
 export interface MappingsDef {
   mappingsModule: Record<string, unknown>
   imports: string[]
-  blockInterval: BlockInterval
-  eventHandlers: Record<string, MappingHandler>
-  extrinsicHandlers: Record<string, ExtrinsicHandler>
+  range: BlockRange
+  eventHandlers: EventHandler[]
+  extrinsicHandlers: ExtrinsicHandler[]
   preBlockHooks: MappingHandler[]
   postBlockHooks: MappingHandler[]
 }
 
-export interface BlockInterval {
+export interface BlockRange {
   from: number
   to: number
 }
 
 export interface MappingHandler {
-  blockInterval?: BlockInterval
-  handlerFunc: HandlerFunc
-  // argTypes: string[]
+  range?: BlockRange
+  handler: HandlerFunc
+}
+
+export interface EventHandler extends MappingHandler {
+  event: string
 }
 
 export interface ExtrinsicHandler extends MappingHandler {
-  success: boolean
+  extrinsic: string
+  triggerEvents: string[]
+}
+
+export function hasExtrinsic(
+  handler: unknown
+): handler is { extrinsic: string } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (handler as any).extrinsic !== undefined
+}
+
+export function hasEvent(handler: unknown): handler is { event: string } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (handler as any).event !== undefined
 }
 
 export interface ProcessorManifest {
@@ -166,7 +212,7 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
   debug(`Parsed mappings def: ${JSON.stringify(parsed, null, 2)}`)
   const {
     mappingsModule,
-    blockInterval,
+    range,
     eventHandlers,
     extrinsicHandlers,
     preBlockHooks,
@@ -189,57 +235,58 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
           event: string
         }
       | { extrinsic: string }
-    ) & {
-      handler?: string
-      suffix?: string
-    }
+      | { handler: string }
+    ) &
+      HandlerInput
   ): MappingHandler {
-    const { handler, suffix } = def
+    const { handler, range } = def
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const input = (def as any).event || (def as any).extrinsic
-    const name = handler || defaultName(input || '', suffix)
+    const name =
+      handler ||
+      defaultHandlerName(def as { event: string } | { extrinsic: string })
 
     return {
-      handlerFunc: resolveHandler(resolvedModule, name),
+      ...def,
+      range: parseRange(range),
+      handler: resolveHandler(resolvedModule, name),
     }
   }
 
   return {
     mappingsModule: resolvedModule,
     imports: [mappingsModule, ...(imports || [])].map((p) => path.resolve(p)),
-    blockInterval: parseBlockInterval(blockInterval),
+    range: parseRange(range),
     eventHandlers: eventHandlers
-      ? eventHandlers.reduce((acc, item) => {
-          acc[item.event] = parseHandler(item)
-          return acc
-        }, {} as Record<string, MappingHandler>)
-      : {},
+      ? eventHandlers.map((item) => parseHandler(item) as EventHandler)
+      : [],
     extrinsicHandlers: extrinsicHandlers
-      ? extrinsicHandlers.reduce((acc, item) => {
-          acc[item.extrinsic] = {
-            success: item.success || true,
-            ...parseHandler(item),
-          }
-          return acc
-        }, {} as Record<string, ExtrinsicHandler>)
-      : {},
+      ? extrinsicHandlers.map(
+          (item) =>
+            ({
+              triggerEvents: item.triggerEvents || ['system.ExtrinsicSuccess'],
+              ...parseHandler(item),
+            } as ExtrinsicHandler)
+        )
+      : [],
     preBlockHooks: preBlockHooks
-      ? preBlockHooks.map((name) => ({
-          handlerFunc: resolveHandler(resolvedModule, name),
-        }))
+      ? preBlockHooks.map((name) => parseHandler(name))
       : [],
     postBlockHooks: postBlockHooks
-      ? postBlockHooks.map((name) => ({
-          handlerFunc: resolveHandler(resolvedModule, name),
-        }))
+      ? postBlockHooks.map((name) => parseHandler(name))
       : [],
   }
 }
 
-export function defaultName(input: string, suffix?: string): string {
+export function defaultHandlerName(
+  eventOrExtrinsic: { event: string } | { extrinsic: string }
+): string {
+  const input = hasExtrinsic(eventOrExtrinsic)
+    ? eventOrExtrinsic.extrinsic
+    : eventOrExtrinsic.event
+  const suffix = hasExtrinsic(eventOrExtrinsic) ? CALL_SUFFIX : '' // no suffix for events
   const [module, name] = input.split('.').map((s) => s.trim())
-
-  return `${camelCase(module)}_${name}${suffix || ''}`
+  // module name camelacased, name pascalcased
+  return `${camelCase(module)}_${upperFirst(camelCase(name))}${suffix}`
 }
 
 function resolveHandler(
@@ -255,30 +302,16 @@ function resolveHandler(
   return mappingsModule[name] as HandlerFunc
 }
 
-export function parseBlockInterval(
-  blockInterval: string | undefined
-): BlockInterval {
-  if (blockInterval === undefined) {
+export function parseRange(range: Partial<BlockRange> | undefined): BlockRange {
+  if (range === undefined) {
     return {
       from: 0,
       to: Number.MAX_SAFE_INTEGER,
     }
   }
-  // accepted formats:
-  //   [1,2]
-  //   [,2]
-  //   [2,]
-  // eslint-disable-next-line no-useless-escape
-  const parts = blockInterval.split(/[\[,\]]/).map((part) => part.trim())
-  if (parts.length !== 4) {
-    throw new Error(
-      `Block interval ${blockInterval} does not match the expected format [number?, number?]`
-    )
+  const { from, to } = range
+  return {
+    from: from ?? 0,
+    to: to ?? Number.MAX_SAFE_INTEGER,
   }
-  // the parts array must be in the form ["", from, to, ""]
-  const from = parts[1].length > 0 ? Number.parseInt(parts[1]) : 0
-  const to =
-    parts[2].length > 0 ? Number.parseInt(parts[2]) : Number.MAX_SAFE_INTEGER
-
-  return { from, to }
 }

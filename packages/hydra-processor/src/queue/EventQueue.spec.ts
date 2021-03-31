@@ -1,6 +1,6 @@
 import { EventQueue } from './EventQueue'
 import { expect } from 'chai'
-import { FilterConfig, MappingFilter } from './IEventQueue'
+import { RangeFilter, MappingFilter } from './IEventQueue'
 import { IndexerStatus, IProcessorState, IStateKeeper } from '../state'
 import { formatEventId } from '@dzlzv/hydra-common'
 import { getConfig as conf } from '../start/config'
@@ -18,15 +18,15 @@ describe('EventQueue', () => {
     } as unknown) as IStateKeeper
 
     eventQueue.indexerStatus = ({ head: 10000 } as unknown) as IndexerStatus
-    eventQueue.globalFilter = ({
+    eventQueue.mappingFilter = ({
       events: [],
       extrinsics: [],
-      blockInterval: {
+      range: {
         to: 150000,
       },
     } as unknown) as MappingFilter
 
-    const initFilter = eventQueue.getInitialFilter()
+    const initFilter = eventQueue.getInitialRange()
 
     expect(initFilter.block.gt).equals(
       1000,
@@ -41,22 +41,22 @@ describe('EventQueue', () => {
   it('should update the next block range', () => {
     const eventQueue: EventQueue = new EventQueue()
 
-    eventQueue.currentFilter = ({
+    eventQueue.rangeFilter = ({
       block: {
         gt: 0,
         lte: 100000,
       },
-    } as unknown) as FilterConfig
+    } as unknown) as RangeFilter
 
-    eventQueue.globalFilter = ({
-      blockInterval: {
+    eventQueue.mappingFilter = ({
+      range: {
         to: 150000,
       },
     } as unknown) as MappingFilter
 
     eventQueue.indexerStatus = ({ head: 500000 } as unknown) as IndexerStatus
 
-    const next = eventQueue.nextBlockRange(eventQueue.currentFilter.block)
+    const next = eventQueue.nextBlockRange(eventQueue.rangeFilter.block)
     expect(next.gt).equals(100000, 'should update the lower block limit')
     expect(next.lte).equals(
       150000,

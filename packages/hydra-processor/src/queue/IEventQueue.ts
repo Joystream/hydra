@@ -1,10 +1,10 @@
 import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { BlockRange } from '../start/manifest'
 
 export enum MappingType {
   EXTRINSIC = 'EXTRINSIC',
   EVENT = 'EVENT',
-  BLOCK_PRE_HOOK = 'BLOCK_PRE_HOOK',
-  BLOCK_POST_HOOK = 'BLOCK_POST_HOOK',
+  BLOCK = 'BLOCK',
 }
 
 export interface MappingContext {
@@ -25,23 +25,40 @@ export interface IEventQueue {
   stop(): void
 }
 
-export interface FilterConfig {
+/**
+ * Describes a block range and id_gt filters for fetching events within a certain range
+ */
+export interface RangeFilter {
   id: {
-    gt: string
+    gt: string //  events after this event ID
   }
   block: {
+    // events in the block range (gt, lte]
     gt: number
     lte: number
   }
-  events: string[]
-  extrinsics: string[]
-  limit: number
+  limit: number // fetch at most that many events
 }
 
+// export interface FilterConfig extends RangeFilter {
+//   events: string[]
+//   extrinsics: {
+//     names: string[]
+//     triggerEvents: string[]
+//   }
+//   blocks: number[]
+// }
+
+/**
+ * Describes a set of query filters derived from the
+ * mapping definition
+ */
 export interface MappingFilter {
-  blockInterval: { from: number; to: number }
+  range: BlockRange
   events: string[]
-  extrinsics: string[]
-  hasPreHooks: boolean
-  hasPostHooks: boolean
+  extrinsics: {
+    names: string[]
+    triggerEvents: string[]
+  }
+  blockHooks: BlockRange[]
 }

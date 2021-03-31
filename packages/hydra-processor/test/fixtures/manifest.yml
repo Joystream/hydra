@@ -22,8 +22,8 @@ mappings:
     - extrinsic: Sudo.batchCall 
       handler: handleSudoCall
   preBlockHooks:
-    - preBlockHook1
-    - preBlockHook2
+    - handler: preBlockHook1
+    - handler: preBlockHook2
   postBlockHooks:
-    - postBlockHook1
-    - postBlockHook2
+    - handler: postBlockHook1
+    - handler: postBlockHook2
