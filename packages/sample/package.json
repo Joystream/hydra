@@ -5,7 +5,7 @@
     "./generated/*",
     "./mappings"
   ],
-  "version": "2.1.0-beta.0",
+  "version": "2.1.0-beta.3",
   "description": "GraphQL-based query node and Substrate processor. Generated with ♥ by Hydra-CLI",
   "scripts": {
     "build": "yarn clean && yarn codegen",
@@ -42,11 +42,11 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "^2.1.0-beta.0",
-    "@dzlzv/hydra-common": "^2.1.0-beta.0",
-    "@dzlzv/hydra-db-utils": "^2.1.0-beta.0",
-    "@dzlzv/hydra-processor": "^2.1.0-beta.0",
-    "@dzlzv/hydra-typegen": "^2.1.0-beta.0",
+    "@dzlzv/hydra-cli": "^2.1.0-beta.3",
+    "@dzlzv/hydra-common": "^2.1.0-beta.3",
+    "@dzlzv/hydra-db-utils": "^2.1.0-beta.3",
+    "@dzlzv/hydra-processor": "^2.1.0-beta.3",
+    "@dzlzv/hydra-typegen": "^2.1.0-beta.3",
     "envsub": "^4.0.7"
   }
 }

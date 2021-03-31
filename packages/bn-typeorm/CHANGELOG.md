@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0-beta.3](https://github.com/dzhelezov/hydra/compare/v2.0.1-beta.17...v2.1.0-beta.3) (2021-03-31)
+
+**Note:** Version bump only for package @dzlzv/bn-typeorm
+
+
+
+
+
 ## 2.1.0-beta.0 (2021-03-30)
 
 
