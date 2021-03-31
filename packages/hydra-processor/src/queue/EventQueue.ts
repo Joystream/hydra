@@ -4,67 +4,78 @@ import { info } from '../util/log'
 import pWaitFor from 'p-wait-for'
 import delay from 'delay'
 import Debug from 'debug'
-import { last, first } from 'lodash'
+import { last, first, union, mapValues } from 'lodash'
 import { IndexerStatus, IStateKeeper, getStateKeeper } from '../state'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import {
   BlockContext,
   MappingContext,
-  FilterConfig,
   IEventQueue,
   MappingFilter,
   MappingType,
+  RangeFilter,
 } from './IEventQueue'
+import { BlockRange, MappingsDef } from '../start/manifest'
+import { SubstrateEvent } from '@dzlzv/hydra-common'
 
 const debug = Debug('hydra-processor:event-queue')
 
-export function getMappingFilter(): MappingFilter {
+export function getMappingFilter(mappingsDef: MappingsDef): MappingFilter {
   const {
-    mappings: {
-      eventHandlers,
-      extrinsicHandlers,
-      blockInterval,
-      preBlockHooks,
-      postBlockHooks,
-    },
-  } = getManifest()
+    eventHandlers,
+    extrinsicHandlers,
+    range,
+    preBlockHooks,
+    postBlockHooks,
+  } = mappingsDef
+
   return {
-    events: Object.keys(eventHandlers),
-    extrinsics: Object.keys(extrinsicHandlers),
-    blockInterval,
-    hasPreHooks: preBlockHooks.length > 0,
-    hasPostHooks: postBlockHooks.length > 0,
+    events: eventHandlers.map((h) => h.event),
+    extrinsics: {
+      names: extrinsicHandlers.map((h) => h.extrinsic),
+      triggerEvents: extrinsicHandlers.reduce<string[]>(
+        (acc, h) => union(acc, h.triggerEvents),
+        [] as string[]
+      ),
+    },
+    range,
+    blockHooks: union(preBlockHooks, postBlockHooks).reduce<BlockRange[]>(
+      (acc, h) => union(acc, h.range ? [h.range] : []),
+      []
+    ),
   }
 }
 
 export class EventQueue implements IEventQueue {
-  currentFilter!: FilterConfig
   _started = false
   _hasNext = true
   indexerStatus!: IndexerStatus
   eventQueue: MappingContext[] = []
   stateKeeper!: IStateKeeper
   eventSource!: IEventsSource
-  globalFilter!: MappingFilter
+  mappingFilter!: MappingFilter
+  rangeFilter!: RangeFilter
+  indexerQueries!: { [key in MappingType]?: Partial<IndexerQuery> }
 
   async init(): Promise<void> {
     info(`Waiting for the indexer head to be initialized`)
 
     this.stateKeeper = await getStateKeeper()
     this.eventSource = await getEventSource()
-    this.globalFilter = getMappingFilter()
+    this.mappingFilter = getMappingFilter(getManifest().mappings)
 
     await pWaitFor(async () => {
       this.indexerStatus = await this.eventSource.indexerStatus()
       return this.indexerStatus.head >= 0
     })
 
-    this.currentFilter = this.getInitialFilter()
+    this.rangeFilter = this.getInitialRange()
+    this.indexerQueries = prepareIndexerQueries(this.mappingFilter)
   }
 
-  getInitialFilter(): FilterConfig {
+  getInitialRange(): RangeFilter {
     const { lastScannedBlock, lastProcessedEvent } = this.stateKeeper.getState()
-    const { events, extrinsics } = this.globalFilter
+
     return {
       id: {
         gt: lastProcessedEvent,
@@ -72,8 +83,7 @@ export class EventQueue implements IEventQueue {
       block: this.nextBlockRange({
         lte: lastScannedBlock,
       }),
-      events,
-      extrinsics,
+
       limit: conf().QUEUE_BATCH_SIZE,
     }
   }
@@ -88,7 +98,6 @@ export class EventQueue implements IEventQueue {
 
   stop(): void {
     this._started = false
-    this._hasNext = false
   }
 
   async pollIndexer(): Promise<void> {
@@ -98,7 +107,7 @@ export class EventQueue implements IEventQueue {
     //   this.indexerHead = h
     // });
     // For now, simply update indexerHead regularly
-    while (this._started) {
+    while (this._started && this._hasNext) {
       this.indexerStatus = await this.eventSource.indexerStatus()
       eventEmitter.emit(
         ProcessorEvents.INDEXER_STATUS_CHANGE,
@@ -112,10 +121,10 @@ export class EventQueue implements IEventQueue {
     return this._hasNext
   }
 
-  private async poll(): Promise<MappingContext> {
-    await pWaitFor(() => this.eventQueue.length > 0 || !this.hasNext())
-    const out = this.eventQueue.shift() as MappingContext
-    if (this.eventQueue.length === 1) {
+  private async poll(): Promise<MappingContext | undefined> {
+    await pWaitFor(() => this.eventQueue.length > 0 || !this._hasNext)
+    const out = this.eventQueue.shift()
+    if (this.eventQueue.length === 0) {
       eventEmitter.emit(ProcessorEvents.QUEUE_DRAINED, out)
     }
     return out
@@ -133,22 +142,30 @@ export class EventQueue implements IEventQueue {
       debug(`Sealing new block`)
 
       let eventCtx = await this.poll()
+      if (eventCtx === undefined) {
+        debug(`The queue is empty and all the events were fetched`)
+        return
+      }
       const block = newBlock(eventCtx)
 
+      debug(`Next block: ${block.blockNumber}`)
       // wait until all the events up to blockNumber are fully fetched
-      pWaitFor(() => this.currentFilter.block.gt >= block.blockNumber)
+      pWaitFor(() => this.rangeFilter.block.gt >= block.blockNumber)
 
       while (
         !this.isEmpty() &&
         (first(this.eventQueue) as MappingContext).event.blockNumber ===
           block.blockNumber
       ) {
-        eventCtx = await this.poll()
+        eventCtx = (await this.poll()) as MappingContext
         block.eventCtxs.push(eventCtx)
       }
 
       // the event is from a new block, yield the current
       debug(`Yielding block ${block.blockNumber}`)
+      if (conf().VERBOSE)
+        debug(`Block contents: ${JSON.stringify(block, null, 2)}`)
+
       yield block
     }
   }
@@ -159,7 +176,7 @@ export class EventQueue implements IEventQueue {
 
   // Long running loop where events are fetched
   private async fill(): Promise<void> {
-    while (this._started) {
+    while (this._started && this._hasNext) {
       await pWaitFor(
         () =>
           this.eventQueue.length <=
@@ -179,7 +196,7 @@ export class EventQueue implements IEventQueue {
       debug(`Pushed ${events.length} events to the queue`)
 
       if (events.length > 0) {
-        this.currentFilter.id.gt = last(events)?.event.id as string
+        this.rangeFilter.id.gt = last(events)?.event.id as string
       }
 
       if (events.length < conf().QUEUE_BATCH_SIZE) {
@@ -191,7 +208,7 @@ export class EventQueue implements IEventQueue {
             }: fetched only ${events.length} events`
           )
 
-        this.updateLastCompleteBlock()
+        this.shiftRangeFilter()
       }
 
       eventEmitter.emit(
@@ -203,22 +220,25 @@ export class EventQueue implements IEventQueue {
         `Event queue state:
           \tIndexer head: ${this.indexerStatus.head}
           \tChain head: ${this.indexerStatus.chainHeight} 
-          \tLast Fetched Event: ${this.currentFilter.id.gt}`
+          \tLast Event in the queue: ${this.rangeFilter.id.gt}`
       )
     }
   }
 
-  private updateLastCompleteBlock() {
-    if (this.currentFilter.block.lte >= this.globalFilter.blockInterval.to) {
+  private shiftRangeFilter() {
+    if (this.rangeFilter.block.lte >= this.mappingFilter.range.to) {
       info(
-        `All the events up to block ${this.globalFilter.blockInterval.to} has been fetched. Stopping`
+        `All the events up to block ${this.mappingFilter.range.to} has been fetched.`
       )
-      this.stop()
+      this.rangeFilter.block.gt = this.mappingFilter.range.to
+      this._hasNext = false
+      return
     }
-    this.currentFilter.block = this.nextBlockRange(this.currentFilter.block)
+
+    this.rangeFilter.block = this.nextBlockRange(this.rangeFilter.block)
     eventEmitter.emit(
       ProcessorEvents.QUEUE_LAST_COMPLETE_BLOCK_CHANGE,
-      this.currentFilter.block.gt
+      this.rangeFilter.block.gt
     )
   }
 
@@ -227,56 +247,77 @@ export class EventQueue implements IEventQueue {
       gt: current.lte,
       lte: Math.min(
         current.lte + conf().BLOCK_WINDOW,
-        this.globalFilter.blockInterval.to,
+        this.mappingFilter.range.to,
         this.indexerStatus.head
       ),
     }
   }
 
   private async fetchNextBatch() {
-    const queries = prepareEventQueries(this.currentFilter)
+    const queries = mapValues(
+      this.indexerQueries,
+      // add range and limit to the indexer queries
+      (query) => ({ ...this.rangeFilter, ...query } as IndexerQuery)
+    )
 
     debug(`Fetching next batch`)
     const events = await this.eventSource.nextBatch(queries)
 
-    let executions: MappingContext[] = []
-    for (const e in events) {
-      const type = e as keyof typeof events
-      executions.push(
-        ...(events[type] || []).map((event) => {
-          return { event, type }
-        })
-      )
-    }
-
-    executions = executions
-      .sort((e1, e2) => (e1.event.id < e2.event.id ? -1 : 1))
-      .slice(0, conf().QUEUE_BATCH_SIZE)
-
-    return executions
+    // collect the events object into an array with types
+    return sortAndTrim(events)
   }
 }
 
-export function prepareEventQueries(
-  filter: FilterConfig
-): { [key in MappingType]?: IndexerQuery } {
+/**
+ *
+ * @param events an object containg events for different mapping types
+ * @param size output batch size
+ * @returns an array of events enriched with the mapping type
+ */
+export function sortAndTrim(
+  events: { [key in MappingType]?: SubstrateEvent[] },
+  size = conf().QUEUE_BATCH_SIZE
+): MappingContext[] {
+  // collect all mapping type event arrays into a single big event
+  let mappingData: MappingContext[] = []
+  for (const e in events) {
+    const type = e as keyof typeof events
+    mappingData.push(
+      ...(events[type] || []).map((event) => {
+        return { event, type }
+      })
+    )
+  }
+
+  // sort the events so that the mappings are exectuted in the right order
+  mappingData = mappingData
+    .sort((e1, e2) => (e1.event.id < e2.event.id ? -1 : 1))
+    .slice(0, size)
+
+  return mappingData
+}
+
+export function prepareIndexerQueries(
+  filter: MappingFilter
+): { [key in MappingType]?: Partial<IndexerQuery> } {
   const { events, extrinsics } = filter
-  const queries: { [key in MappingType]?: IndexerQuery } = {}
+  const queries: { [key in MappingType]?: Partial<IndexerQuery> } = {}
 
   if (events.length > 0) {
     queries[MappingType.EVENT] = {
-      ...filter,
       event: { in: events },
-    } as IndexerQuery
-  }
-
-  if (extrinsics.length > 0) {
-    queries[MappingType.EXTRINSIC] = {
-      ...filter,
-      event: { in: ['system.ExtrinsicSuccess'] }, // TODO: make success-only configurable
-      extrinsic: { in: extrinsics },
     }
   }
+
+  const { names, triggerEvents } = extrinsics
+  if (names.length > 0) {
+    queries[MappingType.EXTRINSIC] = {
+      event: { in: triggerEvents },
+      extrinsic: { in: names },
+    }
+  }
+
+  // TODO: block queries here
 
   debug(`Queries: ${JSON.stringify(queries, null, 2)}`)
   return queries

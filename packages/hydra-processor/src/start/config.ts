@@ -74,7 +74,7 @@ export function configure(): void {
 
 let manifest: ProcessorManifest | undefined
 
-export function getConfig() {
+export function getConfig(): typeof conf {
   if (conf !== undefined) return conf
   configure()
   return conf
