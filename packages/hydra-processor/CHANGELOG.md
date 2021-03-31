@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2.1.0-beta.4 (2021-03-31)
+
+
+### Bug Fixes
+
+* **hydra-processor:** lazily init config to fix the --indexer flag ([#341](https://github.com/Joystream/hydra/issues/341)) ([e7e3d77](https://github.com/Joystream/hydra/commit/e7e3d777dd53adcd958f0d3852a5741fd254b08b))
+
+
+
 ## [2.1.0-beta.3](https://github.com/dzhelezov/hydra/compare/v2.0.1-beta.17...v2.1.0-beta.3) (2021-03-31)
 
 **Note:** Version bump only for package @dzlzv/hydra-processor
