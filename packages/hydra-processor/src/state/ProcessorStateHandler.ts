@@ -5,7 +5,7 @@ import { IProcessorStateHandler } from './IProcessorStateHandler'
 import { IProcessorState } from './IProcessorState'
 import Debug from 'debug'
 import { eventEmitter, STATE_CHANGE } from '../start/events'
-import { conf } from '../start/config'
+import { getConfig as conf } from '../start/config'
 import { IndexerStatus } from '../ingest'
 import assert = require('assert')
 
@@ -19,7 +19,7 @@ export class ProcessorStateHandler implements IProcessorStateHandler {
   ): Promise<void> {
     assert(state.lastProcessedEvent, 'Cannot persist undefined event ID')
     const processed = new ProcessedEventsLogEntity()
-    processed.processor = conf.ID
+    processed.processor = conf().ID
     processed.eventId = state.lastProcessedEvent
     processed.lastScannedBlock = state.lastScannedBlock
     processed.indexerHead = head
@@ -34,7 +34,7 @@ export class ProcessorStateHandler implements IProcessorStateHandler {
   }
 
   async init(blockInterval?: { from: number }): Promise<IProcessorState> {
-    const lastState = await loadState(conf.ID)
+    const lastState = await loadState(conf().ID)
 
     const state = initState(blockInterval, lastState)
     eventEmitter.emit(STATE_CHANGE, state)

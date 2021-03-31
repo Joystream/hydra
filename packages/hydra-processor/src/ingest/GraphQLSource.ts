@@ -2,7 +2,7 @@ import { IProcessorSource, EventQuery, IndexerStatus } from './'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
-import { conf } from '../start/config'
+import { getConfig as conf } from '../start/config'
 import { quotedJoin } from '../util/utils'
 
 const debug = Debug('hydra-processor:graphql-source')
@@ -21,7 +21,7 @@ export class GraphQLSource implements IProcessorSource {
   private graphClient: GraphQLClient
 
   constructor() {
-    const _endpoint = conf.INDEXER_ENDPOINT_URL
+    const _endpoint = conf().INDEXER_ENDPOINT_URL
     debug(`Using Indexer API endpoint ${_endpoint}`)
     this.graphClient = new GraphQLClient(_endpoint)
   }
@@ -46,7 +46,7 @@ export class GraphQLSource implements IProcessorSource {
     const query = collectQueries(
       queries.map((f) => getEventsGraphQLQuery(f, size))
     )
-    if (conf.VERBOSE) debug(`GraphqQL Query: ${query}`)
+    if (conf().VERBOSE) debug(`GraphqQL Query: ${query}`)
 
     const raw = await this.graphClient.request<
       Record<string, SubstrateEvent[]>
@@ -58,7 +58,7 @@ export class GraphQLSource implements IProcessorSource {
 
     debug(`Fetched ${data.length} events`)
 
-    if (conf.VERBOSE) debug(`Events: ${JSON.stringify(data, null, 2)} events`)
+    if (conf().VERBOSE) debug(`Events: ${JSON.stringify(data, null, 2)} events`)
 
     return data.slice(0, size)
   }

@@ -19,7 +19,7 @@ import {
   ProcessorStateHandler,
 } from '../state'
 
-import { conf, getManifest } from '../start/config'
+import { getConfig as conf, getManifest } from '../start/config'
 
 import { eventEmitter, PROCESSED_EVENT } from '../start/events'
 import { BlockInterval } from '../start/manifest'
@@ -43,7 +43,7 @@ export class MappingsProcessor {
       blockInterval: mappings.blockInterval,
       events: Object.keys(mappings.eventHandlers),
       extrinsics: Object.keys(mappings.extrinsicHandlers),
-      blockWindow: conf.BLOCK_WINDOW,
+      blockWindow: conf().BLOCK_WINDOW,
     }
   }
 
@@ -79,7 +79,7 @@ export class MappingsProcessor {
     // For now, simply update indexerHead regularly
     while (this._started) {
       this.indexerStatus = await this.eventsSource.indexerStatus()
-      await delay(conf.POLL_INTERVAL_MS)
+      await delay(conf().POLL_INTERVAL_MS)
     }
   }
 
@@ -91,7 +91,7 @@ export class MappingsProcessor {
       () =>
         !this._started ||
         this.indexerStatus.head - this.state.lastScannedBlock >
-          conf.MIN_BLOCKS_AHEAD
+          conf().MIN_BLOCKS_AHEAD
     )
   }
 
@@ -108,7 +108,7 @@ export class MappingsProcessor {
 
         const events = await this.eventsSource.nextBatch(
           queries,
-          conf.BATCH_SIZE
+          conf().BATCH_SIZE
         )
 
         debug(`Processing new batch of events of size: ${events.length}`)
@@ -130,12 +130,14 @@ export class MappingsProcessor {
           }
         })
 
-        if (events.length < conf.BATCH_SIZE) {
+        if (events.length < conf().BATCH_SIZE) {
           // This means that we have exhausted all the events in the current
           // block interval and should updateLastScanned block
-          if (conf.VERBOSE)
+          if (conf().VERBOSE)
             debug(
-              `Batch of size ${conf.BATCH_SIZE} complete: ${events.length} events`
+              `Batch of size ${conf().BATCH_SIZE} complete: ${
+                events.length
+              } events`
             )
           this.state = onBatchComplete(this.state, queries)
           await this.stateHandler.persist(this.state, this.indexerStatus)
@@ -206,7 +208,7 @@ export async function processEvent(
 ): Promise<IProcessorState> {
   debug(`Processing event ${event.id}`)
 
-  if (conf.VERBOSE) debug(`JSON: ${JSON.stringify(event, null, 2)}`)
+  if (conf().VERBOSE) debug(`JSON: ${JSON.stringify(event, null, 2)}`)
 
   await handler()
 

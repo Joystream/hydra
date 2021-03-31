@@ -4,7 +4,7 @@ import { SubstrateEvent, logError } from '@dzlzv/hydra-common'
 import Debug from 'debug'
 import { countProcessedEvents } from '../db'
 import { eventEmitter, PROCESSED_EVENT, STATE_CHANGE } from '../start/events'
-import { conf } from '../start/config'
+import { getConfig as conf } from '../start/config'
 
 const debug = Debug('index-builder:processor-prom-client')
 
@@ -38,7 +38,7 @@ export class ProcessorPromClient {
   }
 
   private async initValues(): Promise<void> {
-    const totalEvents = await countProcessedEvents(conf.ID)
+    const totalEvents = await countProcessedEvents(conf().ID)
     this.processedEvents.set(totalEvents)
   }
 }
