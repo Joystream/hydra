@@ -39,9 +39,7 @@ import { InterfaceType } from 'type-graphql';
 
 {{#enums}}
   import { {{name}} } from '../enums/enums';
-  {{#export}}
-  export { {{name}} }; {{! we need to re-export enums for type-GraphQL to resolve types correctly, but only once }}
-  {{/export}}
+  export { {{name}} }; {{! we need to re-export enums for type-GraphQL to resolve types correctly }}
 {{/enums}}
 
 {{#interfaces}}

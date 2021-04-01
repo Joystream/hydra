@@ -380,9 +380,9 @@ describe('ModelRenderer', () => {
     )
     rendered = generator.render(modelTemplate)
     debug(`rendered B: ${JSON.stringify(rendered, null, 2)}`)
-    expect(rendered).to.not.include(
+    expect(rendered).to.include(
       'export { enum1 }',
-      'B should not export enum1'
+      'B should also export enum1'
     )
   })
 
