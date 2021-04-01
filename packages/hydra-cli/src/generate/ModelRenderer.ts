@@ -5,23 +5,20 @@ import { buildFieldContext } from './field-context'
 import * as utils from './utils'
 import { GraphQLEnumType } from 'graphql'
 import { AbstractRenderer } from './AbstractRenderer'
-import { EnumContextProvider } from './EnumContextProvider'
+import { withEnum } from './enum-context'
 
 const debug = Debug('qnode-cli:model-renderer')
 
 export class ModelRenderer extends AbstractRenderer {
   private objType: ObjectType
-  private enumCtxProvider: EnumContextProvider
 
   constructor(
     model: WarthogModel,
     objType: ObjectType,
-    enumContextProvider: EnumContextProvider,
     context: GeneratorContext = {}
   ) {
     super(model, context)
     this.objType = objType
-    this.enumCtxProvider = enumContextProvider
   }
 
   withInterfaceProp(): GeneratorContext {
@@ -63,7 +60,7 @@ export class ModelRenderer extends AbstractRenderer {
     })
     const enums: GeneratorContext[] = []
     for (const e of referncedEnums) {
-      enums.push(this.enumCtxProvider.withEnum(e))
+      enums.push(withEnum(e))
     }
     return {
       enums,
