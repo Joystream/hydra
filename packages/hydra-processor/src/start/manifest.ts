@@ -283,12 +283,11 @@ export function extractTypes(handler: string | undefined): string[] {
   if (handler === undefined) {
     return []
   }
-
-  if (!handler.match(/\w+(\(\s*(([\w\.]+(,\s*[\w\.]+\s*)*))?\))?$/)) {
+  if (!handler.match(/\w+(\(\s*(([\w.]+(,\s*[\w.]+\s*)*))?\))?$/)) {
     throw new Error(`Malformed handler signature: ${handler}`)
   }
 
-  const split = compact(handler.split(/[\(\)]/))
+  const split = compact(handler.split(/[()]/))
 
   if (split.length === 1) {
     // it was of the form handlerName()
