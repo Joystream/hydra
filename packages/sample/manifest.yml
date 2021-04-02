@@ -28,6 +28,9 @@ mappings:
   mappingsModule: mappings/lib/mappings
   imports:
     - mappings/lib/mappings/generated/types
+  range:
+    from: 0 
+    to: 20
   eventHandlers:
     - event: balances.Transfer 
       handler: balancesTransfer
@@ -35,7 +38,7 @@ mappings:
     - extrinsic: timestamp.set 
       handler: timestampCall
   preBlockHooks:
-    - preHook
+    - handler: preHook
   postBlockHooks:
-    - postHook
+    - handler: postHook
   
