@@ -9,6 +9,7 @@ entities:
   - test/fixtures/test-entities.ts
 mappings:
   mappingsModule: test/fixtures/test-mappings.ts
+  range: '[, 345]'
   imports:
     - test/fixtures/test-types.ts
   eventHandlers:
@@ -21,9 +22,11 @@ mappings:
     - extrinsic: Balances.Transfer 
     - extrinsic: Sudo.batchCall 
       handler: handleSudoCall
+      range: '[4,5]'
   preBlockHooks:
     - handler: preBlockHook1
     - handler: preBlockHook2
   postBlockHooks:
     - handler: postBlockHook1
+      range: '[4,4]'
     - handler: postBlockHook2

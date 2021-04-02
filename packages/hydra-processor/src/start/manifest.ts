@@ -6,7 +6,11 @@ import semver from 'semver'
 import { camelCase, upperFirst, compact } from 'lodash'
 import Debug from 'debug'
 import { HandlerFunc } from './QueryEventProcessingPack'
-import { PROCESSOR_PACKAGE_NAME, resolvePackageVersion } from '../util/utils'
+import {
+  parseRange,
+  PROCESSOR_PACKAGE_NAME,
+  resolvePackageVersion,
+} from '../util/utils'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
 export const CONTEXT_CLASS_NAME = 'SubstrateEvent'
@@ -37,10 +41,7 @@ const manifestValidatorOptions = {
         {
           event: 'string',
           'handler?': 'string',
-          'range?': {
-            'from?': 'number',
-            'to?': 'number',
-          },
+          'range?': 'string',
         },
       ],
       'extrinsicHandlers?': [
@@ -48,28 +49,19 @@ const manifestValidatorOptions = {
           extrinsic: 'string',
           'handler?': 'string',
           'triggerEvents?': ['string'],
-          'range?': {
-            'from?': 'number',
-            'to?': 'number',
-          },
+          'range?': 'string',
         },
       ],
       'preBlockHooks?': [
         {
           handler: 'string',
-          'range?': {
-            'from?': 'number',
-            'to?': 'number',
-          },
+          'range?': 'string',
         },
       ],
       'postBlockHooks?': [
         {
           handler: 'string',
-          'range?': {
-            'from?': 'number',
-            'to?': 'number',
-          },
+          'range?': 'string',
         },
       ],
     },
@@ -88,12 +80,12 @@ export interface DataSource {
 
 interface HandlerInput {
   handler?: string
-  range?: Partial<BlockRange>
+  range?: string
 }
 
 interface MappingsDefInput {
   mappingsModule: string
-  range?: Partial<BlockRange>
+  range?: string
   imports?: string[]
   eventHandlers?: Array<{ event: string } & HandlerInput>
   extrinsicHandlers?: Array<
@@ -113,6 +105,7 @@ export interface MappingsDef {
   postBlockHooks: MappingHandler[]
 }
 
+// inclusive
 export interface BlockRange {
   from: number
   to: number
@@ -330,18 +323,4 @@ function resolveHandler(
     throw new Error(`Cannot resolve the handler ${name} in the mappings module`)
   }
   return mappingsModule[name] as HandlerFunc
-}
-
-export function parseRange(range: Partial<BlockRange> | undefined): BlockRange {
-  if (range === undefined) {
-    return {
-      from: 0,
-      to: Number.MAX_SAFE_INTEGER,
-    }
-  }
-  const { from, to } = range
-  return {
-    from: from ?? 0,
-    to: to ?? Number.MAX_SAFE_INTEGER,
-  }
 }

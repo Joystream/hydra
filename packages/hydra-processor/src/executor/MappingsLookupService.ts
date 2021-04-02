@@ -18,6 +18,7 @@ import {
 import { BlockContext, MappingContext, MappingType } from '../queue'
 import BN from 'bn.js'
 import { getConfig as conf } from '../start/config'
+import { isInRange } from '../util/utils'
 
 const debug = Debug('hydra-processor:handler-lookup-service')
 
@@ -212,18 +213,6 @@ export function rangeFilter<T extends { range?: BlockRange }>(
   blockNumber: number
 ): T[] {
   return mappings.filter((m) => isInRange(blockNumber, m.range))
-}
-
-export function isInRange(
-  blockNumber: number,
-  interval: BlockRange | undefined
-): boolean {
-  if (interval === undefined) {
-    return true
-  }
-  const { from, to } = interval
-  const notInRange = (from && from > blockNumber) || (to && to <= blockNumber)
-  return !notInRange
 }
 
 export async function resolveImports(

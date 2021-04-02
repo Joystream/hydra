@@ -243,11 +243,11 @@ export class EventQueue implements IEventQueue {
     )
   }
 
-  nextBlockRange(current: { lte: number }): { lte: number; gt: number } {
+  nextBlockRange(last: { lte: number }): { gt: number; lte: number } {
     return {
-      gt: current.lte,
+      gt: last.lte,
       lte: Math.min(
-        current.lte + conf().BLOCK_WINDOW,
+        last.lte + conf().BLOCK_WINDOW,
         this.mappingFilter.range.to,
         this.indexerStatus.head
       ),

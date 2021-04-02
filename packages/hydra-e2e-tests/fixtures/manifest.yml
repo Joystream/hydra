@@ -29,12 +29,8 @@ mappings:
       handler: timestampCall
   preBlockHooks:
     - handler: preHook
-      range: 
-        from: 1 
-        to: 3
+      range: '[1, 2]'
   postBlockHooks:
     - handler: postHook
-      range:
-        from: 2
-        to: 4
+      range: '[2, 4)'
   

@@ -6,11 +6,12 @@ import { IProcessorState, IStateKeeper } from './IStateKeeper'
 import Debug from 'debug'
 import pThrottle from 'p-throttle'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
-import { getConfig as conf } from '../start/config'
-import { parseEventId } from '../util/utils'
+import { getConfig as conf, getManifest } from '../start/config'
+import { isInRange, parseEventId } from '../util/utils'
 import { formatEventId, SubstrateEvent } from '@dzlzv/hydra-common'
 import { IndexerStatus } from '.'
-import { info } from '../util/log'
+import { info, warn } from '../util/log'
+import { BlockRange } from '../start/manifest'
 const debug = Debug('hydra-processor:processor-state-handler')
 
 export class StateKeeper implements IStateKeeper {
@@ -92,10 +93,12 @@ export class StateKeeper implements IStateKeeper {
     eventEmitter.emit(ProcessorEvents.STATE_CHANGE, this.processorState)
   }
 
-  async init(blockInterval?: { from: number }): Promise<IProcessorState> {
+  async init(): Promise<IProcessorState> {
     const lastState = await loadState(conf().ID)
 
-    this.processorState = initState(blockInterval, lastState)
+    const range = getManifest().mappings.range
+
+    this.processorState = initState(range, lastState)
     eventEmitter.emit(ProcessorEvents.STATE_CHANGE, this.processorState)
 
     return this.processorState
@@ -111,40 +114,49 @@ export class StateKeeper implements IStateKeeper {
 }
 
 export function initState(
-  blockInterval: { from: number } | undefined,
+  range: BlockRange,
   lastState: { eventId: string; lastScannedBlock: number } | undefined
 ): IProcessorState {
-  let atBlock = 0
-  if (blockInterval) {
+  info(
+    `Mappings will be executed for blocks in the range [${range.from}, ${range.to}], inclusively `
+  )
+
+  if (lastState === undefined) {
     debug(
-      `Mappings will be applied to block interval: ${JSON.stringify(
-        blockInterval
-      )}`
+      `No saved state has been found, setting lastScannedBlock to ${
+        range.from - 1
+      }`
     )
-    atBlock = blockInterval.from || 0
-  }
-
-  if (atBlock > 0) {
-    debug(`Got block height hint: ${atBlock}`)
-  }
-
-  if (lastState) {
-    debug(`Found the most recent processed event ${lastState.eventId}`)
-    if (atBlock > lastState.lastScannedBlock) {
-      debug(
-        `WARNING! There are processed events in the processor logs.
-          Last processed event id ${lastState.eventId}. The indexer 
-          will continue from block ${lastState.lastScannedBlock} and ignore the block height hint.`
-      )
+    return {
+      lastScannedBlock: range.from - 1,
+      lastProcessedEvent: formatEventId(0, 0),
     }
+  }
+
+  if (isInRange(lastState.lastScannedBlock + 1, range)) {
+    info(
+      `There are already processed blocks in the database. The indexer will continue from block ${
+        lastState.lastScannedBlock + 1
+      }.`
+    )
     return {
       lastProcessedEvent: lastState.eventId,
       lastScannedBlock: lastState.lastScannedBlock,
     }
   }
 
-  return {
-    lastScannedBlock: atBlock,
-    lastProcessedEvent: formatEventId(0, 0),
+  if (lastState.lastScannedBlock < range.from) {
+    warn(
+      `The last processed block ${lastState.lastScannedBlock} is behind the starting block ${range.from}. Make sure it is intended.`
+    )
+    return {
+      lastProcessedEvent: lastState.eventId,
+      lastScannedBlock: range.from - 1,
+    }
   }
+
+  // Here must be (lastState.lastScannedBlock >= range.to)
+  throw new Error(
+    `The last processed block ${lastState.lastScannedBlock} is beyond the provided block range.`
+  )
 }
