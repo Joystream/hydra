@@ -1,7 +1,10 @@
 import { DatabaseManager } from '@dzlzv/hydra-db-utils'
 import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model'
 import { BlockTimestamp } from '../generated/graphql-server/src/modules/block-timestamp/block-timestamp.model'
-
+import {
+  BlockHook,
+  HookType,
+} from '../generated/graphql-server/src/modules/block-hook/block-hook.model'
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
 import { Balances, Timestamp } from './generated/types'
@@ -50,17 +53,29 @@ export async function timestampCall({
 }
 
 export async function preHook({
-  block: { eventCtxs },
+  block: { blockNumber },
+  store,
 }: {
-  block: { eventCtxs: { event: SubstrateEvent }[] }
+  block: { blockNumber: BN }
+  store: DatabaseManager
 }) {
-  blockStartTime = Date.now()
-  totalBlocks++
-  totalEvents += eventCtxs.length
+  const hook = new BlockHook()
+  hook.blockNumber = blockNumber
+  hook.type = HookType.PRE
+  await store.save<BlockHook>(hook)
 }
 
-export async function postHook() {
-  blockTime += Date.now() - blockStartTime
+export async function postHook({
+  block: { blockNumber },
+  store,
+}: {
+  block: { blockNumber: BN }
+  store: DatabaseManager
+}) {
+  const hook = new BlockHook()
+  hook.blockNumber = blockNumber
+  hook.type = HookType.POST
+  await store.save<BlockHook>(hook)
   benchmark()
 }
 
