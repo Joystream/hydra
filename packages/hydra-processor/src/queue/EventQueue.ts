@@ -220,7 +220,8 @@ export class EventQueue implements IEventQueue {
         `Event queue state:
           \tIndexer head: ${this.indexerStatus.head}
           \tChain head: ${this.indexerStatus.chainHeight} 
-          \tLast Event in the queue: ${this.rangeFilter.id.gt}`
+          \tQueue size: ${this.eventQueue.length}
+          \tLast fetched event: ${this.rangeFilter.id.gt}`
       )
     }
   }
@@ -264,7 +265,13 @@ export class EventQueue implements IEventQueue {
     const events = await this.eventSource.nextBatch(queries)
 
     // collect the events object into an array with types
-    return sortAndTrim(events)
+    const trimmed = sortAndTrim(events)
+    if (conf().VERBOSE) {
+      debug(
+        `Enqueuing events: ${JSON.stringify(trimmed.map((e) => e.event.id))}`
+      )
+    }
+    return trimmed
   }
 }
 
