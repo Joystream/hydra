@@ -35,13 +35,10 @@ describe('manifest', () => {
       `balancesTransfer(DatabaseManager, Balances.TransferEvent)`
     )
     expect(name).equals('balancesTransfer')
-    name = extractName(
-      `balancesTransfer()`
-    )
+    name = extractName(`balancesTransfer()`)
     expect(name).equals('balancesTransfer')
     name = extractName(`balancesTransfer`)
     expect(name).equals('balancesTransfer')
-    
   })
 
   it('infers default handler names', () => {
