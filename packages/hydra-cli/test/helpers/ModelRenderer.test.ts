@@ -4,7 +4,6 @@ import { createModel, fromStringSchema } from './model'
 import * as fs from 'fs-extra'
 import { expect } from 'chai'
 import Debug from 'debug'
-import { EnumContextProvider } from '../../src/generate/EnumContextProvider'
 
 const debug = Debug('cli-test:model-renderer')
 
@@ -12,7 +11,6 @@ describe('ModelRenderer', () => {
   let generator: ModelRenderer
   let warthogModel: WarthogModel
   let modelTemplate: string
-  let enumCtxProvider: EnumContextProvider
   let resolverTemplate: string
 
   before(() => {
@@ -29,7 +27,6 @@ describe('ModelRenderer', () => {
 
   beforeEach(() => {
     warthogModel = createModel()
-    enumCtxProvider = new EnumContextProvider()
   })
 
   it('should transform fields to camelCase', function () {
@@ -39,8 +36,7 @@ describe('ModelRenderer', () => {
 
     generator = new ModelRenderer(
       warthogModel,
-      warthogModel.lookupEntity('Post'),
-      enumCtxProvider
+      warthogModel.lookupEntity('Post')
     )
 
     const rendered = generator.render(modelTemplate)
@@ -71,8 +67,7 @@ describe('ModelRenderer', () => {
 
     generator = new ModelRenderer(
       warthogModel,
-      warthogModel.lookupEntity('some_randomEntity'),
-      enumCtxProvider
+      warthogModel.lookupEntity('some_randomEntity')
     )
 
     const rendered = generator.render(modelTemplate)
@@ -97,8 +92,7 @@ describe('ModelRenderer', () => {
 
     generator = new ModelRenderer(
       warthogModel,
-      warthogModel.lookupEntity('Post'),
-      enumCtxProvider
+      warthogModel.lookupEntity('Post')
     )
 
     const rendered = generator.render(modelTemplate)
@@ -122,11 +116,7 @@ describe('ModelRenderer', () => {
       author: Author!
     }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Author'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Author'))
 
     const rendered = generator.render(modelTemplate)
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
@@ -156,11 +146,7 @@ describe('ModelRenderer', () => {
       author: Author! 
     }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Post'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Post'))
     const rendered = generator.render(modelTemplate)
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
 
@@ -190,11 +176,7 @@ describe('ModelRenderer', () => {
       name: String!
     }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Channel'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Channel'))
     const rendered = generator.render(modelTemplate)
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
 
@@ -210,11 +192,7 @@ describe('ModelRenderer', () => {
       posts: [String]
     }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Author'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Author'))
 
     const rendered = generator.render(modelTemplate)
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
@@ -246,11 +224,7 @@ describe('ModelRenderer', () => {
         episode: Episode
       }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Movie'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Movie'))
     const rendered = generator.render(modelTemplate)
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
 
@@ -279,11 +253,7 @@ describe('ModelRenderer', () => {
         episode: episode_Camel_Case
       }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Movie'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Movie'))
     const rendered = generator.render(modelTemplate)
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
 
@@ -330,11 +300,7 @@ describe('ModelRenderer', () => {
         field1: enum1,
         field2: enum2
       }`)
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Movie'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Movie'))
     const rendered = generator.render(modelTemplate)
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
     expect(rendered).to.include(
@@ -364,25 +330,17 @@ describe('ModelRenderer', () => {
       type A @entity {
         field1: enum1,
       }`)
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('A'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('A'))
     let rendered = generator.render(modelTemplate)
     debug(`rendered A: ${JSON.stringify(rendered, null, 2)}`)
     expect(rendered).to.include('export { enum1 }', 'Should export enum1')
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('B'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('B'))
     rendered = generator.render(modelTemplate)
     debug(`rendered B: ${JSON.stringify(rendered, null, 2)}`)
-    expect(rendered).to.not.include(
+    expect(rendered).to.include(
       'export { enum1 }',
-      'B should not export enum1'
+      'B should also export enum1'
     )
   })
 
@@ -395,11 +353,7 @@ describe('ModelRenderer', () => {
             field1: String
             field2: String
     }`)
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('A'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('A'))
     const rendered = generator.render(modelTemplate)
     expect(rendered).to.include('extends IEntity')
     expect(rendered).to.include(
@@ -437,11 +391,7 @@ describe('ModelRenderer', () => {
             propertah: String!
         }
     `)
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('A'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('A'))
     const rendered = generator.render(modelTemplate)
     expect(rendered).to.include(
       `import { unionOne } from '../variants/variants.model';`,
@@ -458,11 +408,7 @@ describe('ModelRenderer', () => {
             field1: String
             field2: String
     }`)
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('A'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('A'))
     const rendered = generator.render(modelTemplate)
     expect(rendered).to.not.include('field1')
   })
@@ -476,11 +422,7 @@ describe('ModelRenderer', () => {
             field1: String
             field2: String
     }`)
-    generator = new ModelRenderer(
-      model,
-      model.lookupInterface('IEntity'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupInterface('IEntity'))
     const rendered = generator.render(modelTemplate)
     expect(rendered).to.include('@InterfaceType')
   })
@@ -499,18 +441,13 @@ describe('ModelRenderer', () => {
           indexInBlock: Int!
           inExtrinsic: Extrinsic!
     }`)
-    generator = new ModelRenderer(
-      model,
-      model.lookupInterface('Event'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupInterface('Event'))
     let rendered = generator.render(modelTemplate)
     expect(rendered).to.not.include('inExtrinsic')
 
     generator = new ModelRenderer(
       model,
-      model.lookupEntity('BoughtMemberEvent'),
-      enumCtxProvider
+      model.lookupEntity('BoughtMemberEvent')
     )
     rendered = generator.render(modelTemplate)
     expect(rendered).to.include('inExtrinsic')
@@ -532,11 +469,7 @@ describe('ModelRenderer', () => {
       status: Poor!
     }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('MyEntity'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('MyEntity'))
     const rendered = generator.render(modelTemplate)
     expect(rendered).to.include(
       `import { Poor } from '../variants/variants.model'`
@@ -558,11 +491,7 @@ describe('ModelRenderer', () => {
       value: BigInt!
     }
     `)
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Tip'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Tip'))
     const rendered = generator.render(modelTemplate)
     expect(rendered).to.include(`transformer`)
     expect(rendered).to.include(
@@ -581,11 +510,7 @@ describe('ModelRenderer', () => {
     }
     `)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Member'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Member'))
     const rendered = generator.render(resolverTemplate)
 
     expect(rendered).to.include(`MemberEdge`)
@@ -607,20 +532,12 @@ describe('ModelRenderer', () => {
     }
     `)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('VideoCategory'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('VideoCategory'))
     const rendered = generator.render(resolverTemplate)
     expect(rendered).to.include(`videoCategoriesConnection`)
     expect(rendered).to.include(`async videoCategories`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Video'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Video'))
     expect(generator.render(resolverTemplate)).to.include(`videosConnection`)
     expect(generator.render(resolverTemplate)).to.include(`async videos`)
   })
@@ -632,11 +549,7 @@ describe('ModelRenderer', () => {
       handle: String!
     }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Channel'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Channel'))
     const rendered = generator.render(resolverTemplate)
 
     expect(rendered).to.include(`Query(() => Channel, { nullable: true })`)
@@ -669,11 +582,7 @@ describe('ModelRenderer', () => {
       anotherStatus: Poor!
     }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('MyEntity'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('MyEntity'))
     const rendered = generator.render(modelTemplate)
 
     expect(rendered).to.include(

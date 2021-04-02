@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import * as fs from 'fs-extra'
-import { EnumContextProvider } from '../../src/generate/EnumContextProvider'
 import { ModelRenderer } from '../../src/generate/ModelRenderer'
 import { RelationshipGenerator } from '../../src/generate/RelationshipGenerator'
 import { WarthogModel } from '../../src/model'
@@ -10,7 +9,6 @@ describe('ReletionshipGenerator', () => {
   let model: WarthogModel
   let generator: ModelRenderer
   let modelTemplate: string
-  let enumCtxProvider: EnumContextProvider
   let resolverTemplate: string
 
   before(() => {
@@ -31,11 +29,7 @@ describe('ReletionshipGenerator', () => {
       invitor: Member
       invitees: [Member!] @derivedFrom(field: "invitor")
     }`)
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Member'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Member'))
     const rendered = generator.render(modelTemplate)
     expect(rendered).to.not.include(
       `import { Member } from '../member/member.model.ts'`
@@ -71,11 +65,7 @@ describe('ReletionshipGenerator', () => {
       inExtrinsic: Extrinsic!
     }`)
 
-    generator = new ModelRenderer(
-      model,
-      model.lookupEntity('Extrinsic'),
-      enumCtxProvider
-    )
+    generator = new ModelRenderer(model, model.lookupEntity('Extrinsic'))
     const rendered = generator.render(modelTemplate)
 
     expect(rendered).to.include(

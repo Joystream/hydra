@@ -9,7 +9,6 @@ import { ModelRenderer } from './ModelRenderer'
 import { EnumRenderer } from './EnumRenderer'
 import { kebabCase } from './utils'
 import { ConfigProvider } from './ConfigProvider'
-import { EnumContextProvider } from './EnumContextProvider'
 import { VariantsRenderer } from './VariantsRenderer'
 
 const debug = Debug('qnode-cli:sources-generator')
@@ -46,8 +45,6 @@ export class SourcesGenerator {
   generateModels(): void {
     createDir(path.resolve(process.cwd(), 'src/modules'), false, true)
 
-    const enumContextProvider = new EnumContextProvider()
-
     const typesAndInterfaces: ObjectType[] = [
       ...this.model.interfaces,
       ...this.model.entities,
@@ -55,12 +52,7 @@ export class SourcesGenerator {
 
     typesAndInterfaces.map((objType) => {
       const context = this.config.withGeneratedFolderRelPath(objType.name)
-      const modelRenderer = new ModelRenderer(
-        this.model,
-        objType,
-        enumContextProvider,
-        context
-      )
+      const modelRenderer = new ModelRenderer(this.model, objType, context)
       const destFolder = this.config.getDestFolder(objType.name)
       createDir(path.resolve(process.cwd(), destFolder), false, true)
 
