@@ -3,7 +3,7 @@ import YamlValidator from 'yaml-validator'
 import fs from 'fs'
 import path from 'path'
 import semver from 'semver'
-import { camelCase, upperFirst } from 'lodash'
+import { camelCase, upperFirst, compact } from 'lodash'
 import Debug from 'debug'
 import { HandlerFunc } from './QueryEventProcessingPack'
 import { PROCESSOR_PACKAGE_NAME, resolvePackageVersion } from '../util/utils'
@@ -121,6 +121,7 @@ export interface BlockRange {
 export interface MappingHandler {
   range?: BlockRange
   handler: HandlerFunc
+  types: string[]
 }
 
 export interface EventHandler extends MappingHandler {
@@ -241,14 +242,15 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
   ): MappingHandler {
     const { handler, range } = def
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const name =
-      handler ||
-      defaultHandlerName(def as { event: string } | { extrinsic: string })
+    const name = handler
+      ? extractName(handler)
+      : defaultHandlerName(def as { event: string } | { extrinsic: string })
 
     return {
       ...def,
       range: parseRange(range),
       handler: resolveHandler(resolvedModule, name),
+      types: extractTypes(handler),
     }
   }
 
@@ -277,6 +279,35 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
   }
 }
 
+export function extractTypes(handler: string | undefined): string[] {
+  if (handler === undefined) {
+    return []
+  }
+
+  if (!handler.match(/\w+(\(\s*(([\w\.]+(,\s*[\w\.]+\s*)*))?\))?$/)) {
+    throw new Error(`Malformed handler signature: ${handler}`)
+  }
+
+  const split = compact(handler.split(/[\(\)]/))
+
+  if (split.length === 1) {
+    // it was of the form handlerName()
+    return []
+  }
+
+  if (split.length !== 2) {
+    throw new Error(`Cannot parse types from ${handler}`)
+  }
+  return compact(split[1].split(',')).map((s) => s.trim())
+}
+
+export function extractName(handler: string): string {
+  if (handler.includes('(')) {
+    return handler.split('(')[0]
+  }
+  return handler
+}
+
 export function defaultHandlerName(
   eventOrExtrinsic: { event: string } | { extrinsic: string }
 ): string {
@@ -285,7 +316,7 @@ export function defaultHandlerName(
     : eventOrExtrinsic.event
   const suffix = hasExtrinsic(eventOrExtrinsic) ? CALL_SUFFIX : '' // no suffix for events
   const [module, name] = input.split('.').map((s) => s.trim())
-  // module name camelacased, name pascalcased
+  // module name camelcased, name pascalcased
   return `${camelCase(module)}_${upperFirst(camelCase(name))}${suffix}`
 }
 

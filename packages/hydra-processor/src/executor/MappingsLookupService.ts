@@ -16,7 +16,7 @@ import {
   EventContext,
 } from './IMappingsLookup'
 import { BlockContext, MappingContext, MappingType } from '../queue'
-import pImmediate from 'p-immediate'
+import BN from 'bn.js'
 import { getConfig as conf } from '../start/config'
 
 const debug = Debug('hydra-processor:handler-lookup-service')
@@ -33,7 +33,7 @@ export function isEventContext(context: ExecContext): context is EventContext {
 
 export function extractBlock(
   context: MappingContext
-): { blockNumber: number; blockTimestamp: number } {
+): { blockNumber: number; blockTimestamp: BN } {
   // TODO: extract block
   return context.event
 }
@@ -41,6 +41,7 @@ export function extractBlock(
 export class MappingsLookupService implements IMappingsLookup {
   private events: Record<string, EventHandler[]> = {}
   private extrinsics: Record<string, ExtrinsicHandler[]> = {}
+  private resolvedImports!: Record<string, unknown>
 
   constructor(protected mappings: MappingsDef) {
     this.mappings.eventHandlers.map((h) => {
@@ -123,25 +124,74 @@ export class MappingsLookupService implements IMappingsLookup {
     const { handler: handlerFunc } = handler
 
     // TODO: these should be replaced with casts to hydra-common interfaces
-    const arg = isBlockHookContext(ctx)
+    let ctxArg = { ...ctx } as ExecContext
+    const extra = isBlockHookContext(ctx)
       ? { block: ctx }
       : {
-          ...ctx,
           block: extractBlock(ctx as MappingContext),
           extrinsic: ctx.event.extrinsic,
         }
+    ctxArg = { ...extra, ...ctxArg }
 
-    await handlerFunc(...[arg])
+    if (handler.types.length > 0) {
+      const args = handler.types.map((t) =>
+        resolveType(ctxArg, t, this.resolvedImports)
+      )
+      await handlerFunc(...args)
+      return
+    }
+
+    await handlerFunc(...[ctxArg])
   }
 
   async load(): Promise<void> {
-    // do nothing for now
-    await pImmediate()
+    this.resolvedImports = await resolveImports(this.mappings.imports)
   }
 }
 
+export function resolveType(
+  ctx: ExecContext,
+  type: string,
+  resolvedImports: Record<string, unknown>
+): unknown {
+  if (type === 'DatabaseManager') {
+    return ctx.store
+  }
+  if (type === 'SubstrateEvent') {
+    if (!isEventContext(ctx)) {
+      throw new Error(
+        `Cannot extract SubstrateEvent from the context ${JSON.stringify(
+          ctx,
+          null,
+          2
+        )}`
+      )
+    }
+    return ctx.event
+  }
+
+  if (type === 'ExecContext') {
+    return ctx
+  }
+
+  if (!isEventContext(ctx)) {
+    throw new Error(
+      `Cannot construct an argument of type ${type} from the context ${JSON.stringify(
+        ctx,
+        null,
+        2
+      )}`
+    )
+  }
+
+  const proto = resolveArgType(type, resolvedImports).prototype
+  const instance = Object.create(proto)
+
+  return new instance.constructor(ctx.event)
+}
+
 // used to normalize event and extrinsic names for consistent lookups
-export const normalize = (s: string): string => s.trim().toLocaleLowerCase()
+export const normalize = (s: string): string => s.trim().toLowerCase()
 
 export function extractName(ctx: MappingContext): string {
   if (ctx.type === MappingType.EVENT) return ctx.event.name
