@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
+import copyfiles from 'copyfiles'
 import { getTemplatePath, createFile, createDir } from '../utils/utils'
 
 import Debug from 'debug'
@@ -10,6 +11,8 @@ import { EnumRenderer } from './EnumRenderer'
 import { kebabCase } from './utils'
 import { ConfigProvider } from './ConfigProvider'
 import { VariantsRenderer } from './VariantsRenderer'
+import { render } from './AbstractRenderer'
+import { indexContext } from './model-index-context'
 
 const debug = Debug('qnode-cli:sources-generator')
 
@@ -29,10 +32,12 @@ export interface GeneratorContext {
 export class SourcesGenerator {
   readonly config: ConfigProvider
   readonly model: WarthogModel
+  dryRun = false
 
   constructor(model: WarthogModel) {
     this.config = new ConfigProvider()
     this.model = model
+    this.dryRun = process.env.DRY_RUN === 'true'
   }
 
   generate(): void {
@@ -40,6 +45,7 @@ export class SourcesGenerator {
     this.generateVariants()
     this.generateModels()
     this.generateQueries()
+    this.generateModelIndex()
   }
 
   generateModels(): void {
@@ -139,6 +145,36 @@ export class SourcesGenerator {
       this.readTemplate('entities/enums.ts.mst')
     )
     this.writeFile(path.join(enumsDir, `enums.ts`), rendered)
+  }
+
+  generateModelIndex(): string {
+    const rendered = render(
+      this.readTemplate('entities/model-all.ts.mst'),
+      indexContext(this.model)
+    )
+    if (!this.dryRun) {
+      // create top-level /model folder
+      const modelDir = path.join(this.config.config.get('ROOT_FOLDER'), 'model')
+      createDir(modelDir, false, true)
+
+      // write to /modul/index.ts
+      this.writeFile(path.join(modelDir, 'index.ts'), rendered)
+      // copy all model files there
+      copyfiles(
+        [
+          'src/**/*.model.*',
+          'src/**/enums/enums.ts',
+          'src/**/variants/variants.ts',
+          modelDir,
+        ],
+        2,
+        () => {
+          // do nothing
+        }
+      )
+    }
+    // return the result to simply testing
+    return rendered
   }
 
   /**

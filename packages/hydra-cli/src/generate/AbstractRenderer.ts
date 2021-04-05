@@ -18,14 +18,17 @@ export abstract class AbstractRenderer {
   abstract transform(): GeneratorContext
 
   render(mustacheTeplate: string): string {
-    const mustacheContext = this.transform()
-    debug(`Rendering with context: ${JSON.stringify(mustacheContext, null, 2)}`)
-
-    const rendered = Mustache.render(mustacheTeplate, mustacheContext)
-    return prettier.format(rendered, {
-      parser: 'typescript',
-      singleQuote: true,
-      printWidth: 120,
-    })
+    return render(mustacheTeplate, this.transform())
   }
+}
+
+export function render(template: string, context: GeneratorContext): string {
+  debug(`Rendering with context: ${JSON.stringify(context, null, 2)}`)
+
+  const rendered = Mustache.render(template, context)
+  return prettier.format(rendered, {
+    parser: 'typescript',
+    singleQuote: true,
+    printWidth: 120,
+  })
 }

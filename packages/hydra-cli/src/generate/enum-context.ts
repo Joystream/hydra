@@ -1,16 +1,11 @@
 import { GraphQLEnumType } from 'graphql'
 import { GeneratorContext, ENUMS_FOLDER } from './SourcesGenerator'
+import { withNames } from './utils'
 
 export function withEnum(enumType: GraphQLEnumType): GeneratorContext {
   return {
-    ...withName(enumType),
+    ...withNames(enumType),
     ...withValues(enumType),
-  }
-}
-
-export function withName(enumType: GraphQLEnumType): GeneratorContext {
-  return {
-    name: enumType.name,
   }
 }
 

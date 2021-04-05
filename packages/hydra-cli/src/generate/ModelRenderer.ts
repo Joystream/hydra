@@ -33,7 +33,7 @@ export class ModelRenderer extends AbstractRenderer {
       this.objType.interfaces !== undefined
     ) {
       return {
-        interfaces: [utils.withNames(this.objType.interfaces[0].name)],
+        interfaces: [utils.withNames(this.objType.interfaces[0])],
       }
     }
     return {}
@@ -46,7 +46,7 @@ export class ModelRenderer extends AbstractRenderer {
     const subclasses: GeneratorContext[] = []
     this.model
       .getSubclasses(this.objType.name)
-      .map((o) => subclasses.push(utils.withNames(o.name)))
+      .map((o) => subclasses.push(utils.withNames(o)))
     return {
       subclasses,
     }
@@ -169,7 +169,7 @@ export class ModelRenderer extends AbstractRenderer {
       ...this.withDescription(),
       ...this.withImportProps(),
       ...this.withFieldResolvers(),
-      ...utils.withNames(this.objType.name),
+      ...utils.withNames(this.objType),
     }
   }
 }

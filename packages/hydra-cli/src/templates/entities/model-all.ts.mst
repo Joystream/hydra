@@ -1,0 +1,20 @@
+{{#modelClasses}}
+  import { {{className}} } from './{{kebabName}}/{{kebabName}}.model';
+  export { {{className}} };
+{{/modelClasses}}
+
+
+{{#enums}}
+  import { {{name}} } from './enums/enums';
+  export { {{name}} }; {{! we need to re-export enums for type-GraphQL to resolve types correctly }}
+{{/enums}}
+
+{{#variants}}
+  import { {{name}} } from './variants/variants.model'
+  export { {{name}} };
+{{/variants}}
+
+{{#unions}}
+  import { {{name}} } from './variants/variants.model'
+  export { {{name}} };
+{{/unions}}
