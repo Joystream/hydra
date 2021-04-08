@@ -33,7 +33,7 @@ export function names(name: string): { [key: string]: string } {
   }
 }
 
-export function withNames(name: string): GeneratorContext {
+export function withNames({ name }: { name: string }): GeneratorContext {
   return {
     name,
     ...names(name),
@@ -83,4 +83,14 @@ export function generateResolverReturnType(
   isList: boolean
 ): string {
   return `Promise<${type}${isList ? '[]' : ''} | null>`
+}
+
+/**
+ * replace all whitespaces and carriage returns
+ *
+ * @param s
+ * @returns the same string with all whitecharacters removed
+ */
+export function compact(s: string): string {
+  return s.replace(/\s/g, '')
 }
