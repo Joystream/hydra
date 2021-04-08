@@ -1,6 +1,5 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
-import copyfiles from 'copyfiles'
 import { getTemplatePath, createFile, createDir } from '../utils/utils'
 
 import Debug from 'debug'
@@ -159,19 +158,6 @@ export class SourcesGenerator {
 
       // write to /modul/index.ts
       this.writeFile(path.join(modelDir, 'index.ts'), rendered)
-      // copy all model files there
-      copyfiles(
-        [
-          'src/**/*.model.*',
-          'src/**/enums/enums.ts',
-          'src/**/variants/variants.ts',
-          modelDir,
-        ],
-        2,
-        () => {
-          // do nothing
-        }
-      )
     }
     // return the result to simply testing
     return rendered
