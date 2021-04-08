@@ -2,11 +2,10 @@ import dotenv from 'dotenv'
 import chalk from 'chalk'
 import figlet from 'figlet'
 import commander from 'commander'
-import path from 'path'
 
-import { configure, getLogger } from 'log4js'
+import { getLogger } from 'log4js'
 
-import { QueryNodeManager } from './index'
+import { configure, QueryNodeManager } from './index'
 
 const logger = getLogger()
 
@@ -39,6 +38,9 @@ function main(): commander.Command {
     .command('index')
     .option('-h, --height <height>', 'starting block height')
     .option('-t, --typedefs [typedefs]', 'type definitions')
+    .option('--spectypes [spectypes]', 'spec type definitions')
+    .option('--chaintypes [chaintypes]', 'chain type definitions')
+    .option('--bundletypes [bundletypes]', 'bundle type definitions')
     .option('--provider [chain]', 'substrate chain provider url')
     .option('-e, --env <file>', '.env file location', '.env')
     .description('Index all events and extrinsics in the substrate chain')
@@ -60,47 +62,30 @@ function setUp(opts: Record<string, string>) {
   dotenv.config()
   dotenv.config({ path: opts.env })
 
-  if (opts.height) {
-    process.env.BLOCK_HEIGHT = opts.height
-  } else if (!process.env.BLOCK_HEIGHT) {
-    process.env.BLOCK_HEIGHT = '0'
-  }
+  // here we just translate the flags into env variables, defaults will be
+  // set later
+  process.env.BLOCK_HEIGHT = opts.height ?? process.env.BLOCK_HEIGHT ?? 0
+  //process.env.LOG_CONFIG = opts.logging || process.env.LOG_CONFIG
+  process.env.TYPES_JSON = opts.typedefs || process.env.TYPES_JSON
+  process.env.SPEC_TYPES = opts.spectypes || process.env.SPEC_TYPES
+  process.env.CHAIN_TYPES = opts.chaintypes || process.env.CHAIN_TYPES
+  process.env.BUNDLE_TYPES = opts.bundletypes || process.env.BUNDLE_TYPES
 
+  process.env.WS_PROVIDER_ENDPOINT_URI =
+    opts.provider || process.env.WS_PROVIDER_ENDPOINT_URI
   // log4js config
-  if (opts.logging) {
-    configure(opts.logging)
-  } else {
-    // log4js default: DEBUG to console output;
-    getLogger().level = 'debug'
-  }
+  // if (opts.logging) {
+  //   configure(opts.logging)
+  // } else {
+  //   // log4js default: DEBUG to console output;
+  //   getLogger().level = 'debug'
+  // }
 }
 
-async function runIndexer(opts: Record<string, unknown>) {
+async function runIndexer() {
+  configure()
   const node = new QueryNodeManager()
-  const atBlock = process.env.BLOCK_HEIGHT
-
-  const typesPath = process.env.TYPES_JSON || opts.typedefs
-
-  const types = typesPath
-    ? // eslint-disable-next-line @typescript-eslint/no-var-requires
-      (require(path.resolve(typesPath as string)) as Record<
-        string,
-        Record<string, string>
-      >)
-    : {}
-
-  const wsProviderURI = (process.env.WS_PROVIDER_ENDPOINT_URI ||
-    opts.provider) as string
-
-  if (!wsProviderURI) {
-    throw new Error(`Chain API endpoint is not provided`)
-  }
-
-  await node.index({
-    wsProviderURI,
-    atBlock: atBlock ? Number.parseInt(atBlock) : undefined,
-    types,
-  })
+  await node.index()
 }
 
 async function runMigrations() {

@@ -2,17 +2,14 @@
 import { ApiPromise, WsProvider /* RuntimeVersion */ } from '@polkadot/api'
 
 import { IndexBuilder } from '..'
-import { IndexerOptions } from '.'
+import { getConfig } from '.'
 import Debug from 'debug'
 
 import Container, { Inject, Service } from 'typedi'
 
 import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
-import { retry, waitFor } from '@dzlzv/hydra-common'
-import { SUBSTRATE_API_CALL_RETRIES } from '../indexer/indexer-consts'
+import { waitFor } from '@dzlzv/hydra-common'
 import { RedisRelayer } from '../indexer/RedisRelayer'
-
-import registry from '../substrate/typeRegistry'
 
 const debug = Debug('index-builder:query-node')
 
@@ -34,61 +31,25 @@ export class QueryNode {
   @Inject('IndexBuilder')
   readonly indexBuilder!: IndexBuilder
 
-  @Inject('IndexerOptions')
-  private indexerOptions!: IndexerOptions
-
   private constructor() {
     this._state = QueryNodeState.NOT_STARTED
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   }
 
-  static async create(options: IndexerOptions): Promise<QueryNode> {
+  static async create(): Promise<QueryNode> {
     // TODO: Do we really need to do it like this?
     // Its pretty ugly, but the registrtion appears to be
     // accessing some sort of global state, and has to be done after
     // the provider is created.
-    Container.set('IndexerOptions', options)
 
-    const { wsProviderURI, types } = options
-
-    await QueryNode.createApi(wsProviderURI, types)
-
-    const redisURL = options.redisURI || process.env.REDIS_URI
-    Container.set('RedisClientFactory', new RedisClientFactory(redisURL))
+    Container.set(
+      'RedisClientFactory',
+      new RedisClientFactory(getConfig().REDIS_URI)
+    )
     Container.set('RedisRelayer', new RedisRelayer())
     const node = Container.get<QueryNode>('QueryNode')
-    node.indexerOptions = options
     return node
-  }
-
-  static async createApi(
-    wsProviderURI: string,
-    types: Record<string, Record<string, string>> = {}
-  ): Promise<void> {
-    const provider = new WsProvider(wsProviderURI)
-
-    const names = Object.keys(types)
-
-    names.length && debug(`Injected types: ${names.join(', ')}`)
-
-    // Create the API and wait until ready
-    // TODO: move to substrate
-    const api = await retry(
-      () =>
-        new ApiPromise({
-          provider,
-          registry,
-          types,
-        }).isReadyOrError,
-      SUBSTRATE_API_CALL_RETRIES
-    )
-
-    debug(`Api is ready`)
-
-    Container.set('ApiPromise', api)
-
-    // debug(`Api is set: ${JSON.stringify(api, null, 2)}`)
   }
 
   async start(): Promise<void> {
@@ -99,7 +60,9 @@ export class QueryNode {
 
     // Start only the indexer
     try {
-      await this.indexBuilder.start(this.indexerOptions.atBlock)
+      await this.indexBuilder.start()
+    } catch (e) {
+      process.exitCode = -1
     } finally {
       // if due tot error, it will bubble up
       debug(`Stopping the query node`)
