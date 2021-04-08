@@ -2,6 +2,7 @@ import { QueryEventBlock, IQueryEvent } from '../../src'
 import { Phase, Event, EventRecord } from '@polkadot/types/interfaces'
 import { BlockPayload } from '../../src/model'
 import { withTs } from '@dzlzv/hydra-common'
+import BN from 'bn.js'
 
 export function blockPayload(height: number): BlockPayload {
   return (withTs({
@@ -41,6 +42,7 @@ export function* queryEvent(
         } as unknown) as Event,
       } as unknown) as EventRecord,
       blockNumber: block,
+      blockTimestamp: new BN(11111111111),
       indexInBlock: i,
       eventName: 'fake.event',
       eventMethod: 'fake.method',

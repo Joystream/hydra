@@ -1,8 +1,7 @@
-import { Header, Hash, Extrinsic } from '@polkadot/types/interfaces'
+import { Header, Hash } from '@polkadot/types/interfaces'
 import { UnsubscribePromise } from '@polkadot/api/types'
 import { Service } from 'typedi'
 
-import assert from 'assert'
 import Debug from 'debug'
 import { EventEmitter } from 'events'
 
@@ -16,18 +15,8 @@ import {
   HEADER_CACHE_CAPACITY,
   FINALITY_THRESHOLD,
 } from './indexer-consts'
-import {
-  getBlockTimestamp,
-  getSubstrateService,
-  ISubstrateService,
-} from '../substrate'
-import {
-  IQueryEvent,
-  QueryEventBlock,
-  QueryEvent,
-  BlockData,
-  fromBlockData,
-} from '../model'
+import { getSubstrateService, ISubstrateService } from '../substrate'
+import { QueryEventBlock, fromBlockData } from '../model'
 import { IBlockProducer } from './IBlockProducer'
 import FIFOCache from './FIFOCache'
 import { getConfig } from '..'
@@ -39,8 +28,7 @@ const debug = Debug(DEBUG_TOPIC)
 export const NEW_CHAIN_HEIGHT_EVENT = 'NEW_CHAIN_HEIGHT'
 
 @Service('BlockProducer')
-export class BlockProducer
-  extends EventEmitter
+export class BlockProducer extends EventEmitter
   implements IBlockProducer<QueryEventBlock> {
   private _started: boolean
 

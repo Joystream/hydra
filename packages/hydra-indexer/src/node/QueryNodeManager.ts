@@ -1,12 +1,10 @@
-import { getConfig, QueryNode } from '.'
-import { IndexerOptions } from './QueryNodeStartOptions'
+import { QueryNode } from '.'
 import { createDBConnection } from '../db/dal'
 import { Connection, getConnection } from 'typeorm'
 import Debug from 'debug'
 import Container from 'typedi'
 import { logError } from '@dzlzv/hydra-common'
 import { log } from 'console'
-import { ISubstrateService } from '../substrate'
 import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 import { eventEmitter, Events } from './event-emitter'
 

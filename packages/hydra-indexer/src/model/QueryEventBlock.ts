@@ -46,9 +46,7 @@ export function fromBlockData({
         phase.isApplyExtrinsic && blockExtrinsics.length
           ? blockExtrinsics[Number.parseInt(phase.asApplyExtrinsic.toString())]
           : undefined
-      const event = new QueryEvent(record, height, index, timestamp, extrinsic)
-
-      return event
+      return new QueryEvent(record, height, index, timestamp, extrinsic)
     }
   )
   return new QueryEventBlock(height, blockEvents)
