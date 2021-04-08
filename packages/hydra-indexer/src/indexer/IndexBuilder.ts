@@ -14,6 +14,7 @@ import { IStatusService } from './IStatusService'
 import { WORKERS_NUMBER } from './indexer-consts'
 import { toPayload } from '../model/BlockPayload'
 import { getConnection, EntityManager } from 'typeorm'
+import { getConfig } from '../node'
 
 const debug = Debug('index-builder:indexer')
 
@@ -29,7 +30,7 @@ export class IndexBuilder extends EventEmitter {
     super()
   }
 
-  async start(atBlock?: number): Promise<void> {
+  async start(): Promise<void> {
     assert(this.producer, 'BlockProducer must be set')
     assert(this.statusService, 'StatusService must be set')
 
@@ -40,19 +41,18 @@ export class IndexBuilder extends EventEmitter {
     debug(`Last indexed block in the database: ${lastHead.toString()}`)
     let startBlock = lastHead + 1
 
-    if (atBlock) {
-      debug(`Got block height hint: ${atBlock}`)
-      if (lastHead >= 0 && process.env.FORCE_BLOCK_HEIGHT !== 'true') {
-        debug(
-          `WARNING! The database contains indexed blocks.
+    const atBlock = getConfig().BLOCK_HEIGHT
+
+    if (lastHead >= 0 && !getConfig().FORCE_HEIGHT) {
+      debug(
+        `WARNING! The database contains indexed blocks.
           The last indexed block height is ${lastHead}. The indexer 
           will continue from block ${lastHead} ignoring the start 
           block height hint. Set the environment variable FORCE_BLOCK_HEIGHT to true 
           if you want to start from ${atBlock} anyway.`
-        )
-      } else {
-        startBlock = Math.max(startBlock, atBlock)
-      }
+      )
+    } else {
+      startBlock = Math.max(startBlock, atBlock)
     }
 
     debug(`Starting the block indexer at block ${startBlock}`)

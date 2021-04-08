@@ -45,7 +45,7 @@ export class IndexerStatusService implements IStatusService {
 
     this.redisSub.on('message', (channel, message) => {
       this.onNewMessage(channel, message).catch((e) => {
-        throw new Error(`Error connecting to Redis: ${logError(e)}`)
+        debug(`Error connecting to Redis: ${logError(e)}`)
       })
     })
 
