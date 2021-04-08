@@ -1,6 +1,6 @@
 {
   "name": "@dzlzv/hydra-typegen",
-  "version": "2.1.0-beta.5",
+  "version": "2.1.0-beta.6",
   "description": "\"Hydra-cli pluging for generating typed events\"",
   "main": "lib/index.js",
   "repository": "https://github.com/Joystream/hydra",
