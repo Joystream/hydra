@@ -42,15 +42,15 @@ describe('model index render', () => {
     const rendered = new SourcesGenerator(model).generateModelIndex()
 
     expect(c(rendered)).to.include(
-      c(`import { MyUnion } from './variants/variants.model`),
+      c(`import { MyUnion } from '../src/modules/variants/variants.model`),
       'should import union types'
     )
     expect(c(rendered)).to.include(
-      c(`import { Var1 } from './variants/variants.model`),
+      c(`import { Var1 } from '../src/modules/variants/variants.model`),
       'should import variant'
     )
     expect(c(rendered)).to.include(
-      c(`import { Network } from './enums/enums`),
+      c(`import { Network } from '../src/modules/enums/enums`),
       'should import enums'
     )
     expect(c(rendered)).to.include(
@@ -58,7 +58,7 @@ describe('model index render', () => {
       'should export enums'
     )
     expect(c(rendered)).to.include(
-      c(`import { MyEntity } from './my-entity/my-entity.model`),
+      c(`import { MyEntity } from '../src/modules/my-entity/my-entity.model`),
       'should import entities'
     )
     expect(c(rendered)).to.include(
@@ -66,7 +66,9 @@ describe('model index render', () => {
       'should export entities'
     )
     expect(c(rendered)).to.include(
-      c(`import { MyInterface } from './my-interface/my-interface.model`),
+      c(
+        `import { MyInterface } from '../src/modules/my-interface/my-interface.model`
+      ),
       'should import interfaces'
     )
     expect(c(rendered)).to.include(
