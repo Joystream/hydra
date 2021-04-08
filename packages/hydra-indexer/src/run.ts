@@ -65,7 +65,7 @@ function setUp(opts: Record<string, string>) {
   // here we just translate the flags into env variables, defaults will be
   // set later
   process.env.BLOCK_HEIGHT = opts.height ?? process.env.BLOCK_HEIGHT ?? 0
-  //process.env.LOG_CONFIG = opts.logging || process.env.LOG_CONFIG
+  // process.env.LOG_CONFIG = opts.logging || process.env.LOG_CONFIG
   process.env.TYPES_JSON = opts.typedefs || process.env.TYPES_JSON
   process.env.SPEC_TYPES = opts.spectypes || process.env.SPEC_TYPES
   process.env.CHAIN_TYPES = opts.chaintypes || process.env.CHAIN_TYPES
