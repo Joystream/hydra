@@ -1,6 +1,4 @@
 // @ts-check
-import { ApiPromise, WsProvider /* RuntimeVersion */ } from '@polkadot/api'
-
 import { IndexBuilder } from '..'
 import { getConfig } from '.'
 import Debug from 'debug'
@@ -48,8 +46,7 @@ export class QueryNode {
       new RedisClientFactory(getConfig().REDIS_URI)
     )
     Container.set('RedisRelayer', new RedisRelayer())
-    const node = Container.get<QueryNode>('QueryNode')
-    return node
+    return Container.get<QueryNode>('QueryNode')
   }
 
   async start(): Promise<void> {

@@ -8,7 +8,6 @@ let conf: {
   BLOCK_HEIGHT: number
   FORCE_HEIGHT: boolean
   VERBOSE: boolean
-  //LOG_CONFIG: string
   DEBUG: string
   TYPES_JSON: Record<string, unknown>
   SPEC_TYPES: Record<string, unknown>
