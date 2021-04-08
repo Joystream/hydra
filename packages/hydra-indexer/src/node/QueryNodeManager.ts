@@ -1,4 +1,4 @@
-import { QueryNode } from '.'
+import { getConfig, QueryNode } from '.'
 import { IndexerOptions } from './QueryNodeStartOptions'
 import { createDBConnection } from '../db/dal'
 import { Connection, getConnection } from 'typeorm'
@@ -8,6 +8,7 @@ import { logError } from '@dzlzv/hydra-common'
 import { log } from 'console'
 import { ISubstrateService } from '../substrate'
 import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
+import { eventEmitter, Events } from './event-emitter'
 
 const debug = Debug('index-builder:manager')
 
@@ -29,9 +30,13 @@ export class QueryNodeManager {
     )
     // Hook into application
     // eslint-disable-next-line
-    process.on('exit', () =>
+    process.on('SIGINT', () =>
       QueryNodeManager.cleanUp().catch((e) => log(`${logError(e)}`))
     )
+    // // eslint-disable-next-line
+    // process.on('exit', () =>
+    //   QueryNodeManager.cleanUp().catch((e) => log(`${logError(e)}`))
+    // )
   }
 
   /**
@@ -39,13 +44,12 @@ export class QueryNodeManager {
    *
    * @param options options passed to create the indexer service
    */
-  async index(options: IndexerOptions): Promise<void> {
+  async index(): Promise<void> {
     if (this._queryNode)
       throw Error('Cannot start the same manager multiple times.')
     await createDBConnection()
 
-    debug(`Indexer options: ${JSON.stringify(options, null, 2)}`)
-    this._queryNode = await QueryNode.create(options)
+    this._queryNode = await QueryNode.create()
     try {
       await this._queryNode.start()
     } finally {
@@ -68,23 +72,23 @@ export class QueryNodeManager {
   }
 
   static async cleanUp(): Promise<void> {
+    eventEmitter.emit(Events.NODE_STOP)
     if (Container.has('QueryNode')) {
       await Container.get<QueryNode>('QueryNode').stop()
     }
-    if (Container.has('SubstrateService')) {
-      await Container.get<ISubstrateService>('SubstrateService').stop()
-    }
+
     if (Container.has('RedisClientFactory')) {
       Container.get<RedisClientFactory>('RedisClientFactory').stop()
     }
     try {
       const connection = getConnection()
-      if (connection) {
+      if (connection && connection.isConnected) {
         debug('Closing the database connection')
         await connection.close()
       }
     } catch (e) {
       debug(`Error: ${logError(e)}`)
     }
+    process.exit()
   }
 }

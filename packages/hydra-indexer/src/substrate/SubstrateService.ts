@@ -25,7 +25,6 @@ import {
   SUBSTRATE_API_TIMEOUT,
 } from '../indexer/indexer-consts'
 
-import { Service } from 'typedi'
 import BN from 'bn.js'
 import { BlockData } from '../model'
 import { eventEmitter, Events } from '../node/event-emitter'
