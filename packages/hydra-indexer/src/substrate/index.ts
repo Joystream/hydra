@@ -5,6 +5,7 @@ import Debug from 'debug'
 import { getConfig } from '../node/config'
 import { ISubstrateService } from './ISubstrateService'
 import { SubstrateService } from './SubstrateService'
+import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 
 export * from './ISubstrateService'
 export * from './SubstrateService'
@@ -25,7 +26,7 @@ export async function getSubstrateService(): Promise<ISubstrateService> {
 }
 
 export async function getApiPromise(): Promise<ApiPromise> {
-  if (apiPromise && apiPromise.isConnected) {
+  if (apiPromise) {
     return apiPromise
   }
 
@@ -47,11 +48,21 @@ export async function getApiPromise(): Promise<ApiPromise> {
         typesSpec: conf.SPEC_TYPES as Record<string, RegistryTypes>,
         typesChain: conf.CHAIN_TYPES as Record<string, RegistryTypes>,
       }).isReadyOrError,
-    { retries: 3 }
+    {
+      retries: 99, // large enough
+      onFailedAttempt: (error) =>
+        debug(`API failed to connect: ${JSON.stringify(error)}`),
+    }
   )
 
   apiPromise.on('error', async (e) => {
-    debug(`Api error: ${JSON.stringify(e)}, reconnecting`)
+    debug(`Api error: ${JSON.stringify(e)}, reconnecting....`)
+    apiPromise = await getApiPromise()
+  })
+
+  apiPromise.on('connected', () => {
+    debug(`Api connected`)
+    eventEmitter.emit(IndexerEvents.API_CONNECTED)
   })
 
   return apiPromise

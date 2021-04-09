@@ -5,7 +5,7 @@ import commander from 'commander'
 
 import { getLogger } from 'log4js'
 
-import { configure, QueryNodeManager } from './index'
+import { configure, IndexerStarter, cleanUp } from './node'
 
 const logger = getLogger()
 
@@ -73,25 +73,29 @@ function setUp(opts: Record<string, string>) {
 
   process.env.WS_PROVIDER_ENDPOINT_URI =
     opts.provider || process.env.WS_PROVIDER_ENDPOINT_URI
-  // log4js config
-  // if (opts.logging) {
-  //   configure(opts.logging)
-  // } else {
-  //   // log4js default: DEBUG to console output;
-  //   getLogger().level = 'debug'
-  // }
+  //  TODO: use logger everywhere
+  getLogger().level = 'debug'
 }
 
 async function runIndexer() {
   configure()
-  const node = new QueryNodeManager()
-  await node.index()
+  logger.info(`Starting the indexer`)
+  await IndexerStarter.index()
 }
 
 async function runMigrations() {
   logger.info(`Running migrations`)
-  await QueryNodeManager.migrate()
-  // TODO: here should be TypeORM migrations...
+  await IndexerStarter.migrate()
 }
+
+process.on('SIGINT', async () => {
+  logger.info(`SIGINT: terminating`)
+  await cleanUp()
+})
+
+process.on('SIGTERM', async () => {
+  logger.info(`SIGTERM: terminating`)
+  await cleanUp()
+})
 
 main()

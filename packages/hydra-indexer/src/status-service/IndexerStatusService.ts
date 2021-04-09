@@ -3,7 +3,7 @@ import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
 import { logError, stringifyWithTs, waitFor } from '@dzlzv/hydra-common'
-import { BlockPayload, QueryEventBlock } from './../model'
+import { BlockPayload } from '../model'
 import {
   INDEXER_HEAD_BLOCK,
   INDEXER_NEW_HEAD_CHANNEL,
@@ -13,11 +13,14 @@ import {
   EVENT_TOTAL,
   BLOCK_CACHE_PREFIX,
   INDEXER_STATUS,
-} from './redis-keys'
+} from '../redis/redis-keys'
 import { IStatusService } from './IStatusService'
 import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
-import { BLOCK_CACHE_TTL_SEC, INDEXER_HEAD_TTL_SEC } from './indexer-consts'
-import { IBlockProducer, NEW_CHAIN_HEIGHT_EVENT } from '.'
+import {
+  BLOCK_CACHE_TTL_SEC,
+  INDEXER_HEAD_TTL_SEC,
+} from '../indexer/indexer-consts'
+import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 
 const debug = Debug('index-builder:status-server')
 
@@ -36,12 +39,10 @@ export class IndexerStatusService implements IStatusService {
     this.redisSub = clientFactory.getClient()
     this.redisPub = clientFactory.getClient()
     this.redisClient = clientFactory.getClient()
-    this.redisSub
-      .subscribe([BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL])
-      .then(() => debug(`Subscribed to the indexer channels`))
-      .catch((e) => {
-        throw new Error(e)
-      })
+  }
+
+  async init(): Promise<void> {
+    await this.redisSub.subscribe([BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL])
 
     this.redisSub.on('message', (channel, message) => {
       this.onNewMessage(channel, message).catch((e) => {
@@ -49,11 +50,8 @@ export class IndexerStatusService implements IStatusService {
       })
     })
 
-    const producer = Container.get<IBlockProducer<QueryEventBlock>>(
-      'BlockProducer'
-    )
     // eslint-disable-next-line
-    producer.on(NEW_CHAIN_HEIGHT_EVENT, async (height) => {
+    eventEmitter.on(IndexerEvents.NEW_FINALIZED_HEAD, async ({ height }) => {
       await this.redisClient.hset(INDEXER_STATUS, 'CHAIN_HEIGHT', height)
     })
   }
