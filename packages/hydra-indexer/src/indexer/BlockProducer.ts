@@ -1,10 +1,5 @@
 import { Header, Hash } from '@polkadot/types/interfaces'
-import { UnsubscribePromise } from '@polkadot/api/types'
-import { Service } from 'typedi'
-
 import Debug from 'debug'
-import { EventEmitter } from 'events'
-
 import { waitFor, withTimeout } from '@dzlzv/hydra-common'
 
 import pRetry from 'p-retry'
@@ -20,19 +15,14 @@ import { QueryEventBlock, fromBlockData } from '../model'
 import { IBlockProducer } from './IBlockProducer'
 import FIFOCache from './FIFOCache'
 import { getConfig } from '..'
+import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 
-const DEBUG_TOPIC = 'index-builder:producer'
+const DEBUG_TOPIC = 'hydra-indexer:producer'
 
 const debug = Debug(DEBUG_TOPIC)
 
-export const NEW_CHAIN_HEIGHT_EVENT = 'NEW_CHAIN_HEIGHT'
-
-@Service('BlockProducer')
-export class BlockProducer extends EventEmitter
-  implements IBlockProducer<QueryEventBlock> {
+export class BlockProducer implements IBlockProducer<QueryEventBlock> {
   private _started: boolean
-
-  private _newHeadsUnsubscriber: UnsubscribePromise | undefined
 
   private _blockToProduceNext: number
 
@@ -42,10 +32,7 @@ export class BlockProducer extends EventEmitter
   private substrateService!: ISubstrateService
 
   constructor() {
-    super()
     this._started = false
-    this._newHeadsUnsubscriber = undefined
-
     this._blockToProduceNext = 0
     this._chainHeight = 0
   }
@@ -63,12 +50,11 @@ export class BlockProducer extends EventEmitter
     this._chainHeight = header.number.toNumber()
 
     //
-    this._newHeadsUnsubscriber = this.substrateService.subscribeFinalizedHeads(
-      (header: Header) => {
-        this._headerCache.put(header.number.toNumber(), header)
-        this._onNewHeads(header)
-      }
-    )
+    eventEmitter.on(IndexerEvents.NEW_FINALIZED_HEAD, ({ header, height }) => {
+      debug(`New finalized head: ${JSON.stringify(header)}, height: ${height}`)
+      this._headerCache.put(height, header)
+      this._onNewHeads(header)
+    })
 
     this._blockToProduceNext = atBlock
     debug(
@@ -88,17 +74,12 @@ export class BlockProducer extends EventEmitter
       return
     }
 
-    if (this._newHeadsUnsubscriber) {
-      // eslint-disable-next-line
-      ;(await this._newHeadsUnsubscriber)()
-    }
     debug('Block producer has been stopped')
     this._started = false
   }
 
   private _onNewHeads(header: Header) {
     this._chainHeight = header.number.toNumber()
-    this.emit(NEW_CHAIN_HEIGHT_EVENT, this._chainHeight)
     debug(`New block found at height #${this._chainHeight.toString()}`)
   }
 
