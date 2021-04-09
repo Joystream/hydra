@@ -25,7 +25,7 @@ For popular chains, one can use an already in-sync publicly available Indexer en
 Run
 
 ```text
-$ npx @dzlzv/hydra-cli scaffold
+$ npx @dzlzv/hydra-cli@next scaffold
 ```
 
 and answer the prompts. It will generate a sample project and README with setup instructions.
