@@ -20,4 +20,5 @@
   * [GraphQL Entity Relationships](docs/entity-relationship.md)
   * [Architecture](docs/architecture.md)
 * [Migration to Hydra v2](migration-to-hydra-v2.md)
+* [Announcing Hydra v3](announcing-hydra-v3.md)
 
