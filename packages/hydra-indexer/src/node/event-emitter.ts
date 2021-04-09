@@ -2,7 +2,12 @@ import EventEmitter from 'events'
 
 export const eventEmitter = new EventEmitter()
 
-export enum Events {
-  NEW_BLOCK_ARRIVED = 'NEW_BLOCK_ARRIVED',
-  NODE_STOP = 'NODE_STOP',
+export enum IndexerEvents {
+  // NEW_BLOCK_ARRIVED = 'NEW_BLOCK_ARRIVED', // when a new block has arrived
+  INDEXER_STOP = 'NODE_STOP', // emitted when the indexer is stopping
+  NEW_FINALIZED_HEAD = 'NEW_FINALIZED_HEAD', // new block has been finalized
+  NEW_BEST_HEAD = 'NEW_BEST_HEAD', // new block has been finalized
+  NEW_HEAD = 'NEW_HEAD', // emitted from a subscription to all heads
+  API_CONNECTED = 'API_CONNECTED', // api has been (re)-connected
+  BLOCK_START_CHANNEL = 'BLOCK_START_CHANNEL', // block processing started
 }

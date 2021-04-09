@@ -5,34 +5,37 @@ import * as _ from 'lodash'
 import Debug from 'debug'
 import { PooledExecutor } from './PooledExecutor'
 import { SubstrateEventEntity } from '../entities'
-import { Inject, Service } from 'typedi'
-import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-keys'
-import { IBlockProducer } from './IBlockProducer'
-import { assert } from 'console'
-import { EventEmitter } from 'events'
-import { IStatusService } from './IStatusService'
+import {
+  BLOCK_START_CHANNEL,
+  BLOCK_COMPLETE_CHANNEL,
+} from '../redis/redis-keys'
+import { IStatusService } from '../status-service/IStatusService'
 import { WORKERS_NUMBER } from './indexer-consts'
 import { toPayload } from '../model/BlockPayload'
 import { getConnection, EntityManager } from 'typeorm'
 import { getConfig } from '../node'
+import { BlockProducer } from '.'
+import { getStatusService } from '../status-service'
+import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 
-const debug = Debug('index-builder:indexer')
+const debug = Debug('hydra-indexer:indexer')
 
-@Service('IndexBuilder')
-export class IndexBuilder extends EventEmitter {
+// @Service('IndexBuilder')
+export class IndexBuilder {
   private _stopped = false
-
-  public constructor(
-    @Inject('BlockProducer')
-    protected readonly producer: IBlockProducer<QueryEventBlock>,
-    @Inject('StatusService') protected readonly statusService: IStatusService
-  ) {
-    super()
-  }
+  private producer!: BlockProducer
+  private statusService!: IStatusService
+  // public constructor(
+  //   @Inject('BlockProducer')
+  //   protected readonly producer: IBlockProducer<QueryEventBlock>,
+  //   @Inject('StatusService') protected readonly statusService: IStatusService
+  // ) {
+  //   super()
+  // }
 
   async start(): Promise<void> {
-    assert(this.producer, 'BlockProducer must be set')
-    assert(this.statusService, 'StatusService must be set')
+    this.producer = new BlockProducer()
+    this.statusService = await getStatusService()
 
     debug('Spawned worker.')
 
@@ -66,6 +69,7 @@ export class IndexBuilder extends EventEmitter {
     )
 
     debug('Started a pool of indexers.')
+    eventEmitter.on(IndexerEvents.INDEXER_STOP, async () => await this.stop())
 
     try {
       await poolExecutor.run(() => this._stopped)
@@ -90,7 +94,7 @@ export class IndexBuilder extends EventEmitter {
         return
       }
 
-      this.emit(BLOCK_START_CHANNEL, {
+      eventEmitter.emit(BLOCK_START_CHANNEL, {
         height: h,
       })
 
@@ -101,7 +105,7 @@ export class IndexBuilder extends EventEmitter {
       await this.transformAndPersist(queryEventsBlock)
       debug(`Done block #${h.toString()}`)
 
-      this.emit(BLOCK_COMPLETE_CHANNEL, toPayload(queryEventsBlock))
+      eventEmitter.emit(BLOCK_COMPLETE_CHANNEL, toPayload(queryEventsBlock))
     }
   }
 
