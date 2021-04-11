@@ -58,8 +58,13 @@ export {{#isInterface}}abstract{{/isInterface}} class {{className}}
 {{#fields}}
   {{#is.otm}}
     @OneToMany(
-      () => {{relation.columnType}}, (param: {{relation.columnType}}) => param.{{relation.relatedTsProp}}
-      {{#relation.nullable}},{ nullable: true }{{/relation.nullable}}
+      () => {{relation.columnType}}, (param: {{relation.columnType}}) => param.{{relation.relatedTsProp}},
+      {
+        {{#relation.nullable}}nullable: true,{{/relation.nullable}}
+        modelName: '{{entityName}}',
+        relModelName: '{{relation.columnType}}',
+        propertyName: '{{camelName}}'
+      }
     )
     {{camelName}}?: {{relation.columnType}}[];  
   {{/is.otm}}
@@ -68,7 +73,13 @@ export {{#isInterface}}abstract{{/isInterface}} class {{className}}
     @ManyToOne(
       () => {{relation.columnType}},
       {{#relation.relatedTsProp}}(param: {{relation.columnType}}) => param.{{relation.relatedTsProp}},{{/relation.relatedTsProp}}
-      { skipGraphQLField: true {{#relation.nullable}},nullable: true{{/relation.nullable}} }
+      {
+        skipGraphQLField: true,
+        {{#relation.nullable}}nullable: true,{{/relation.nullable}}
+        modelName: '{{entityName}}',
+        relModelName: '{{relation.columnType}}',
+        propertyName: '{{camelName}}'
+      }
     )
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: {{relation.columnType}};
   {{/is.mto}}
@@ -76,7 +87,16 @@ export {{#isInterface}}abstract{{/isInterface}} class {{className}}
   {{#is.oto}}
     {{^relation.joinColumn}}@OneToOne{{/relation.joinColumn}}
     {{#relation.joinColumn}}@OneToOneJoin{{/relation.joinColumn}}
-    (() => {{relation.columnType}},(param: {{relation.columnType}}) => param.{{relation.relatedTsProp}} {{#relation.nullable}},{ nullable: true }{{/relation.nullable}} )
+    (
+      () => {{relation.columnType}},
+      (param: {{relation.columnType}}) => param.{{relation.relatedTsProp}},
+      {
+        {{#relation.nullable}}nullable: true,{{/relation.nullable}}
+        modelName: '{{entityName}}',
+        relModelName: '{{relation.columnType}}',
+        propertyName: '{{camelName}}',
+      }
+    )
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: {{relation.columnType}};
   {{/is.oto}}
 

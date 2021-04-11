@@ -87,7 +87,9 @@ export class {{className}}ConnectionWhereArgs extends ConnectionPageInputOptions
 
 @Resolver({{className}})
 export class {{className}}Resolver {
-  constructor(@Inject('{{className}}Service') public readonly service: {{className}}Service) {}
+  constructor(
+    @Inject('{{className}}Service') public readonly service: {{className}}Service
+  ) {}
 
   @Query(() => [{{className}}])
   async {{camelNamePlural}}(
