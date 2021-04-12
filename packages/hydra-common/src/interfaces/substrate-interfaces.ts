@@ -1,5 +1,4 @@
 import { AnyJson, AnyJsonField } from './json-types'
-import * as BN from 'bn.js'
 
 export interface EventParam {
   type: string
