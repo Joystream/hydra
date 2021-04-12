@@ -26,17 +26,16 @@ export class IndexerStarter {
     configure()
     await createDBConnection()
 
-    Container.set(
-      'RedisClientFactory',
-      new RedisClientFactory(getConfig().REDIS_URI)
-    )
+    debug(`Database connection OK`)
+
     Container.set('RedisRelayer', new RedisRelayer())
+
     // Start only the indexer
     const indexBuilder = new IndexBuilder()
     try {
       await indexBuilder.start()
     } catch (e) {
-      debug(`Stopping the indexer due to errors: ${JSON.stringify(e, null, 2)}`)
+      debug(`Stopping the indexer due to errors: ${logError(e)}`)
       process.exitCode = -1
     } finally {
       await cleanUp()
@@ -69,9 +68,6 @@ export async function cleanUp(): Promise<void> {
     // ignore
   }
 
-  if (Container.has('RedisClientFactory')) {
-    Container.get<RedisClientFactory>('RedisClientFactory').stop()
-  }
   try {
     const connection = getConnection()
     if (connection && connection.isConnected) {

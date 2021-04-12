@@ -6,10 +6,19 @@ import {
   PrimaryColumn,
   Index,
 } from 'typeorm'
-import { AnyJson, AnyJsonField, EventParam } from '@dzlzv/hydra-common'
-import { formatEventId, IQueryEvent } from '..'
+import {
+  AnyJson,
+  AnyJsonField,
+  EventParam,
+  SubstrateEvent,
+  formatEventId,
+} from '@dzlzv/hydra-common'
+import { EventRecord, Extrinsic } from '@polkadot/types/interfaces'
 import BN from 'bn.js'
-import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity'
+import {
+  fromBlockExtrinsic,
+  SubstrateExtrinsicEntity,
+} from './SubstrateExtrinsicEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
 import { NumericTransformer } from '@dzlzv/bn-typeorm'
 
@@ -18,8 +27,10 @@ export const EVENT_TABLE_NAME = 'substrate_event'
 @Entity({
   name: EVENT_TABLE_NAME,
 })
-@Index(['blockNumber', 'index'], { unique: true })
-export class SubstrateEventEntity extends AbstractWarthogModel {
+@Index(['blockNumber', 'index'])
+export class SubstrateEventEntity
+  extends AbstractWarthogModel
+  implements SubstrateEvent {
   @PrimaryColumn()
   id!: string
 
@@ -57,7 +68,7 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
 
   // PG int type size is not large enough
   @Column('numeric', { transformer: new NumericTransformer() })
-  blockTimestamp!: BN
+  blockTimestamp!: number
 
   @Column()
   index!: number
@@ -83,7 +94,13 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
   @JoinColumn()
   extrinsic?: SubstrateExtrinsicEntity
 
-  static fromQueryEvent(q: IQueryEvent): SubstrateEventEntity {
+  static fromQueryEvent(q: {
+    blockNumber: number
+    blockTimestamp: number
+    indexInBlock: number
+    eventRecord: EventRecord
+    extrinsic?: Extrinsic
+  }): SubstrateEventEntity {
     const _entity = new SubstrateEventEntity()
 
     _entity.blockNumber = q.blockNumber
@@ -121,40 +138,17 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
     const extrinsicArgs: AnyJson = {}
 
     if (q.extrinsic) {
-      const e = q.extrinsic
-      const extr = new SubstrateExtrinsicEntity()
-      _entity.extrinsic = extr
+      const { extrinsic } = q
+      _entity.extrinsic = fromBlockExtrinsic({
+        e: extrinsic,
+        blockNumber: q.blockNumber,
+      })
 
-      extr.blockNumber = q.blockNumber
-      extr.signature = e.signature.toString()
-      extr.signer = e.signer.toString()
-
-      extr.method = e.method.method || 'NO_METHOD'
-      extr.section = e.method.section || 'NO_SECTION'
-      _entity.extrinsicName = `${extr.section}.${extr.method}`
-
-      extr.meta = (e.meta.toJSON() || {}) as AnyJson
-      extr.hash = e.hash.toString()
-      _entity.extrinsicHash = extr.hash
-
-      extr.isSigned = e.isSigned
-      extr.tip = new BN(e.tip.toString())
-      extr.versionInfo = e.version.toString()
-      extr.nonce = e.nonce.toNumber()
-      extr.era = (e.era.toJSON() || {}) as AnyJson
-
-      extr.args = []
-
-      e.method.args.forEach((data, index) => {
-        const name = e.meta.args[index].name.toString()
+      extrinsic.method.args.forEach((data, index) => {
+        const name = extrinsic.meta.args[index].name.toString()
         const value = (data.toJSON() || '') as AnyJsonField
         const type = data.toRawType()
 
-        extr.args.push({
-          type,
-          value,
-          name,
-        })
         extrinsicArgs[name] = { type, value }
       })
     }

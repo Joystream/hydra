@@ -1,10 +1,9 @@
-import Container, { Service } from 'typedi'
 import { BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL } from './redis-keys'
 import Debug from 'debug'
 import { stringifyWithTs, logError } from '@dzlzv/hydra-common'
-import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 import { eventEmitter } from '../node/event-emitter'
-import IORedis = require('ioredis')
+import { getRedisFactory } from './client-factory'
+import * as IORedis from 'ioredis'
 
 const debug = Debug('index-builder:redis-relayer')
 
@@ -13,14 +12,11 @@ const debug = Debug('index-builder:redis-relayer')
  *  The main reason for it is to decouple most of the core classes from the
  *  Redis infrastructure
  **/
-@Service()
 export class RedisRelayer {
   private redisPub: IORedis.Redis
 
   public constructor() {
-    const clientFactory = Container.get<RedisClientFactory>(
-      'RedisClientFactory'
-    )
+    const clientFactory = getRedisFactory()
     this.redisPub = clientFactory.getClient()
     // Relay local events globablly via redis
     const events = [BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL]

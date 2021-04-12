@@ -1,5 +1,5 @@
 // @ts-check
-import { QueryEventBlock } from '../model'
+import { BlockData, fromBlockData, QueryEventBlock } from '../model'
 import * as _ from 'lodash'
 
 import Debug from 'debug'
@@ -17,23 +17,18 @@ import { getConfig } from '../node'
 import { BlockProducer } from '.'
 import { getStatusService } from '../status-service'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
+import { SubstrateBlockEntity } from '../entities/SubstrateBlockEntity'
 
-const debug = Debug('hydra-indexer:indexer')
+const debug = Debug('index-builder:indexer')
 
-// @Service('IndexBuilder')
 export class IndexBuilder {
   private _stopped = false
   private producer!: BlockProducer
   private statusService!: IStatusService
-  // public constructor(
-  //   @Inject('BlockProducer')
-  //   protected readonly producer: IBlockProducer<QueryEventBlock>,
-  //   @Inject('StatusService') protected readonly statusService: IStatusService
-  // ) {
-  //   super()
-  // }
 
   async start(): Promise<void> {
+    debug(`Starting Index Builder`)
+
     this.producer = new BlockProducer()
     this.statusService = await getStatusService()
 
@@ -98,24 +93,24 @@ export class IndexBuilder {
         height: h,
       })
 
-      const queryEventsBlock: QueryEventBlock = await this.producer.fetchBlock(
-        h
-      )
+      const blockData = await this.producer.fetchBlock(h)
 
-      await this.transformAndPersist(queryEventsBlock)
+      await this.transformAndPersist(blockData)
+
       debug(`Done block #${h.toString()}`)
-
-      eventEmitter.emit(BLOCK_COMPLETE_CHANNEL, toPayload(queryEventsBlock))
     }
   }
 
-  async transformAndPersist(queryEventsBlock: QueryEventBlock): Promise<void> {
-    const batches = _.chunk(queryEventsBlock.queryEvents, 100)
+  async transformAndPersist(blockData: BlockData): Promise<void> {
+    const queryEventsBlock = fromBlockData(blockData)
+    const blockEntity = SubstrateBlockEntity.fromBlockData(blockData)
+
+    const batches = _.chunk(queryEventsBlock.blockEvents, 100)
     debug(
-      `Read ${queryEventsBlock.queryEvents.length} events; saving in ${batches.length} batches`
+      `Read ${queryEventsBlock.blockEvents.length} events; saving in ${batches.length} batches`
     )
 
-    getConnection().transaction(async (em: EntityManager) => {
+    await getConnection().transaction(async (em: EntityManager) => {
       debug(`Saving event entities`)
 
       let saved = 0
@@ -128,6 +123,12 @@ export class IndexBuilder {
         batch = []
         debug(`Saved ${saved} events`)
       }
+
+      await em.save(blockEntity)
+
+      debug(`Saved block data`)
     })
+
+    eventEmitter.emit(BLOCK_COMPLETE_CHANNEL, JSON.stringify(blockEntity))
   }
 }

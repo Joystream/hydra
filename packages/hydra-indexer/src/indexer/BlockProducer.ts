@@ -11,7 +11,7 @@ import {
   FINALITY_THRESHOLD,
 } from './indexer-consts'
 import { getSubstrateService, ISubstrateService } from '../substrate'
-import { QueryEventBlock, fromBlockData } from '../model'
+import { BlockData } from '../model'
 import { IBlockProducer } from './IBlockProducer'
 import FIFOCache from './FIFOCache'
 import { getConfig } from '..'
@@ -21,7 +21,7 @@ const DEBUG_TOPIC = 'hydra-indexer:producer'
 
 const debug = Debug(DEBUG_TOPIC)
 
-export class BlockProducer implements IBlockProducer<QueryEventBlock> {
+export class BlockProducer implements IBlockProducer<BlockData> {
   private _started: boolean
 
   private _blockToProduceNext: number
@@ -32,12 +32,14 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
   private substrateService!: ISubstrateService
 
   constructor() {
+    debug(`Creating Block Producer`)
     this._started = false
     this._blockToProduceNext = 0
     this._chainHeight = 0
   }
 
   async start(atBlock: number): Promise<void> {
+    debug(`Starting Block Producer`)
     if (this._started) throw Error(`Cannot start when already started.`)
     this.substrateService = await getSubstrateService()
 
@@ -53,7 +55,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
     eventEmitter.on(IndexerEvents.NEW_FINALIZED_HEAD, ({ header, height }) => {
       debug(`New finalized head: ${JSON.stringify(header)}, height: ${height}`)
       this._headerCache.put(height, header)
-      this._onNewHeads(header)
+      this._chainHeight = header.number.toNumber()
     })
 
     this._blockToProduceNext = atBlock
@@ -78,12 +80,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
     this._started = false
   }
 
-  private _onNewHeads(header: Header) {
-    this._chainHeight = header.number.toNumber()
-    debug(`New block found at height #${this._chainHeight.toString()}`)
-  }
-
-  public async fetchBlock(height: number): Promise<QueryEventBlock> {
+  public async fetchBlock(height: number): Promise<BlockData> {
     if (height > this._chainHeight) {
       throw new Error(
         `Cannot fetch block at height ${height}, current chain height is ${this._chainHeight}`
@@ -110,7 +107,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
    * It can throw errors which should be handled by the top-level code
    * (in this case _produce_block())
    */
-  private async _doBlockProduce(targetHash: Hash): Promise<QueryEventBlock> {
+  private async _doBlockProduce(targetHash: Hash): Promise<BlockData> {
     debug(`\tHash ${targetHash.toString()}.`)
 
     const blockData = await this.substrateService.getBlockData(targetHash)
@@ -119,7 +116,7 @@ export class BlockProducer implements IBlockProducer<QueryEventBlock> {
     }
     debug(`Produced query event block.`)
 
-    return fromBlockData(blockData)
+    return blockData
   }
 
   private async checkHeightOrWait(): Promise<void> {
