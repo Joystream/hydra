@@ -10,8 +10,6 @@ import {
 
 import { u32 } from '@polkadot/types'
 
-import BN from 'bn.js'
-
 export interface QueryEventBlock {
   blockNumber: number
   blockEvents: IQueryEvent[]

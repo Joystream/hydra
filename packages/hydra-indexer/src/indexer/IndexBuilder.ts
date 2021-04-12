@@ -1,5 +1,5 @@
 // @ts-check
-import { BlockData, fromBlockData, QueryEventBlock } from '../model'
+import { BlockData, fromBlockData } from '../model'
 import * as _ from 'lodash'
 
 import Debug from 'debug'
@@ -11,7 +11,6 @@ import {
 } from '../redis/redis-keys'
 import { IStatusService } from '../status-service/IStatusService'
 import { WORKERS_NUMBER } from './indexer-consts'
-import { toPayload } from '../model/BlockPayload'
 import { getConnection, EntityManager } from 'typeorm'
 import { getConfig } from '../node'
 import { BlockProducer } from '.'
