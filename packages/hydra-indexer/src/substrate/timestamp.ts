@@ -1,11 +1,10 @@
 import { Extrinsic } from '@polkadot/types/interfaces'
-import BN from 'bn.js'
 
 // Except genesis block all blocks have timestamp event
-export function getBlockTimestamp(extrinsics: Extrinsic[]): BN {
+export function getBlockTimestamp(extrinsics: Extrinsic[]): number {
   const ex = extrinsics.find(
     ({ method: { method, section } }) =>
       section === 'timestamp' && method === 'set'
   )
-  return ex ? new BN(ex.args[0].toJSON() as number) : new BN(0)
+  return ex ? (ex.args[0].toJSON() as number) : 0
 }

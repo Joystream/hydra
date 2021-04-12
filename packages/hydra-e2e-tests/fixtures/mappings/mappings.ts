@@ -2,12 +2,12 @@ import { DatabaseManager } from '@dzlzv/hydra-db-utils'
 import BN from 'bn.js'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 
-import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model'
-import { BlockTimestamp } from '../generated/graphql-server/src/modules/block-timestamp/block-timestamp.model'
 import {
+  Transfer,
+  BlockTimestamp,
   BlockHook,
   HookType,
-} from '../generated/graphql-server/src/modules/block-hook/block-hook.model'
+} from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
@@ -39,7 +39,7 @@ export async function timestampCall({
   const call = new Timestamp.SetCall(event)
   const block = new BlockTimestamp()
   block.timestamp = call.args.now.toBn()
-  block.blockNumber = new BN(call.ctx.blockNumber)
+  block.blockNumber = call.ctx.blockNumber
 
   await store.save<BlockTimestamp>(block)
 }
@@ -48,7 +48,7 @@ export async function preHook({
   block: { blockNumber },
   store,
 }: {
-  block: { blockNumber: BN }
+  block: { blockNumber: number }
   store: DatabaseManager
 }) {
   const hook = new BlockHook()
@@ -61,7 +61,7 @@ export async function postHook({
   block: { blockNumber },
   store,
 }: {
-  block: { blockNumber: BN }
+  block: { blockNumber: number }
   store: DatabaseManager
 }) {
   const hook = new BlockHook()

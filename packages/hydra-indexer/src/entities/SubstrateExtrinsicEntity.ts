@@ -5,11 +5,17 @@ import {
   OneToOne,
   Index,
 } from 'typeorm'
-import { AnyJson, ExtrinsicArg, SubstrateExtrinsic } from '@dzlzv/hydra-common'
-import * as BN from 'bn.js'
+import {
+  AnyJson,
+  AnyJsonField,
+  ExtrinsicArg,
+  SubstrateExtrinsic,
+} from '@dzlzv/hydra-common'
+import BN from 'bn.js'
 import { NumericTransformer } from '@dzlzv/bn-typeorm'
 import { SubstrateEventEntity } from './SubstrateEventEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
+import { Extrinsic } from '@polkadot/types/interfaces'
 
 export const EXTRINSIC_TABLE_NAME = 'substrate_extrinsic'
 
@@ -77,4 +83,48 @@ export class SubstrateExtrinsicEntity extends AbstractWarthogModel
     (event: SubstrateEventEntity) => event.extrinsic
   ) // specify inverse side as a second parameter
   event!: SubstrateEventEntity
+
+  get name(): string {
+    return `${this.section}.${this.method}`
+  }
+}
+
+export function fromBlockExtrinsic(data: {
+  e: Extrinsic
+  blockNumber: number
+}): SubstrateExtrinsicEntity {
+  const extr = new SubstrateExtrinsicEntity()
+  const { e, blockNumber } = data
+
+  extr.blockNumber = blockNumber
+  extr.signature = e.signature.toString()
+  extr.signer = e.signer.toString()
+
+  extr.method = e.method.method || 'NO_METHOD'
+  extr.section = e.method.section || 'NO_SECTION'
+
+  extr.meta = (e.meta.toJSON() || {}) as AnyJson
+  extr.hash = e.hash.toString()
+
+  extr.isSigned = e.isSigned
+  extr.tip = new BN(e.tip.toString())
+  extr.versionInfo = e.version.toString()
+  extr.nonce = e.nonce.toNumber()
+  extr.era = (e.era.toJSON() || {}) as AnyJson
+
+  extr.args = []
+
+  e.method.args.forEach((data, index) => {
+    const name = e.meta.args[index].name.toString()
+    const value = (data.toJSON() || '') as AnyJsonField
+    const type = data.toRawType()
+
+    extr.args.push({
+      type,
+      value,
+      name,
+    })
+  })
+
+  return extr
 }
