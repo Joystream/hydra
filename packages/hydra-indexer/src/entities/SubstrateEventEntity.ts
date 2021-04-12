@@ -14,7 +14,6 @@ import {
   formatEventId,
 } from '@dzlzv/hydra-common'
 import { EventRecord, Extrinsic } from '@polkadot/types/interfaces'
-import BN from 'bn.js'
 import {
   fromBlockExtrinsic,
   SubstrateExtrinsicEntity,
