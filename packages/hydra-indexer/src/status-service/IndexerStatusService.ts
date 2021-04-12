@@ -1,4 +1,3 @@
-import Container, { Service } from 'typedi'
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
@@ -15,16 +14,15 @@ import {
   INDEXER_STATUS,
 } from '../redis/redis-keys'
 import { IStatusService } from './IStatusService'
-import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
 import {
   BLOCK_CACHE_TTL_SEC,
   INDEXER_HEAD_TTL_SEC,
 } from '../indexer/indexer-consts'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
+import { getRedisFactory } from '../redis/client-factory'
 
 const debug = Debug('index-builder:status-server')
 
-@Service('StatusService')
 export class IndexerStatusService implements IStatusService {
   private redisSub: IORedis.Redis
   private redisPub: IORedis.Redis
@@ -33,15 +31,15 @@ export class IndexerStatusService implements IStatusService {
   private _isLoading = false
 
   constructor() {
-    const clientFactory = Container.get<RedisClientFactory>(
-      'RedisClientFactory'
-    )
+    debug(`Creating status service`)
+    const clientFactory = getRedisFactory()
     this.redisSub = clientFactory.getClient()
     this.redisPub = clientFactory.getClient()
     this.redisClient = clientFactory.getClient()
   }
 
   async init(): Promise<void> {
+    debug(`Initializing status service`)
     await this.redisSub.subscribe([BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL])
 
     this.redisSub.on('message', (channel, message) => {
