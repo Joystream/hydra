@@ -1,5 +1,5 @@
 // @ts-check
-import { BlockData, fromBlockData } from '../model'
+import { BlockData, fromBlockData, toPayload } from '../model'
 import * as _ from 'lodash'
 
 import Debug from 'debug'
@@ -128,6 +128,6 @@ export class IndexBuilder {
       debug(`Saved block data`)
     })
 
-    eventEmitter.emit(BLOCK_COMPLETE_CHANNEL, JSON.stringify(blockEntity))
+    eventEmitter.emit(BLOCK_COMPLETE_CHANNEL, toPayload(blockEntity))
   }
 }
