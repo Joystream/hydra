@@ -42,6 +42,7 @@ export class SubstrateEventEntity extends AbstractWarthogModel
   section?: string
 
   @Column({ nullable: true })
+  @Index()
   extrinsicName?: string
 
   @Column({
@@ -149,6 +150,8 @@ export class SubstrateEventEntity extends AbstractWarthogModel
 
         extrinsicArgs[name] = { type, value }
       })
+      _entity.extrinsicName = _entity.extrinsic.name
+      _entity.extrinsicHash = _entity.extrinsic.hash
     }
 
     _entity.extrinsicArgs = extrinsicArgs
