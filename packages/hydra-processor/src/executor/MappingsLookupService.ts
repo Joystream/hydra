@@ -16,7 +16,6 @@ import {
   EventContext,
 } from './IMappingsLookup'
 import { BlockContext, MappingContext, MappingType } from '../queue'
-import BN from 'bn.js'
 import { getConfig as conf } from '../start/config'
 import { isInRange } from '../util/utils'
 
@@ -34,7 +33,7 @@ export function isEventContext(context: ExecContext): context is EventContext {
 
 export function extractBlock(
   context: MappingContext
-): { blockNumber: number; blockTimestamp: BN } {
+): { blockNumber: number; blockTimestamp: number } {
   // TODO: extract block
   return context.event
 }
