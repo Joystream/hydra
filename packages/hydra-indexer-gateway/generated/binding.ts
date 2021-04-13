@@ -117,6 +117,99 @@ export interface BaseWhereInput {
   deletedById_eq?: String | null
 }
 
+export interface SubstrateBlockCreateInput {
+  height: Float
+  timestamp: Float
+  hash: String
+  parentHash: String
+  stateRoot: String
+  extrinsicsRoot: String
+  runtimeVersion: JSONObject
+  lastRuntimeUpgrade: JSONObject
+  events: JSONObject
+  extrinsics: JSONObject
+}
+
+export interface SubstrateBlockUpdateInput {
+  height?: Float | null
+  timestamp?: Float | null
+  hash?: String | null
+  parentHash?: String | null
+  stateRoot?: String | null
+  extrinsicsRoot?: String | null
+  runtimeVersion?: JSONObject | null
+  lastRuntimeUpgrade?: JSONObject | null
+  events?: JSONObject | null
+  extrinsics?: JSONObject | null
+}
+
+export interface SubstrateBlockWhereInput {
+  id_eq?: ID_Input | null
+  id_in?: ID_Output[] | ID_Output | null
+  createdAt_eq?: DateTime | null
+  createdAt_lt?: DateTime | null
+  createdAt_lte?: DateTime | null
+  createdAt_gt?: DateTime | null
+  createdAt_gte?: DateTime | null
+  createdById_eq?: ID_Input | null
+  createdById_in?: ID_Output[] | ID_Output | null
+  updatedAt_eq?: DateTime | null
+  updatedAt_lt?: DateTime | null
+  updatedAt_lte?: DateTime | null
+  updatedAt_gt?: DateTime | null
+  updatedAt_gte?: DateTime | null
+  updatedById_eq?: ID_Input | null
+  updatedById_in?: ID_Output[] | ID_Output | null
+  deletedAt_all?: Boolean | null
+  deletedAt_eq?: DateTime | null
+  deletedAt_lt?: DateTime | null
+  deletedAt_lte?: DateTime | null
+  deletedAt_gt?: DateTime | null
+  deletedAt_gte?: DateTime | null
+  deletedById_eq?: ID_Input | null
+  deletedById_in?: ID_Output[] | ID_Output | null
+  height_eq?: Int | null
+  height_gt?: Int | null
+  height_gte?: Int | null
+  height_lt?: Int | null
+  height_lte?: Int | null
+  height_in?: Int[] | Int | null
+  timestamp_eq?: Int | null
+  timestamp_gt?: Int | null
+  timestamp_gte?: Int | null
+  timestamp_lt?: Int | null
+  timestamp_lte?: Int | null
+  timestamp_in?: Int[] | Int | null
+  hash_eq?: String | null
+  hash_contains?: String | null
+  hash_startsWith?: String | null
+  hash_endsWith?: String | null
+  hash_in?: String[] | String | null
+  parentHash_eq?: String | null
+  parentHash_contains?: String | null
+  parentHash_startsWith?: String | null
+  parentHash_endsWith?: String | null
+  parentHash_in?: String[] | String | null
+  stateRoot_eq?: String | null
+  stateRoot_contains?: String | null
+  stateRoot_startsWith?: String | null
+  stateRoot_endsWith?: String | null
+  stateRoot_in?: String[] | String | null
+  extrinsicsRoot_eq?: String | null
+  extrinsicsRoot_contains?: String | null
+  extrinsicsRoot_startsWith?: String | null
+  extrinsicsRoot_endsWith?: String | null
+  extrinsicsRoot_in?: String[] | String | null
+  runtimeVersion_json?: JSONObject | null
+  lastRuntimeUpgrade_json?: JSONObject | null
+  events_json?: JSONObject | null
+  extrinsics_json?: JSONObject | null
+}
+
+export interface SubstrateBlockWhereUniqueInput {
+  id: ID_Output
+}
+
 export interface SubstrateEventCreateInput {
   name: String
   section?: String | null
@@ -394,6 +487,8 @@ export interface IndexerStatus {
   lastComplete: Int
   maxComplete: Int
   chainHeight: Int
+  inSync: Boolean
+  hydraVersion?: String | null
 }
 
 export interface PageInfo {
@@ -405,6 +500,27 @@ export interface PageInfo {
 
 export interface StandardDeleteResponse {
   id: ID_Output
+}
+
+export interface SubstrateBlock extends BaseGraphQLObject {
+  id: ID_Output
+  createdAt: DateTime
+  createdById: String
+  updatedAt?: DateTime | null
+  updatedById?: String | null
+  deletedAt?: DateTime | null
+  deletedById?: String | null
+  version: Int
+  height: Int
+  timestamp: BigInt
+  hash: String
+  parentHash: String
+  stateRoot: String
+  extrinsicsRoot: String
+  runtimeVersion: JSONObject
+  lastRuntimeUpgrade: JSONObject
+  events: Array<JSONObject>
+  extrinsics: Array<JSONObject>
 }
 
 export interface SubstrateEvent extends BaseGraphQLObject {

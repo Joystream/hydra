@@ -22,9 +22,320 @@ const { GraphQLJSONObject } = require('graphql-type-json');
 import { BaseWhereInput, JsonObject, PaginationArgs, DateOnlyString, DateTimeString } from 'warthog';
 
 // @ts-ignore
+import { SubstrateBlock } from "../src/modules/substrate-block/substrate-block.model";
+// @ts-ignore
 import { SubstrateExtrinsic } from "../src/modules/substrate-extrinsic/substrate-extrinsic.model";
 // @ts-ignore
 import { SubstrateEvent } from "../src/modules/substrate-event/substrate-event.model";
+
+export enum SubstrateBlockOrderByEnum {
+  createdAt_ASC = "createdAt_ASC",
+  createdAt_DESC = "createdAt_DESC",
+
+  updatedAt_ASC = "updatedAt_ASC",
+  updatedAt_DESC = "updatedAt_DESC",
+
+  deletedAt_ASC = "deletedAt_ASC",
+  deletedAt_DESC = "deletedAt_DESC",
+
+  height_ASC = "height_ASC",
+  height_DESC = "height_DESC",
+
+  timestamp_ASC = "timestamp_ASC",
+  timestamp_DESC = "timestamp_DESC",
+
+  hash_ASC = "hash_ASC",
+  hash_DESC = "hash_DESC",
+
+  parentHash_ASC = "parentHash_ASC",
+  parentHash_DESC = "parentHash_DESC",
+
+  stateRoot_ASC = "stateRoot_ASC",
+  stateRoot_DESC = "stateRoot_DESC",
+
+  extrinsicsRoot_ASC = "extrinsicsRoot_ASC",
+  extrinsicsRoot_DESC = "extrinsicsRoot_DESC"
+}
+
+registerEnumType(SubstrateBlockOrderByEnum, {
+  name: "SubstrateBlockOrderByInput"
+});
+
+@TypeGraphQLInputType()
+export class SubstrateBlockWhereInput {
+  @TypeGraphQLField(() => ID, { nullable: true })
+  id_eq?: string;
+
+  @TypeGraphQLField(() => [ID], { nullable: true })
+  id_in?: string[];
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  createdAt_eq?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  createdAt_lt?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  createdAt_lte?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  createdAt_gt?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  createdAt_gte?: Date;
+
+  @TypeGraphQLField(() => ID, { nullable: true })
+  createdById_eq?: string;
+
+  @TypeGraphQLField(() => [ID], { nullable: true })
+  createdById_in?: string[];
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  updatedAt_eq?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  updatedAt_lt?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  updatedAt_lte?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  updatedAt_gt?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  updatedAt_gte?: Date;
+
+  @TypeGraphQLField(() => ID, { nullable: true })
+  updatedById_eq?: string;
+
+  @TypeGraphQLField(() => [ID], { nullable: true })
+  updatedById_in?: string[];
+
+  @TypeGraphQLField({ nullable: true })
+  deletedAt_all?: Boolean;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  deletedAt_eq?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  deletedAt_lt?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  deletedAt_lte?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  deletedAt_gt?: Date;
+
+  @TypeGraphQLField(() => DateTime, { nullable: true })
+  deletedAt_gte?: Date;
+
+  @TypeGraphQLField(() => ID, { nullable: true })
+  deletedById_eq?: string;
+
+  @TypeGraphQLField(() => [ID], { nullable: true })
+  deletedById_in?: string[];
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  height_eq?: number;
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  height_gt?: number;
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  height_gte?: number;
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  height_lt?: number;
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  height_lte?: number;
+
+  @TypeGraphQLField(() => [Int], { nullable: true })
+  height_in?: number[];
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  timestamp_eq?: number;
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  timestamp_gt?: number;
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  timestamp_gte?: number;
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  timestamp_lt?: number;
+
+  @TypeGraphQLField(() => Int, { nullable: true })
+  timestamp_lte?: number;
+
+  @TypeGraphQLField(() => [Int], { nullable: true })
+  timestamp_in?: number[];
+
+  @TypeGraphQLField({ nullable: true })
+  hash_eq?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  hash_contains?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  hash_startsWith?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  hash_endsWith?: string;
+
+  @TypeGraphQLField(() => [String], { nullable: true })
+  hash_in?: string[];
+
+  @TypeGraphQLField({ nullable: true })
+  parentHash_eq?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  parentHash_contains?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  parentHash_startsWith?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  parentHash_endsWith?: string;
+
+  @TypeGraphQLField(() => [String], { nullable: true })
+  parentHash_in?: string[];
+
+  @TypeGraphQLField({ nullable: true })
+  stateRoot_eq?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  stateRoot_contains?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  stateRoot_startsWith?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  stateRoot_endsWith?: string;
+
+  @TypeGraphQLField(() => [String], { nullable: true })
+  stateRoot_in?: string[];
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicsRoot_eq?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicsRoot_contains?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicsRoot_startsWith?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicsRoot_endsWith?: string;
+
+  @TypeGraphQLField(() => [String], { nullable: true })
+  extrinsicsRoot_in?: string[];
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  runtimeVersion_json?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  lastRuntimeUpgrade_json?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  events_json?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  extrinsics_json?: JsonObject;
+}
+
+@TypeGraphQLInputType()
+export class SubstrateBlockWhereUniqueInput {
+  @TypeGraphQLField(() => ID)
+  id?: string;
+}
+
+@TypeGraphQLInputType()
+export class SubstrateBlockCreateInput {
+  @TypeGraphQLField()
+  height!: number;
+
+  @TypeGraphQLField()
+  timestamp!: number;
+
+  @TypeGraphQLField()
+  hash!: string;
+
+  @TypeGraphQLField()
+  parentHash!: string;
+
+  @TypeGraphQLField()
+  stateRoot!: string;
+
+  @TypeGraphQLField()
+  extrinsicsRoot!: string;
+
+  @TypeGraphQLField(() => GraphQLJSONObject)
+  runtimeVersion!: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject)
+  lastRuntimeUpgrade!: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject)
+  events!: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject)
+  extrinsics!: JsonObject;
+}
+
+@TypeGraphQLInputType()
+export class SubstrateBlockUpdateInput {
+  @TypeGraphQLField({ nullable: true })
+  height?: number;
+
+  @TypeGraphQLField({ nullable: true })
+  timestamp?: number;
+
+  @TypeGraphQLField({ nullable: true })
+  hash?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  parentHash?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  stateRoot?: string;
+
+  @TypeGraphQLField({ nullable: true })
+  extrinsicsRoot?: string;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  runtimeVersion?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  lastRuntimeUpgrade?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  events?: JsonObject;
+
+  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
+  extrinsics?: JsonObject;
+}
+
+@ArgsType()
+export class SubstrateBlockWhereArgs extends PaginationArgs {
+  @TypeGraphQLField(() => SubstrateBlockWhereInput, { nullable: true })
+  where?: SubstrateBlockWhereInput;
+
+  @TypeGraphQLField(() => SubstrateBlockOrderByEnum, { nullable: true })
+  orderBy?: SubstrateBlockOrderByEnum;
+}
+
+@ArgsType()
+export class SubstrateBlockCreateManyArgs {
+  @TypeGraphQLField(() => [SubstrateBlockCreateInput])
+  data!: SubstrateBlockCreateInput[];
+}
+
+@ArgsType()
+export class SubstrateBlockUpdateArgs {
+  @TypeGraphQLField() data!: SubstrateBlockUpdateInput;
+  @TypeGraphQLField() where!: SubstrateBlockWhereUniqueInput;
+}
 
 export enum SubstrateExtrinsicOrderByEnum {
   createdAt_ASC = "createdAt_ASC",
