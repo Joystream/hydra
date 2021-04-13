@@ -2,10 +2,9 @@ import { configure } from '.'
 import { createDBConnection } from '../db/dal'
 import { Connection, getConnection } from 'typeorm'
 import Debug from 'debug'
-import Container from 'typedi'
 import { logError } from '@dzlzv/hydra-common'
 import { eventEmitter, IndexerEvents } from './event-emitter'
-import { RedisRelayer } from '../redis/RedisRelayer'
+import { initPubSub } from '../redis/RedisRelayer'
 import { IndexBuilder } from '../indexer'
 
 const debug = Debug('hydra-indexer:manager')
@@ -24,10 +23,10 @@ export class IndexerStarter {
 
     configure()
     await createDBConnection()
-
     debug(`Database connection OK`)
 
-    Container.set('RedisRelayer', new RedisRelayer())
+    initPubSub()
+    debug(`PubSub OK`)
 
     // Start only the indexer
     const indexBuilder = new IndexBuilder()

@@ -12,23 +12,49 @@ const debug = Debug('index-builder:redis-relayer')
  *  The main reason for it is to decouple most of the core classes from the
  *  Redis infrastructure
  **/
-export class RedisRelayer {
+class RedisRelayer implements PubSub {
   private redisPub: IORedis.Redis
 
   public constructor() {
     const clientFactory = getRedisFactory()
     this.redisPub = clientFactory.getClient()
+  }
+
+  listen() {
     // Relay local events globablly via redis
     const events = [BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL]
     events.forEach((event) => {
-      eventEmitter.on(event, (data) => this.relayToRedis(event, data))
+      eventEmitter.on(event, (data) => this.publish(event, data))
     })
   }
 
-  private relayToRedis(topic: string, data: Record<string, unknown>) {
+  publish(topic: string, data: Record<string, unknown>): void {
     debug(`Relaying to redis: ${topic} ${JSON.stringify(data)}`)
     this.redisPub
       .publish(topic, stringifyWithTs(data))
       .catch((e) => debug(`${logError(e)}`))
   }
+}
+
+export interface PubSub {
+  publish(topic: string, data: Record<string, unknown>): void
+}
+
+let relayer: RedisRelayer
+
+export function getPubSub(): PubSub {
+  if (relayer) {
+    return relayer
+  }
+  initPubSub()
+  return relayer
+}
+
+// TODO: implement more flexible pubsub
+export function initPubSub(): void {
+  if (relayer) {
+    return
+  }
+  relayer = new RedisRelayer()
+  relayer.listen()
 }
