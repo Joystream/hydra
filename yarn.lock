@@ -2005,7 +2005,7 @@
     bn.js "^4.11.9"
     eventemitter3 "^4.0.7"
 
-"@polkadot/keyring@6.0.5", "@polkadot/keyring@^6.0.5":
+"@polkadot/keyring@6.0.5", "@polkadot/keyring@6.1.1", "@polkadot/keyring@^6.0.5":
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/@polkadot/keyring/-/keyring-6.0.5.tgz#b684f354476e96c657a7e8d3e5f0c090e1178b31"
   integrity sha512-v9Tmu+eGZnWpLzxHUj5AIvmfX0uCHWShtF90zvaLvMXLFRWfeuaFnZwdZ+fNkXsrbI0R/w1gRtpFqzsT7QUbVw==
@@ -14707,7 +14707,7 @@ walker@^1.0.7, walker@~1.0.5:
   dependencies:
     makeerror "1.0.x"
 
-warthog@^2.19.0:
+warthog@^2.20.0:
   version "2.21.0"
   resolved "https://registry.yarnpkg.com/warthog/-/warthog-2.21.0.tgz#c7a5aa01d935ee8b5de23ba1de06790edb51629b"
   integrity sha512-TwOd2vmYy1YcqHsT4CyPMK02HLqHVcWSAtAzIe948gIoCvDDMG6eMtxxIgThfeaFQh+j87BOjuVIsfWaCmMbsg==

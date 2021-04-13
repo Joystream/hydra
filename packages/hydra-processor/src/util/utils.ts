@@ -33,18 +33,21 @@ export function resolvePackageVersion(pkgName: string): string {
 
 export function parseEventId(
   eventId: string
-): { blockHeight: number; eventId: number } {
+): { blockHeight: number; eventId: number; hash?: string } {
   const parts = eventId.split('-')
 
-  if (parts.length !== 2) {
+  if (parts.length < 2) {
     throw new Error(
-      `Event ID ${eventId} does not match the format <blockHeight>-<eventId>`
+      `Event ID ${eventId} does not match the format <blockHeight>-<eventId>-<hash>`
     )
   }
+
+  const hash = parts.length >= 3 ? parts[2] : undefined
 
   return {
     blockHeight: parseInt(parts[0], 10),
     eventId: parseInt(parts[1], 10),
+    hash,
   }
 }
 

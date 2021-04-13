@@ -1,7 +1,7 @@
 import { BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL } from './redis-keys'
 import Debug from 'debug'
 import { stringifyWithTs, logError } from '@dzlzv/hydra-common'
-import { eventEmitter } from '../node/event-emitter'
+import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 import { getRedisFactory } from './client-factory'
 import * as IORedis from 'ioredis'
 
@@ -20,12 +20,13 @@ class RedisRelayer implements PubSub {
     this.redisPub = clientFactory.getClient()
   }
 
-  listen() {
-    // Relay local events globablly via redis
-    const events = [BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL]
-    events.forEach((event) => {
-      eventEmitter.on(event, (data) => this.publish(event, data))
-    })
+  async listen(): Promise<void> {
+    eventEmitter.on(IndexerEvents.BLOCK_STARTED, (data) =>
+      this.publish(BLOCK_START_CHANNEL, data)
+    )
+    eventEmitter.on(IndexerEvents.BLOCK_COMPLETED, (data) =>
+      this.publish(BLOCK_COMPLETE_CHANNEL, data)
+    )
   }
 
   publish(topic: string, data: Record<string, unknown>): void {

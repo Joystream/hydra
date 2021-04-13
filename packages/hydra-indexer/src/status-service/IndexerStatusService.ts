@@ -21,7 +21,7 @@ import {
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 import { getRedisFactory } from '../redis/client-factory'
 
-const debug = Debug('index-builder:status-server')
+const debug = Debug('hydra-indexer:status-server')
 
 export class IndexerStatusService implements IStatusService {
   private redisSub: IORedis.Redis
@@ -70,8 +70,7 @@ export class IndexerStatusService implements IStatusService {
   async updateCompleteMetrics(height: number): Promise<void> {
     await this.redisClient.hset(INDEXER_STATUS, 'LAST_COMPLETE', height)
     const max = await this.redisClient.hget(INDEXER_STATUS, 'MAX_COMPLETE')
-
-    if (max === null || Number.parseInt(max) < height) {
+    if (!max || Number.parseInt(max) < height) {
       await this.redisClient.hset(INDEXER_STATUS, 'MAX_COMPLETE', height)
     }
   }
