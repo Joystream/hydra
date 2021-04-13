@@ -7,7 +7,7 @@ import {
 } from '@dzlzv/hydra-common'
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm'
 import { SubstrateEventEntity } from '.'
-import { BlockData, getExtrinsicIndex } from '../model'
+import { BlockData, getExtrinsic } from '../model'
 import { fromBlockExtrinsic } from './SubstrateExtrinsicEntity'
 
 @Entity({
@@ -82,7 +82,7 @@ export class SubstrateBlockEntity implements SubstrateBlock {
       })
       return {
         id: formatEventId(entity.height, index), // TODO: rename
-        name: `${extrinsicEntity.section}.${extrinsicEntity.method}`,
+        name: extrinsicEntity.name,
       }
     })
 
@@ -93,15 +93,15 @@ export class SubstrateBlockEntity implements SubstrateBlock {
         indexInBlock: index,
         eventRecord,
       })
-      const extrinsicIndex = getExtrinsicIndex(eventRecord)
 
       return {
         id: eventEntity.id,
         name: eventEntity.name,
         extrinsic:
-          extrinsicIndex && entity.extrinsics.length > extrinsicIndex
-            ? entity.extrinsics[extrinsicIndex].name
-            : 'none',
+          getExtrinsic({
+            record: eventRecord,
+            extrinsics: block.extrinsics,
+          }) || 'none',
       } as EventInfo
     })
 

@@ -83,6 +83,10 @@ export class SubstrateExtrinsicEntity extends AbstractWarthogModel
     (event: SubstrateEventEntity) => event.extrinsic
   ) // specify inverse side as a second parameter
   event!: SubstrateEventEntity
+
+  get name(): string {
+    return `${this.section}.${this.method}`
+  }
 }
 
 export function fromBlockExtrinsic(data: {
