@@ -1,19 +1,22 @@
 import {
   AnyJson,
-  SubstrateBlock,
   EventInfo,
   ExtrinsicInfo,
-  formatEventId,
+  formatId,
+  SubstrateBlock,
 } from '@dzlzv/hydra-common'
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm'
-import { SubstrateEventEntity } from '.'
-import { BlockData, getExtrinsic } from '../model'
-import { fromBlockExtrinsic } from './SubstrateExtrinsicEntity'
+import { BlockData, fullName, getExtrinsic } from '../model'
+import { AbstractWarthogModel } from './AbstractWarthogModel'
 
 @Entity({
   name: 'substrate_block',
 })
-export class SubstrateBlockEntity implements SubstrateBlock {
+export class SubstrateBlockEntity extends AbstractWarthogModel
+  implements SubstrateBlock {
+  @PrimaryColumn()
+  id!: string
+
   @Column()
   @Index()
   height!: number
@@ -22,7 +25,7 @@ export class SubstrateBlockEntity implements SubstrateBlock {
   timestamp!: number
 
   @Column()
-  @PrimaryColumn()
+  @Index()
   hash!: string
 
   @Column()
@@ -36,19 +39,15 @@ export class SubstrateBlockEntity implements SubstrateBlock {
   extrinsicsRoot!: string
 
   @Column({ type: 'jsonb' })
-  @Index()
   runtimeVersion!: AnyJson
 
   @Column({ type: 'jsonb' })
-  @Index()
   lastRuntimeUpgrade!: AnyJson
 
   @Column({ type: 'jsonb' })
-  @Index()
   events!: EventInfo[]
 
   @Column({ type: 'jsonb' })
-  @Index()
   extrinsics!: ExtrinsicInfo[]
 
   static fromBlockData({
@@ -57,7 +56,7 @@ export class SubstrateBlockEntity implements SubstrateBlock {
     events,
     signedBlock: { block },
     timestamp,
-  }: BlockData): SubstrateBlockEntity & SubstrateBlock {
+  }: BlockData): SubstrateBlockEntity {
     const entity = new SubstrateBlockEntity()
 
     entity.lastRuntimeUpgrade = lastRuntimeUpgrade
@@ -74,35 +73,25 @@ export class SubstrateBlockEntity implements SubstrateBlock {
     entity.height = header.number.toNumber()
     entity.extrinsicsRoot = header.extrinsicsRoot.toHex()
     entity.timestamp = timestamp
+    entity.id = formatId({ height: entity.height, hash: entity.hash })
 
     entity.extrinsics = block.extrinsics.map((extrinsic, index) => {
-      const extrinsicEntity = fromBlockExtrinsic({
-        e: extrinsic,
-        blockNumber: entity.height,
-      })
       return {
-        id: formatEventId(entity.height, index), // TODO: rename
-        name: extrinsicEntity.name,
+        id: formatId({ height: entity.height, index, hash: entity.hash }),
+        name: fullName(extrinsic.method),
       }
     })
 
     entity.events = events.map((eventRecord, index) => {
-      const eventEntity = SubstrateEventEntity.fromQueryEvent({
-        blockNumber: entity.height,
-        blockTimestamp: timestamp,
-        indexInBlock: index,
-        eventRecord,
+      const extrinsic = getExtrinsic({
+        record: eventRecord,
+        extrinsics: block.extrinsics,
       })
-
       return {
-        id: eventEntity.id,
-        name: eventEntity.name,
-        extrinsic:
-          getExtrinsic({
-            record: eventRecord,
-            extrinsics: block.extrinsics,
-          }) || 'none',
-      } as EventInfo
+        id: formatId({ height: entity.height, index, hash: entity.hash }),
+        name: fullName(eventRecord.event),
+        extrinsic: extrinsic ? fullName(extrinsic.method) : 'none',
+      }
     })
 
     return entity

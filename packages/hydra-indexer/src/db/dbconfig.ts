@@ -18,9 +18,9 @@ const config: () => ConnectionOptions = () => {
       SubstrateExtrinsicEntity,
       SubstrateBlockEntity,
     ],
-    migrations: ['./**/migrations/*.js'],
+    migrations: ['./**/migrations/v3/*.js'],
     cli: {
-      migrationsDir: 'src/migrations',
+      migrationsDir: 'src/migrations/v3',
     },
     logging: conf.DB_LOGGING,
     namingStrategy: new SnakeNamingStrategy(),

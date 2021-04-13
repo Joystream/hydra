@@ -1,7 +1,9 @@
 import { SubstrateBlock } from '@dzlzv/hydra-common'
+import { pick } from 'lodash'
 
 export interface BlockPayload {
   height: number
+  hash: string
   ts: number
   events: { id: string; name: string }[]
   extrinsics: { id: string; name: string }[]
@@ -23,8 +25,15 @@ export interface BlockPayload {
 // }
 
 export function toPayload(sb: SubstrateBlock): BlockPayload {
-  return {
-    ...sb,
+  return <BlockPayload>{
+    ...pick(sb, [
+      'events',
+      'extrinsics',
+      'hash',
+      'parentHash',
+      'height',
+      'runtimeVersion.specVersion',
+    ]),
     ts: sb.timestamp,
   }
 }

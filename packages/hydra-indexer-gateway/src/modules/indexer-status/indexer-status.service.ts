@@ -10,7 +10,6 @@ import { logError } from '@dzlzv/hydra-common'
 const debug = Debug('index-server:indexer-status-service')
 
 const INDEXER_STATUS_KEY = 'hydra:indexer:status'
-const INDEXER_HEAD_BLOCK = 'hydra:indexer:head'
 
 @Service('IndexerStatusService')
 export class IndexerStatusService {
