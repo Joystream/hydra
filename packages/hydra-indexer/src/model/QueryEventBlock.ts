@@ -63,3 +63,6 @@ export function getExtrinsic(eventInBlock: {
     ? eventInBlock.extrinsics[extrinsicIndex]
     : undefined
 }
+
+export const fullName = (e: { section: string; method: string }): string =>
+  `${e.section}.${e.method}`
