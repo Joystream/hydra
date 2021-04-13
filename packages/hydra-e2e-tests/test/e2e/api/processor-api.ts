@@ -30,8 +30,9 @@ export interface ProcessorStatus {
 
 export let processorStatus: ProcessorStatus | undefined
 
-const getGQLClient = () => Container.get<GraphQLClient>('ProcessorClient')
-const getSubClient = () =>
+export const getGQLClient = () =>
+  Container.get<GraphQLClient>('ProcessorClient')
+export const getSubClient = () =>
   Container.get<SubscriptionClient>('SubscriptionClient')
 
 export async function findTransfersByComment(text: string): Promise<string[]> {

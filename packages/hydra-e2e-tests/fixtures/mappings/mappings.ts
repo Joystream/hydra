@@ -1,43 +1,34 @@
 import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import BN from 'bn.js'
+import { SubstrateEvent } from '@dzlzv/hydra-common'
+
+import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model'
+import { BlockTimestamp } from '../generated/graphql-server/src/modules/block-timestamp/block-timestamp.model'
 import {
-  Transfer,
-  BlockTimestamp,
   BlockHook,
   HookType,
-} from '../generated/graphql-server/model'
+} from '../generated/graphql-server/src/modules/block-hook/block-hook.model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
 import { Balances, Timestamp } from './generated/types'
-import BN from 'bn.js'
-import { SubstrateEvent } from '@dzlzv/hydra-common'
 
-const start = Date.now()
-let blockTime = 0
-let blockStartTime = 0
-let totalEvents = 0
-let totalBlocks = 0
-
-export async function balancesTransfer({
-  store,
-  event,
-  block,
-}: {
-  store: DatabaseManager
-  event: SubstrateEvent
-  block: { blockNumber: number }
-}) {
+// positional arguments
+export async function balancesTransfer(
+  store: DatabaseManager,
+  event: Balances.TransferEvent
+) {
   const transfer = new Transfer()
-  const _event = new Balances.TransferEvent(event)
-  transfer.from = Buffer.from(_event.data.accountIds[0].toHex())
-  transfer.to = Buffer.from(_event.data.accountIds[1].toHex())
-  transfer.value = _event.data.balance.toBn()
-  transfer.block = block.blockNumber
+  transfer.from = Buffer.from(event.data.accountIds[0].toHex())
+  transfer.to = Buffer.from(event.data.accountIds[1].toHex())
+  transfer.value = event.data.balance.toBn()
+  transfer.block = event.ctx.blockNumber
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
   transfer.insertedAt = new Date()
   await store.save<Transfer>(transfer)
 }
 
+// context argument
 export async function timestampCall({
   store,
   event,
@@ -77,17 +68,4 @@ export async function postHook({
   hook.blockNumber = blockNumber
   hook.type = HookType.POST
   await store.save<BlockHook>(hook)
-  benchmark()
-}
-
-function benchmark() {
-  const millis = Date.now() - start
-  if (totalEvents % 10 === 0) {
-    console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`)
-    console.log(
-      `Everage event time ms: ${millis / totalEvents}, block exec time ms: ${
-        blockTime / totalBlocks
-      }, total events: ${totalEvents}, total blocks: ${totalBlocks}`
-    )
-  }
 }

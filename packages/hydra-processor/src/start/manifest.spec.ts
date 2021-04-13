@@ -1,79 +1,55 @@
 import { expect } from 'chai'
-import {
-  inferDefault,
-  parseBlockInterval,
-  parseHandlerDef,
-  validateArgTypes,
-} from './manifest'
+import { defaultHandlerName, extractName, extractTypes } from './manifest'
 
 describe('manifest', () => {
-  it('parses block intervals', () => {
-    const empty = parseBlockInterval(undefined)
-    expect(empty.from).equals(0)
-    expect(empty.to).equals(Number.MAX_SAFE_INTEGER)
+  it('parses types', () => {
+    let types = extractTypes(
+      `balancesTransfer(DatabaseManager, Balances.TransferEvent)`
+    )
+    expect(types.length).equals(2)
+    expect(types[0]).equals('DatabaseManager')
+    expect(types[1]).equals('Balances.TransferEvent')
 
-    const left = parseBlockInterval('[42,]')
-    expect(left).not.to.be.an('undefined')
-    expect(left.from).equals(42, 'should read the from block')
-    expect(left.to).equals(Number.MAX_SAFE_INTEGER)
+    types = extractTypes(`balancesTransfer`)
+    expect(types.length).equals(0)
 
-    const right = parseBlockInterval('[,42]')
-    expect(right).not.to.be.an('undefined')
-    expect(right.to).equals(42, 'should read the to block')
-    expect(right.from).equals(0)
+    types = extractTypes(`balancesTransfer()`)
+    expect(types.length).equals(0)
 
-    const both = parseBlockInterval(' [ 2 , 42 ] ')
-    expect(both).not.to.be.an('undefined')
-    expect(both.from).equals(2, 'should read the from block')
-    expect(both.to).equals(42, 'should read the from block')
+    expect(() => extractTypes('balancesTransfer(')).to.throw(
+      'Malformed',
+      'balancesTransfer('
+    )
+    expect(() => extractTypes('balancesTransfer(a,,b)')).to.throw(
+      'Malformed',
+      'balancesTransfer(a,,b)'
+    )
+    expect(() => extractTypes('balancesTransfer(,b)')).to.throw(
+      'Malformed',
+      'balancesTransfer(,b)'
+    )
   })
 
-  it('parses handlers', () => {
-    const { name, argTypes } = parseHandlerDef(
-      'balancesTransfer(DatabaseManager, SubstrateEvent) '
+  it('parses name', () => {
+    let name = extractName(
+      `balancesTransfer(DatabaseManager, Balances.TransferEvent)`
     )
     expect(name).equals('balancesTransfer')
-    expect(argTypes).contains('DatabaseManager')
-    expect(argTypes).contains('SubstrateEvent')
-    expect(argTypes.length).equals(2)
+    name = extractName(`balancesTransfer()`)
+    expect(name).equals('balancesTransfer')
+    name = extractName(`balancesTransfer`)
+    expect(name).equals('balancesTransfer')
   })
 
   it('infers default handler names', () => {
-    const { name, argTypes } = inferDefault('Balances.Transfer', 'Event')
+    let name = defaultHandlerName({ event: 'Balances.Transfer' })
 
-    expect(name).equals('balances_TransferEvent')
-    expect(argTypes).contains('DatabaseManager')
-    expect(argTypes).contains('Balances.TransferEvent')
-    expect(argTypes.length).equals(2)
-  })
+    expect(name).equals('balances_Transfer')
 
-  it('validate handler args', () => {
-    expect(() =>
-      validateArgTypes({
-        handler: 'test',
-        argTypes: ['DatabaseManager', 'DatabaseManager'],
-      })
-    ).to.throw('multiple arguments')
+    name = defaultHandlerName({ event: 'data_directory.ContentRemoved' })
+    expect(name).equals('dataDirectory_ContentRemoved')
 
-    expect(() =>
-      validateArgTypes({
-        handler: 'test',
-        argTypes: ['DatabaseManager', 'XEvent', 'YEvent'],
-      })
-    ).to.throw('multiple arguments of event type')
-
-    expect(() =>
-      validateArgTypes({
-        handler: 'test',
-        argTypes: ['DatabaseManager', 'XCall', 'YCall'],
-      })
-    ).to.throw('multiple arguments of call type')
-  })
-
-  it('Parse handler definitions', () => {
-    expect(parseHandlerDef('test()').argTypes.length).to.equal(
-      0,
-      'Should parse empty arg list'
-    )
+    name = defaultHandlerName({ extrinsic: 'balances.transfer' })
+    expect(name).equals('balances_TransferCall')
   })
 })

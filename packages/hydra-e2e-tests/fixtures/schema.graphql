@@ -14,6 +14,17 @@ type BlockTimestamp @entity {
   timestamp: BigInt!
 }
 
+" Tracks block hooks "
+type BlockHook @entity {
+  blockNumber: BigInt!
+  type: HookType!
+}
+
+enum HookType {
+  PRE
+  POST
+}
+
 ############## Test purpose only @hydra-e2e-tests #################
 # To make sure graphql api is generated as expected
 type Extrinsic @entity {
