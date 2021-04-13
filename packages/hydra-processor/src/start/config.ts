@@ -19,19 +19,33 @@ let conf: {
   // the query tries to events from the current block to block + BLOCK_WINDOW
   BLOCK_WINDOW: number
   PROCESSOR_NAME: string
-  // Maximal number of events to process in a single transaction
-  BATCH_SIZE: number
   // Interval at which the processor pulls new blocks from the database
   // The interval is reasonably large by default. The trade-off is the latency
   // between the updates and the load to the database
   // It will be replaced by a poll-free subscription in the future
   POLL_INTERVAL_MS: number
+
+  // Maximal number of events to process in a single transaction
+  BATCH_SIZE: number
+
+  // multiplication factors to calculate the queue batch, queue cap, and fetch batch size
+  // in terms of the BATCH_SIZE
+  QUEUE_FACTOR: number
+  QUEUE_MAX_CAP_FACTOR: number
+  MAPPINGS_FACTOR: number
+
   // Wait for the indexer head block to be ahead for at least that number of blocks
   MIN_BLOCKS_AHEAD: number
+  // batch size taken by the processor
+  MAPPINGS_BATCH_SIZE: number
+  // max batch size
+  QUEUE_BATCH_SIZE: number
+  // max queue capacity
+  EVENT_QUEUE_MAX_CAPACITY: number
 }
 
 export function configure(): void {
-  conf = cleanEnv(process.env, {
+  const envConf = cleanEnv(process.env, {
     MANIFEST_PATH: str({ default: 'manifest.yml' }),
     INDEXER_ENDPOINT_URL: str({ devDefault: 'http://localhost:4001' }),
     NAME: str({ default: 'Hydra-Processor' }),
@@ -44,14 +58,23 @@ export function configure(): void {
     BATCH_SIZE: num({ default: 10 }),
     POLL_INTERVAL_MS: num({ default: 60 * 1000 }),
     MIN_BLOCKS_AHEAD: num({ default: 0 }),
+    MAPPINGS_FACTOR: num({ default: 1 }),
+    QUEUE_FACTOR: num({ default: 2 }),
+    QUEUE_MAX_CAP_FACTOR: num({ default: 5 }),
   })
+  conf = {
+    ...envConf,
+    MAPPINGS_BATCH_SIZE: envConf.BATCH_SIZE * envConf.MAPPINGS_FACTOR,
+    QUEUE_BATCH_SIZE: envConf.BATCH_SIZE * envConf.QUEUE_FACTOR,
+    EVENT_QUEUE_MAX_CAPACITY: envConf.BATCH_SIZE * envConf.QUEUE_MAX_CAP_FACTOR,
+  }
   setWarthogEnvs()
   Debug.enable(conf.DEBUG)
 }
 
 let manifest: ProcessorManifest | undefined
 
-export function getConfig() {
+export function getConfig(): typeof conf {
   if (conf !== undefined) return conf
   configure()
   return conf
