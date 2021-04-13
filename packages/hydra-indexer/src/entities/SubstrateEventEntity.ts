@@ -27,8 +27,7 @@ export const EVENT_TABLE_NAME = 'substrate_event'
   name: EVENT_TABLE_NAME,
 })
 @Index(['blockNumber', 'index'])
-export class SubstrateEventEntity
-  extends AbstractWarthogModel
+export class SubstrateEventEntity extends AbstractWarthogModel
   implements SubstrateEvent {
   @PrimaryColumn()
   id!: string
