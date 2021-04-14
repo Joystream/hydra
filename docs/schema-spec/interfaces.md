@@ -13,12 +13,12 @@ interface Profile {
     about: String!
 }
 
-type Member implements About @entity {
+type Member implements Profile @entity {
     about: String!
     handle: String!
 }
 
-type Account implements About @entity {
+type Account implements Profile @entity {
     about: String!
     accountId: Bytes   
 }
