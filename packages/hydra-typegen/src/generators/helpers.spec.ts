@@ -7,9 +7,7 @@ describe('helpers', () => {
     const prmsReturn = helper.paramsReturnType.bind({
       args: ['Type1', 'Type2 & Codec', 'Option<Type3>'],
     })
-    expect(c(prmsReturn())).to.equal(
-      c(`[Type1, Type2 & Codec, Option<Type3>]`)
-    )
+    expect(c(prmsReturn())).to.equal(c(`[Type1, Type2 & Codec, Option<Type3>]`))
   })
 
   it('should render return type statement', () => {

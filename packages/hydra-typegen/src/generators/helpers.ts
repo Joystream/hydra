@@ -1,8 +1,7 @@
 import Handlebars from 'handlebars'
 import { ImportsDef } from './types'
-import { kebabCase, countBy, last, camelCase, upperFirst } from 'lodash'
+import { kebabCase, camelCase, upperFirst } from 'lodash'
 import { Arg } from '../metadata'
-import { warn } from '../log'
 
 const debug = require('debug')('hydra-typegen:helpers')
 
@@ -47,7 +46,7 @@ export function renderNamedArgs(
   }, '')
 }
 
-export function renderTypedParams(argTypes: string[]) {
+export function renderTypedParams(argTypes: string[]): string {
   const returnType = `[${argTypes.join(',')}]`
   const returnObjects = argTypes.map((argType, index) =>
     renderCreateTypeStmt(argType, eventParamValueGetter(index))
@@ -80,6 +79,7 @@ export const helper: Handlebars.HelperDeclareSpec = {
     return upperFirst(camelCase(s))
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toString(s: any) {
     if (s.toString !== undefined) {
       return s.toString()
