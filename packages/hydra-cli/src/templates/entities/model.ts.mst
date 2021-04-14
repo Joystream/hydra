@@ -101,8 +101,15 @@ export {{#isInterface}}abstract{{/isInterface}} class {{className}}
   {{/is.oto}}
 
   {{#is.mtm}}
-    @ManyToMany(() => {{relation.columnType}}, (param: {{relation.columnType}}) => param.{{relation.relatedTsProp}}
-      {{#relation.nullable}},{ nullable: true }{{/relation.nullable}}
+    @ManyToMany(
+      () => {{relation.columnType}},
+      (param: {{relation.columnType}}) => param.{{relation.relatedTsProp}},
+      {
+        {{#relation.nullable}},{ nullable: true }{{/relation.nullable}}
+        modelName: '{{entityName}}',
+        relModelName: '{{relation.columnType}}',
+        propertyName: '{{camelName}}',
+      }
     )
     {{#relation.joinTable}}
       @JoinTable({

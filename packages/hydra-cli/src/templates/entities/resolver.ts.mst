@@ -103,9 +103,9 @@ export class {{className}}Resolver {
     if (where) {
       const id_in = where.id_in;
 
-      const { {{#fieldResolvers}} {{^relationType.isOTM}} {{fieldName}},{{/relationType.isOTM}} {{/fieldResolvers}} } = where
       {{#fieldResolvers}}
         {{#relationType.isOTO}}
+        const { {{fieldName}} } = where 
         if ({{fieldName}}) {
           where.id_in = (
             await this.{{fieldName}}Service
@@ -119,21 +119,37 @@ export class {{className}}Resolver {
         }
         {{/relationType.isOTO}}
 
-        {{#relationType.isOTM}}
+        {{#relationType.isModifier}}
           const { {{fieldName}}_some, {{fieldName}}_none, {{fieldName}}_every } = where
           if ({{fieldName}}_some || {{fieldName}}_none || {{fieldName}}_every) {
             const result = await this.{{fieldName}}Service
               .getQueryBuilder({{fieldName}}_some || {{fieldName}}_none || {{fieldName}}_every)
               .leftJoinAndSelect('{{tableName}}.{{relatedTsProp}}', '{{relatedTsProp}}')
               .getMany();
-            const {{relatedTsProp}}Ids = Array.from(new Set(result.map(v => v.{{relatedTsProp}}.id)));
+            let {{relatedTsProp}}Ids: string[] = []
+            {{#relationType.isOTM}}
+            {{relatedTsProp}}Ids = Array.from(new Set(result.map(v => v.{{relatedTsProp}}.id)));
+            {{/relationType.isOTM}}
+            {{#relationType.isMTM}}
+            Array.from(new Set(result.map(v => v.{{relatedTsProp}}.map(c => {{relatedTsProp}}Ids.push(c.id)))));
+            {{/relationType.isMTM}}
+
             delete where.{{fieldName}}_some
             delete where.{{fieldName}}_none
             delete where.{{fieldName}}_every
 
+            {{#relationType.isOTM}}
             if ({{fieldName}}_some) {
               where.id_in = {{relatedTsProp}}Ids;
             }
+            {{/relationType.isOTM}}
+
+            {{#relationType.isMTM}}
+            if ({{fieldName}}_some || {{fieldName}}_every) {
+              where.id_in = {{relatedTsProp}}Ids;
+            }
+            {{/relationType.isMTM}}
+            
 
             if ({{fieldName}}_none) {
               where.id_in = (
@@ -144,6 +160,7 @@ export class {{className}}Resolver {
               ).map(c => c.id);
             }
 
+            {{#relationType.isOTM}}
             if ({{fieldName}}_every) {
               getConnection().transaction(async em => {
                 const finalIds = [];
@@ -165,10 +182,12 @@ export class {{className}}Resolver {
                 where.id_in = finalIds;
               });
             }
+            {{/relationType.isOTM}}
           }
-        {{/relationType.isOTM}}
+        {{/relationType.isModifier}}
 
         {{#relationType.isMTO}}
+        const { {{fieldName}} } = where 
         if ({{fieldName}}) {
           const entityIds: string[] = [];
           (
