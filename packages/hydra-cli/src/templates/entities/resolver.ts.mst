@@ -193,9 +193,9 @@ export class {{className}}Resolver {
           (
             await this.{{fieldName}}Service
               .getQueryBuilder({{fieldName}})
-              .leftJoinAndSelect('{{lowerCase}}.{{relatedTsProp}}', '{{relatedTsProp}}')
+              .leftJoinAndSelect('{{tableName}}.{{relatedTsProp}}', '{{relatedTsProp}}')
               .getMany()
-          ).map(c => entityIds.push(...c.{{relatedTsProp}}!.map(v => v.id)));
+          ).map((c: any) => entityIds.push(...c.{{relatedTsProp}}!.map((v: any) => v.id)));
           where.id_in = entityIds;
           delete where.{{fieldName}};
         }
