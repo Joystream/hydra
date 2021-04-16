@@ -915,8 +915,8 @@ export enum SubstrateEventOrderByEnum {
   blockNumber_ASC = 'blockNumber_ASC',
   blockNumber_DESC = 'blockNumber_DESC',
 
-  index_ASC = 'index_ASC',
-  index_DESC = 'index_DESC',
+  indexInBlock_ASC = 'indexInBlock_ASC',
+  indexInBlock_DESC = 'indexInBlock_DESC',
 
   blockTimestamp_ASC = 'blockTimestamp_ASC',
   blockTimestamp_DESC = 'blockTimestamp_DESC',
@@ -1103,22 +1103,22 @@ export class SubstrateEventWhereInput {
   blockNumber_in?: number[]
 
   @TypeGraphQLField(() => Int, { nullable: true })
-  index_eq?: number
+  indexInBlock_eq?: number
 
   @TypeGraphQLField(() => Int, { nullable: true })
-  index_gt?: number
+  indexInBlock_gt?: number
 
   @TypeGraphQLField(() => Int, { nullable: true })
-  index_gte?: number
+  indexInBlock_gte?: number
 
   @TypeGraphQLField(() => Int, { nullable: true })
-  index_lt?: number
+  indexInBlock_lt?: number
 
   @TypeGraphQLField(() => Int, { nullable: true })
-  index_lte?: number
+  indexInBlock_lte?: number
 
   @TypeGraphQLField(() => [Int], { nullable: true })
-  index_in?: number[]
+  indexInBlock_in?: number[]
 
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   params_json?: JsonObject
@@ -1178,7 +1178,7 @@ export class SubstrateEventCreateInput {
   blockNumber!: number
 
   @TypeGraphQLField()
-  index!: number
+  indexInBlock!: number
 
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   params?: JsonObject
@@ -1217,7 +1217,7 @@ export class SubstrateEventUpdateInput {
   blockNumber?: number
 
   @TypeGraphQLField({ nullable: true })
-  index?: number
+  indexInBlock?: number
 
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   params?: JsonObject
