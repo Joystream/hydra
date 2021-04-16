@@ -61,6 +61,7 @@ export class SubstrateBlockService extends BaseService<SubstrateBlock> {
   ): { whereClause: string; params: { [key: string]: string } } {
     const column = `${this.attrToDBColumn(field)}`
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const whereClause = options.reduce((acc, _, index) => {
       const clause = `${column} @> :${paramKey}${index}::jsonb`
       return index === 0 ? `${acc}${clause}` : `${acc} OR ${clause}`

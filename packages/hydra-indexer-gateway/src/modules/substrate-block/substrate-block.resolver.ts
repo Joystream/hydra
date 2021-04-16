@@ -1,9 +1,15 @@
-import { Args, Query, Resolver } from 'type-graphql'
+import {
+  Args,
+  Query,
+  Resolver,
+  ArgsType,
+  Field as TypeGraphQLField,
+  InputType,
+} from 'type-graphql'
 import { Inject } from 'typedi'
 import { PaginationArgs } from 'warthog'
 import { SubstrateBlockService } from './substrate-block.service'
 import { SubstrateBlock } from './substrate-block.model'
-import { ArgsType, Field as TypeGraphQLField, InputType } from 'type-graphql'
 
 import {
   SubstrateBlockWhereInput,

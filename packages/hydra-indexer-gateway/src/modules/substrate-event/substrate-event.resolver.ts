@@ -176,5 +176,4 @@ export class SubstrateEventResolver {
   ): Promise<SubstrateExtrinsic | undefined> {
     return this.service.getExtrinsic(event.id)
   }
-
 }
