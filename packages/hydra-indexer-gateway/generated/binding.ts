@@ -7,6 +7,7 @@ import * as schema from  './schema.graphql'
 
 export interface Query {
     indexerStatus: <T = IndexerStatus>(args?: {}, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
+    substrateBlocks: <T = Array<SubstrateBlock>>(args: { offset?: Int | null, limit?: Int | null, where?: SubstrateBlockWhereInputAugmented | null, orderBy?: SubstrateBlockOrderByInput | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     eventsConnection: <T = SubstrateEventConnection>(args: { first?: Int | null, after?: String | null, last?: Int | null, before?: String | null, where?: SubstrateEventWhereInput | null, orderBy?: Array<SubstrateEventOrderByInput> | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     substrateEventsAfter: <T = Array<SubstrateEvent>>(args: { afterID?: ID_Output | null, limit?: Int | null, where?: SubstrateEventWhereInput | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     substrateEvents: <T = Array<SubstrateEvent>>(args: { offset?: Int | null, limit?: Int | null, where?: SubstrateEventWhereInput | null, orderBy?: SubstrateEventOrderByInput | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
@@ -42,6 +43,25 @@ export const Binding = makeBindingClass<BindingConstructor<Binding>>({ schema: s
 /**
  * Types
 */
+
+export type SubstrateBlockOrderByInput =   'createdAt_ASC' |
+  'createdAt_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'deletedAt_ASC' |
+  'deletedAt_DESC' |
+  'height_ASC' |
+  'height_DESC' |
+  'timestamp_ASC' |
+  'timestamp_DESC' |
+  'hash_ASC' |
+  'hash_DESC' |
+  'parentHash_ASC' |
+  'parentHash_DESC' |
+  'stateRoot_ASC' |
+  'stateRoot_DESC' |
+  'extrinsicsRoot_ASC' |
+  'extrinsicsRoot_DESC'
 
 export type SubstrateEventOrderByInput =   'createdAt_ASC' |
   'createdAt_DESC' |
@@ -115,6 +135,119 @@ export interface BaseWhereInput {
   deletedAt_gt?: String | null
   deletedAt_gte?: String | null
   deletedById_eq?: String | null
+}
+
+export interface EventInfoCreateInput {
+  id: String
+  name: String
+  extrinsic?: String | null
+}
+
+export interface EventInfoUpdateInput {
+  id?: String | null
+  name?: String | null
+  extrinsic?: String | null
+}
+
+export interface EventInfoWhereInput {
+  id_eq?: String | null
+  id_contains?: String | null
+  id_startsWith?: String | null
+  id_endsWith?: String | null
+  id_in?: String[] | String | null
+  createdAt_eq?: DateTime | null
+  createdAt_lt?: DateTime | null
+  createdAt_lte?: DateTime | null
+  createdAt_gt?: DateTime | null
+  createdAt_gte?: DateTime | null
+  createdById_eq?: ID_Input | null
+  createdById_in?: ID_Output[] | ID_Output | null
+  updatedAt_eq?: DateTime | null
+  updatedAt_lt?: DateTime | null
+  updatedAt_lte?: DateTime | null
+  updatedAt_gt?: DateTime | null
+  updatedAt_gte?: DateTime | null
+  updatedById_eq?: ID_Input | null
+  updatedById_in?: ID_Output[] | ID_Output | null
+  deletedAt_all?: Boolean | null
+  deletedAt_eq?: DateTime | null
+  deletedAt_lt?: DateTime | null
+  deletedAt_lte?: DateTime | null
+  deletedAt_gt?: DateTime | null
+  deletedAt_gte?: DateTime | null
+  deletedById_eq?: ID_Input | null
+  deletedById_in?: ID_Output[] | ID_Output | null
+  name_eq?: String | null
+  name_contains?: String | null
+  name_startsWith?: String | null
+  name_endsWith?: String | null
+  name_in?: String[] | String | null
+  extrinsic_eq?: String | null
+  extrinsic_contains?: String | null
+  extrinsic_startsWith?: String | null
+  extrinsic_endsWith?: String | null
+  extrinsic_in?: String[] | String | null
+}
+
+export interface EventInfoWhereUniqueInput {
+  id: String
+}
+
+export interface ExtrinsicInfoCreateInput {
+  id: String
+  name: String
+}
+
+export interface ExtrinsicInfoUpdateInput {
+  id?: String | null
+  name?: String | null
+}
+
+export interface ExtrinsicInfoWhereInput {
+  id_eq?: String | null
+  id_contains?: String | null
+  id_startsWith?: String | null
+  id_endsWith?: String | null
+  id_in?: String[] | String | null
+  createdAt_eq?: DateTime | null
+  createdAt_lt?: DateTime | null
+  createdAt_lte?: DateTime | null
+  createdAt_gt?: DateTime | null
+  createdAt_gte?: DateTime | null
+  createdById_eq?: ID_Input | null
+  createdById_in?: ID_Output[] | ID_Output | null
+  updatedAt_eq?: DateTime | null
+  updatedAt_lt?: DateTime | null
+  updatedAt_lte?: DateTime | null
+  updatedAt_gt?: DateTime | null
+  updatedAt_gte?: DateTime | null
+  updatedById_eq?: ID_Input | null
+  updatedById_in?: ID_Output[] | ID_Output | null
+  deletedAt_all?: Boolean | null
+  deletedAt_eq?: DateTime | null
+  deletedAt_lt?: DateTime | null
+  deletedAt_lte?: DateTime | null
+  deletedAt_gt?: DateTime | null
+  deletedAt_gte?: DateTime | null
+  deletedById_eq?: ID_Input | null
+  deletedById_in?: ID_Output[] | ID_Output | null
+  name_eq?: String | null
+  name_contains?: String | null
+  name_startsWith?: String | null
+  name_endsWith?: String | null
+  name_in?: String[] | String | null
+}
+
+export interface ExtrinsicInfoWhereUniqueInput {
+  id: String
+}
+
+export interface NameWhereInput {
+  name_eq?: String | null
+  name_contains?: String | null
+  name_startsWith?: String | null
+  name_endsWith?: String | null
+  name_in?: String[] | String | null
 }
 
 export interface SubstrateBlockCreateInput {
@@ -204,6 +337,71 @@ export interface SubstrateBlockWhereInput {
   lastRuntimeUpgrade_json?: JSONObject | null
   events_json?: JSONObject | null
   extrinsics_json?: JSONObject | null
+}
+
+export interface SubstrateBlockWhereInputAugmented {
+  id_eq?: ID_Input | null
+  id_in?: ID_Output[] | ID_Output | null
+  createdAt_eq?: DateTime | null
+  createdAt_lt?: DateTime | null
+  createdAt_lte?: DateTime | null
+  createdAt_gt?: DateTime | null
+  createdAt_gte?: DateTime | null
+  createdById_eq?: ID_Input | null
+  createdById_in?: ID_Output[] | ID_Output | null
+  updatedAt_eq?: DateTime | null
+  updatedAt_lt?: DateTime | null
+  updatedAt_lte?: DateTime | null
+  updatedAt_gt?: DateTime | null
+  updatedAt_gte?: DateTime | null
+  updatedById_eq?: ID_Input | null
+  updatedById_in?: ID_Output[] | ID_Output | null
+  deletedAt_all?: Boolean | null
+  deletedAt_eq?: DateTime | null
+  deletedAt_lt?: DateTime | null
+  deletedAt_lte?: DateTime | null
+  deletedAt_gt?: DateTime | null
+  deletedAt_gte?: DateTime | null
+  deletedById_eq?: ID_Input | null
+  deletedById_in?: ID_Output[] | ID_Output | null
+  height_eq?: Int | null
+  height_gt?: Int | null
+  height_gte?: Int | null
+  height_lt?: Int | null
+  height_lte?: Int | null
+  height_in?: Int[] | Int | null
+  timestamp_eq?: Int | null
+  timestamp_gt?: Int | null
+  timestamp_gte?: Int | null
+  timestamp_lt?: Int | null
+  timestamp_lte?: Int | null
+  timestamp_in?: Int[] | Int | null
+  hash_eq?: String | null
+  hash_contains?: String | null
+  hash_startsWith?: String | null
+  hash_endsWith?: String | null
+  hash_in?: String[] | String | null
+  parentHash_eq?: String | null
+  parentHash_contains?: String | null
+  parentHash_startsWith?: String | null
+  parentHash_endsWith?: String | null
+  parentHash_in?: String[] | String | null
+  stateRoot_eq?: String | null
+  stateRoot_contains?: String | null
+  stateRoot_startsWith?: String | null
+  stateRoot_endsWith?: String | null
+  stateRoot_in?: String[] | String | null
+  extrinsicsRoot_eq?: String | null
+  extrinsicsRoot_contains?: String | null
+  extrinsicsRoot_startsWith?: String | null
+  extrinsicsRoot_endsWith?: String | null
+  extrinsicsRoot_in?: String[] | String | null
+  runtimeVersion_json?: JSONObject | null
+  lastRuntimeUpgrade_json?: JSONObject | null
+  events_json?: JSONObject | null
+  extrinsics_json?: JSONObject | null
+  events_some?: SubstrateEventWhereInput | null
+  extrinsics_some?: SubstrateExtrinsicWhereInput | null
 }
 
 export interface SubstrateBlockWhereUniqueInput {
@@ -471,10 +669,21 @@ export interface BaseModelUUID extends BaseGraphQLObject {
   version: Int
 }
 
+export interface EventInfo {
+  id: String
+  name: String
+  extrinsic?: String | null
+}
+
 export interface EventParam {
   type: String
   name: String
   value?: JSON | null
+}
+
+export interface ExtrinsicInfo {
+  id: String
+  name: String
 }
 
 export interface IndexerHead {
@@ -519,8 +728,8 @@ export interface SubstrateBlock extends BaseGraphQLObject {
   extrinsicsRoot: String
   runtimeVersion: JSONObject
   lastRuntimeUpgrade: JSONObject
-  events: Array<JSONObject>
-  extrinsics: Array<JSONObject>
+  events: Array<EventInfo>
+  extrinsics: Array<ExtrinsicInfo>
 }
 
 export interface SubstrateEvent extends BaseGraphQLObject {

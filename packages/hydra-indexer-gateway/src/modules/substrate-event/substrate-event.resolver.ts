@@ -177,16 +177,4 @@ export class SubstrateEventResolver {
     return this.service.getExtrinsic(event.id)
   }
 
-  // TODO: Move to a separate module
-  // @Subscription(() => IndexerHead, { topics: 'indexer:head' })
-  // async newIndexerHead(
-  //   @Root() payload: BlockPayload,
-  //   @Ctx() ctx: PubSubContext
-  // ): Promise<IndexerHead> {
-  //   debug(`Notification payload: ${JSON.stringify(payload, null, 2)}`)
-  //   const res = await ctx.pubSub
-  //     ?.asyncIterator<IndexerHead>('indexer:head')
-  //     .next()
-  //   return res?.value
-  // }
 }

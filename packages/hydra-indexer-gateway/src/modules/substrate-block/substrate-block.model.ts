@@ -1,6 +1,6 @@
-import { AnyJson, EventInfo, ExtrinsicInfo } from '@dzlzv/hydra-common'
+import { AnyJson } from '@dzlzv/hydra-common'
 import { Column } from 'typeorm'
-import { Field } from 'type-graphql'
+import { Field, ObjectType } from 'type-graphql'
 import {
   BaseModel,
   IntField,
@@ -10,6 +10,27 @@ import {
   JSONField,
 } from 'warthog'
 import GraphQLBigNumber from '../../types/bn-graphql'
+
+@ObjectType()
+export class EventInfo {
+  @Field({ nullable: true })
+  id?: string
+
+  @Field({ nullable: true })
+  name?: string
+
+  @Field({ nullable: true })
+  extrinsic?: string
+}
+
+@ObjectType()
+export class ExtrinsicInfo {
+  @Field({ nullable: true })
+  id?: string
+
+  @Field({ nullable: true })
+  name?: string
+}
 
 @Model({ db: { name: 'substrate_block' } })
 export class SubstrateBlock extends BaseModel {
@@ -39,9 +60,13 @@ export class SubstrateBlock extends BaseModel {
   @JSONField()
   lastRuntimeUpgrade!: AnyJson
 
-  @JSONField()
+  @Field(() => [EventInfo])
+  @Column('jsonb')
+  @WarthogField('json')
   events!: EventInfo[]
 
-  @JSONField()
+  @Field(() => [ExtrinsicInfo])
+  @Column('jsonb')
+  @WarthogField('json')
   extrinsics!: ExtrinsicInfo[]
 }
