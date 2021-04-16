@@ -58,11 +58,17 @@ export function getExtrinsic(eventInBlock: {
 }): Extrinsic | undefined {
   const extrinsicIndex = getExtrinsicIndex(eventInBlock.record)
 
-  return extrinsicIndex !== undefined &&
-    eventInBlock.extrinsics.length > extrinsicIndex
-    ? eventInBlock.extrinsics[extrinsicIndex]
-    : undefined
+  return getOrUndefined(extrinsicIndex, eventInBlock.extrinsics)
 }
 
 export const fullName = (e: { section: string; method: string }): string =>
   `${e.section}.${e.method}`
+
+export function getOrUndefined<T>(
+  index: number | undefined,
+  from: T[] | undefined
+): T | undefined {
+  if (index !== undefined && from !== undefined && from.length > index) {
+    return from[index]
+  }
+}

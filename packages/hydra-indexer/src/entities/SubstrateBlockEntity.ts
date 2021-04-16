@@ -1,4 +1,10 @@
-import { AnyJson } from '@dzlzv/hydra-common'
+import {
+  AnyJson,
+  EventInfo,
+  ExtrinsicInfo,
+  formatId,
+  SubstrateBlock,
+} from '@dzlzv/hydra-common'
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm'
 import { BlockData, fullName, getExtrinsic } from '../model'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
@@ -6,7 +12,8 @@ import { AbstractWarthogModel } from './AbstractWarthogModel'
 @Entity({
   name: 'substrate_block',
 })
-export class SubstrateBlockEntity extends AbstractWarthogModel {
+export class SubstrateBlockEntity extends AbstractWarthogModel
+  implements SubstrateBlock {
   @PrimaryColumn()
   id!: string
 
@@ -38,10 +45,10 @@ export class SubstrateBlockEntity extends AbstractWarthogModel {
   lastRuntimeUpgrade!: AnyJson
 
   @Column({ type: 'jsonb' })
-  events!: AnyJson[]
+  events!: EventInfo[]
 
   @Column({ type: 'jsonb' })
-  extrinsics!: AnyJson[]
+  extrinsics!: ExtrinsicInfo[]
 
   static fromBlockData({
     lastRuntimeUpgrade,
@@ -66,11 +73,11 @@ export class SubstrateBlockEntity extends AbstractWarthogModel {
     entity.height = header.number.toNumber()
     entity.extrinsicsRoot = header.extrinsicsRoot.toHex()
     entity.timestamp = timestamp
-    entity.id = `${entity.height}-${entity.hash}`
+    entity.id = formatId({ height: entity.height, hash: entity.hash })
 
     entity.extrinsics = block.extrinsics.map((extrinsic, index) => {
       return {
-        index,
+        id: formatId({ height: entity.height, index, hash: entity.hash }),
         name: fullName(extrinsic.method),
       }
     })
@@ -81,7 +88,7 @@ export class SubstrateBlockEntity extends AbstractWarthogModel {
         extrinsics: block.extrinsics,
       })
       return {
-        index,
+        id: formatId({ height: entity.height, index, hash: entity.hash }),
         name: fullName(eventRecord.event),
         extrinsic: extrinsic ? fullName(extrinsic.method) : 'none',
       }

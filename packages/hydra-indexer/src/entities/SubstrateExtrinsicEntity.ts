@@ -1,32 +1,36 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToOne,
   Index,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  PrimaryColumn,
 } from 'typeorm'
 import {
   AnyJson,
   AnyJsonField,
   ExtrinsicArg,
   SubstrateExtrinsic,
+  formatId,
 } from '@dzlzv/hydra-common'
 import BN from 'bn.js'
 import { NumericTransformer } from '@dzlzv/bn-typeorm'
 import { SubstrateEventEntity } from './SubstrateEventEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
 import { Extrinsic } from '@polkadot/types/interfaces'
+import { SubstrateBlockEntity } from './SubstrateBlockEntity'
+import { fullName } from '../model'
 
 export const EXTRINSIC_TABLE_NAME = 'substrate_extrinsic'
 
 @Entity({
   name: EXTRINSIC_TABLE_NAME,
 })
-export class SubstrateExtrinsicEntity
-  extends AbstractWarthogModel
+export class SubstrateExtrinsicEntity extends AbstractWarthogModel
   implements SubstrateExtrinsic {
-  @PrimaryGeneratedColumn()
-  id!: number
+  @PrimaryColumn()
+  id!: string
 
   @Column({
     type: 'numeric',
@@ -34,11 +38,13 @@ export class SubstrateExtrinsicEntity
   })
   tip!: BN
 
-  @Column({
-    type: 'numeric',
-  })
+  @Column('bigint')
   @Index()
   blockNumber!: number
+
+  @Column()
+  @Index()
+  blockHash!: string
 
   @Column()
   versionInfo!: string
@@ -49,10 +55,19 @@ export class SubstrateExtrinsicEntity
   meta!: AnyJson
 
   @Column()
+  @Index()
   method!: string
 
   @Column()
+  indexInBlock!: number
+
+  @Column()
+  @Index()
   section!: string
+
+  @Column()
+  @Index()
+  name!: string
 
   @Column({
     type: 'jsonb',
@@ -79,30 +94,42 @@ export class SubstrateExtrinsicEntity
   @Column()
   isSigned!: boolean
 
-  @OneToOne(
+  @OneToMany(
     () => SubstrateEventEntity,
     (event: SubstrateEventEntity) => event.extrinsic
   ) // specify inverse side as a second parameter
-  event!: SubstrateEventEntity
+  events!: SubstrateEventEntity[]
 
-  get name(): string {
-    return `${this.section}.${this.method}`
-  }
+  @ManyToOne(() => SubstrateBlockEntity)
+  @JoinColumn({ name: 'block_id', referencedColumnName: 'id' })
+  block!: SubstrateBlockEntity
 }
 
 export function fromBlockExtrinsic(data: {
   e: Extrinsic
-  blockNumber: number
+  blockEntity: SubstrateBlockEntity
+  indexInBlock: number
 }): SubstrateExtrinsicEntity {
   const extr = new SubstrateExtrinsicEntity()
-  const { e, blockNumber } = data
+  const { e, indexInBlock, blockEntity } = data
+  const { height, hash } = blockEntity
 
-  extr.blockNumber = blockNumber
+  extr.id = formatId({
+    height,
+    index: indexInBlock,
+    hash,
+  })
+  extr.block = blockEntity
+
+  extr.blockNumber = height
+  extr.blockHash = hash
+  extr.indexInBlock = indexInBlock
   extr.signature = e.signature.toString()
   extr.signer = e.signer.toString()
 
   extr.method = e.method.method || 'NO_METHOD'
   extr.section = e.method.section || 'NO_SECTION'
+  extr.name = fullName(e.method)
 
   extr.meta = (e.meta.toJSON() || {}) as AnyJson
   extr.hash = e.hash.toString()
