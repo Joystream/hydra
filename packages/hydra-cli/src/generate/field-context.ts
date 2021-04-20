@@ -95,6 +95,7 @@ export function withFieldTypeGuardProps(f: Field): GeneratorContext {
   is.scalar = f.isScalar()
   is.enum = f.isEnum()
   is.union = f.isUnion()
+  is.entity = f.isEntity()
   ;['mto', 'oto', 'otm', 'mtm'].map((s) => (is[s] = f.relation?.type === s))
   return {
     is: is,

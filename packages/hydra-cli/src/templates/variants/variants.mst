@@ -10,8 +10,11 @@ import {
   EnumField,
   StringField
 } from 'warthog';
+import BN from 'bn.js'
 
-{{#imports}} {{{.}}} {{/imports}}
+{{#imports}} 
+{{{.}}};
+{{/imports}}
 
 {{#variants}}
   {{#fields}}
@@ -23,6 +26,7 @@ import {
 {{/variants}}
 
 import { ObjectType, Field, createUnionType } from 'type-graphql';
+import { getRepository, In } from 'typeorm'
 
 {{#variants}}
 @ObjectType()
@@ -30,6 +34,17 @@ export class {{name}} {
 	public isTypeOf: string = '{{name}}';
 
   {{#fields}}
+    {{#is.entity}}
+      @Field(() => {{tsType}}, {
+        nullable: true,
+        {{#description}}description: `{{{description}}}`{{/description}}
+      })
+      {{camelName}}?:{{tsType}};
+
+      // `id` of the related entity, it is required to make the relationship possible.
+      @StringField({ dbOnly: true })
+      {{camelName}}Id!: string;
+    {{/is.entity}}
 
     {{#is.scalar}}
       @{{decorator}}({
@@ -55,6 +70,20 @@ export class {{name}} {
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: typeof {{tsType}};
     {{/is.union}}
 
+  {{/fields}}
+
+  {{#fields}}
+    {{#is.entity}}
+      static async fetchData(records: any, unionFieldName: string) {
+        const data = await getRepository({{tsType}}).find({
+          where: { id: In(records.map((r: any) => r[unionFieldName].{{camelName}}Id)) }
+        });
+        records.map((record: any) => {
+          record.status.{{camelName}} = data.find((u: any) => u.id === record[unionFieldName].{{camelName}}Id);
+        });
+        return records
+      }
+    {{/is.entity}}
   {{/fields}}
 }
 {{/variants}}

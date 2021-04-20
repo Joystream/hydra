@@ -157,6 +157,28 @@ export class ModelRenderer extends AbstractRenderer {
     }
   }
 
+  /**
+   * Provides variant names for the fields that have union type, we need variant names for the union
+   * in order to fetch the data for variant relations and it is used by service.mst template
+   * @returns GeneratorContext
+   */
+  withVariantNames(): GeneratorContext {
+    const variantNames = new Set<string>()
+
+    for (const field of this.objType.fields.filter((f) => f.isUnion())) {
+      const union = this.model.lookupUnion(field.type)
+
+      for (const type of union.types) {
+        type.fields.forEach((f) => {
+          if (f.isEntity()) {
+            variantNames.add(type.name)
+          }
+        })
+      }
+    }
+    return { variantNames: Array.from(variantNames) }
+  }
+
   transform(): GeneratorContext {
     return {
       ...this.context, // this.getGeneratedFolderRelativePath(objType.name),
@@ -170,6 +192,7 @@ export class ModelRenderer extends AbstractRenderer {
       ...this.withImportProps(),
       ...this.withFieldResolvers(),
       ...utils.withNames(this.objType),
+      ...this.withVariantNames(),
     }
   }
 }

@@ -5,6 +5,8 @@ import { BaseService, WhereInput } from 'warthog';
 
 import { {{className}} } from './{{kebabName}}.model';
 
+import { {{#variantNames}} {{.}}, {{/variantNames}} } from '../variants/variants.model'
+
 @Service('{{className}}Service')
 export class {{className}}Service extends BaseService<{{className}}> {
   constructor(
@@ -32,8 +34,20 @@ export class {{className}}Service extends BaseService<{{className}}> {
         }
       {{/is.union}}
     {{/fields}}
-
-		return super.find<W>(where, orderBy, limit, offset, f);
+    
+    {{#has.union}}
+      let records = await super.find<W>(where, orderBy, limit, offset, f);
+      {{#fields}}
+        {{#is.union}}
+          {{#variantNames}}
+          records = await {{.}}.fetchData(records, '{{camelName}}')
+          {{/variantNames}}
+        {{/is.union}}
+      {{/fields}}
+      return records;
+    {{/has.union}}
+    
+    {{^has.union}} return super.find<W>(where, orderBy, limit, offset, f); {{/has.union}}
 	}
 
 }
