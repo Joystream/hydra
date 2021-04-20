@@ -20,7 +20,6 @@ import { getApiPromise, getBlockTimestamp, ISubstrateService } from '.'
 
 // import pTimeout from 'p-timeout'
 import pRetry from 'p-retry'
-import { SUBSTRATE_API_CALL_RETRIES } from '../indexer/indexer-consts'
 
 import BN from 'bn.js'
 import { BlockData } from '../model'
@@ -142,7 +141,7 @@ export class SubstrateService implements ISubstrateService {
         return promiseFn(api)
       },
       {
-        retries: SUBSTRATE_API_CALL_RETRIES,
+        retries: getConfig().SUBSTRATE_API_CALL_RETRIES,
         onFailedAttempt: (i) =>
           debug(
             `Failed to execute "${functionName}" after ${i.attemptNumber} attempts. Retries left: ${i.retriesLeft}`

@@ -1,15 +1,9 @@
 import { Header, Hash } from '@polkadot/types/interfaces'
 import Debug from 'debug'
-import { waitFor, withTimeout } from '@dzlzv/hydra-common'
-
+import pWaitFor from 'p-wait-for'
+import pTimeout, { TimeoutError } from 'p-timeout'
 import pRetry from 'p-retry'
-
-import {
-  BLOCK_PRODUCER_FETCH_RETRIES,
-  NEW_BLOCK_TIMEOUT_MS,
-  HEADER_CACHE_CAPACITY,
-  FINALITY_THRESHOLD,
-} from './indexer-consts'
+import { getConfig as conf } from '../node'
 import { getSubstrateService, ISubstrateService } from '../substrate'
 import { BlockData } from '../model'
 import { IBlockProducer } from './IBlockProducer'
@@ -28,7 +22,10 @@ export class BlockProducer implements IBlockProducer<BlockData> {
 
   private _chainHeight: number
 
-  private _headerCache = new FIFOCache<number, Header>(HEADER_CACHE_CAPACITY)
+  private _headerCache = new FIFOCache<number, Header>(
+    conf().HEADER_CACHE_CAPACITY
+  )
+
   private substrateService!: ISubstrateService
 
   constructor() {
@@ -66,7 +63,7 @@ export class BlockProducer implements IBlockProducer<BlockData> {
       debug(
         `Current finalized head ${this._chainHeight} is behind the start block ${atBlock}. Waiting...`
       )
-      await waitFor(() => this._chainHeight >= atBlock)
+      await pWaitFor(() => this._chainHeight >= atBlock)
     }
   }
 
@@ -89,7 +86,7 @@ export class BlockProducer implements IBlockProducer<BlockData> {
     debug(`Fetching block #${height.toString()}`)
     const targetHash = await this.getBlockHash(height)
     return pRetry(() => this._doBlockProduce(targetHash), {
-      retries: BLOCK_PRODUCER_FETCH_RETRIES,
+      retries: conf().BLOCK_PRODUCER_FETCH_RETRIES,
     }) // retry after 5 seconds
   }
 
@@ -120,15 +117,17 @@ export class BlockProducer implements IBlockProducer<BlockData> {
   }
 
   private async checkHeightOrWait(): Promise<void> {
-    return await withTimeout(
-      waitFor(
+    return await pTimeout(
+      pWaitFor(
         // when to resolve
-        () => this._blockToProduceNext <= this._chainHeight,
-        // exit condition
-        () => !this._started
+        () => this._blockToProduceNext <= this._chainHeight
       ),
-      `Timed out: no block has been produced within last ${NEW_BLOCK_TIMEOUT_MS} seconds`,
-      NEW_BLOCK_TIMEOUT_MS
+      conf().NEW_BLOCK_TIMEOUT_MS,
+      new TimeoutError(
+        `Timed out: no block has been produced within last ${
+          conf().NEW_BLOCK_TIMEOUT_MS
+        } seconds`
+      )
     )
   }
 
@@ -140,12 +139,14 @@ export class BlockProducer implements IBlockProducer<BlockData> {
       return cachedHeader.hash
     }
     // wait for finality threshold to be on the safe side
-    const isFinal = () => this._chainHeight - h > FINALITY_THRESHOLD
+    const isFinal = () => this._chainHeight - h > conf().FINALITY_THRESHOLD
     if (!isFinal()) {
       debug(
-        `Block number: ${h}, current chain height: ${this._chainHeight}. Waiting for the finality threshold: ${FINALITY_THRESHOLD}.`
+        `Block number: ${h}, current chain height: ${
+          this._chainHeight
+        }. Waiting for the finality threshold: ${conf().FINALITY_THRESHOLD}.`
       )
-      await waitFor(isFinal)
+      await pWaitFor(isFinal)
     }
 
     return await this.substrateService.getBlockHash(h.toString())

@@ -1,6 +1,6 @@
 import { BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL } from './redis-keys'
 import Debug from 'debug'
-import { stringifyWithTs, logError } from '@dzlzv/hydra-common'
+import { logError } from '@dzlzv/hydra-common'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 import { getRedisFactory } from './client-factory'
 import * as IORedis from 'ioredis'
@@ -32,7 +32,7 @@ class RedisRelayer implements PubSub {
   publish(topic: string, data: Record<string, unknown>): void {
     debug(`Relaying to redis: ${topic} ${JSON.stringify(data)}`)
     this.redisPub
-      .publish(topic, stringifyWithTs(data))
+      .publish(topic, JSON.stringify(data))
       .catch((e) => debug(`${logError(e)}`))
   }
 }
