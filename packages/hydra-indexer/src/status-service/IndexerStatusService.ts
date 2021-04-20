@@ -1,7 +1,8 @@
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
-import { logError, stringifyWithTs, waitFor } from '@dzlzv/hydra-common'
+import { logError } from '@dzlzv/hydra-common'
+import * as pWaitFor from 'p-wait-for'
 import { BlockPayload } from '../model'
 import {
   INDEXER_HEAD_BLOCK,
@@ -14,10 +15,7 @@ import {
   INDEXER_STATUS,
 } from '../redis/redis-keys'
 import { IStatusService } from './IStatusService'
-import {
-  BLOCK_CACHE_TTL_SEC,
-  INDEXER_HEAD_TTL_SEC,
-} from '../indexer/indexer-consts'
+import { getConfig as conf } from '../node'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 import { getRedisFactory } from '../redis/client-factory'
 
@@ -88,7 +86,7 @@ export class IndexerStatusService implements IStatusService {
       return Number.parseInt(headVal)
     }
 
-    await waitFor(() => !this._isLoading)
+    await pWaitFor.default(() => !this._isLoading)
     debug(`Redis cache is empty, loading from the database`)
     this._isLoading = true
     const _indexerHead = await this.slowIndexerHead()
@@ -112,11 +110,11 @@ export class IndexerStatusService implements IStatusService {
       INDEXER_HEAD_BLOCK,
       height,
       'EX',
-      INDEXER_HEAD_TTL_SEC
+      conf().INDEXER_HEAD_TTL_SEC
     )
     await this.redisPub.publish(
       INDEXER_NEW_HEAD_CHANNEL,
-      stringifyWithTs({ height })
+      JSON.stringify({ height })
     )
     await this.redisClient.hset(INDEXER_STATUS, 'HEAD', height)
 
@@ -140,7 +138,7 @@ export class IndexerStatusService implements IStatusService {
       `${BLOCK_CACHE_PREFIX}:${payload.height}`,
       JSON.stringify(payload),
       'EX',
-      BLOCK_CACHE_TTL_SEC
+      conf().BLOCK_CACHE_TTL_SEC
     )
   }
 
@@ -153,7 +151,7 @@ export class IndexerStatusService implements IStatusService {
     const isRecent = await this.redisClient.get(key)
     const isComplete = isRecent !== null
     if (isComplete) {
-      await this.redisClient.expire(key, BLOCK_CACHE_TTL_SEC)
+      await this.redisClient.expire(key, conf().BLOCK_CACHE_TTL_SEC)
     }
     return isComplete
   }

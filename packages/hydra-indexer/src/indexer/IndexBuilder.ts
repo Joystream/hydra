@@ -12,7 +12,6 @@ import Debug from 'debug'
 import { PooledExecutor } from './PooledExecutor'
 import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { IStatusService } from '../status-service/IStatusService'
-import { WORKERS_NUMBER } from './indexer-consts'
 import { getConnection, EntityManager } from 'typeorm'
 import { getConfig } from '../node'
 import { BlockProducer } from '.'
@@ -60,7 +59,7 @@ export class IndexBuilder {
     await this.producer.start(startBlock)
 
     const poolExecutor = new PooledExecutor(
-      WORKERS_NUMBER,
+      getConfig().WORKERS_NUMBER,
       this.producer.blockHeights(),
       this._indexBlock()
     )
