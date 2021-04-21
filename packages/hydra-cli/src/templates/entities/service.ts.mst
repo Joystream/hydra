@@ -37,13 +37,15 @@ export class {{className}}Service extends BaseService<{{className}}> {
     
     {{#has.union}}
       let records = await super.find<W>(where, orderBy, limit, offset, f);
-      {{#fields}}
-        {{#is.union}}
-          {{#variantNames}}
-          records = await {{.}}.fetchData(records, '{{camelName}}')
-          {{/variantNames}}
-        {{/is.union}}
-      {{/fields}}
+      if (records.length) {
+        {{#fields}}
+          {{#is.union}}
+            {{#variantNames}}
+            records = await {{.}}.fetchData(records, '{{camelName}}')
+            {{/variantNames}}
+          {{/is.union}}
+        {{/fields}}
+      }
       return records;
     {{/has.union}}
     

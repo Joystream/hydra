@@ -35,15 +35,15 @@ export class {{name}} {
 
   {{#fields}}
     {{#is.entity}}
-      @Field(() => {{tsType}}, {
+      @Field(() => {{^array}}{{tsType}}{{/array}} {{#array}}[{{tsType}}]{{/array}}, {
         nullable: true,
         {{#description}}description: `{{{description}}}`{{/description}}
       })
-      {{camelName}}?:{{tsType}};
+      {{camelName}}?:{{tsType}}{{#array}}[]{{/array}};
 
       // `id` of the related entity, it is required to make the relationship possible.
-      @StringField({ dbOnly: true })
-      {{camelName}}Id!: string;
+      @StringField({ dbOnly: true {{#array}},array: true{{/array}} })
+      {{camelName}}Id{{#array}}s{{/array}}!: string{{#array}}[]{{/array}};
     {{/is.entity}}
 
     {{#is.scalar}}
@@ -75,12 +75,47 @@ export class {{name}} {
   {{#fields}}
     {{#is.entity}}
       static async fetchData(records: any, unionFieldName: string) {
-        const data = await getRepository({{tsType}}).find({
-          where: { id: In(records.map((r: any) => r[unionFieldName].{{camelName}}Id)) }
-        });
-        records.map((record: any) => {
-          record.status.{{camelName}} = data.find((u: any) => u.id === record[unionFieldName].{{camelName}}Id);
-        });
+        {{#array}}
+          const data: any = {}
+          const ids: any[] = []
+          records = records.filter(
+            (r: any) => (r[unionFieldName] as {{name}}).{{camelName}}Ids && (r[unionFieldName] as {{name}}).{{camelName}}Ids.length
+          )
+          records.map((r: any) => ids.push(...(r[unionFieldName] as {{name}}).{{camelName}}Ids))
+
+          const relationData = await getRepository({{tsType}}).find({
+            where: { id: In(ids) }
+          })
+          relationData.map((r: any) => data[r.id] = r);
+
+          for (const record of records) {
+            
+            for (const id of (record[unionFieldName] as {{name}}).{{camelName}}Ids) {
+              const m = data[id]
+              if (m) {
+                if (!(record[unionFieldName] as {{name}}).{{camelName}}) {
+                  (record[unionFieldName] as {{name}}).{{camelName}} = []
+                }
+                record[unionFieldName].{{camelName}}!.push(data[id])
+              }
+            }
+          }
+        {{/array}}
+
+        {{^array}}
+          const data: any = {}
+          const relationData = await getRepository({{tsType}}).find({
+            where: { id: In(records.map((r: any) => r[unionFieldName].{{camelName}}Id)) }
+          });
+          relationData.map((r: any) => data[r.id] = r);
+
+          for (const record of records) {
+            const m = data[record[unionFieldName].{{camelName}}Id]
+            if (m) {
+            record[unionFieldName].{{camelName}} = m
+            }
+          }
+        {{/array}}
         return records
       }
     {{/is.entity}}

@@ -86,6 +86,7 @@ export function buildFieldContext(
     ...withDerivedNames(f, entity),
     ...withDescription(f),
     ...withTransformer(f),
+    ...withArrayProp(f),
   }
 }
 
@@ -177,6 +178,12 @@ export function withImport(f: Field): GeneratorContext {
 export function withRelation(f: Field): GeneratorContext {
   return {
     relation: f.relation,
+  }
+}
+
+export function withArrayProp(f: Field): GeneratorContext {
+  return {
+    array: f.isList,
   }
 }
 
