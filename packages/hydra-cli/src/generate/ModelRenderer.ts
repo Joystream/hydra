@@ -6,6 +6,7 @@ import * as utils from './utils'
 import { GraphQLEnumType } from 'graphql'
 import { AbstractRenderer } from './AbstractRenderer'
 import { withEnum } from './enum-context'
+import { camelCase } from 'lodash'
 
 const debug = Debug('qnode-cli:model-renderer')
 
@@ -164,6 +165,7 @@ export class ModelRenderer extends AbstractRenderer {
    */
   withVariantNames(): GeneratorContext {
     const variantNames = new Set<string>()
+    const fieldVariantMap: { field: string; type: string }[] = []
 
     for (const field of this.objType.fields.filter((f) => f.isUnion())) {
       const union = this.model.lookupUnion(field.type)
@@ -172,11 +174,12 @@ export class ModelRenderer extends AbstractRenderer {
         type.fields.forEach((f) => {
           if (f.isEntity()) {
             variantNames.add(type.name)
+            fieldVariantMap.push({ field: camelCase(f.name), type: type.name })
           }
         })
       }
     }
-    return { variantNames: Array.from(variantNames) }
+    return { variantNames: Array.from(variantNames), fieldVariantMap }
   }
 
   transform(): GeneratorContext {

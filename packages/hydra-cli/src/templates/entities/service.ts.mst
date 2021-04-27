@@ -40,9 +40,9 @@ export class {{className}}Service extends BaseService<{{className}}> {
       if (records.length) {
         {{#fields}}
           {{#is.union}}
-            {{#variantNames}}
-            records = await {{.}}.fetchData(records, '{{camelName}}')
-            {{/variantNames}}
+            {{#fieldVariantMap}}
+            records = await {{type}}.fetchData{{field}}(records, '{{camelName}}')
+            {{/fieldVariantMap}}
           {{/is.union}}
         {{/fields}}
       }
