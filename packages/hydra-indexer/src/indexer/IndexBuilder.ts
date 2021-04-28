@@ -3,36 +3,39 @@ import { QueryEventBlock } from '../model'
 import * as _ from 'lodash'
 
 import Debug from 'debug'
-import { doInTransaction } from '@dzlzv/hydra-db-utils'
 import { PooledExecutor } from './PooledExecutor'
 import { SubstrateEventEntity } from '../entities'
-import { Inject, Service } from 'typedi'
-import { BLOCK_START_CHANNEL, BLOCK_COMPLETE_CHANNEL } from './redis-keys'
-import { IBlockProducer } from './IBlockProducer'
-import { assert } from 'console'
-import { EventEmitter } from 'events'
-import { IStatusService } from './IStatusService'
+import {
+  BLOCK_START_CHANNEL,
+  BLOCK_COMPLETE_CHANNEL,
+} from '../redis/redis-keys'
+import { IStatusService } from '../status-service/IStatusService'
 import { WORKERS_NUMBER } from './indexer-consts'
 import { toPayload } from '../model/BlockPayload'
-import { QueryRunner } from 'typeorm'
+import { getConnection, EntityManager } from 'typeorm'
+import { getConfig } from '../node'
+import { BlockProducer } from '.'
+import { getStatusService } from '../status-service'
+import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 
-const debug = Debug('index-builder:indexer')
+const debug = Debug('hydra-indexer:indexer')
 
-@Service('IndexBuilder')
-export class IndexBuilder extends EventEmitter {
+// @Service('IndexBuilder')
+export class IndexBuilder {
   private _stopped = false
+  private producer!: BlockProducer
+  private statusService!: IStatusService
+  // public constructor(
+  //   @Inject('BlockProducer')
+  //   protected readonly producer: IBlockProducer<QueryEventBlock>,
+  //   @Inject('StatusService') protected readonly statusService: IStatusService
+  // ) {
+  //   super()
+  // }
 
-  public constructor(
-    @Inject('BlockProducer')
-    protected readonly producer: IBlockProducer<QueryEventBlock>,
-    @Inject('StatusService') protected readonly statusService: IStatusService
-  ) {
-    super()
-  }
-
-  async start(atBlock?: number): Promise<void> {
-    assert(this.producer, 'BlockProducer must be set')
-    assert(this.statusService, 'StatusService must be set')
+  async start(): Promise<void> {
+    this.producer = new BlockProducer()
+    this.statusService = await getStatusService()
 
     debug('Spawned worker.')
 
@@ -41,19 +44,18 @@ export class IndexBuilder extends EventEmitter {
     debug(`Last indexed block in the database: ${lastHead.toString()}`)
     let startBlock = lastHead + 1
 
-    if (atBlock) {
-      debug(`Got block height hint: ${atBlock}`)
-      if (lastHead >= 0 && process.env.FORCE_BLOCK_HEIGHT !== 'true') {
-        debug(
-          `WARNING! The database contains indexed blocks.
+    const atBlock = getConfig().BLOCK_HEIGHT
+
+    if (lastHead >= 0 && !getConfig().FORCE_HEIGHT) {
+      debug(
+        `WARNING! The database contains indexed blocks.
           The last indexed block height is ${lastHead}. The indexer 
           will continue from block ${lastHead} ignoring the start 
           block height hint. Set the environment variable FORCE_BLOCK_HEIGHT to true 
           if you want to start from ${atBlock} anyway.`
-        )
-      } else {
-        startBlock = Math.max(startBlock, atBlock)
-      }
+      )
+    } else {
+      startBlock = Math.max(startBlock, atBlock)
     }
 
     debug(`Starting the block indexer at block ${startBlock}`)
@@ -67,6 +69,7 @@ export class IndexBuilder extends EventEmitter {
     )
 
     debug('Started a pool of indexers.')
+    eventEmitter.on(IndexerEvents.INDEXER_STOP, async () => await this.stop())
 
     try {
       await poolExecutor.run(() => this._stopped)
@@ -91,7 +94,7 @@ export class IndexBuilder extends EventEmitter {
         return
       }
 
-      this.emit(BLOCK_START_CHANNEL, {
+      eventEmitter.emit(BLOCK_START_CHANNEL, {
         height: h,
       })
 
@@ -102,7 +105,7 @@ export class IndexBuilder extends EventEmitter {
       await this.transformAndPersist(queryEventsBlock)
       debug(`Done block #${h.toString()}`)
 
-      this.emit(BLOCK_COMPLETE_CHANNEL, toPayload(queryEventsBlock))
+      eventEmitter.emit(BLOCK_COMPLETE_CHANNEL, toPayload(queryEventsBlock))
     }
   }
 
@@ -112,7 +115,7 @@ export class IndexBuilder extends EventEmitter {
       `Read ${queryEventsBlock.queryEvents.length} events; saving in ${batches.length} batches`
     )
 
-    await doInTransaction(async (queryRunner: QueryRunner) => {
+    getConnection().transaction(async (em: EntityManager) => {
       debug(`Saving event entities`)
 
       let saved = 0
@@ -120,7 +123,7 @@ export class IndexBuilder extends EventEmitter {
         const qeEntities = batch.map((event) =>
           SubstrateEventEntity.fromQueryEvent(event)
         )
-        await queryRunner.manager.save(qeEntities)
+        await em.save(qeEntities)
         saved += qeEntities.length
         batch = []
         debug(`Saved ${saved} events`)

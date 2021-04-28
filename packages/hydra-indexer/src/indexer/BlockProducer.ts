@@ -1,61 +1,45 @@
-import { getBlockTimestamp, ISubstrateService } from '../substrate'
-import { IQueryEvent, QueryEventBlock, QueryEvent } from '../model'
-import { Header, Hash, Extrinsic } from '@polkadot/types/interfaces'
-import assert from 'assert'
-
+import { Header, Hash } from '@polkadot/types/interfaces'
 import Debug from 'debug'
-import { UnsubscribePromise } from '@polkadot/api/types'
-import {
-  waitFor,
-  retry,
-  withTimeout,
-  ConstantBackOffStrategy,
-} from '@dzlzv/hydra-common'
-import { IBlockProducer } from './IBlockProducer'
-import { Service, Inject } from 'typedi'
+import { waitFor, withTimeout } from '@dzlzv/hydra-common'
+
+import pRetry from 'p-retry'
+
 import {
   BLOCK_PRODUCER_FETCH_RETRIES,
   NEW_BLOCK_TIMEOUT_MS,
   HEADER_CACHE_CAPACITY,
   FINALITY_THRESHOLD,
 } from './indexer-consts'
-import { EventEmitter } from 'events'
+import { getSubstrateService, ISubstrateService } from '../substrate'
+import { QueryEventBlock, fromBlockData } from '../model'
+import { IBlockProducer } from './IBlockProducer'
 import FIFOCache from './FIFOCache'
+import { getConfig } from '..'
+import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 
-const DEBUG_TOPIC = 'index-builder:producer'
+const DEBUG_TOPIC = 'hydra-indexer:producer'
 
 const debug = Debug(DEBUG_TOPIC)
 
-export const NEW_CHAIN_HEIGHT_EVENT = 'NEW_CHAIN_HEIGHT'
-
-@Service('BlockProducer')
-export class BlockProducer extends EventEmitter
-  implements IBlockProducer<QueryEventBlock> {
+export class BlockProducer implements IBlockProducer<QueryEventBlock> {
   private _started: boolean
-
-  private _newHeadsUnsubscriber: UnsubscribePromise | undefined
 
   private _blockToProduceNext: number
 
   private _chainHeight: number
 
   private _headerCache = new FIFOCache<number, Header>(HEADER_CACHE_CAPACITY)
-
-  @Inject('SubstrateService')
-  private readonly substrateService!: ISubstrateService
+  private substrateService!: ISubstrateService
 
   constructor() {
-    super()
     this._started = false
-    this._newHeadsUnsubscriber = undefined
-
     this._blockToProduceNext = 0
     this._chainHeight = 0
   }
 
   async start(atBlock: number): Promise<void> {
-    assert(this.substrateService, 'SubstrateService must be set')
     if (this._started) throw Error(`Cannot start when already started.`)
+    this.substrateService = await getSubstrateService()
 
     // mark as started
     this._started = true
@@ -66,12 +50,11 @@ export class BlockProducer extends EventEmitter
     this._chainHeight = header.number.toNumber()
 
     //
-    this._newHeadsUnsubscriber = this.substrateService.subscribeFinalizedHeads(
-      (header: Header) => {
-        this._headerCache.put(header.number.toNumber(), header)
-        this._onNewHeads(header)
-      }
-    )
+    eventEmitter.on(IndexerEvents.NEW_FINALIZED_HEAD, ({ header, height }) => {
+      debug(`New finalized head: ${JSON.stringify(header)}, height: ${height}`)
+      this._headerCache.put(height, header)
+      this._onNewHeads(header)
+    })
 
     this._blockToProduceNext = atBlock
     debug(
@@ -91,19 +74,12 @@ export class BlockProducer extends EventEmitter
       return
     }
 
-    if (this._newHeadsUnsubscriber) {
-      // eslint-disable-next-line
-      ;(await this._newHeadsUnsubscriber)()
-    }
     debug('Block producer has been stopped')
     this._started = false
   }
 
   private _onNewHeads(header: Header) {
-    assert(this._started, 'Has to be started to process new heads.')
-
     this._chainHeight = header.number.toNumber()
-    this.emit(NEW_CHAIN_HEIGHT_EVENT, this._chainHeight)
     debug(`New block found at height #${this._chainHeight.toString()}`)
   }
 
@@ -113,11 +89,11 @@ export class BlockProducer extends EventEmitter
         `Cannot fetch block at height ${height}, current chain height is ${this._chainHeight}`
       )
     }
-    return retry(
-      () => this._doBlockProduce(height),
-      BLOCK_PRODUCER_FETCH_RETRIES,
-      new ConstantBackOffStrategy(1000 * 5)
-    ) // retry after 5 seconds
+    debug(`Fetching block #${height.toString()}`)
+    const targetHash = await this.getBlockHash(height)
+    return pRetry(() => this._doBlockProduce(targetHash), {
+      retries: BLOCK_PRODUCER_FETCH_RETRIES,
+    }) // retry after 5 seconds
   }
 
   public async *blockHeights(): AsyncGenerator<number> {
@@ -134,59 +110,16 @@ export class BlockProducer extends EventEmitter
    * It can throw errors which should be handled by the top-level code
    * (in this case _produce_block())
    */
-  private async _doBlockProduce(height: number): Promise<QueryEventBlock> {
-    debug(`Fetching block #${height.toString()}`)
-
-    const targetHash = await this.getBlockHash(height)
+  private async _doBlockProduce(targetHash: Hash): Promise<QueryEventBlock> {
     debug(`\tHash ${targetHash.toString()}.`)
 
-    const records = await this.substrateService.eventsAt(targetHash)
-
-    debug(`\tRead ${records.length} events.`)
-
-    let blockExtrinsics: Extrinsic[] = []
-    const signedBlock = await this.substrateService.getBlock(targetHash)
-
-    debug(`\tFetched full block.`)
-
-    blockExtrinsics = signedBlock.block.extrinsics.toArray()
-    const timestamp = getBlockTimestamp(blockExtrinsics)
-
-    const blockEvents: IQueryEvent[] = records.map(
-      (record, index): IQueryEvent => {
-        // Extract the phase, event
-        const { phase } = record
-
-        // Try to recover extrinsic: only possible if its right phase, and extrinsics arra is non-empty, the last constraint
-        // is needed to avoid events from build config code in genesis, and possibly other cases.
-        const extrinsic =
-          phase.isApplyExtrinsic && blockExtrinsics.length
-            ? blockExtrinsics[
-                Number.parseInt(phase.asApplyExtrinsic.toString())
-              ]
-            : undefined
-
-        const event = new QueryEvent(
-          record,
-          height,
-          index,
-          timestamp,
-          extrinsic
-        )
-
-        // Reduce log verbosity and log only if a flag is set
-        if (process.env.LOG_QUERY_EVENTS) {
-          event.log(0, debug)
-        }
-
-        return event
-      }
-    )
-
-    const eventBlock = new QueryEventBlock(height, blockEvents)
-    // this.emit('QueryEventBlock', query_block);
+    const blockData = await this.substrateService.getBlockData(targetHash)
+    if (getConfig().VERBOSE) {
+      debug(`Received block data: ${JSON.stringify(blockData, null, 2)}`)
+    }
     debug(`Produced query event block.`)
-    return eventBlock
+
+    return fromBlockData(blockData)
   }
 
   private async checkHeightOrWait(): Promise<void> {
