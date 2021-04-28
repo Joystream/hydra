@@ -1,9 +1,8 @@
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
-import { logError } from '@dzlzv/hydra-common'
+import { BlockPayload, logError } from '@dzlzv/hydra-common'
 import * as pWaitFor from 'p-wait-for'
-import { BlockPayload } from '../model'
 import {
   INDEXER_HEAD_BLOCK,
   INDEXER_NEW_HEAD_CHANNEL,

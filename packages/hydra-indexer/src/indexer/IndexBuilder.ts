@@ -4,9 +4,10 @@ import {
   fromBlockData,
   getExtrinsicIndex,
   getOrUndefined,
-  toPayload,
 } from '../model'
-import * as _ from 'lodash'
+import _ from 'lodash'
+
+import { toPayload } from '@dzlzv/hydra-common'
 
 import Debug from 'debug'
 import { PooledExecutor } from './PooledExecutor'
