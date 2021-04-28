@@ -32,6 +32,7 @@ export class SubstrateService implements ISubstrateService {
   private shouldStop = false
 
   async init(): Promise<void> {
+    debug(`Initializing SubstrateService`)
     await getApiPromise()
     await this.subscribeToHeads()
 

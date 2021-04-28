@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@polkadot/api": "4.2.1",
-    "@polkadot/keyring": "6.0.5",
+    "@polkadot/keyring": "6.1.1",
     "fetch": "^1.1.0",
     "graphql-request": "^3.3.0",
     "graphql-subscriptions-client": "^0.16.0",
