@@ -2,12 +2,12 @@ import { DatabaseManager } from '@dzlzv/hydra-db-utils'
 import BN from 'bn.js'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 
-import { Transfer } from '../generated/graphql-server/src/modules/transfer/transfer.model'
-import { BlockTimestamp } from '../generated/graphql-server/src/modules/block-timestamp/block-timestamp.model'
 import {
+  Transfer,
+  BlockTimestamp,
   BlockHook,
   HookType,
-} from '../generated/graphql-server/src/modules/block-hook/block-hook.model'
+} from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
@@ -19,9 +19,10 @@ export async function balancesTransfer(
   event: Balances.TransferEvent
 ) {
   const transfer = new Transfer()
-  transfer.from = Buffer.from(event.data.accountIds[0].toHex())
-  transfer.to = Buffer.from(event.data.accountIds[1].toHex())
-  transfer.value = event.data.balance.toBn()
+  const [from, to, value] = event.params
+  transfer.from = Buffer.from(from.toHex())
+  transfer.to = Buffer.from(to.toHex())
+  transfer.value = value.toBn()
   transfer.block = event.ctx.blockNumber
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
   transfer.insertedAt = new Date()
