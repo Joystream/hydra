@@ -10,13 +10,13 @@ type Transfer @entity {
 
 " Tracks block timestamps "
 type BlockTimestamp @entity {
-  blockNumber: BigInt!
+  blockNumber: Int!
   timestamp: BigInt!
 }
 
 " Tracks block hooks "
 type BlockHook @entity {
-  blockNumber: BigInt!
+  blockNumber: Int!
   type: HookType!
 }
 

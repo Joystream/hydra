@@ -62,7 +62,6 @@
     "reflect-metadata": "^0.1.13",
     "set-interval-async": "^2.0.1",
     "shortid": "^2.2.15",
-    "typedi": "^0.8.0",
     "typeorm": "^0.2.25"
   },
   "devDependencies": {

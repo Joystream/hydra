@@ -40,7 +40,7 @@ export async function timestampCall({
   const call = new Timestamp.SetCall(event)
   const block = new BlockTimestamp()
   block.timestamp = call.args.now.toBn()
-  block.blockNumber = new BN(call.ctx.blockNumber)
+  block.blockNumber = call.ctx.blockNumber
 
   await store.save<BlockTimestamp>(block)
 }
@@ -49,7 +49,7 @@ export async function preHook({
   block: { blockNumber },
   store,
 }: {
-  block: { blockNumber: BN }
+  block: { blockNumber: number }
   store: DatabaseManager
 }) {
   const hook = new BlockHook()
@@ -62,7 +62,7 @@ export async function postHook({
   block: { blockNumber },
   store,
 }: {
-  block: { blockNumber: BN }
+  block: { blockNumber: number }
   store: DatabaseManager
 }) {
   const hook = new BlockHook()
