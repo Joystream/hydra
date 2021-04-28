@@ -23,7 +23,7 @@ describe('Query builder', () => {
       'name',
       'method',
       { 'params': ['name', 'type', 'value'] },
-      'index',
+      'indexInBlock',
       'blockNumber',
       'blockTimestamp',
     ])
@@ -37,7 +37,7 @@ describe('Query builder', () => {
           type
           value
         }
-        index
+        indexInBlock
         blockNumber
         blockTimestamp
       `

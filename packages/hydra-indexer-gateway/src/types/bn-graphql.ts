@@ -9,7 +9,7 @@ export const GraphQLBigNumber = new GraphQLScalarType({
     return new BN(value, 10) // value from the client input variables
   },
 
-  serialize(value: BN) {
+  serialize(value: BN | BigInt | number) {
     return value ? value.toString(10) : null // value sent to the client
   },
 })

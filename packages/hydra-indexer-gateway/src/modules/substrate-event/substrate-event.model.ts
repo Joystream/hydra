@@ -64,7 +64,7 @@ export class SubstrateEvent extends BaseModel {
   blockNumber!: number
 
   @IntField()
-  index!: number
+  indexInBlock!: number
 
   @Field(() => [EventParam], { nullable: true })
   @Column('jsonb')
