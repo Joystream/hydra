@@ -1,9 +1,9 @@
 import Container, { Service } from 'typedi'
 import { BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL } from './redis-keys'
-import { IndexBuilder } from './IndexBuilder'
 import Debug from 'debug'
 import { stringifyWithTs, logError } from '@dzlzv/hydra-common'
 import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
+import { eventEmitter } from '../node/event-emitter'
 import IORedis = require('ioredis')
 
 const debug = Debug('index-builder:redis-relayer')
@@ -16,18 +16,16 @@ const debug = Debug('index-builder:redis-relayer')
 @Service()
 export class RedisRelayer {
   private redisPub: IORedis.Redis
-  private indexBuilder!: IndexBuilder
 
   public constructor() {
     const clientFactory = Container.get<RedisClientFactory>(
       'RedisClientFactory'
     )
     this.redisPub = clientFactory.getClient()
-    this.indexBuilder = Container.get<IndexBuilder>('IndexBuilder')
     // Relay local events globablly via redis
     const events = [BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL]
     events.forEach((event) => {
-      this.indexBuilder.on(event, (data) => this.relayToRedis(event, data))
+      eventEmitter.on(event, (data) => this.relayToRedis(event, data))
     })
   }
 
