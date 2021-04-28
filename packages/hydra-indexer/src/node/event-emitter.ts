@@ -9,5 +9,6 @@ export enum IndexerEvents {
   NEW_BEST_HEAD = 'NEW_BEST_HEAD', // new block has been finalized
   NEW_HEAD = 'NEW_HEAD', // emitted from a subscription to all heads
   API_CONNECTED = 'API_CONNECTED', // api has been (re)-connected
-  BLOCK_START_CHANNEL = 'BLOCK_START_CHANNEL', // block processing started
+  BLOCK_COMPLETED = 'BLOCK_COMPLETED', // a full block hash been successfully saved
+  BLOCK_STARTED = 'BLOCK_STARTED', // block processing started
 }

@@ -1,14 +1,16 @@
 // @ts-check
-import { BlockData, fromBlockData, toPayload } from '../model'
+import {
+  BlockData,
+  fromBlockData,
+  getExtrinsicIndex,
+  getOrUndefined,
+  toPayload,
+} from '../model'
 import * as _ from 'lodash'
 
 import Debug from 'debug'
 import { PooledExecutor } from './PooledExecutor'
-import { SubstrateEventEntity } from '../entities'
-import {
-  BLOCK_START_CHANNEL,
-  BLOCK_COMPLETE_CHANNEL,
-} from '../redis/redis-keys'
+import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { IStatusService } from '../status-service/IStatusService'
 import { WORKERS_NUMBER } from './indexer-consts'
 import { getConnection, EntityManager } from 'typeorm'
@@ -17,6 +19,7 @@ import { BlockProducer } from '.'
 import { getStatusService } from '../status-service'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 import { SubstrateBlockEntity } from '../entities/SubstrateBlockEntity'
+import { fromBlockExtrinsic } from '../entities/SubstrateExtrinsicEntity'
 
 const debug = Debug('index-builder:indexer')
 
@@ -88,7 +91,7 @@ export class IndexBuilder {
         return
       }
 
-      eventEmitter.emit(BLOCK_START_CHANNEL, {
+      eventEmitter.emit(IndexerEvents.BLOCK_STARTED, {
         height: h,
       })
 
@@ -101,33 +104,57 @@ export class IndexBuilder {
   }
 
   async transformAndPersist(blockData: BlockData): Promise<void> {
-    const queryEventsBlock = fromBlockData(blockData)
     const blockEntity = SubstrateBlockEntity.fromBlockData(blockData)
 
-    const batches = _.chunk(queryEventsBlock.blockEvents, 100)
-    debug(
-      `Read ${queryEventsBlock.blockEvents.length} events; saving in ${batches.length} batches`
-    )
-
     await getConnection().transaction(async (em: EntityManager) => {
+      debug(`Saving block data`)
+      await em.save(blockEntity)
+      debug(`Saved block data`)
+
+      debug(`Saving extrinsics`)
+      const {
+        signedBlock: { block },
+      } = blockData
+
+      const extrinsicEntities: SubstrateExtrinsicEntity[] = block.extrinsics.map(
+        (e, index) =>
+          fromBlockExtrinsic({
+            e,
+            blockEntity,
+            indexInBlock: index,
+          })
+      )
+      await em.save(extrinsicEntities)
+      debug(`Saved ${extrinsicEntities.length} extrinsics`)
+
       debug(`Saving event entities`)
+      const queryEventsBlock = fromBlockData(blockData)
+      const batches = _.chunk(queryEventsBlock.blockEvents, 100)
+      debug(
+        `Read ${queryEventsBlock.blockEvents.length} events; saving in ${batches.length} batches`
+      )
 
       let saved = 0
       for (let batch of batches) {
-        const qeEntities = batch.map((event) =>
-          SubstrateEventEntity.fromQueryEvent(event)
-        )
+        const qeEntities = batch.map((event) => {
+          const extrinsicIndex = getExtrinsicIndex(event.eventRecord)
+          const extrinsicEntity = getOrUndefined(
+            extrinsicIndex,
+            extrinsicEntities
+          )
+          return SubstrateEventEntity.fromQueryEvent({
+            ...event,
+            extrinsicEntity,
+            blockEntity,
+          })
+        })
         await em.save(qeEntities)
         saved += qeEntities.length
         batch = []
         debug(`Saved ${saved} events`)
       }
-
-      await em.save(blockEntity)
-
-      debug(`Saved block data`)
     })
 
-    eventEmitter.emit(BLOCK_COMPLETE_CHANNEL, toPayload(blockEntity))
+    eventEmitter.emit(IndexerEvents.BLOCK_COMPLETED, toPayload(blockEntity))
   }
 }

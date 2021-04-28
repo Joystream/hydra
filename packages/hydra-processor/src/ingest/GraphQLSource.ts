@@ -121,7 +121,7 @@ export function getEventsGraphQLQuery({
       type
       value
     }
-    index 
+    indexInBlock 
     blockNumber
     blockTimestamp
     extrinsic {
