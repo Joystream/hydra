@@ -14,25 +14,24 @@ import { SubstrateEvent } from '@dzlzv/hydra-common'
 
 const start = Date.now()
 let blockTime = 0
-let blockStartTime = 0
 let totalEvents = 0
 let totalBlocks = 0
 
 export async function balancesTransfer({
   store,
   event,
-  block,
 }: {
   store: DatabaseManager
   event: SubstrateEvent
   block: { blockNumber: number }
 }) {
   const transfer = new Transfer()
-  const _event = new Balances.TransferEvent(event)
-  transfer.from = Buffer.from(_event.data.accountIds[0].toHex())
-  transfer.to = Buffer.from(_event.data.accountIds[1].toHex())
-  transfer.value = _event.data.balance.toBn()
-  transfer.block = block.blockNumber
+  const [from, to, value] = new Balances.TransferEvent(event).params
+  transfer.from = Buffer.from(from.toHex())
+  transfer.to = Buffer.from(to.toHex())
+  transfer.value = value.toBn()
+
+  transfer.block = event.blockNumber
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
   transfer.insertedAt = new Date()
   await store.save<Transfer>(transfer)
