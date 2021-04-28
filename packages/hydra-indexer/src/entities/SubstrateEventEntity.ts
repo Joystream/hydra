@@ -16,7 +16,6 @@ import {
 import { EventRecord } from '@polkadot/types/interfaces'
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
-import { NumericTransformer } from '@dzlzv/bn-typeorm'
 import { SubstrateBlockEntity } from './SubstrateBlockEntity'
 
 export const EVENT_TABLE_NAME = 'substrate_event'
@@ -70,7 +69,7 @@ export class SubstrateEventEntity extends AbstractWarthogModel
   blockHash!: string
 
   // PG int type size is not large enough
-  @Column('numeric', { transformer: new NumericTransformer() })
+  @Column('bigint')
   blockTimestamp!: number
 
   @Column()
