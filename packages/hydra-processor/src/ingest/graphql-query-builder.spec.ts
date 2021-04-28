@@ -1,11 +1,27 @@
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { expect } from 'chai'
-import { format, stripSpaces } from '../util/utils'
-import { buildFields, buildQuery, buildWhere } from './graphql-query-builder'
+import { format, stripSpaces, compact as c } from '../util/utils'
+import { buildQueryFields, buildQuery, buildWhere } from './graphql-query-builder'
 
 describe('Query builder', () => {
+  it('should construct blocks query', () => {
+    const out = buildWhere<{
+      height: number
+      events: { name: string }[]
+      extrinsics: { name: string }[]
+    }>({
+      height: { gt: 4234 },
+      events: { some: { name: { in: ['abc', 'cde'] } } },
+      extrinsics: { some: { name: { in: ['xyz', 'qqq'] } } },
+    })
+
+    const expected = ` where: { height_gt: 4234, events_some: { name_in: ["abc", "cde"]}, extrinsics_some: { name_in: ["xyz", "qqq"]}}`
+
+    expect(c(out)).equals(c(expected))
+  })
+
   it('should construct query where ', () => {
-    const out = buildWhere({
+    const out = buildWhere<{ block: number; id: string; name: string }>({
       block: { gt: 100, lte: 500 },
       id: { gt: '3333' },
       name: { in: ['abc', 'cde'] },
@@ -18,7 +34,7 @@ describe('Query builder', () => {
   })
 
   it('should build query fields', () => {
-    const out = buildFields<SubstrateEvent>([
+    const out = buildQueryFields<SubstrateEvent>([
       'id',
       'name',
       'method',

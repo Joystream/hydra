@@ -3,7 +3,7 @@ import { makeDatabaseManager } from '@dzlzv/hydra-db-utils'
 import { getConfig as conf } from '../start/config'
 import Debug from 'debug'
 import { info } from '../util/log'
-import { BlockContext } from '../queue'
+import { BlockData } from '../queue'
 import { getMappingsLookup, IMappingExecutor } from '.'
 import { IMappingsLookup, EventContext } from './IMappingsLookup'
 
@@ -12,7 +12,7 @@ const debug = Debug('hydra-processor:mappings-executor')
 /**
  * A transactional event context
  */
-export interface TxAwareBlockContext extends BlockContext {
+export interface TxAwareBlockContext extends BlockData {
   /**
    * A TypeORM entityManager holding the DB transaction within which the mapping batch is executed
    */
@@ -24,7 +24,7 @@ export interface TxAwareBlockContext extends BlockContext {
  * @param ctx Event
  * @returns If the event context has been enriched with a transactional EntityManager
  */
-export function isTxAware(ctx: BlockContext): ctx is TxAwareBlockContext {
+export function isTxAware(ctx: BlockData): ctx is TxAwareBlockContext {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (ctx as any).entityManager !== undefined
 }
@@ -38,14 +38,14 @@ export class TransactionalExecutor implements IMappingExecutor {
   }
 
   async executeBlock(
-    blockCtx: BlockContext,
-    onSuccess: (ctx: BlockContext) => Promise<void>
+    blockCtx: BlockData,
+    onSuccess: (ctx: BlockData) => Promise<void>
   ): Promise<void> {
     await getConnection().transaction(async (entityManager: EntityManager) => {
       const allMappings = this.mappingsLookup.lookupHandlers(blockCtx)
       if (conf().VERBOSE)
         debug(
-          `Mappings for block ${blockCtx.blockNumber}: ${JSON.stringify(
+          `Mappings for block ${blockCtx.block.id}: ${JSON.stringify(
             allMappings,
             null,
             2
@@ -65,7 +65,7 @@ export class TransactionalExecutor implements IMappingExecutor {
 
       let i = 0
       for (const mapping of mappings) {
-        const ctx = blockCtx.eventCtxs[i]
+        const ctx = blockCtx.events[i]
         debug(`Processing event ${ctx.event.id}`)
 
         if (conf().VERBOSE) debug(`JSON: ${JSON.stringify(ctx, null, 2)}`)

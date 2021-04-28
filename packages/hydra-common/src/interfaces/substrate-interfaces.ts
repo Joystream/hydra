@@ -26,6 +26,11 @@ export interface ExtrinsicInfo {
 
 export interface SubstrateBlock {
   /**
+   * Unique block id, following the format <block height>-<first hex digits of the hash>
+   */
+  id: string
+
+  /**
    * Current block hash
    */
   hash: string
@@ -186,6 +191,7 @@ export interface SubstrateExtrinsic {
 export interface BlockContext {
   block: SubstrateBlock
 }
+
 export interface ExtrinsicContext extends BlockContext {
   extrinsic: SubstrateExtrinsic
 }
@@ -195,8 +201,4 @@ export interface EventContext extends BlockContext {
   extrinsic?: SubstrateExtrinsic
 }
 
-export interface MappingContext {
-  log: any
-}
-
-export type BlockMapping = MappingContext & BlockContext
+export type MappingContext = BlockContext | ExtrinsicContext | EventContext

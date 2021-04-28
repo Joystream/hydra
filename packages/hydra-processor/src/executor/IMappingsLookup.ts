@@ -1,12 +1,12 @@
 import { DatabaseManager } from '@dzlzv/hydra-db-utils'
-import { BlockContext, MappingContext } from '../queue'
+import { BlockData, MappingContext } from '../queue'
 import { MappingHandler } from '../start/manifest'
 
 export interface StoreContext {
   store: DatabaseManager
 }
 
-export type BlockHookContext = StoreContext & BlockContext
+export type BlockHookContext = StoreContext & BlockData
 
 export type EventContext = StoreContext & MappingContext
 
@@ -19,7 +19,7 @@ export interface BlockMappings {
 }
 
 export interface IMappingsLookup {
-  lookupHandlers(ctx: BlockContext): BlockMappings
+  lookupHandlers(ctx: BlockData): BlockMappings
 
   call(handler: MappingHandler, ctx: ExecContext): Promise<void>
 }

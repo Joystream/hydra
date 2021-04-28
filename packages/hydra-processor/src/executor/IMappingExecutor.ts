@@ -1,8 +1,8 @@
-import { BlockContext } from '../queue'
+import { BlockData } from '../queue'
 
 export interface IMappingExecutor {
   executeBlock(
-    blockCtx: BlockContext,
-    onSuccess: (ctx: BlockContext) => Promise<void>
+    blockCtx: BlockData,
+    onSuccess: (ctx: BlockData) => Promise<void>
   ): Promise<void>
 }

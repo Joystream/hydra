@@ -13,10 +13,54 @@ export interface Filter {
   endsWith: string
 }
 
-export type QueryWhere<T> = Partial<{ [P in keyof T]: Partial<Filter> }>
+export type TypedFilter<T> = T extends string | number
+  ? PrimitiveFilter<T>
+  : T extends unknown[]
+  ? ArrayFilter<T>
+  : T extends object
+  ? ObjectFilter<T>
+  : never
+
+export type PrimitiveFilter<T> = T extends number
+  ? CommonFilter<T>
+  : T extends string
+  ? CommonFilter<T> | StringFilter
+  : never
+
+export interface CommonFilter<T extends string | number> {
+  gte: T
+  lte: T
+  gt: T
+  lt: T
+  in: T[]
+}
+
+export interface StringFilter {
+  startsWith: string
+  contains: string
+  endsWith: string
+}
+
+export type ArrayFilterValue<T> = T extends object[]
+  ? ObjectFilter<ArrayElement<T>>
+  : T extends string[] | number[]
+  ? PrimitiveFilter<ArrayElement<T>>
+  : never
+
+export interface ArrayFilter<T extends readonly unknown[]> {
+  some: ArrayFilterValue<T>
+  each: ArrayFilterValue<T>
+  none: ArrayFilterValue<T>
+}
+
+export type ObjectFilter<T> = Partial<
+  {
+    [P in keyof T]: Partial<TypedFilter<T[P]>>
+  }
+>
 
 export interface QueryFilter<T> {
-  where: QueryWhere<T>
+  where: ObjectFilter<T>
   limit?: number
   orderBy?: Partial<{
     asc: string

@@ -8,11 +8,10 @@ import { last, first, union, mapValues } from 'lodash'
 import { IndexerStatus, IStateKeeper, getStateKeeper } from '../state'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import {
-  BlockContext,
-  MappingContext,
+  BlockData,
   IEventQueue,
   MappingFilter,
-  MappingType,
+  HandlerKind,
   RangeFilter,
 } from './IEventQueue'
 import { BlockRange, MappingsDef } from '../start/manifest'
@@ -55,7 +54,7 @@ export class EventQueue implements IEventQueue {
   eventSource!: IEventsSource
   mappingFilter!: MappingFilter
   rangeFilter!: RangeFilter
-  indexerQueries!: { [key in MappingType]?: Partial<IndexerQuery> }
+  indexerQueries!: { [key in HandlerKind]?: Partial<IndexerQuery> }
 
   async init(): Promise<void> {
     info(`Waiting for the indexer head to be initialized`)
@@ -130,8 +129,8 @@ export class EventQueue implements IEventQueue {
     return out
   }
 
-  async *blocks(): AsyncGenerator<BlockContext, void, void> {
-    const newBlock = (eventCtx: MappingContext): BlockContext => {
+  async *blocks(): AsyncGenerator<BlockData, void, void> {
+    const newBlock = (eventCtx: MappingContext): BlockData => {
       const { event } = eventCtx
       return {
         blockNumber: event.blockNumber,
@@ -282,16 +281,16 @@ export class EventQueue implements IEventQueue {
  * @returns an array of events enriched with the mapping type
  */
 export function sortAndTrim(
-  events: { [key in MappingType]?: SubstrateEvent[] },
+  events: { [key in HandlerKind]?: SubstrateEvent[] },
   size = conf().QUEUE_BATCH_SIZE
 ): MappingContext[] {
-  // collect all mapping type event arrays into a single big event
+  // collect all mapping type event arrays into a single big array
   let mappingData: MappingContext[] = []
   for (const e in events) {
-    const type = e as keyof typeof events
+    const kind = e as keyof typeof events
     mappingData.push(
-      ...(events[type] || []).map((event) => {
-        return { event, type }
+      ...(events[kind] || []).map((event) => {
+        return { event, kind }
       })
     )
   }
@@ -306,19 +305,19 @@ export function sortAndTrim(
 
 export function prepareIndexerQueries(
   filter: MappingFilter
-): { [key in MappingType]?: Partial<IndexerQuery> } {
+): { [key in HandlerKind]?: Partial<IndexerQuery> } {
   const { events, extrinsics } = filter
-  const queries: { [key in MappingType]?: Partial<IndexerQuery> } = {}
+  const queries: { [key in HandlerKind]?: Partial<IndexerQuery> } = {}
 
   if (events.length > 0) {
-    queries[MappingType.EVENT] = {
+    queries[HandlerKind.EVENT] = {
       event: { in: events },
     }
   }
 
   const { names, triggerEvents } = extrinsics
   if (names.length > 0) {
-    queries[MappingType.EXTRINSIC] = {
+    queries[HandlerKind.EXTRINSIC] = {
       event: { in: triggerEvents },
       extrinsic: { in: names },
     }

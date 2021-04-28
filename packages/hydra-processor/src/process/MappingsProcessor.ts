@@ -4,7 +4,7 @@ import Debug from 'debug'
 
 import { IStateKeeper, getStateKeeper } from '../state'
 import { error, info } from '../util/log'
-import { BlockContext, getEventQueue, IEventQueue } from '../queue'
+import { BlockData, getEventQueue, IEventQueue } from '../queue'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import { getMappingExecutor, IMappingExecutor, isTxAware } from '../executor'
 
@@ -54,24 +54,24 @@ export class MappingsProcessor {
         const nextBlock = next.value
 
         debug(
-          `Next block: ${nextBlock.blockNumber}, events count: ${nextBlock.eventCtxs.length} `
+          `Next block: ${nextBlock.block.id}, events count: ${nextBlock.events.length} `
         )
 
         await this.mappingsExecutor.executeBlock(
           nextBlock,
-          async (ctx: BlockContext) => {
+          async (ctx: BlockData) => {
             await this.stateKeeper.updateState(
-              { lastScannedBlock: ctx.blockNumber },
+              { lastScannedBlock: ctx.block.height },
               // update the state in the same transaction if the tx context is present
               isTxAware(ctx) ? ctx.entityManager : undefined
             )
           }
         )
         // emit all at once
-        nextBlock.eventCtxs.map((ctx) =>
+        nextBlock.events.map((ctx) =>
           eventEmitter.emit(ProcessorEvents.PROCESSED_EVENT, ctx.event)
         )
-        debug(`Done block ${nextBlock.blockNumber}`)
+        debug(`Done block ${nextBlock.block.height}`)
       } catch (e) {
         error(`Stopping the proccessor due to errors: ${logError(e)}`)
         this.stop()

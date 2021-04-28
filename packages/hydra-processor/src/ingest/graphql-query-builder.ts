@@ -1,12 +1,22 @@
 import { compact } from 'lodash'
-import { GraphQLQuery, QueryFields, QueryWhere } from '.'
+import { GraphQLQuery, QueryFields, ObjectFilter } from '.'
 import { format, stripSpaces } from '../util/utils'
 
-export type FilterValue = undefined | string | number | string[] | number[]
+export type FilterValue<T> =
+  | undefined
+  | string
+  | number
+  | string[]
+  | number[]
+  | ObjectFilter<T[keyof T]>
 
-export function isArray(f: FilterValue): f is string[] | number[] {
+export function isArray(f: FilterValue<any>): f is string[] | number[] {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return f !== undefined && (f as any).pop !== undefined
+}
+
+export function isObject<T>(f: FilterValue<T>): f is ObjectFilter<T[keyof T]> {
+  return f !== undefined && typeof f === 'object'
 }
 
 export function isString(f: string | number): f is string {
@@ -18,12 +28,12 @@ export function formatScalar(value: string | number): string {
   return isString(value) ? `"${value}"` : `${value}`
 }
 
-export function formatClause(name: string, value: FilterValue): string {
+export function formatClause<T>(name: string, value: FilterValue<T>): string {
   if (value === undefined) return ''
-  return `${name}: ${formatValue(value)}`
+  return `${name}: ${formatFilterValue(value)}`
 }
 
-export function formatValue(value: FilterValue): string {
+export function formatFilterValue<T>(value: FilterValue<T>): string {
   if (value === undefined) {
     return ''
   }
@@ -33,12 +43,16 @@ export function formatValue(value: FilterValue): string {
       .join(', ')}]`
   }
 
+  if (isObject(value)) {
+    return stripSpaces(`{ ${collectFieldClauses(value)} }`)
+  }
+
   return formatScalar(value as string | number)
 }
 
-export function clauses(
+export function singleFieldClauses<T>(
   field: string,
-  filter: Record<string, FilterValue> | undefined
+  filter: Record<string, FilterValue<T>> | undefined
 ): string[] {
   if (filter === undefined) {
     return ['']
@@ -50,23 +64,42 @@ export function clauses(
     }
 
     acc.push(
-      `${field}_${clause}: ${formatValue(filter[clause] as FilterValue)}`
+      `${field}_${clause}: ${formatFilterValue(
+        filter[clause] as FilterValue<T>
+      )}`
     )
     return acc
   }, [] as string[])
 }
 
-export function buildWhere<T>(where: QueryWhere<T>): string {
+export function collectFieldClauses<T>(where: ObjectFilter<T>): string {
   let whereBody: string[] = Object.keys(where).reduce((acc, f) => {
-    acc.push(...clauses(f, where[f as keyof typeof where]))
+    acc.push(
+      ...singleFieldClauses(
+        f,
+        // we simplify types here as QueryWhere is already type-checked
+        where[f as keyof typeof where] as
+          | Record<string, FilterValue<T>>
+          | undefined
+      )
+    )
 
     return acc
   }, [] as string[])
-  whereBody = compact(whereBody)
-  return stripSpaces(`where: { ${whereBody.join(', ')} }`)
+  return `${compact(whereBody).join(', ')}`
 }
 
-export function buildFields<T>(fields: QueryFields<T>): string {
+export function buildWhere<T>(where: ObjectFilter<T>): string {
+  // let whereBody: string[] = Object.keys(where).reduce((acc, f) => {
+  //   acc.push(...clauses(f, where[f as keyof typeof where]))
+
+  //   return acc
+  // }, [] as string[])
+  // whereBody = compact(whereBody)
+  return stripSpaces(`where: { ${collectFieldClauses(where)} }`)
+}
+
+export function buildQueryFields<T>(fields: QueryFields<T>): string {
   let output = ''
   for (const field of fields) {
     if (typeof field === 'string') {
@@ -87,7 +120,7 @@ export function buildFields<T>(fields: QueryFields<T>): string {
 
       output = `
       ${output}${key} {
-        ${buildFields(nestedFields)}
+        ${buildQueryFields(nestedFields)}
       }\n`
     }
   }
@@ -102,11 +135,14 @@ export function buildQuery<T>({
   const parts: string[] = compact([
     buildWhere(where),
     formatClause('limit', limit),
-    ...clauses('orderBy', orderBy as Record<string, FilterValue> | undefined),
+    ...singleFieldClauses(
+      'orderBy',
+      orderBy as Record<string, FilterValue<T>> | undefined
+    ),
   ])
 
   return stripSpaces(`${name}( ${parts.join(', ')} ) {
-    ${buildFields(fields)}
+    ${buildQueryFields(fields)}
   }`)
 }
 

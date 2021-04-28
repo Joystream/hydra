@@ -1,5 +1,6 @@
 import Debug from 'debug'
 import fs from 'fs'
+import { SSL_OP_ALL } from 'node:constants'
 import { BlockRange } from '../start/manifest'
 
 const debug = Debug('hydra-processor:util')
@@ -70,6 +71,10 @@ export function stripSpaces(s: string): string {
 
 export function format(s: string): string {
   return stripSpaces(s).replace('{ ', '{\n').replace(' }', '\n}\n')
+}
+
+export function compact(s: string): string {
+  return s.replace(/\s/g, '')
 }
 
 /**

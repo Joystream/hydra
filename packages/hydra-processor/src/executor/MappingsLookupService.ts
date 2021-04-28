@@ -15,7 +15,7 @@ import {
   IMappingsLookup,
   EventContext,
 } from './IMappingsLookup'
-import { BlockContext, MappingContext, MappingType } from '../queue'
+import { BlockData, MappingContext, HandlerKind } from '../queue'
 import { getConfig as conf } from '../start/config'
 import { isInRange } from '../util/utils'
 
@@ -76,18 +76,20 @@ export class MappingsLookupService implements IMappingsLookup {
     debug(`Post-hooks: ${JSON.stringify(this.mappings.postBlockHooks)}`)
   }
 
-  lookupHandlers(ctx: BlockContext): BlockMappings {
+  lookupHandlers(ctx: BlockData): BlockMappings {
     if (conf().VERBOSE)
       debug(`Lookup handlers, block context: ${JSON.stringify(ctx, null, 2)}`)
     // in the future here we can do much more complex lookups here, e.g. based
     // on the block height or runtime metadata of the current block
-    const { blockNumber } = ctx
+    const {
+      block: { height },
+    } = ctx
 
     const filtered = {
-      pre: rangeFilter(this.mappings.preBlockHooks || [], blockNumber),
-      post: rangeFilter(this.mappings.postBlockHooks || [], blockNumber),
+      pre: rangeFilter(this.mappings.preBlockHooks || [], height),
+      post: rangeFilter(this.mappings.postBlockHooks || [], height),
       mappings: compact(
-        ctx.eventCtxs.map((ctx) => this.lookupMapping(ctx, blockNumber))
+        ctx.events.map((ctx) => this.lookupMapping(ctx, height))
       ),
     }
 
@@ -103,7 +105,7 @@ export class MappingsLookupService implements IMappingsLookup {
   ): MappingHandler | undefined {
     const name = normalize(extractName(ctx))
     const mappings: MappingHandler[] =
-      ctx.type === MappingType.EVENT ? this.events[name] : this.extrinsics[name]
+      ctx.kind === HandlerKind.EVENT ? this.events[name] : this.extrinsics[name]
 
     const inRange = rangeFilter(mappings, blockNumber)
 
@@ -194,8 +196,8 @@ export function resolveType(
 export const normalize = (s: string): string => s.trim().toLowerCase()
 
 export function extractName(ctx: MappingContext): string {
-  if (ctx.type === MappingType.EVENT) return ctx.event.name
-  if (ctx.type === MappingType.EXTRINSIC) {
+  if (ctx.kind === HandlerKind.EVENT) return ctx.event.name
+  if (ctx.kind === HandlerKind.EXTRINSIC) {
     const extrinsic = ctx.event.extrinsic
     if (extrinsic === undefined) {
       throw new Error(
