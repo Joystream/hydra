@@ -1,5 +1,4 @@
 import {
-  MappingContext,
   SubstrateBlock,
   SubstrateEvent,
 } from '@dzlzv/hydra-common'
@@ -11,11 +10,11 @@ export enum HandlerKind {
   BLOCK = 'BLOCK',
 }
 
-// export interface MappingContext {
-//   // TODO: update interfaces in hydra-common
-//   event: SubstrateEvent
-//   kind: HandlerKind
-// }
+export interface MappingContext {
+  // TODO: update interfaces in hydra-common
+  event: SubstrateEvent
+  kind: HandlerKind
+}
 
 export interface BlockData {
   block: SubstrateBlock

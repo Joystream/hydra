@@ -76,20 +76,20 @@ export class MappingsLookupService implements IMappingsLookup {
     debug(`Post-hooks: ${JSON.stringify(this.mappings.postBlockHooks)}`)
   }
 
-  lookupHandlers(ctx: BlockData): BlockMappings {
+  lookupHandlers(blockData: BlockData): BlockMappings {
     if (conf().VERBOSE)
-      debug(`Lookup handlers, block context: ${JSON.stringify(ctx, null, 2)}`)
+      debug(`Lookup handlers, block context: ${JSON.stringify(blockData, null, 2)}`)
     // in the future here we can do much more complex lookups here, e.g. based
     // on the block height or runtime metadata of the current block
     const {
       block: { height },
-    } = ctx
+    } = blockData
 
     const filtered = {
       pre: rangeFilter(this.mappings.preBlockHooks || [], height),
       post: rangeFilter(this.mappings.postBlockHooks || [], height),
       mappings: compact(
-        ctx.events.map((ctx) => this.lookupMapping(ctx, height))
+        blockData.events.map((ctx) => this.lookupMapping(ctx, height))
       ),
     }
 

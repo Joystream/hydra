@@ -1,12 +1,12 @@
 import { GraphQLSource } from './GraphQLSource'
-import { IEventsSource } from './IEventsSource'
+import { IProcessorSource } from './IProcessorSource'
 import pImmediate from 'p-immediate'
-
-export * from './IEventsSource'
 
 let eventSource: GraphQLSource
 
-export async function getEventSource(): Promise<IEventsSource> {
+export * from './IProcessorSource'
+
+export async function getEventSource(): Promise<IProcessorSource> {
   if (!eventSource) {
     // just to make it async, do some async init here if needed
     await pImmediate()

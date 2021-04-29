@@ -1,4 +1,4 @@
-import { IEventsSource, IndexerQuery, getEventSource } from '../ingest'
+import { getEventSource } from '../ingest'
 import { getConfig as conf, getManifest } from '../start/config'
 import { info } from '../util/log'
 import pWaitFor from 'p-wait-for'
@@ -13,9 +13,16 @@ import {
   MappingFilter,
   HandlerKind,
   RangeFilter,
+  MappingContext,
 } from './IEventQueue'
 import { BlockRange, MappingsDef } from '../start/manifest'
-import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
+import {
+  AsJson,
+  GraphQLQuery,
+  IndexerQuery,
+  IProcessorSource,
+} from '../ingest/IProcessorSource'
 
 const debug = Debug('hydra-processor:event-queue')
 
@@ -51,7 +58,7 @@ export class EventQueue implements IEventQueue {
   indexerStatus!: IndexerStatus
   eventQueue: MappingContext[] = []
   stateKeeper!: IStateKeeper
-  eventSource!: IEventsSource
+  eventSource!: IProcessorSource
   mappingFilter!: MappingFilter
   rangeFilter!: RangeFilter
   indexerQueries!: { [key in HandlerKind]?: Partial<IndexerQuery> }
@@ -188,6 +195,8 @@ export class EventQueue implements IEventQueue {
         }`
       )
 
+      const blocks = await this.fetchBlocks()
+
       const events: MappingContext[] = await this.fetchNextBatch()
 
       this.eventQueue.push(...events)
@@ -223,6 +232,37 @@ export class EventQueue implements IEventQueue {
           \tLast fetched event: ${this.rangeFilter.id.gt}`
       )
     }
+  }
+
+  private async fetchBlocks(): Promise<SubstrateBlock[]> {
+    const { events, extrinsics } = this.mappingFilter
+    const query: GraphQLQuery<SubstrateBlock> = {
+      name: 'substrateBlocks',
+      fields: [
+        'id',
+        'hash',
+        'parentHash',
+        'height',
+        'timestamp',
+        'stateRoot',
+        'runtimeVersion',
+        'lastRuntimeUpgrade',
+        { 'events': ['id', 'name', 'extrinsic'] },
+        { 'extrinsics': ['id', 'name'] },
+      ],
+      query: {
+        where: {
+          events: { some: { name: { in: events } } },
+          //extrinsics: { some: { name: { in: extrinsics.names } } },
+          height: this.rangeFilter.block,
+        },
+        limit: conf().BLOCK_WINDOW,
+        orderBy: { desc: 'height' },
+      },
+    }
+    const blocks = await this.eventSource.executeQueries({ eventBlocks: query })
+
+    return blocks.eventBlocks
   }
 
   private shiftRangeFilter() {
@@ -327,4 +367,31 @@ export function prepareIndexerQueries(
 
   debug(`Queries: ${JSON.stringify(queries, null, 2)}`)
   return queries
+}
+
+export function prepareBlockQueries(
+  filter: MappingFilter
+): GraphQLQuery<SubstrateBlock> {
+  const { events, extrinsics } = filter
+
+  return {
+    name: 'substrateBlocks',
+    fields: [
+      'id',
+      'hash',
+      'parentHash',
+      'stateRoot',
+      'runtimeVersion',
+      'lastRuntimeUpgrade',
+      'lastRuntimeUpgrade',
+      { 'events': ['id', 'name'] },
+      { 'extrinsics': ['id', 'name'] },
+    ],
+    query: {
+      where: {
+        events: { some: { name: { in: events } } },
+        extrinsics: { some: { name: { in: extrinsics.names } } },
+      },
+    },
+  }
 }

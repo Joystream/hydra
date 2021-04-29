@@ -1,10 +1,10 @@
-import { IEventsSource } from './'
+import { IProcessorSource, AsJson } from './'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
 import { getConfig as conf } from '../start/config'
 import { quotedJoin } from '../util/utils'
-import { GraphQLQuery, IndexerQuery } from './IEventsSource'
+import { GraphQLQuery, IndexerQuery } from './IProcessorSource'
 import { IndexerStatus } from '../state'
 import { collectNamedQueries } from './graphql-query-builder'
 
@@ -20,7 +20,7 @@ query {
 }
 `
 
-export class GraphQLSource implements IEventsSource {
+export class GraphQLSource implements IProcessorSource {
   private graphClient: GraphQLClient
 
   constructor() {
@@ -66,13 +66,15 @@ export class GraphQLSource implements IEventsSource {
     return raw as { [K in keyof typeof queries]: SubstrateEvent[] }
   }
 
-  executeQueries<T, R>(
+  executeQueries<T>(
     queries: {
       [K in keyof T]: GraphQLQuery<T[K]>
     }
-  ): Promise<R> {
+  ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }> {
     const bigNamedQuery = collectNamedQueries(queries)
-    return this.graphClient.request<R>(bigNamedQuery)
+    return this.graphClient.request<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>(
+      bigNamedQuery
+    )
   }
 }
 

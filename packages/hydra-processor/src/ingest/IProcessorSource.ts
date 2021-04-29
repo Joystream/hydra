@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { AnyJson, SubstrateEvent } from '@dzlzv/hydra-common'
 import { IndexerStatus } from '../state'
 
 export interface Filter {
@@ -83,6 +83,20 @@ export type QueryField<T> =
       }
     >
 
+export type AsJson<T> = T extends
+  | string
+  | number
+  | BigInt
+  | AnyJson
+  | boolean
+  | null
+  ? T
+  : T extends Function
+  ? never
+  : T extends object
+  ? { [K in keyof T]: AsJson<T[K]> }
+  : never
+
 export type QueryFields<T> = Array<QueryField<T>>
 /**
  * Query for fetching events
@@ -104,18 +118,18 @@ export interface GraphQLQuery<T> {
   fields: QueryFields<T>
 }
 
-export interface IEventsSource {
+export interface IProcessorSource {
   nextBatch<T>(
     queries: {
       [K in keyof T]: IndexerQuery
     }
   ): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }>
 
-  executeQueries<T, R>(
+  executeQueries<T>(
     queries: {
       [K in keyof T]: GraphQLQuery<T[K]>
     }
-  ): Promise<R>
+  ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>
 
   indexerStatus(): Promise<IndexerStatus>
 
