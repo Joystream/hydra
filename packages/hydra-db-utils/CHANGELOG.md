@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2.1.0-beta.8 (2021-04-29)
+
+
+### Bug Fixes
+
+* **hydra-cli:** fix stack overflow caused by lodash.cloneDeep ([#369](https://github.com/Joystream/hydra/issues/369)) ([e087c5c](https://github.com/Joystream/hydra/commit/e087c5c771de20a1b1cf09c38c9a91806af84819))
+
+
+
 ## 2.1.0-beta.7 (2021-04-08)
 
 
