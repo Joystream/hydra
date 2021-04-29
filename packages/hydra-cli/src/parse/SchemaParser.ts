@@ -15,7 +15,6 @@ import {
 } from 'graphql'
 import * as fs from 'fs-extra'
 import Debug from 'debug'
-import { cloneDeep } from 'lodash'
 import { SCHEMA_DEFINITIONS_PREAMBLE } from './constant'
 import { SchemaDirective } from './SchemaDirective'
 import { FTSDirective } from './FTSDirective'
@@ -207,7 +206,7 @@ export class GraphQLSchemaParser {
           path.push(node)
           if (node.kind === 'Directive') {
             if (node.name.value in visitors.directives) {
-              visitors.directives[node.name.value].visit(cloneDeep(path))
+              visitors.directives[node.name.value].visit([...path])
             }
           }
         },

@@ -1,6 +1,5 @@
 import { SchemaNode } from './SchemaParser'
 import { SchemaDirective } from './SchemaDirective'
-import { cloneDeep } from 'lodash'
 import { WarthogModel } from '../model'
 import {
   DirectiveNode,
@@ -18,7 +17,7 @@ export class FTSDirective implements SchemaDirective {
   name = FULL_TEXT_SEARCHABLE_DIRECTIVE
 
   validate(_path: SchemaNode[]): void {
-    const path = cloneDeep(_path)
+    const path = [..._path]
 
     if (path.length < 3) {
       throw new Error(

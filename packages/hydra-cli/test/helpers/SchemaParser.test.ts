@@ -5,6 +5,7 @@ import {
 } from './../../src/parse/SchemaParser'
 import { expect } from 'chai'
 import { FULL_TEXT_SEARCHABLE_DIRECTIVE } from '../../src/parse/SchemaDirective'
+import { fromStringSchema } from './model'
 
 describe('SchemaParser', () => {
   it('should fail on non-existent file', () => {
@@ -126,28 +127,18 @@ describe('SchemaParser', () => {
     )
   })
 
-  // TODO: in order to allow multiple directives we need to switch off SDL validation
-  // in the parser. So this test is comment for the future use
-  //
-  // it('should support multiple directives', () => {
-  //     const parser = new GraphQLSchemaParser('test/fixtures/multiple-queries.graphql');
-  //     const queries: string[] = [];
-  //     const visitor: Visitor = {
-  //         visit: (path) => {
-  //             path.map((n: SchemaNode) => {
-  //                 if (n.kind === 'Directive') {
-  //                     queries.push((n.arguments?.[0].value as StringValueNode).value)
-  //                 }
+  it('should handle many entities', () => {
+    let schema = ``
 
-  //             });
-  //         }
-  //     }
-  //     parser.dfsTraversal({
-  //         directives: {
-  //             "fullTextSearchable": visitor
-  //         }
-  //     });
+    for (let i = 0; i < 5000; i++) {
+      schema = `${schema}
+      type Cat${i} @entity {
+        meow: String! @${FULL_TEXT_SEARCHABLE_DIRECTIVE}(query: "test")
+      }
+      `
+    }
 
-  //     expect(queries).members(["handles1", "handles2"], "Should detect multiple queries on the same field");
-  // })
+    const model = fromStringSchema(schema)
+    expect(model.entities.length).equals(5000, 'should parse all entities')
+  })
 })
