@@ -7,7 +7,7 @@ import { getConfig as conf } from '../node'
 import { getSubstrateService, ISubstrateService } from '../substrate'
 import { BlockData } from '../model'
 import { IBlockProducer } from './IBlockProducer'
-import FIFOCache from './FIFOCache'
+import { FIFOCache } from '@dzlzv/hydra-common'
 import { getConfig } from '..'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 

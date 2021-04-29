@@ -1,4 +1,4 @@
-export default class FIFOCache<K, V> {
+export class FIFOCache<K, V> {
   private fifoStore: Array<V> = []
   private lookup: Map<K, V> = new Map<K, V>()
   private inverse: Map<V, K> = new Map<V, K>()
