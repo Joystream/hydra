@@ -14,8 +14,6 @@ import {
   SubstrateExtrinsic,
   formatId,
 } from '@dzlzv/hydra-common'
-import BN from 'bn.js'
-import { NumericTransformer } from '@dzlzv/bn-typeorm'
 import { SubstrateEventEntity } from './SubstrateEventEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
 import { Extrinsic } from '@polkadot/types/interfaces'
@@ -27,16 +25,16 @@ export const EXTRINSIC_TABLE_NAME = 'substrate_extrinsic'
 @Entity({
   name: EXTRINSIC_TABLE_NAME,
 })
-export class SubstrateExtrinsicEntity extends AbstractWarthogModel
+export class SubstrateExtrinsicEntity
+  extends AbstractWarthogModel
   implements SubstrateExtrinsic {
   @PrimaryColumn()
   id!: string
 
   @Column({
     type: 'numeric',
-    transformer: new NumericTransformer(),
   })
-  tip!: BN
+  tip!: BigInt
 
   @Column('bigint')
   @Index()
@@ -135,7 +133,7 @@ export function fromBlockExtrinsic(data: {
   extr.hash = e.hash.toString()
 
   extr.isSigned = e.isSigned
-  extr.tip = new BN(e.tip.toString())
+  extr.tip = e.tip.toBigInt()
   extr.versionInfo = e.version.toString()
   extr.nonce = e.nonce.toNumber()
   extr.era = (e.era.toJSON() || {}) as AnyJson
