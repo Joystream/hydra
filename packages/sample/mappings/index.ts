@@ -3,8 +3,8 @@
 //export { balancesTransfer as balances_Transfer } from './transfer'
 export {
   balancesTransfer,
-  timestampCall,
-  timestampCall2,
+  timestampCallV1,
+  timestampCallV2,
   preHook,
   postHook,
 } from './mappings'

@@ -1,4 +1,3 @@
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
 import {
   Transfer,
   BlockTimestamp,
@@ -10,7 +9,12 @@ import {
 // to genenerate typescript classes for events, such as Balances.TransferEvent
 import { Balances, Timestamp } from './generated/types'
 import BN from 'bn.js'
-import { SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
+import {
+  ExtrinsicContext,
+  EventContext,
+  BlockContext,
+  StoreContext,
+} from '@dzlzv/hydra-common'
 
 const start = Date.now()
 let blockTime = 0
@@ -21,31 +25,27 @@ export async function balancesTransfer({
   store,
   event,
   block,
-}: {
-  store: DatabaseManager
-  event: SubstrateEvent
-  block: SubstrateBlock
-}) {
+  extrinsic,
+}: EventContext & StoreContext) {
   const transfer = new Transfer()
   const [from, to, value] = new Balances.TransferEvent(event).params
   transfer.from = Buffer.from(from.toHex())
   transfer.to = Buffer.from(to.toHex())
   transfer.value = value.toBn()
+  transfer.tip = extrinsic ? new BN(extrinsic.tip.toString(10)) : new BN(0)
 
   transfer.block = block.height
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
-  transfer.insertedAt = new Date(block.timestamp)
+  transfer.timestamp = new BN(block.timestamp)
   totalEvents++
+  console.log(`Spec version: ${block.runtimeVersion.specVersion}`)
   await store.save<Transfer>(transfer)
 }
 
-export async function timestampCall({
+export async function timestampCallV1({
   store,
   event,
-}: {
-  store: DatabaseManager
-  event: SubstrateEvent
-}) {
+}: EventContext & StoreContext) {
   const call = new Timestamp.SetCall(event)
   const block = new BlockTimestamp()
   block.timestamp = call.args.now.toBn()
@@ -54,29 +54,23 @@ export async function timestampCall({
   await store.save<BlockTimestamp>(block)
 }
 
-export async function timestampCall2({
+export async function timestampCallV2({
   store,
   event,
-}: {
-  store: DatabaseManager
-  event: SubstrateEvent
-}) {
-  console.log(`I am timestampcall 2`)
+  block,
+}: ExtrinsicContext & StoreContext) {
   const call = new Timestamp.SetCall(event)
-  const block = new BlockTimestamp()
-  block.timestamp = call.args.now.toBn()
-  block.blockNumber = new BN(call.ctx.blockNumber)
+  const blockT = new BlockTimestamp()
+  blockT.timestamp = new BN(block.timestamp)
+  blockT.blockNumber = new BN(block.height)
   totalEvents++
-  await store.save<BlockTimestamp>(block)
+  await store.save<BlockTimestamp>(blockT)
 }
 
 export async function preHook({
   block: { height },
   store,
-}: {
-  block: SubstrateBlock
-  store: DatabaseManager
-}) {
+}: BlockContext & StoreContext) {
   const hook = new BlockHook()
   hook.blockNumber = new BN(height)
   hook.type = HookType.PRE
@@ -86,10 +80,7 @@ export async function preHook({
 export async function postHook({
   block: { height },
   store,
-}: {
-  block: SubstrateBlock
-  store: DatabaseManager
-}) {
+}: BlockContext & StoreContext) {
   const hook = new BlockHook()
   hook.blockNumber = new BN(height)
   hook.type = HookType.POST

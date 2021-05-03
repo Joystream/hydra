@@ -28,25 +28,24 @@ mappings:
   mappingsModule: mappings/lib/mappings
   imports:
     - mappings/lib/mappings/generated/types
-  #range: '[0, 200]'
+  range: '[100000, )'
   eventHandlers:
     - event: balances.Transfer 
       handler: balancesTransfer
       filter:
-        height: '[0, 5]'
         specVersion: '[0,)'
-  extrinsicHandlers:
-    - extrinsic: timestamp.set 
-      handler: timestampCall
-      filter:
-        height: '[0, 5]'
-        specVersion: '[0,)'
+  # extrinsicHandlers:
+  #   - extrinsic: timestamp.set 
+  #     handler: timestampCallV1
+  #     filter:
+  #       height: '[0, 5]'
+  #       specVersion: '[0,10)'
         
-    - extrinsic: timestamp.set 
-      handler: timestampCall2
-      filter:
-        height: '[6, )'
-        specVersion: '[0,)'
+  #   - extrinsic: timestamp.set 
+  #     handler: timestampCallV2
+  #     filter:
+  #       height: '[6, )'
+  #       specVersion: '[11,)'
 
   preBlockHooks:
     - handler: preHook
