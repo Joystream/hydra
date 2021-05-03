@@ -175,10 +175,10 @@ export class GraphQLSource implements IProcessorSource {
   ): Promise<T> {
     const raw = await this.graphClient.request<T>(query)
     return JSON.parse(JSON.stringify(raw), (k, v) => {
-      if (revive[k as keyof K] == 'BigInt') {
+      if (revive[k as keyof K] === 'BigInt' && typeof v === 'string') {
         return BigInt(v)
       }
-      if (revive[k as keyof K] == 'Number') {
+      if (revive[k as keyof K] === 'Number' && typeof v === 'string') {
         return Number.parseInt(v)
       }
       return v

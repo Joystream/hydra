@@ -33,12 +33,12 @@ export async function balancesTransfer({
   transfer.to = Buffer.from(to.toHex())
   transfer.value = value.toBn()
   transfer.tip = extrinsic ? new BN(extrinsic.tip.toString(10)) : new BN(0)
-
+  transfer.insertedAt = new Date(block.timestamp)
   transfer.block = block.height
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
   transfer.timestamp = new BN(block.timestamp)
   totalEvents++
-  console.log(`Spec version: ${block.runtimeVersion.specVersion}`)
+
   await store.save<Transfer>(transfer)
 }
 
