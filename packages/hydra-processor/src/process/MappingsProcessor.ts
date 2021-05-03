@@ -6,14 +6,7 @@ import { IStateKeeper, getStateKeeper } from '../state'
 import { error, info } from '../util/log'
 import { BlockData, getEventQueue, IEventQueue } from '../queue'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
-import {
-  getMappingExecutor,
-  getMappingsLookup,
-  IMappingExecutor,
-  isTxAware,
-} from '../executor'
-import { IMappingsLookup } from '../executor/IMappingsLookup'
-
+import { getMappingExecutor, IMappingExecutor, isTxAware } from '../executor'
 const debug = Debug('hydra-processor:mappings-processor')
 
 export class MappingsProcessor {

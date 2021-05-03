@@ -16,7 +16,7 @@ export interface Filter {
 export type TypedFilter<T> = T extends string | number
   ? PrimitiveFilter<T>
   : T extends unknown[]
-  ? ArrayFilter<T>
+  ? ArrayFilter<T> // eslint-disable-next-line @typescript-eslint/ban-types
   : T extends object
   ? ObjectFilter<T>
   : never
@@ -41,6 +41,7 @@ export interface StringFilter {
   endsWith: string
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type ArrayFilterValue<T> = T extends object[]
   ? ObjectFilter<ArrayElement<T>>
   : T extends string[] | number[]
@@ -90,9 +91,9 @@ export type AsJson<T> = T extends
   | AnyJson
   | boolean
   | null
-  ? T
+  ? T // eslint-disable-next-line @typescript-eslint/ban-types
   : T extends Function
-  ? never
+  ? never // eslint-disable-next-line @typescript-eslint/ban-types
   : T extends object
   ? { [K in keyof T]: AsJson<T[K]> }
   : never

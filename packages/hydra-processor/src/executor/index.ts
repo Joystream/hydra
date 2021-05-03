@@ -1,4 +1,4 @@
-import { MappingsLookupService } from '..'
+import { MappingsLookupService } from './MappingsLookupService'
 import { getManifest } from '../start/config'
 import { IMappingExecutor } from './IMappingExecutor'
 import { IMappingsLookup } from './IMappingsLookup'
@@ -8,7 +8,8 @@ let mappingExecutor: TransactionalExecutor
 let mappingsLookup: MappingsLookupService
 
 export * from './IMappingExecutor'
-export * from './TransactionalExecutor'
+export * from './IMappingsLookup'
+export * from './tx-aware'
 
 export async function getMappingExecutor(): Promise<IMappingExecutor> {
   if (!mappingExecutor) {

@@ -1,33 +1,19 @@
 import { getConnection, EntityManager } from 'typeorm'
-import { makeDatabaseManager } from '@dzlzv/hydra-db-utils'
+import * as shortid from 'shortid'
 import { getConfig as conf } from '../start/config'
 import Debug from 'debug'
 import { info } from '../util/log'
-import { BlockData, Kind } from '../queue'
+import { BlockData } from '../queue'
 import { getMappingsLookup, IMappingExecutor } from '.'
-import { IMappingsLookup, EventContext } from './IMappingsLookup'
+import { IMappingsLookup } from './IMappingsLookup'
+import {
+  DeepPartial,
+  FindOneOptions,
+  DatabaseManager,
+} from '@dzlzv/hydra-common'
+import { TxAwareBlockContext } from './tx-aware'
 
 const debug = Debug('hydra-processor:mappings-executor')
-
-/**
- * A transactional event context
- */
-export interface TxAwareBlockContext extends BlockData {
-  /**
-   * A TypeORM entityManager holding the DB transaction within which the mapping batch is executed
-   */
-  entityManager: EntityManager
-}
-
-/**
- *
- * @param ctx Event
- * @returns If the event context has been enriched with a transactional EntityManager
- */
-export function isTxAware(ctx: BlockData): ctx is TxAwareBlockContext {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (ctx as any).entityManager !== undefined
-}
 
 export class TransactionalExecutor implements IMappingExecutor {
   private mappingsLookup!: IMappingsLookup
@@ -65,7 +51,7 @@ export class TransactionalExecutor implements IMappingExecutor {
 
       let i = 0
       for (const mapping of mappings) {
-        const { event, kind } = blockData.events[i]
+        const { event } = blockData.events[i]
         debug(`Processing event ${event.id}`)
 
         if (conf().VERBOSE) debug(`JSON: ${JSON.stringify(event, null, 2)}`)
@@ -74,7 +60,7 @@ export class TransactionalExecutor implements IMappingExecutor {
           ...blockData,
           event,
           store,
-          extrinsic: kind == Kind.EXTRINSIC ? event.extrinsic : undefined,
+          extrinsic: event.extrinsic,
         }
 
         await this.mappingsLookup.call(mapping, ctx)
@@ -90,4 +76,61 @@ export class TransactionalExecutor implements IMappingExecutor {
       await onSuccess({ ...blockData, entityManager } as TxAwareBlockContext)
     })
   }
+}
+
+/**
+ * Create database manager.
+ * @param entityManager EntityManager
+ */
+export function makeDatabaseManager(
+  entityManager: EntityManager
+): DatabaseManager {
+  return {
+    save: async <T>(entity: DeepPartial<T>): Promise<void> => {
+      entity = fillRequiredWarthogFields(entity)
+      await entityManager.save(entity)
+    },
+    remove: async <T>(entity: DeepPartial<T>): Promise<void> => {
+      await entityManager.remove(entity)
+    },
+    get: async <T>(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      entity: { new (...args: any[]): T },
+      options: FindOneOptions<T>
+    ): Promise<T | undefined> => {
+      return await entityManager.findOne(entity, options)
+    },
+    getMany: async <T>(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      entity: { new (...args: any[]): T },
+      options: FindOneOptions<T>
+    ): Promise<T[]> => {
+      return await entityManager.find(entity, options)
+    },
+  } as DatabaseManager
+}
+
+/**
+ * Fixes compatibility between typeorm and warthog models.
+ *
+ * @tutorial Warthog add extra properties to its BaseModel and some of these properties are
+ * required. This function mutate the entity to make it compatible with warthog models.
+ * Warthog throw error if required properties contains null values.
+ *
+ * @param entity: DeepPartial<T>
+ */
+function fillRequiredWarthogFields<T>(entity: DeepPartial<T>): DeepPartial<T> {
+  // eslint-disable-next-line no-prototype-builtins
+  if (!entity.hasOwnProperty('id')) {
+    Object.assign(entity, { id: shortid.generate() })
+  }
+  // eslint-disable-next-line no-prototype-builtins
+  if (!entity.hasOwnProperty('createdById')) {
+    Object.assign(entity, { createdById: shortid.generate() })
+  }
+  // eslint-disable-next-line no-prototype-builtins
+  if (!entity.hasOwnProperty('version')) {
+    Object.assign(entity, { version: 1 })
+  }
+  return entity
 }

@@ -1,5 +1,5 @@
 import { SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
-import { Range } from '../start/manifest'
+import { Filter, Range } from '../start/manifest'
 
 export enum Kind {
   EXTRINSIC = 'EXTRINSIC',
@@ -61,5 +61,6 @@ export interface MappingFilter {
     names: string[]
     triggerEvents: string[]
   }
-  //blockHooks: Range[]
+  // TODO: implement arbitrary block filters
+  //blockHooks: { height?: Range }[]
 }

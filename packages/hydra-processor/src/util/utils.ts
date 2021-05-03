@@ -1,6 +1,5 @@
 import Debug from 'debug'
 import fs from 'fs'
-import { SSL_OP_ALL } from 'node:constants'
 import { Range } from '../start/manifest'
 
 const debug = Debug('hydra-processor:util')
@@ -84,10 +83,7 @@ export function compact(s: string): string {
  * @param range
  * @returns
  */
-export function isInRange(
-  height: number,
-  range: Range | undefined
-): boolean {
+export function isInRange(height: number, range: Range | undefined): boolean {
   if (range === undefined) {
     return true
   }

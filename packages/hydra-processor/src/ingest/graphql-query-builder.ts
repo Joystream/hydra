@@ -10,7 +10,7 @@ export type FilterValue<T> =
   | number[]
   | ObjectFilter<T[keyof T]>
 
-export function isArray(f: FilterValue<any>): f is string[] | number[] {
+export function isArray<T>(f: FilterValue<T>): f is string[] | number[] {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return f !== undefined && (f as any).pop !== undefined
 }
@@ -73,7 +73,7 @@ export function singleFieldClauses<T>(
 }
 
 export function collectFieldClauses<T>(where: ObjectFilter<T>): string {
-  let whereBody: string[] = Object.keys(where).reduce((acc, f) => {
+  const whereBody: string[] = Object.keys(where).reduce((acc, f) => {
     acc.push(
       ...singleFieldClauses(
         f,

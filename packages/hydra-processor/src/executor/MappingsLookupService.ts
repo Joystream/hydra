@@ -2,30 +2,26 @@
 import Debug from 'debug'
 import { compact } from 'lodash'
 import {
-  Range,
   EventHandler,
   ExtrinsicHandler,
   MappingHandler,
   MappingsDef,
   Filter,
 } from '../start/manifest'
-import {
-  ExecContext,
-  IMappingsLookup,
-  EventContext,
-  BlockMappings,
-  StoreContext,
-  MappingContext,
-  ExtrinsicContext,
-} from './IMappingsLookup'
+
 import { BlockData, EventData, Kind } from '../queue'
 import { getConfig as conf } from '../start/config'
 import { isInRange } from '../util/utils'
-import { SubstrateEvent } from '@dzlzv/hydra-common'
-
+import {
+  MappingContext,
+  EventContext,
+  ExtrinsicContext,
+  ExecContext,
+} from '@dzlzv/hydra-common'
+import { IMappingsLookup, BlockMappings } from './IMappingsLookup'
 const debug = Debug('hydra-processor:handler-lookup-service')
 
-//export function isBlockHookContext(
+// export function isBlockHookContext(
 //   context: ExecContext
 // ): context is BlockHookContext {
 //   return (context as any).eventCtxs !== undefined
@@ -130,15 +126,14 @@ export class MappingsLookupService implements IMappingsLookup {
   async call(handler: MappingHandler, ctx: ExecContext): Promise<void> {
     const { handler: handlerFunc } = handler
 
-    if (isEventOrExtrinsicContext(ctx))
-      if (handler.types.length > 0) {
-        // legacy arg-style mappings
-        const args = handler.types.map((t) =>
-          resolveType(ctx, t, this.resolvedImports)
-        )
-        await handlerFunc(...args)
-        return
-      }
+    if (isEventOrExtrinsicContext(ctx) && handler.types.length > 0) {
+      // legacy mappings with positional arguments
+      const args = handler.types.map((t) =>
+        resolveType(ctx, t, this.resolvedImports)
+      )
+      await handlerFunc(...args)
+      return
+    }
 
     await handlerFunc(...[ctx])
   }

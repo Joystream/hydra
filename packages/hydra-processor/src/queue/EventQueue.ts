@@ -1,11 +1,11 @@
 import { getEventSource } from '../ingest'
 import { getConfig as conf, getManifest } from '../start/config'
 import { info } from '../util/log'
-import { uniq } from 'lodash'
+import { uniq, last, first, union, mapValues } from 'lodash'
 import pWaitFor from 'p-wait-for'
 import delay from 'delay'
 import Debug from 'debug'
-import { last, first, union, mapValues } from 'lodash'
+
 import { IndexerStatus, IStateKeeper, getStateKeeper } from '../state'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import {
@@ -16,25 +16,15 @@ import {
   RangeFilter,
   EventData,
 } from './IEventQueue'
-import { Range, MappingsDef } from '../start/manifest'
-import { FIFOCache, SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
-import {
-  GraphQLQuery,
-  IndexerQuery,
-  IProcessorSource,
-} from '../ingest/IProcessorSource'
+import { MappingsDef } from '../start/manifest'
+import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { IndexerQuery, IProcessorSource } from '../ingest/IProcessorSource'
 import { parseEventId } from '../util/utils'
 
 const debug = Debug('hydra-processor:event-queue')
 
 export function getMappingFilter(mappingsDef: MappingsDef): MappingFilter {
-  const {
-    eventHandlers,
-    extrinsicHandlers,
-    range,
-    preBlockHooks,
-    postBlockHooks,
-  } = mappingsDef
+  const { eventHandlers, extrinsicHandlers, range } = mappingsDef
 
   return {
     events: eventHandlers.map((h) => h.event),
@@ -46,10 +36,9 @@ export function getMappingFilter(mappingsDef: MappingsDef): MappingFilter {
       ),
     },
     range,
-    // blockHooks: union(preBlockHooks, postBlockHooks).reduce<Range[]>(
-    //   (acc, h) => union(acc, h.range ? [h.range] : []),
-    //   []
-    // ),
+    // blockHooks: union(preBlockHooks, postBlockHooks).reduce<{
+    //   height?: Range[]
+    // }>((acc, h) => union(acc, h.range ? [h.range] : []), []),
   }
 }
 
@@ -168,6 +157,7 @@ export class EventQueue implements IEventQueue {
 
       while (
         !this.isEmpty() &&
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         first(this.eventQueue)!.event.blockNumber === block.height
       ) {
         nextEventData = (await this.poll()) as EventData
