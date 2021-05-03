@@ -1,5 +1,4 @@
 import { AnyJson, AnyJsonField } from './json-types'
-import * as BN from 'bn.js'
 
 export interface EventParam {
   type: string
@@ -180,25 +179,10 @@ export interface SubstrateExtrinsic {
   /**
    * Extrinsic tip
    */
-  tip: BN
+  tip: BigInt
 
   /**
    * Ordinal index in the event array of the current block
    */
   indexInBlock: number
 }
-
-export interface BlockContext {
-  block: SubstrateBlock
-}
-
-export interface ExtrinsicContext extends BlockContext {
-  extrinsic: SubstrateExtrinsic
-}
-
-export interface EventContext extends BlockContext {
-  event: SubstrateEvent
-  extrinsic?: SubstrateExtrinsic
-}
-
-export type MappingContext = BlockContext | ExtrinsicContext | EventContext
