@@ -95,6 +95,7 @@ query Query1 {
 `PageInfo` returns the cursor, page information and object has following fields:
 
 ```javascript
+```json
 pageInfo {
   startCursor
   endCursor
