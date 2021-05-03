@@ -1,5 +1,10 @@
 import { IProcessorSource, AsJson } from './'
-import { FIFOCache, SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
+import {
+  FIFOCache,
+  SubstrateBlock,
+  SubstrateEvent,
+  SubstrateExtrinsic,
+} from '@dzlzv/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
 import { getConfig as conf } from '../start/config'
@@ -9,6 +14,20 @@ import { IndexerStatus } from '../state'
 import { collectNamedQueries } from './graphql-query-builder'
 
 const debug = Debug('hydra-processor:graphql-source')
+
+type SubstrateType = SubstrateBlock | SubstrateEvent | SubstrateExtrinsic
+
+const REVIVE_SUBSTRATE_FIELDS: Partial<
+  {
+    [P in keyof SubstrateType]: SubstrateType[P] extends number | BigInt
+      ? 'BigInt' | 'Number'
+      : never
+  }
+> = {
+  'timestamp': 'Number',
+  'tip': 'BigInt',
+  'blockTimestamp': 'Number',
+}
 
 // to be replaced with a ws subsription
 const GET_INDEXER_STATUS = `
@@ -54,7 +73,11 @@ export class GraphQLSource implements IProcessorSource {
     const query = collectQueries(queries)
     if (conf().VERBOSE) debug(`GraphqQL Query: ${query}`)
 
-    const raw = await this.graphClient.request<
+    // const raw = await this.graphClient.request<
+    //   { [K in keyof typeof queries]: SubstrateEvent[] }
+    // >(query)
+
+    const raw = await this.requestSubstrateData<
       { [K in keyof typeof queries]: SubstrateEvent[] }
     >(query)
 
@@ -67,7 +90,9 @@ export class GraphQLSource implements IProcessorSource {
 
     if (conf().VERBOSE) debug(`Results: ${JSON.stringify(raw, null, 2)}`)
 
-    return raw as { [K in keyof typeof queries]: SubstrateEvent[] }
+    return raw as {
+      [K in keyof typeof queries]: SubstrateEvent[]
+    }
   }
 
   executeQueries<T>(
@@ -76,7 +101,10 @@ export class GraphQLSource implements IProcessorSource {
     }
   ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }> {
     const bigNamedQuery = collectNamedQueries(queries)
-    return this.graphClient.request<
+    // return this.graphClient.request<
+    //   { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
+    // >(bigNamedQuery)
+    return this.requestSubstrateData<
       { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
     >(bigNamedQuery)
   }
@@ -128,6 +156,33 @@ export class GraphQLSource implements IProcessorSource {
     }
 
     debug(`Fetched and cached ${result.blocks.length} blocks`)
+  }
+
+  private requestSubstrateData<T>(query: string): Promise<T> {
+    // TODO: use timeouts?
+    return this.request<T, SubstrateType>(query, REVIVE_SUBSTRATE_FIELDS)
+  }
+
+  private async request<T, K>(
+    query: string,
+    revive: Partial<
+      {
+        [P in keyof K]: K[P] extends number | BigInt
+          ? 'BigInt' | 'Number'
+          : never
+      }
+    >
+  ): Promise<T> {
+    const raw = await this.graphClient.request<T>(query)
+    return JSON.parse(JSON.stringify(raw), (k, v) => {
+      if (revive[k as keyof K] == 'BigInt') {
+        return BigInt(v)
+      }
+      if (revive[k as keyof K] == 'Number') {
+        return Number.parseInt(v)
+      }
+      return v
+    })
   }
 }
 
