@@ -80,7 +80,7 @@ export class {{className}}ConnectionWhereArgs extends ConnectionPageInputOptions
   where?: {{className}}WhereInput;
 
   @Field(() => {{className}}OrderByEnum, { nullable: true })
-  orderBy?: {{className}}OrderByEnum;
+  orderBy?: [{{className}}OrderByEnum];
 }
 
 {{! -- Pagination objects }}
