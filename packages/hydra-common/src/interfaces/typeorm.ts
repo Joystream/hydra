@@ -140,32 +140,39 @@ export declare class FindOperator<T> {
     getSql?: SqlGeneratorType,
     objectLiteralParameters?: ObjectLiteral
   )
+
   /**
    * Indicates if parameter is used or not for this operator.
    * Extracts final value if value is another find operator.
    */
   get useParameter(): boolean
+
   /**
    * Indicates if multiple parameters must be used for this operator.
    * Extracts final value if value is another find operator.
    */
   get multipleParameters(): boolean
+
   /**
    * Gets the Type of this FindOperator
    */
   get type(): string
+
   /**
    * Gets the final value needs to be used as parameter value.
    */
   get value(): T
+
   /**
    * Gets ObjectLiteral parameters.
    */
   get objectLiteralParameters(): ObjectLiteral | undefined
+
   /**
    * Gets the child FindOperator if it exists
    */
   get child(): FindOperator<T> | undefined
+
   /**
    * Gets the SQL generator
    */
@@ -281,5 +288,6 @@ export interface FindOneOptions<Entity = any> {
  * Interface of the entity fields names only (without functions)
  */
 export declare type EntityFieldsNames<Entity = any> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   [P in keyof Entity]: Entity[P] extends Function ? never : P
 }[keyof Entity]

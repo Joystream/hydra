@@ -25,8 +25,7 @@ export const EXTRINSIC_TABLE_NAME = 'substrate_extrinsic'
 @Entity({
   name: EXTRINSIC_TABLE_NAME,
 })
-export class SubstrateExtrinsicEntity
-  extends AbstractWarthogModel
+export class SubstrateExtrinsicEntity extends AbstractWarthogModel
   implements SubstrateExtrinsic {
   @PrimaryColumn()
   id!: string
