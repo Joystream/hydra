@@ -40,7 +40,7 @@ const manifestValidatorOptions = {
       'eventHandlers?': [
         {
           event: 'string',
-          'handler?': 'string',
+          handler: 'string',
           'filter?': {
             'height?': 'string',
             'specVersion?': 'string',
@@ -50,7 +50,7 @@ const manifestValidatorOptions = {
       'extrinsicHandlers?': [
         {
           extrinsic: 'string',
-          'handler?': 'string',
+          handler: 'string',
           'triggerEvents?': ['string'],
           'filter?': {
             'height?': 'string',
@@ -61,11 +61,17 @@ const manifestValidatorOptions = {
       'preBlockHooks?': [
         {
           handler: 'string',
+          'filter?': {
+            'height?': 'string',
+          },
         },
       ],
       'postBlockHooks?': [
         {
           handler: 'string',
+          'filter?': {
+            'height?': 'string',
+          },
         },
       ],
     },
@@ -83,7 +89,7 @@ export interface DataSource {
 }
 
 interface HandlerInput {
-  handler?: string
+  handler: string
   filter?: {
     height?: string
     specVersion?: string
@@ -98,8 +104,8 @@ interface MappingsDefInput {
   extrinsicHandlers?: Array<
     { extrinsic: string; triggerEvents?: string[] } & HandlerInput
   >
-  preBlockHooks?: Array<{ handler: string }>
-  postBlockHooks?: Array<{ handler: string }>
+  preBlockHooks?: Array<HandlerInput>
+  postBlockHooks?: Array<HandlerInput>
 }
 
 export interface MappingsDef {
@@ -124,7 +130,7 @@ export interface Range {
 }
 
 export interface MappingHandler {
-  filter?: Filter
+  filter: Filter
   handler: HandlerFunc
   types: string[]
 }
@@ -236,14 +242,12 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
   >
 
   const parseHandler = function (
-    def: (
-      | {
+    def:
+      | (HandlerInput & {
           event: string
-        }
-      | { extrinsic: string }
-      | { handler: string }
-    ) &
-      HandlerInput
+        })
+      | (HandlerInput & { extrinsic: string })
+      | HandlerInput
   ): MappingHandler {
     const { handler, filter } = def
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
