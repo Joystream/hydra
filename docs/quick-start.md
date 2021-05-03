@@ -48,9 +48,9 @@ Under the fold, `yarn booststrap` creates a folder `generated/graphql-server` wi
 
 ## 3. Typegen for events and extrinsics
 
- List the events and extrinsics to be used by the mappings and generated type-safe classes using the typegen tool. One can define in a separate yml file or modify the `typegen` section in `manifest.yml` 
+List the events and extrinsics to be used by the mappings and generated type-safe classes using the typegen tool. One can define in a separate yml file or modify the `typegen` section in `manifest.yml`
 
-Typegen fetches the metadata from the chain from the block with a given hash \(or from the top block if no hash is provided\)  
+Typegen fetches the metadata from the chain from the block with a given hash \(or from the top block if no hash is provided\)
 
 ```yaml
 typegen:
@@ -71,7 +71,7 @@ typegen:
 
 ## 4. Mappings and the manifest file
 
-Modify the default mappings in the mappings folder and make sure all the mapping functions are exported. Define the mappings in the `mappings` section 
+Modify the default mappings in the mappings folder and make sure all the mapping functions are exported. Define the mappings in the `mappings` section
 
 ```yaml
 mappings:
@@ -89,12 +89,11 @@ mappings:
       # extrinsic to handle
     - extrinsic: timestamp.set 
       handler: timestampCall(DatabaseManager, Timestamp.SetCall)
- 
 ```
 
 ## 5. Dockerize
 
-Among other things, the scaffolder generates a `docker` folder with Dockerfiles. 
+Among other things, the scaffolder generates a `docker` folder with Dockerfiles.
 
 First, build the builder image:
 
@@ -130,3 +129,4 @@ $ docker-compose up
 * Describe your own [schema](schema-spec/) in `schema.graphql`
 * Write your indexer [mappings](mappings/)
 * Push your Hydra indexer and GraphQL Docker images to [Docker Hub](https://hub.docker.com/) and deploy  
+
