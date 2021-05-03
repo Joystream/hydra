@@ -10,7 +10,7 @@ import {
 // to genenerate typescript classes for events, such as Balances.TransferEvent
 import { Balances, Timestamp } from './generated/types'
 import BN from 'bn.js'
-import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
 
 const start = Date.now()
 let blockTime = 0
@@ -20,10 +20,11 @@ let totalBlocks = 0
 export async function balancesTransfer({
   store,
   event,
+  block,
 }: {
   store: DatabaseManager
   event: SubstrateEvent
-  block: { blockNumber: number }
+  block: SubstrateBlock
 }) {
   const transfer = new Transfer()
   const [from, to, value] = new Balances.TransferEvent(event).params
@@ -31,9 +32,10 @@ export async function balancesTransfer({
   transfer.to = Buffer.from(to.toHex())
   transfer.value = value.toBn()
 
-  transfer.block = event.blockNumber
+  transfer.block = block.height
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
-  transfer.insertedAt = new Date()
+  transfer.insertedAt = new Date(block.timestamp)
+  totalEvents++
   await store.save<Transfer>(transfer)
 }
 
@@ -48,34 +50,51 @@ export async function timestampCall({
   const block = new BlockTimestamp()
   block.timestamp = call.args.now.toBn()
   block.blockNumber = new BN(call.ctx.blockNumber)
+  totalEvents++
+  await store.save<BlockTimestamp>(block)
+}
 
+export async function timestampCall2({
+  store,
+  event,
+}: {
+  store: DatabaseManager
+  event: SubstrateEvent
+}) {
+  console.log(`I am timestampcall 2`)
+  const call = new Timestamp.SetCall(event)
+  const block = new BlockTimestamp()
+  block.timestamp = call.args.now.toBn()
+  block.blockNumber = new BN(call.ctx.blockNumber)
+  totalEvents++
   await store.save<BlockTimestamp>(block)
 }
 
 export async function preHook({
-  block: { blockNumber },
+  block: { height },
   store,
 }: {
-  block: { blockNumber: BN }
+  block: SubstrateBlock
   store: DatabaseManager
 }) {
   const hook = new BlockHook()
-  hook.blockNumber = blockNumber
+  hook.blockNumber = new BN(height)
   hook.type = HookType.PRE
   await store.save<BlockHook>(hook)
 }
 
 export async function postHook({
-  block: { blockNumber },
+  block: { height },
   store,
 }: {
-  block: { blockNumber: BN }
+  block: SubstrateBlock
   store: DatabaseManager
 }) {
   const hook = new BlockHook()
-  hook.blockNumber = blockNumber
+  hook.blockNumber = new BN(height)
   hook.type = HookType.POST
   await store.save<BlockHook>(hook)
+  totalBlocks++
   benchmark()
 }
 

@@ -1,5 +1,5 @@
 import { IProcessorSource, AsJson } from './'
-import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { FIFOCache, SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
 import { getConfig as conf } from '../start/config'
@@ -22,11 +22,15 @@ query {
 
 export class GraphQLSource implements IProcessorSource {
   private graphClient: GraphQLClient
+  private blockCache: FIFOCache<number, SubstrateBlock>
 
   constructor() {
     const _endpoint = conf().INDEXER_ENDPOINT_URL
     debug(`Using Indexer API endpoint ${_endpoint}`)
     this.graphClient = new GraphQLClient(_endpoint)
+    this.blockCache = new FIFOCache<number, SubstrateBlock>(
+      conf().BLOCK_CACHE_CAPACITY
+    )
   }
 
   // TODO: implement
@@ -72,9 +76,58 @@ export class GraphQLSource implements IProcessorSource {
     }
   ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }> {
     const bigNamedQuery = collectNamedQueries(queries)
-    return this.graphClient.request<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>(
-      bigNamedQuery
-    )
+    return this.graphClient.request<
+      { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
+    >(bigNamedQuery)
+  }
+
+  async getBlock(blockNumber: number): Promise<SubstrateBlock> {
+    const block = this.blockCache.get(blockNumber)
+    if (block !== undefined) {
+      return block
+    }
+    debug(`WARNING: block cache miss: ${blockNumber}`)
+    await this.fetchBlocks([blockNumber])
+    return this.blockCache.get(blockNumber) as SubstrateBlock
+  }
+
+  async fetchBlocks(heights: number[]): Promise<void> {
+    const toFetch = heights.filter((h) => this.blockCache.get(h) === undefined)
+    if (toFetch.length === 0) {
+      debug(`All ${heights.length} blocks are cached.`)
+      return
+    }
+
+    const query: GraphQLQuery<SubstrateBlock> = {
+      name: 'substrateBlocks',
+      fields: [
+        'id',
+        'hash',
+        'parentHash',
+        'height',
+        'timestamp',
+        'runtimeVersion',
+        'lastRuntimeUpgrade',
+        { 'events': ['id', 'name', 'extrinsic'] },
+        { 'extrinsics': ['id', 'name'] },
+      ],
+      query: {
+        where: {
+          height: { in: toFetch },
+        },
+        orderBy: { asc: 'height' },
+      },
+    }
+
+    const result = await this.executeQueries({
+      blocks: query,
+    })
+
+    for (const b of result.blocks) {
+      this.blockCache.put(b.height, b)
+    }
+
+    debug(`Fetched and cached ${result.blocks.length} blocks`)
   }
 }
 

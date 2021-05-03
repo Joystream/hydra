@@ -1,25 +1,22 @@
-import {
-  SubstrateBlock,
-  SubstrateEvent,
-} from '@dzlzv/hydra-common'
-import { BlockRange } from '../start/manifest'
+import { SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
+import { Range } from '../start/manifest'
 
-export enum HandlerKind {
+export enum Kind {
   EXTRINSIC = 'EXTRINSIC',
   EVENT = 'EVENT',
   BLOCK = 'BLOCK',
 }
 
-export interface MappingContext {
+export interface EventData {
   // TODO: update interfaces in hydra-common
   event: SubstrateEvent
-  kind: HandlerKind
+  kind: Kind
 }
 
 export interface BlockData {
   block: SubstrateBlock
-  // events for which there is a handler
-  events: { event: SubstrateEvent; kind: HandlerKind }[]
+
+  events: EventData[]
 }
 
 export interface IEventQueue {
@@ -58,11 +55,11 @@ export interface RangeFilter {
  * mapping definition
  */
 export interface MappingFilter {
-  range: BlockRange
+  range: Range
   events: string[]
   extrinsics: {
     names: string[]
     triggerEvents: string[]
   }
-  blockHooks: BlockRange[]
+  //blockHooks: Range[]
 }

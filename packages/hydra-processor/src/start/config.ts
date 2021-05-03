@@ -42,6 +42,8 @@ let conf: {
   QUEUE_BATCH_SIZE: number
   // max queue capacity
   EVENT_QUEUE_MAX_CAPACITY: number
+
+  BLOCK_CACHE_CAPACITY: number
 }
 
 export function configure(): void {
@@ -61,6 +63,7 @@ export function configure(): void {
     MAPPINGS_FACTOR: num({ default: 1 }),
     QUEUE_FACTOR: num({ default: 2 }),
     QUEUE_MAX_CAP_FACTOR: num({ default: 5 }),
+    BLOCK_CACHE_CAPACITY: num({ default: 10000 }),
   })
   conf = {
     ...envConf,

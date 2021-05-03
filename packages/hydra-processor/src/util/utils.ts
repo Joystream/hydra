@@ -1,7 +1,7 @@
 import Debug from 'debug'
 import fs from 'fs'
 import { SSL_OP_ALL } from 'node:constants'
-import { BlockRange } from '../start/manifest'
+import { Range } from '../start/manifest'
 
 const debug = Debug('hydra-processor:util')
 export const PROCESSOR_PACKAGE_NAME = '@dzlzv/hydra-processor'
@@ -86,7 +86,7 @@ export function compact(s: string): string {
  */
 export function isInRange(
   height: number,
-  range: BlockRange | undefined
+  range: Range | undefined
 ): boolean {
   if (range === undefined) {
     return true
@@ -100,7 +100,7 @@ export function isInRange(
  * @param range string of the form [<number>, <number>]
  * @throw throws if the range is empty or if theere's a parsing error
  */
-export function parseRange(range: string | undefined): BlockRange {
+export function parseRange(range: string | undefined): Range {
   const defaultEmpty = {
     from: 0,
     to: Number.POSITIVE_INFINITY,

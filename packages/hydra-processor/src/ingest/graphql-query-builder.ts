@@ -127,6 +127,29 @@ export function buildQueryFields<T>(fields: QueryFields<T>): string {
   return format(output)
 }
 
+export function formatOrderBy(
+  orderBy:
+    | Partial<{
+        asc: string
+        desc: string
+      }>
+    | undefined
+): string {
+  if (orderBy === undefined) {
+    return ''
+  }
+  const suffix = orderBy.asc ? 'ASC' : 'DESC'
+  const field = orderBy.asc || orderBy.desc
+
+  if (field === undefined) {
+    throw new Error(
+      `OrderBy should have at least one field: ${JSON.stringify(orderBy)}`
+    )
+  }
+
+  return `orderBy: ${field}_${suffix}`
+}
+
 export function buildQuery<T>({
   name,
   query: { where, limit, orderBy },
@@ -135,10 +158,7 @@ export function buildQuery<T>({
   const parts: string[] = compact([
     buildWhere(where),
     formatClause('limit', limit),
-    ...singleFieldClauses(
-      'orderBy',
-      orderBy as Record<string, FilterValue<T>> | undefined
-    ),
+    formatOrderBy(orderBy),
   ])
 
   return stripSpaces(`${name}( ${parts.join(', ')} ) {

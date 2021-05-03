@@ -6,7 +6,13 @@ import { IStateKeeper, getStateKeeper } from '../state'
 import { error, info } from '../util/log'
 import { BlockData, getEventQueue, IEventQueue } from '../queue'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
-import { getMappingExecutor, IMappingExecutor, isTxAware } from '../executor'
+import {
+  getMappingExecutor,
+  getMappingsLookup,
+  IMappingExecutor,
+  isTxAware,
+} from '../executor'
+import { IMappingsLookup } from '../executor/IMappingsLookup'
 
 const debug = Debug('hydra-processor:mappings-processor')
 
@@ -71,6 +77,7 @@ export class MappingsProcessor {
         nextBlock.events.map((ctx) =>
           eventEmitter.emit(ProcessorEvents.PROCESSED_EVENT, ctx.event)
         )
+
         debug(`Done block ${nextBlock.block.height}`)
       } catch (e) {
         error(`Stopping the proccessor due to errors: ${logError(e)}`)

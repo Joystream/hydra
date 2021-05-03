@@ -3,7 +3,7 @@ import { makeDatabaseManager } from '@dzlzv/hydra-db-utils'
 import { getConfig as conf } from '../start/config'
 import Debug from 'debug'
 import { info } from '../util/log'
-import { BlockData } from '../queue'
+import { BlockData, Kind } from '../queue'
 import { getMappingsLookup, IMappingExecutor } from '.'
 import { IMappingsLookup, EventContext } from './IMappingsLookup'
 
@@ -38,14 +38,14 @@ export class TransactionalExecutor implements IMappingExecutor {
   }
 
   async executeBlock(
-    blockCtx: BlockData,
-    onSuccess: (ctx: BlockData) => Promise<void>
+    blockData: BlockData,
+    onSuccess: (data: BlockData) => Promise<void>
   ): Promise<void> {
     await getConnection().transaction(async (entityManager: EntityManager) => {
-      const allMappings = this.mappingsLookup.lookupHandlers(blockCtx)
+      const allMappings = this.mappingsLookup.lookupHandlers(blockData)
       if (conf().VERBOSE)
         debug(
-          `Mappings for block ${blockCtx.block.id}: ${JSON.stringify(
+          `Mappings for block ${blockData.block.id}: ${JSON.stringify(
             allMappings,
             null,
             2
@@ -58,32 +58,36 @@ export class TransactionalExecutor implements IMappingExecutor {
 
       for (const hook of pre) {
         await this.mappingsLookup.call(hook, {
-          ...blockCtx,
+          ...blockData,
           store,
         })
       }
 
       let i = 0
       for (const mapping of mappings) {
-        const ctx = blockCtx.events[i]
-        debug(`Processing event ${ctx.event.id}`)
+        const { event, kind } = blockData.events[i]
+        debug(`Processing event ${event.id}`)
 
-        if (conf().VERBOSE) debug(`JSON: ${JSON.stringify(ctx, null, 2)}`)
+        if (conf().VERBOSE) debug(`JSON: ${JSON.stringify(event, null, 2)}`)
 
-        await this.mappingsLookup.call(mapping, {
-          ...ctx,
-          store: store,
-        } as EventContext)
+        const ctx = {
+          ...blockData,
+          event,
+          store,
+          extrinsic: kind == Kind.EXTRINSIC ? event.extrinsic : undefined,
+        }
+
+        await this.mappingsLookup.call(mapping, ctx)
         i++
 
-        debug(`Event ${ctx.event.id} done`)
+        debug(`Event ${event.id} done`)
       }
 
       for (const hook of post) {
-        await this.mappingsLookup.call(hook, { ...blockCtx, store })
+        await this.mappingsLookup.call(hook, { ...blockData, store })
       }
 
-      await onSuccess({ ...blockCtx, entityManager } as TxAwareBlockContext)
+      await onSuccess({ ...blockData, entityManager } as TxAwareBlockContext)
     })
   }
 }

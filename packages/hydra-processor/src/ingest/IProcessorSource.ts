@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { AnyJson, SubstrateEvent } from '@dzlzv/hydra-common'
+import { AnyJson, SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
 import { IndexerStatus } from '../state'
 
 export interface Filter {
@@ -134,4 +134,8 @@ export interface IProcessorSource {
   indexerStatus(): Promise<IndexerStatus>
 
   subscribe(events: string[]): Promise<void>
+
+  getBlock(blockNumber: number): Promise<SubstrateBlock>
+
+  fetchBlocks(heights: number[]): Promise<void>
 }

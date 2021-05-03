@@ -1,7 +1,11 @@
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { expect } from 'chai'
 import { format, stripSpaces, compact as c } from '../util/utils'
-import { buildQueryFields, buildQuery, buildWhere } from './graphql-query-builder'
+import {
+  buildQueryFields,
+  buildQuery,
+  buildWhere,
+} from './graphql-query-builder'
 
 describe('Query builder', () => {
   it('should construct blocks query', () => {
@@ -64,11 +68,15 @@ describe('Query builder', () => {
   it('should build a query', () => {
     const out = buildQuery<SubstrateEvent>({
       name: 'test',
-      query: { where: { id: { in: ['0000'] } }, limit: 5 },
+      query: {
+        where: { id: { in: ['0000'] } },
+        limit: 5,
+        orderBy: { asc: 'id' },
+      },
       fields: ['id'],
     })
 
-    const expected = `test(where: { id_in: ["0000"] }, limit: 5) { id }`
+    const expected = `test(where: { id_in: ["0000"] }, limit: 5, orderBy: id_ASC) { id }`
     expect(out).equals(stripSpaces(expected))
   })
 })

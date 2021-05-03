@@ -2,41 +2,47 @@
 import Debug from 'debug'
 import { compact } from 'lodash'
 import {
-  BlockRange,
+  Range,
   EventHandler,
   ExtrinsicHandler,
   MappingHandler,
   MappingsDef,
+  Filter,
 } from '../start/manifest'
 import {
-  BlockHookContext,
-  BlockMappings,
   ExecContext,
   IMappingsLookup,
   EventContext,
+  BlockMappings,
+  StoreContext,
+  MappingContext,
+  ExtrinsicContext,
 } from './IMappingsLookup'
-import { BlockData, MappingContext, HandlerKind } from '../queue'
+import { BlockData, EventData, Kind } from '../queue'
 import { getConfig as conf } from '../start/config'
 import { isInRange } from '../util/utils'
+import { SubstrateEvent } from '@dzlzv/hydra-common'
 
 const debug = Debug('hydra-processor:handler-lookup-service')
 
-export function isBlockHookContext(
-  context: ExecContext
-): context is BlockHookContext {
-  return (context as any).eventCtxs !== undefined
-}
+//export function isBlockHookContext(
+//   context: ExecContext
+// ): context is BlockHookContext {
+//   return (context as any).eventCtxs !== undefined
+// }
 
-export function isEventContext(context: ExecContext): context is EventContext {
+export function isEventOrExtrinsicContext(
+  context: MappingContext
+): context is EventContext | ExtrinsicContext {
   return (context as any).event !== undefined
 }
 
-export function extractBlock(
-  context: MappingContext
-): { blockNumber: number; blockTimestamp: number } {
-  // TODO: extract block
-  return context.event
-}
+// export function extractBlock(
+//   context: MappingContext
+// ): { blockNumber: number; blockTimestamp: number } {
+//   // TODO: extract block
+//   return context.event
+// }
 
 export class MappingsLookupService implements IMappingsLookup {
   private events: Record<string, EventHandler[]> = {}
@@ -78,18 +84,17 @@ export class MappingsLookupService implements IMappingsLookup {
 
   lookupHandlers(blockData: BlockData): BlockMappings {
     if (conf().VERBOSE)
-      debug(`Lookup handlers, block context: ${JSON.stringify(blockData, null, 2)}`)
-    // in the future here we can do much more complex lookups here, e.g. based
-    // on the block height or runtime metadata of the current block
-    const {
-      block: { height },
-    } = blockData
+      debug(
+        `Lookup handlers, block context: ${JSON.stringify(blockData, null, 2)}`
+      )
 
     const filtered = {
-      pre: rangeFilter(this.mappings.preBlockHooks || [], height),
-      post: rangeFilter(this.mappings.postBlockHooks || [], height),
+      pre: filter(this.mappings.preBlockHooks || [], blockData),
+      post: filter(this.mappings.postBlockHooks || [], blockData),
       mappings: compact(
-        blockData.events.map((ctx) => this.lookupMapping(ctx, height))
+        blockData.events.map((eventData) =>
+          this.lookupMapping(eventData, blockData)
+        )
       ),
     }
 
@@ -100,50 +105,42 @@ export class MappingsLookupService implements IMappingsLookup {
   }
 
   lookupMapping(
-    ctx: MappingContext,
-    blockNumber: number
+    eventData: EventData,
+    blockData: BlockData
   ): MappingHandler | undefined {
-    const name = normalize(extractName(ctx))
+    const name = normalize(extractName(eventData))
     const mappings: MappingHandler[] =
-      ctx.kind === HandlerKind.EVENT ? this.events[name] : this.extrinsics[name]
+      eventData.kind === Kind.EVENT ? this.events[name] : this.extrinsics[name]
 
-    const inRange = rangeFilter(mappings, blockNumber)
+    const inRange = filter(mappings, blockData)
 
     if (inRange.length === 1) return inRange[0]
 
     if (inRange.length > 1) {
       throw new Error(
-        `Multiple mappings match ${name} for block height ${blockNumber} with no ordering defined`
+        `Multiple mappings match ${name} for block ${blockData.block.id} with no ordering defined`
       )
     }
 
-    debug(`Cannot find a handler for ${name} and block ${blockNumber}`)
+    debug(`Cannot find a handler for ${name} and block ${blockData.block.id}`)
 
-    if (conf().VERBOSE) debug(`Context: ${JSON.stringify(ctx, null, 2)}`)
+    if (conf().VERBOSE) debug(`Context: ${JSON.stringify(blockData, null, 2)}`)
   }
 
   async call(handler: MappingHandler, ctx: ExecContext): Promise<void> {
     const { handler: handlerFunc } = handler
 
-    // TODO: these should be replaced with casts to hydra-common interfaces
-    let ctxArg = { ...ctx } as ExecContext
-    const extra = isBlockHookContext(ctx)
-      ? { block: ctx }
-      : {
-          block: extractBlock(ctx as MappingContext),
-          extrinsic: ctx.event.extrinsic,
-        }
-    ctxArg = { ...extra, ...ctxArg }
+    if (isEventOrExtrinsicContext(ctx))
+      if (handler.types.length > 0) {
+        // legacy arg-style mappings
+        const args = handler.types.map((t) =>
+          resolveType(ctx, t, this.resolvedImports)
+        )
+        await handlerFunc(...args)
+        return
+      }
 
-    if (handler.types.length > 0) {
-      const args = handler.types.map((t) =>
-        resolveType(ctxArg, t, this.resolvedImports)
-      )
-      await handlerFunc(...args)
-      return
-    }
-
-    await handlerFunc(...[ctxArg])
+    await handlerFunc(...[ctx])
   }
 
   async load(): Promise<void> {
@@ -160,7 +157,7 @@ export function resolveType(
     return ctx.store
   }
   if (type === 'SubstrateEvent') {
-    if (!isEventContext(ctx)) {
+    if (!isEventOrExtrinsicContext(ctx)) {
       throw new Error(
         `Cannot extract SubstrateEvent from the context ${JSON.stringify(
           ctx,
@@ -176,7 +173,7 @@ export function resolveType(
     return ctx
   }
 
-  if (!isEventContext(ctx)) {
+  if (!isEventOrExtrinsicContext(ctx)) {
     throw new Error(
       `Cannot construct an argument of type ${type} from the context ${JSON.stringify(
         ctx,
@@ -195,9 +192,9 @@ export function resolveType(
 // used to normalize event and extrinsic names for consistent lookups
 export const normalize = (s: string): string => s.trim().toLowerCase()
 
-export function extractName(ctx: MappingContext): string {
-  if (ctx.kind === HandlerKind.EVENT) return ctx.event.name
-  if (ctx.kind === HandlerKind.EXTRINSIC) {
+export function extractName(ctx: EventData): string {
+  if (ctx.kind === Kind.EVENT) return ctx.event.name
+  if (ctx.kind === Kind.EXTRINSIC) {
     const extrinsic = ctx.event.extrinsic
     if (extrinsic === undefined) {
       throw new Error(
@@ -209,11 +206,40 @@ export function extractName(ctx: MappingContext): string {
   throw new Error(`Mapping type does not support name`)
 }
 
-export function rangeFilter<T extends { range?: BlockRange }>(
+export function filter<T extends { filter?: Filter }>(
   mappings: T[],
-  blockNumber: number
+  blockData: BlockData
 ): T[] {
-  return mappings.filter((m) => isInRange(blockNumber, m.range))
+  return mappings.filter((m) => matches(m, blockData))
+}
+
+export function matches<T extends { filter?: Filter }>(
+  mapping: T,
+  blockData: BlockData
+): boolean {
+  if (mapping.filter === undefined) {
+    return true
+  }
+
+  if (
+    mapping.filter.height &&
+    !isInRange(blockData.block.height, mapping.filter.height)
+  ) {
+    return false
+  }
+
+  if (
+    mapping.filter.specVersion &&
+    blockData.block.runtimeVersion.specVersion &&
+    !isInRange(
+      blockData.block.runtimeVersion.specVersion as number,
+      mapping.filter.specVersion
+    )
+  ) {
+    return false
+  }
+
+  return true
 }
 
 export async function resolveImports(
