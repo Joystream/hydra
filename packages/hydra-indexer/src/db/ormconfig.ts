@@ -1,26 +1,6 @@
-import { ConnectionOptions } from 'typeorm'
-import { SnakeNamingStrategy } from '@dzlzv/hydra-db-utils'
-import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
+import config from './dbconfig'
 
-const config: () => ConnectionOptions = () => {
-  return {
-    type: 'postgres',
-    host: process.env.TYPEORM_HOST || process.env.DB_HOST,
-    port: parseInt(
-      process.env.TYPEORM_PORT || process.env.DB_PORT || '5432',
-      10
-    ),
-    username: process.env.TYPEORM_USERNAME || process.env.DB_USER,
-    password: process.env.TYPEORM_PASSWORD || process.env.DB_PASS,
-    database: process.env.TYPEORM_DATABASE || process.env.DB_NAME,
-    entities: [SubstrateEventEntity, SubstrateExtrinsicEntity],
-    migrations: ['./**/migrations/*.js'],
-    cli: {
-      migrationsDir: 'migrations',
-    },
-    logging: process.env.TYPEORM_LOGGING || 'error',
-    namingStrategy: new SnakeNamingStrategy(),
-  } as ConnectionOptions
-}
+const ormconfig = config()
 
-export default config
+// export dbconfig as default so that it can be use with typeorm-cli
+export default ormconfig

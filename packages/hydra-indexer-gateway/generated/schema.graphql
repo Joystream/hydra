@@ -67,10 +67,126 @@ interface DeleteResponse {
   id: ID!
 }
 
+type EventInfo {
+  id: String!
+  name: String!
+  extrinsic: String
+}
+
+input EventInfoCreateInput {
+  id: String!
+  name: String!
+  extrinsic: String
+}
+
+input EventInfoUpdateInput {
+  id: String
+  name: String
+  extrinsic: String
+}
+
+input EventInfoWhereInput {
+  id_eq: String
+  id_contains: String
+  id_startsWith: String
+  id_endsWith: String
+  id_in: [String!]
+  createdAt_eq: DateTime
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  createdById_eq: ID
+  createdById_in: [ID!]
+  updatedAt_eq: DateTime
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  updatedById_eq: ID
+  updatedById_in: [ID!]
+  deletedAt_all: Boolean
+  deletedAt_eq: DateTime
+  deletedAt_lt: DateTime
+  deletedAt_lte: DateTime
+  deletedAt_gt: DateTime
+  deletedAt_gte: DateTime
+  deletedById_eq: ID
+  deletedById_in: [ID!]
+  name_eq: String
+  name_contains: String
+  name_startsWith: String
+  name_endsWith: String
+  name_in: [String!]
+  extrinsic_eq: String
+  extrinsic_contains: String
+  extrinsic_startsWith: String
+  extrinsic_endsWith: String
+  extrinsic_in: [String!]
+}
+
+input EventInfoWhereUniqueInput {
+  id: String!
+}
+
 type EventParam {
   type: String!
   name: String!
   value: JSON
+}
+
+type ExtrinsicInfo {
+  id: String!
+  name: String!
+}
+
+input ExtrinsicInfoCreateInput {
+  id: String!
+  name: String!
+}
+
+input ExtrinsicInfoUpdateInput {
+  id: String
+  name: String
+}
+
+input ExtrinsicInfoWhereInput {
+  id_eq: String
+  id_contains: String
+  id_startsWith: String
+  id_endsWith: String
+  id_in: [String!]
+  createdAt_eq: DateTime
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  createdById_eq: ID
+  createdById_in: [ID!]
+  updatedAt_eq: DateTime
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  updatedById_eq: ID
+  updatedById_in: [ID!]
+  deletedAt_all: Boolean
+  deletedAt_eq: DateTime
+  deletedAt_lt: DateTime
+  deletedAt_lte: DateTime
+  deletedAt_gt: DateTime
+  deletedAt_gte: DateTime
+  deletedById_eq: ID
+  deletedById_in: [ID!]
+  name_eq: String
+  name_contains: String
+  name_startsWith: String
+  name_endsWith: String
+  name_in: [String!]
+}
+
+input ExtrinsicInfoWhereUniqueInput {
+  id: String!
 }
 
 type IndexerHead {
@@ -83,6 +199,8 @@ type IndexerStatus {
   lastComplete: Int!
   maxComplete: Int!
   chainHeight: Int!
+  inSync: Boolean!
+  hydraVersion: String
 }
 
 """
@@ -95,6 +213,14 @@ The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](
 """
 scalar JSONObject
 
+input NameWhereInput {
+  name_eq: String
+  name_contains: String
+  name_startsWith: String
+  name_endsWith: String
+  name_in: [String!]
+}
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -104,6 +230,7 @@ type PageInfo {
 
 type Query {
   indexerStatus: IndexerStatus!
+  substrateBlocks(offset: Int, limit: Int = 50, where: SubstrateBlockWhereInputAugmented, orderBy: SubstrateBlockOrderByInput): [SubstrateBlock!]!
   eventsConnection(first: Int, after: String, last: Int, before: String, where: SubstrateEventWhereInput, orderBy: [SubstrateEventOrderByInput!]): SubstrateEventConnection!
   substrateEventsAfter(afterID: ID, limit: Int, where: SubstrateEventWhereInput): [SubstrateEvent!]!
   substrateEvents(offset: Int, limit: Int = 50, where: SubstrateEventWhereInput, orderBy: SubstrateEventOrderByInput): [SubstrateEvent!]!
@@ -113,6 +240,206 @@ type Query {
 }
 
 type StandardDeleteResponse {
+  id: ID!
+}
+
+type SubstrateBlock implements BaseGraphQLObject {
+  id: ID!
+  createdAt: DateTime!
+  createdById: String!
+  updatedAt: DateTime
+  updatedById: String
+  deletedAt: DateTime
+  deletedById: String
+  version: Int!
+  height: Int!
+  timestamp: BigInt!
+  hash: String!
+  parentHash: String!
+  stateRoot: String!
+  extrinsicsRoot: String!
+  runtimeVersion: JSONObject!
+  lastRuntimeUpgrade: JSONObject!
+  events: [EventInfo!]!
+  extrinsics: [ExtrinsicInfo!]!
+}
+
+input SubstrateBlockCreateInput {
+  height: Float!
+  timestamp: Float!
+  hash: String!
+  parentHash: String!
+  stateRoot: String!
+  extrinsicsRoot: String!
+  runtimeVersion: JSONObject!
+  lastRuntimeUpgrade: JSONObject!
+  events: JSONObject!
+  extrinsics: JSONObject!
+}
+
+enum SubstrateBlockOrderByInput {
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+  height_ASC
+  height_DESC
+  timestamp_ASC
+  timestamp_DESC
+  hash_ASC
+  hash_DESC
+  parentHash_ASC
+  parentHash_DESC
+  stateRoot_ASC
+  stateRoot_DESC
+  extrinsicsRoot_ASC
+  extrinsicsRoot_DESC
+}
+
+input SubstrateBlockUpdateInput {
+  height: Float
+  timestamp: Float
+  hash: String
+  parentHash: String
+  stateRoot: String
+  extrinsicsRoot: String
+  runtimeVersion: JSONObject
+  lastRuntimeUpgrade: JSONObject
+  events: JSONObject
+  extrinsics: JSONObject
+}
+
+input SubstrateBlockWhereInput {
+  id_eq: ID
+  id_in: [ID!]
+  createdAt_eq: DateTime
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  createdById_eq: ID
+  createdById_in: [ID!]
+  updatedAt_eq: DateTime
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  updatedById_eq: ID
+  updatedById_in: [ID!]
+  deletedAt_all: Boolean
+  deletedAt_eq: DateTime
+  deletedAt_lt: DateTime
+  deletedAt_lte: DateTime
+  deletedAt_gt: DateTime
+  deletedAt_gte: DateTime
+  deletedById_eq: ID
+  deletedById_in: [ID!]
+  height_eq: Int
+  height_gt: Int
+  height_gte: Int
+  height_lt: Int
+  height_lte: Int
+  height_in: [Int!]
+  timestamp_eq: Int
+  timestamp_gt: Int
+  timestamp_gte: Int
+  timestamp_lt: Int
+  timestamp_lte: Int
+  timestamp_in: [Int!]
+  hash_eq: String
+  hash_contains: String
+  hash_startsWith: String
+  hash_endsWith: String
+  hash_in: [String!]
+  parentHash_eq: String
+  parentHash_contains: String
+  parentHash_startsWith: String
+  parentHash_endsWith: String
+  parentHash_in: [String!]
+  stateRoot_eq: String
+  stateRoot_contains: String
+  stateRoot_startsWith: String
+  stateRoot_endsWith: String
+  stateRoot_in: [String!]
+  extrinsicsRoot_eq: String
+  extrinsicsRoot_contains: String
+  extrinsicsRoot_startsWith: String
+  extrinsicsRoot_endsWith: String
+  extrinsicsRoot_in: [String!]
+  runtimeVersion_json: JSONObject
+  lastRuntimeUpgrade_json: JSONObject
+  events_json: JSONObject
+  extrinsics_json: JSONObject
+}
+
+input SubstrateBlockWhereInputAugmented {
+  id_eq: ID
+  id_in: [ID!]
+  createdAt_eq: DateTime
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  createdById_eq: ID
+  createdById_in: [ID!]
+  updatedAt_eq: DateTime
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  updatedById_eq: ID
+  updatedById_in: [ID!]
+  deletedAt_all: Boolean
+  deletedAt_eq: DateTime
+  deletedAt_lt: DateTime
+  deletedAt_lte: DateTime
+  deletedAt_gt: DateTime
+  deletedAt_gte: DateTime
+  deletedById_eq: ID
+  deletedById_in: [ID!]
+  height_eq: Int
+  height_gt: Int
+  height_gte: Int
+  height_lt: Int
+  height_lte: Int
+  height_in: [Int!]
+  timestamp_eq: Int
+  timestamp_gt: Int
+  timestamp_gte: Int
+  timestamp_lt: Int
+  timestamp_lte: Int
+  timestamp_in: [Int!]
+  hash_eq: String
+  hash_contains: String
+  hash_startsWith: String
+  hash_endsWith: String
+  hash_in: [String!]
+  parentHash_eq: String
+  parentHash_contains: String
+  parentHash_startsWith: String
+  parentHash_endsWith: String
+  parentHash_in: [String!]
+  stateRoot_eq: String
+  stateRoot_contains: String
+  stateRoot_startsWith: String
+  stateRoot_endsWith: String
+  stateRoot_in: [String!]
+  extrinsicsRoot_eq: String
+  extrinsicsRoot_contains: String
+  extrinsicsRoot_startsWith: String
+  extrinsicsRoot_endsWith: String
+  extrinsicsRoot_in: [String!]
+  runtimeVersion_json: JSONObject
+  lastRuntimeUpgrade_json: JSONObject
+  events_json: JSONObject
+  extrinsics_json: JSONObject
+  events_some: SubstrateEventWhereInput
+  extrinsics_some: SubstrateExtrinsicWhereInput
+}
+
+input SubstrateBlockWhereUniqueInput {
   id: ID!
 }
 

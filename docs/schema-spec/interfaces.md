@@ -9,20 +9,22 @@ Interfaces are useful when several entity types share some set of properties and
 This is achieved through the natively supported GraphQL [interface](https://graphql.org/learn/schema/#interfaces) type and [inline fragments](https://graphql.org/learn/queries/#inline-fragments) in the output schema. For example, let us define the following input schema:
 
 ```graphql
-interface Profile {
+interface Profile @entity {
     about: String!
 }
 
-type Member implements About @entity {
+type Member implements Profile @entity {
     about: String!
     handle: String!
 }
 
-type Account implements About @entity {
+type Account implements Profile @entity {
     about: String!
     accountId: Bytes   
 }
 ```
+
+Note that interfaces should be decorated with `@entity` and all the subclasses must explicitly define the inherited fields \(otherwise an error will be thrown during the codegen\).
 
 The output schema will support a query by `about` which puts together `Member` and `Account` types. Note that `orderBy` is also supported for the inherited properties as well as OpenCRUD.
 

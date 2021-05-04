@@ -9,21 +9,24 @@ entities:
   - test/fixtures/test-entities.ts
 mappings:
   mappingsModule: test/fixtures/test-mappings.ts
+  range: '[, 345]'
   imports:
     - test/fixtures/test-types.ts
   eventHandlers:
-    # inver defaults here
+    # inver defaults here -> balances_Transfer
     - event: Balances.Transfer 
     - event: Sudo.batchCall
-      handler: handleSudoEvent(DatabaseManager,SubstrateEvent)
+      handler: handleSudoEvent
   extrinsicHandlers:
-    # infer defaults here
+    # infer defaults here -> balances_TransferCall
     - extrinsic: Balances.Transfer 
     - extrinsic: Sudo.batchCall 
-      handler: handleSudoCall(DatabaseManager,SubstrateEvent)
+      handler: handleSudoCall
+      range: '[4,5]'
   preBlockHooks:
-    - preBlockHook1(DatabaseManager,SubstrateEvent)
-    - preBlockHook2(DatabaseManager,SubstrateEvent)
+    - handler: preBlockHook1
+    - handler: preBlockHook2
   postBlockHooks:
-    - postBlockHook1(DatabaseManager,SubstrateEvent)
-    - postBlockHook2(DatabaseManager,SubstrateEvent)
+    - handler: postBlockHook1
+      range: '[4,4]'
+    - handler: postBlockHook2

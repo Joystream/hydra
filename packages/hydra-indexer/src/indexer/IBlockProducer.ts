@@ -25,9 +25,4 @@ export interface IBlockProducer<T> {
    *  Stops producing the block
    */
   stop(): Promise<void>
-
-  /**
-   * Explicity expose 'on' method from EventEmitter to ensure listeners can listen to events
-   */
-  on(event: string | symbol, listener: (...args: any[]) => void): this
 }

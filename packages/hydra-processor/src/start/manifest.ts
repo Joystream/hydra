@@ -3,17 +3,21 @@ import YamlValidator from 'yaml-validator'
 import fs from 'fs'
 import path from 'path'
 import semver from 'semver'
-
-import { camelCase, countBy, endsWith, compact } from 'lodash'
-
+import { camelCase, upperFirst, compact } from 'lodash'
+import Debug from 'debug'
 import { HandlerFunc } from './QueryEventProcessingPack'
-import { PROCESSOR_PACKAGE_NAME, resolvePackageVersion } from '../util/utils'
-import { warn } from '../util/log'
+import {
+  parseRange,
+  PROCESSOR_PACKAGE_NAME,
+  resolvePackageVersion,
+} from '../util/utils'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
 export const CONTEXT_CLASS_NAME = 'SubstrateEvent'
 export const EVENT_SUFFIX = 'Event'
 export const CALL_SUFFIX = 'Call'
+
+const debug = Debug('hydra-processor:manifest')
 
 const manifestValidatorOptions = {
   structure: {
@@ -29,22 +33,37 @@ const manifestValidatorOptions = {
     mappings: {
       mappingsModule: 'string',
       'imports?': ['string'],
-      'blockInterval?': 'string',
+      'range?': {
+        'from?': 'number',
+        'to?': 'number',
+      },
       'eventHandlers?': [
         {
           event: 'string',
           'handler?': 'string',
+          'range?': 'string',
         },
       ],
       'extrinsicHandlers?': [
         {
           extrinsic: 'string',
           'handler?': 'string',
-          'success?': 'boolean',
+          'triggerEvents?': ['string'],
+          'range?': 'string',
         },
       ],
-      'preBlockHooks?': ['string'],
-      'postBlockHooks?': ['string'],
+      'preBlockHooks?': [
+        {
+          handler: 'string',
+          'range?': 'string',
+        },
+      ],
+      'postBlockHooks?': [
+        {
+          handler: 'string',
+          'range?': 'string',
+        },
+      ],
     },
   },
 
@@ -59,43 +78,64 @@ export interface DataSource {
   indexerVersion: string
 }
 
+interface HandlerInput {
+  handler?: string
+  range?: string
+}
+
 interface MappingsDefInput {
   mappingsModule: string
-  blockInterval?: string
+  range?: string
   imports?: string[]
-  eventHandlers?: Array<{ event: string; handler?: string }>
-  extrinsicHandlers?: Array<{
-    extrinsic: string
-    handler?: string
-    success?: boolean
-  }>
-  preBlockHooks?: string[]
-  postBlockHooks?: string[]
+  eventHandlers?: Array<{ event: string } & HandlerInput>
+  extrinsicHandlers?: Array<
+    { extrinsic: string; triggerEvents?: string[] } & HandlerInput
+  >
+  preBlockHooks?: Array<{ handler: string } & HandlerInput>
+  postBlockHooks?: Array<{ handler: string } & HandlerInput>
 }
 
 export interface MappingsDef {
   mappingsModule: Record<string, unknown>
   imports: string[]
-  blockInterval: BlockInterval
-  eventHandlers: Record<string, MappingHandler>
-  extrinsicHandlers: Record<string, ExtrinsicHandler>
+  range: BlockRange
+  eventHandlers: EventHandler[]
+  extrinsicHandlers: ExtrinsicHandler[]
   preBlockHooks: MappingHandler[]
   postBlockHooks: MappingHandler[]
 }
 
-export interface BlockInterval {
+// inclusive
+export interface BlockRange {
   from: number
   to: number
 }
 
 export interface MappingHandler {
-  // blockInterval?: BlockInterval TODO: do we need per-handler block intervals?
-  handlerFunc: HandlerFunc
-  argTypes: string[]
+  range?: BlockRange
+  handler: HandlerFunc
+  types: string[]
+}
+
+export interface EventHandler extends MappingHandler {
+  event: string
 }
 
 export interface ExtrinsicHandler extends MappingHandler {
-  success: boolean
+  extrinsic: string
+  triggerEvents: string[]
+}
+
+export function hasExtrinsic(
+  handler: unknown
+): handler is { extrinsic: string } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (handler as any).extrinsic !== undefined
+}
+
+export function hasEvent(handler: unknown): handler is { event: string } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (handler as any).event !== undefined
 }
 
 export interface ProcessorManifest {
@@ -136,7 +176,7 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
   return {
     ...parsed,
     entities: entities.map((e) => path.resolve(e.trim())),
-    mappings: inferDefaults(mappings),
+    mappings: buildMappingsDef(mappings),
   }
 }
 
@@ -162,10 +202,11 @@ not satisfy the required manifest version ${hydraVersion}`)
   }
 }
 
-function inferDefaults(parsed: MappingsDefInput): MappingsDef {
+function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
+  debug(`Parsed mappings def: ${JSON.stringify(parsed, null, 2)}`)
   const {
     mappingsModule,
-    blockInterval,
+    range,
     eventHandlers,
     extrinsicHandlers,
     preBlockHooks,
@@ -182,135 +223,93 @@ function inferDefaults(parsed: MappingsDefInput): MappingsDef {
     unknown
   >
 
-  const parseHandler = function (def: {
-    input?: string
-    handler?: string
-    suffix?: string
-  }): MappingHandler {
-    const { input, handler, suffix } = def
-    const { name, argTypes } = handler
-      ? parseHandlerDef(handler)
-      : inferDefault(input || '', suffix)
+  const parseHandler = function (
+    def: (
+      | {
+          event: string
+        }
+      | { extrinsic: string }
+      | { handler: string }
+    ) &
+      HandlerInput
+  ): MappingHandler {
+    const { handler, range } = def
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const name = handler
+      ? extractName(handler)
+      : defaultHandlerName(def as { event: string } | { extrinsic: string })
+
     return {
-      argTypes,
-      handlerFunc: resolveHandler(resolvedModule, name),
+      ...def,
+      range: parseRange(range),
+      handler: resolveHandler(resolvedModule, name),
+      types: extractTypes(handler),
     }
   }
 
   return {
     mappingsModule: resolvedModule,
     imports: [mappingsModule, ...(imports || [])].map((p) => path.resolve(p)),
-    blockInterval: parseBlockInterval(blockInterval),
+    range: parseRange(range),
     eventHandlers: eventHandlers
-      ? eventHandlers.reduce((acc, item) => {
-          acc[item.event] = parseHandler({
-            ...item,
-            input: item.event,
-            suffix: EVENT_SUFFIX,
-          })
-          return acc
-        }, {} as Record<string, MappingHandler>)
-      : {},
+      ? eventHandlers.map((item) => parseHandler(item) as EventHandler)
+      : [],
     extrinsicHandlers: extrinsicHandlers
-      ? extrinsicHandlers.reduce((acc, item) => {
-          acc[item.extrinsic] = {
-            success: item.success || true,
-            ...parseHandler({
-              ...item,
-              input: item.extrinsic,
-              suffix: CALL_SUFFIX,
-            }),
-          }
-          return acc
-        }, {} as Record<string, ExtrinsicHandler>)
-      : {},
+      ? extrinsicHandlers.map(
+          (item) =>
+            ({
+              triggerEvents: item.triggerEvents || ['system.ExtrinsicSuccess'],
+              ...parseHandler(item),
+            } as ExtrinsicHandler)
+        )
+      : [],
     preBlockHooks: preBlockHooks
-      ? preBlockHooks.map((handler) => parseHandler({ handler }))
+      ? preBlockHooks.map((name) => parseHandler(name))
       : [],
     postBlockHooks: postBlockHooks
-      ? postBlockHooks.map((handler) => parseHandler({ handler }))
+      ? postBlockHooks.map((name) => parseHandler(name))
       : [],
   }
 }
 
-export function parseHandlerDef(
-  handler: string
-): { name: string; argTypes: string[] } {
-  // eslint-disable-next-line no-useless-escape
-  const split = handler.split(/[\(\)]/).map((s) => s.trim())
-  // name(arg1, arg2, arg3) -> ["name", "arg1,arg2,arg3"]
-  if (split.length !== 3) {
-    throw new Error(
-      `The mapping handler definition ${handler} does not match the pattern "name(type1, type2, ...)`
-    )
+export function extractTypes(handler: string | undefined): string[] {
+  if (handler === undefined) {
+    return []
   }
-  const name = split[0]
+  if (!handler.match(/\w+(\(\s*(([\w.]+(,\s*[\w.]+\s*)*))?\))?$/)) {
+    throw new Error(`Malformed handler signature: ${handler}`)
+  }
 
-  const argTypes = compact(split[1].split(/,/).map((s) => s.trim())) // remove empty
+  const split = compact(handler.split(/[()]/))
 
-  validateArgTypes({ handler, argTypes })
+  if (split.length === 1) {
+    // it was of the form handlerName()
+    return []
+  }
 
-  return { name, argTypes }
+  if (split.length !== 2) {
+    throw new Error(`Cannot parse types from ${handler}`)
+  }
+  return compact(split[1].split(',')).map((s) => s.trim())
 }
 
-export function validateArgTypes({
-  handler,
-  argTypes,
-}: {
-  handler: string
-  argTypes: string[]
-}): void {
-  if (argTypes.length === 0) {
-    warn(`Handler ${handler} has no arguments`)
-    return
+export function extractName(handler: string): string {
+  if (handler.includes('(')) {
+    return handler.split('(')[0]
   }
-
-  const typeOccurrences = countBy(argTypes)
-
-  if (!typeOccurrences[STORE_CLASS_NAME]) {
-    warn(
-      `Handler ${handler} does not have an argument of type ${STORE_CLASS_NAME}`
-    )
-  }
-
-  if (
-    typeOccurrences[STORE_CLASS_NAME] &&
-    typeOccurrences[STORE_CLASS_NAME] > 1
-  ) {
-    throw new Error(
-      `Handler ${handler} has multiple arguments of type ${STORE_CLASS_NAME}`
-    )
-  }
-
-  const eventTypeCnt = argTypes.reduce(
-    (acc, item: string) => (endsWith(item, EVENT_SUFFIX) ? acc + 1 : acc),
-    0
-  )
-
-  if (eventTypeCnt > 1) {
-    throw new Error(`Handler ${handler} has multiple arguments of event type`)
-  }
-
-  const callTypeCnt = argTypes.reduce(
-    (acc, item: string) => (endsWith(item, CALL_SUFFIX) ? acc + 1 : acc),
-    0
-  )
-
-  if (callTypeCnt > 1) {
-    throw new Error(`Handler ${handler} has multiple arguments of call type`)
-  }
+  return handler
 }
 
-export function inferDefault(
-  input: string,
-  suffix?: string
-): { name: string; argTypes: string[] } {
+export function defaultHandlerName(
+  eventOrExtrinsic: { event: string } | { extrinsic: string }
+): string {
+  const input = hasExtrinsic(eventOrExtrinsic)
+    ? eventOrExtrinsic.extrinsic
+    : eventOrExtrinsic.event
+  const suffix = hasExtrinsic(eventOrExtrinsic) ? CALL_SUFFIX : '' // no suffix for events
   const [module, name] = input.split('.').map((s) => s.trim())
-
-  return {
-    name: `${camelCase(module)}_${name}${suffix || ''}`,
-    argTypes: [STORE_CLASS_NAME, `${module}.${name}${suffix || ''}`],
-  }
+  // module name camelcased, name pascalcased
+  return `${camelCase(module)}_${upperFirst(camelCase(name))}${suffix}`
 }
 
 function resolveHandler(
@@ -324,32 +323,4 @@ function resolveHandler(
     throw new Error(`Cannot resolve the handler ${name} in the mappings module`)
   }
   return mappingsModule[name] as HandlerFunc
-}
-
-export function parseBlockInterval(
-  blockInterval: string | undefined
-): BlockInterval {
-  if (blockInterval === undefined) {
-    return {
-      from: 0,
-      to: Number.MAX_SAFE_INTEGER,
-    }
-  }
-  // accepted formats:
-  //   [1,2]
-  //   [,2]
-  //   [2,]
-  // eslint-disable-next-line no-useless-escape
-  const parts = blockInterval.split(/[\[,\]]/).map((part) => part.trim())
-  if (parts.length !== 4) {
-    throw new Error(
-      `Block interval ${blockInterval} does not match the expected format [number?, number?]`
-    )
-  }
-  // the parts array must be in the form ["", from, to, ""]
-  const from = parts[1].length > 0 ? Number.parseInt(parts[1]) : 0
-  const to =
-    parts[2].length > 0 ? Number.parseInt(parts[2]) : Number.MAX_SAFE_INTEGER
-
-  return { from, to }
 }

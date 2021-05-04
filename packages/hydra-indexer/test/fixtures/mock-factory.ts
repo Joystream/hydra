@@ -13,7 +13,7 @@ export function queryEventBlock(block = 0): QueryEventBlock {
   const gen = queryEvent(block)
   return {
     blockNumber: block,
-    queryEvents: [
+    blockEvents: [
       gen.next().value as IQueryEvent,
       gen.next().value as IQueryEvent,
       gen.next().value as IQueryEvent,
@@ -41,6 +41,7 @@ export function* queryEvent(
         } as unknown) as Event,
       } as unknown) as EventRecord,
       blockNumber: block,
+      blockTimestamp: 11111111111,
       indexInBlock: i,
       eventName: 'fake.event',
       eventMethod: 'fake.method',

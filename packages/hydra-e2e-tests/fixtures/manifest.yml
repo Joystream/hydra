@@ -23,9 +23,14 @@ mappings:
     - event: balances.Transfer 
       handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
   extrinsicHandlers:
-    # infer defaults
     - extrinsic: timestamp.set 
-      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
+      # if no argument types were provided, a single 
+      # context argument is passed
+      handler: timestampCall
   preBlockHooks:
+    - handler: preHook
+      range: '[1, 2]'
   postBlockHooks:
+    - handler: postHook
+      range: '[2, 4)'
   
