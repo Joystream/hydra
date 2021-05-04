@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { getConnection } from 'typeorm';
 import { BaseService, WhereInput } from 'warthog';
-import { orderBy } from 'lodash';
+import { isArray, orderBy } from 'lodash';
 
 {{#subclasses}}
 import { {{className}}Service } from '../{{kebabName}}/{{kebabName}}.service'
@@ -47,9 +47,9 @@ export class {{className}}Service {
 
 		let collect: any[] = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];
 		if (ob) {
-      const directions: string[] = []
+      const directions: ('asc' | 'desc')[] = []
       const attrs: string[] = []
-      if (!ob.length) {
+      if (!isArray(ob)) {
         ob = [ob]
       }
       ob.map(o => {
