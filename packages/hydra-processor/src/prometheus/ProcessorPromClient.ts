@@ -1,9 +1,9 @@
 import { Gauge, collectDefaultMetrics } from 'prom-client'
-import { IProcessorState } from '../state'
+import { IndexerStatus, IProcessorState } from '../state'
 import { SubstrateEvent, logError } from '@dzlzv/hydra-common'
 import Debug from 'debug'
 import { countProcessedEvents } from '../db'
-import { eventEmitter, PROCESSED_EVENT, STATE_CHANGE } from '../start/events'
+import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import { getConfig as conf } from '../start/config'
 
 const debug = Debug('index-builder:processor-prom-client')
@@ -14,10 +14,25 @@ export class ProcessorPromClient {
     help: 'Last block the processor has scanned for events',
   })
 
+  protected chainHeight = new Gauge({
+    name: 'hydra_processor_chain_height',
+    help: 'Current substrate chain height as reported by the indexer',
+  })
+
+  protected indexerHead = new Gauge({
+    name: 'hydra_processor_indexer_head',
+    help: 'Last read of the indexer head block',
+  })
+
   protected processedEvents = new Gauge({
     name: 'hydra_processor_processed_events_cnt',
-    help: 'total number of processed events',
+    help: 'Total number of processed events',
     labelNames: ['name'],
+  })
+
+  protected eventQueueSize = new Gauge({
+    name: 'hydra_processor_event_queue_size',
+    help: 'Number of events in the queue',
   })
 
   init(): void {
@@ -25,13 +40,31 @@ export class ProcessorPromClient {
 
     this.initValues()
       .then(() => {
-        eventEmitter.on(STATE_CHANGE, (state: IProcessorState) => {
-          this.lastScannedBlock.set(state.lastScannedBlock)
-        })
+        eventEmitter.on(
+          ProcessorEvents.STATE_CHANGE,
+          (state: IProcessorState) => {
+            this.lastScannedBlock.set(state.lastScannedBlock)
+          }
+        )
 
-        eventEmitter.on(PROCESSED_EVENT, (event: SubstrateEvent) => {
-          this.processedEvents.inc()
-          this.processedEvents.inc({ name: event.name })
+        eventEmitter.on(
+          ProcessorEvents.PROCESSED_EVENT,
+          (event: SubstrateEvent) => {
+            this.processedEvents.inc()
+            this.processedEvents.inc({ name: event.name })
+          }
+        )
+
+        eventEmitter.on(
+          ProcessorEvents.INDEXER_STATUS_CHANGE,
+          (indexerStatus: IndexerStatus) => {
+            this.chainHeight.set(indexerStatus.chainHeight)
+            this.indexerHead.set(indexerStatus.head)
+          }
+        )
+
+        eventEmitter.on(ProcessorEvents.QUEUE_SIZE_CHANGE, (size) => {
+          this.eventQueueSize.set(size)
         })
       })
       .catch((e) => debug(`Error initializing the values: ${logError(e)}`))

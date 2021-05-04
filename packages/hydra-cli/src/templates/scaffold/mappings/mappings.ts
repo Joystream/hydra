@@ -14,9 +14,9 @@ export async function balancesTransfer(
   event: Balances.TransferEvent
 ) {
   const transfer = new Transfer()
-  transfer.from = Buffer.from(event.data.accountIds[0].toHex())
-  transfer.to = Buffer.from(event.data.accountIds[1].toHex())
-  transfer.value = event.data.balance.toBn()
+  transfer.from = Buffer.from(event.params[0].toHex())
+  transfer.to = Buffer.from(event.params[1].toHex())
+  transfer.value = event.params[2].toBn()
   transfer.block = event.ctx.blockNumber
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
   transfer.insertedAt = new Date()

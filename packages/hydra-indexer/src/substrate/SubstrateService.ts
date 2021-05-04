@@ -4,73 +4,116 @@ import {
   BlockNumber,
   EventRecord,
   SignedBlock,
+  MetadataLatest,
+  RuntimeVersion,
+  LastRuntimeUpgradeInfo,
 } from '@polkadot/types/interfaces'
-import { Callback, Codec } from '@polkadot/types/types'
-import { u32 } from '@polkadot/types/primitive'
+import { Codec } from '@polkadot/types/types'
 import { ApiPromise } from '@polkadot/api'
-
-import { ISubstrateService } from '.'
-import { UnsubscribePromise } from '@polkadot/api/types'
+import pForever from 'p-forever'
+import delay from 'delay'
 import Debug from 'debug'
-import { retryWithTimeout, logError } from '@dzlzv/hydra-common'
+import pProps from 'p-props'
 
-import {
-  SUBSTRATE_API_CALL_RETRIES,
-  SUBSTRATE_API_TIMEOUT,
-} from '../indexer/indexer-consts'
+import { getConfig } from '../'
+import { getApiPromise, getBlockTimestamp, ISubstrateService } from '.'
 
-import { Inject, Service } from 'typedi'
+// import pTimeout from 'p-timeout'
+import pRetry from 'p-retry'
+import { SUBSTRATE_API_CALL_RETRIES } from '../indexer/indexer-consts'
 
-const debug = Debug('index-builder:producer')
+import BN from 'bn.js'
+import { BlockData } from '../model'
+import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 
-@Service('SubstrateService')
+const debug = Debug('hydra-indexer:substrate-service')
+
 export class SubstrateService implements ISubstrateService {
-  // Enough large number
-  private readonly _versionReset = 99999999
+  private shouldStop = false
 
-  // Store runtime spec version
-  private _specVersion: u32
+  async init(): Promise<void> {
+    debug(`Initializing SubstrateService`)
+    await getApiPromise()
+    await this.subscribeToHeads()
 
-  constructor(@Inject('ApiPromise') protected api: ApiPromise) {
-    this._specVersion = api.createType('u32', this._versionReset)
+    eventEmitter.on(IndexerEvents.INDEXER_STOP, async () => await this.stop())
+    // eventEmitter.on(
+    //   IndexerEvents.API_CONNECTED,
+    //   async () => await this.subscribeToHeads()
+    // )
+
+    pForever(async () => {
+      if (this.shouldStop) {
+        return pForever.end
+      }
+      await this.ping()
+      await delay(getConfig().NODE_PING_INTERVAL)
+    })
   }
 
   async getHeader(hash: Hash | Uint8Array | string): Promise<Header> {
-    return this._retryWithBackoff(
-      () => this.api.rpc.chain.getHeader(hash),
+    return this.apiCall(
+      (api) => api.rpc.chain.getHeader(hash),
       `Getting block header of ${JSON.stringify(hash)}`
     )
   }
 
   getFinalizedHead(): Promise<Hash> {
-    return this._retryWithBackoff(
-      () => this.api.rpc.chain.getFinalizedHead(),
+    return this.apiCall(
+      (api) => api.rpc.chain.getFinalizedHead(),
       `Getting finalized head`
     )
   }
 
-  subscribeFinalizedHeads(v: Callback<Header>): UnsubscribePromise {
-    return this._retryWithBackoff(
-      () => this.api.rpc.chain.subscribeFinalizedHeads(v),
-      `Subscribing to new heads`
-    )
+  async subscribeToHeads(): Promise<void> {
+    debug(`Subscribing to new heads`)
+    const api = await getApiPromise()
+    api.rx.rpc.chain.subscribeFinalizedHeads().subscribe({
+      next: (header: Header) =>
+        eventEmitter.emit(IndexerEvents.NEW_FINALIZED_HEAD, {
+          header,
+          height: header.number.toNumber(),
+        }),
+    })
+
+    api.rx.rpc.chain.subscribeNewHeads().subscribe({
+      next: (header: Header) =>
+        eventEmitter.emit(IndexerEvents.NEW_BEST_HEAD, {
+          header,
+          height: header.number.toNumber(),
+        }),
+    })
+
+    api.rx.rpc.chain.subscribeAllHeads().subscribe({
+      next: (header: Header) =>
+        eventEmitter.emit(IndexerEvents.NEW_HEAD, {
+          header,
+          height: header.number.toNumber(),
+        }),
+    })
   }
+
+  // async subscribeFinalizedHeads(v: Callback<Header>): UnsubscribePromise {
+  //   const api = await getApiPromise()
+  //   api.rpc.chain.subscribeFinalizedHeads()
+  //   return (await getApiPromise()).rpc.chain.subscribeFinalizedHeads(v)
+  // }
 
   async getBlockHash(
     blockNumber?: BlockNumber | Uint8Array | number | string
   ): Promise<Hash> {
-    debug(`Fetching block hash: BlockNumber: ${JSON.stringify(blockNumber)}`)
-    return this._retryWithBackoff(
-      () => this.api.rpc.chain.getBlockHash(blockNumber),
-      `Getting block hash of ${JSON.stringify(blockNumber)}`
+    debug(`Fetching block hash. BlockNumber: ${JSON.stringify(blockNumber)}`)
+    return this.apiCall(
+      (api) => api.rpc.chain.getBlockHash(blockNumber),
+      `get block hash by height ${JSON.stringify(blockNumber)}`
     )
   }
 
-  async getBlock(hash: Hash | Uint8Array | string): Promise<SignedBlock> {
-    debug(`Fething block: BlockHash: ${JSON.stringify(hash)}`)
-    return this._retryWithBackoff(
-      () => this.api.rpc.chain.getBlock(hash),
-      `Getting block at ${JSON.stringify(hash)}`
+  async getSignedBlock(hash: Hash | Uint8Array | string): Promise<SignedBlock> {
+    debug(`Fething signed block: ${JSON.stringify(hash)}`)
+    return this.apiCall(
+      (api) => api.rpc.chain.getBlock(hash),
+      `get signed block by hash ${JSON.stringify(hash)}`
     )
   }
 
@@ -78,32 +121,89 @@ export class SubstrateService implements ISubstrateService {
     hash: Hash | Uint8Array | string
   ): Promise<EventRecord[] & Codec> {
     debug(`Fething events. BlockHash:  ${JSON.stringify(hash)}`)
-    return this._retryWithBackoff(
-      () => this.api.query.system.events.at(hash),
-      `Fetching events at ${JSON.stringify(hash)}`
+    return this.apiCall(
+      (api) => api.query.system.events.at(hash),
+      `get block events of block ${JSON.stringify(hash)}`
     )
   }
 
-  private async _retryWithBackoff<T>(
-    promiseFn: () => Promise<T>,
-    functionName: string
+  private async apiCall<T>(
+    promiseFn: (api: ApiPromise) => Promise<T>,
+    functionName = 'api request'
   ): Promise<T> {
-    try {
-      return await retryWithTimeout(
-        promiseFn,
-        SUBSTRATE_API_TIMEOUT,
-        SUBSTRATE_API_CALL_RETRIES
-      )
-    } catch (e) {
-      throw new Error(
-        `Substrated API call ${functionName} failed. Error: ${logError(e)}`
-      )
+    return pRetry(
+      async () => {
+        if (this.shouldStop) {
+          throw new pRetry.AbortError(
+            'The indexer is stopping, aborting all API calls'
+          )
+        }
+        const api = await getApiPromise()
+        return promiseFn(api)
+      },
+      {
+        retries: SUBSTRATE_API_CALL_RETRIES,
+        onFailedAttempt: (i) =>
+          debug(
+            `Failed to execute "${functionName}" after ${i.attemptNumber} attempts. Retries left: ${i.retriesLeft}`
+          ),
+      }
+    )
+  }
+
+  async getBlockData(hash: Hash): Promise<BlockData> {
+    const data = {
+      events: this.eventsAt(hash),
+      signedBlock: this.getSignedBlock(hash),
+      lastUpgrade: this.lastRuntimeUpgrade(hash),
+      runtimeVersion: this.runtimeVersion(hash),
     }
+    const out = (await pProps(data)) as Partial<BlockData>
+    if (getConfig().VERBOSE) debug(`Out: ${JSON.stringify(out, null, 2)}`)
+    out.timestamp = getBlockTimestamp(
+      (out.signedBlock as SignedBlock).block.extrinsics.toArray()
+    )
+    return out as BlockData
+  }
+
+  async ping(): Promise<void> {
+    debug(`PING`)
+    const health = await this.apiCall((api) => api.rpc.system.health())
+    debug(`PONG. Node health: ${JSON.stringify(health)}`)
+  }
+
+  async metadata(hash: Hash): Promise<MetadataLatest> {
+    const metadata = await this.apiCall((api) =>
+      api.rpc.state.getMetadata(hash)
+    )
+    return metadata.asLatest
+  }
+
+  async runtimeVersion(hash: Hash): Promise<RuntimeVersion> {
+    return this.apiCall((api) => api.rpc.state.getRuntimeVersion(hash))
+  }
+
+  async timestamp(hash: Hash): Promise<BN> {
+    return this.apiCall((api) => api.query.timestamp.now.at(hash))
+  }
+
+  async lastRuntimeUpgrade(
+    hash: Hash
+  ): Promise<LastRuntimeUpgradeInfo | undefined> {
+    const info = await this.apiCall((api) =>
+      api.query.system.lastRuntimeUpgrade.at(hash)
+    )
+    return info.unwrapOr(undefined)
   }
 
   async stop(): Promise<void> {
-    if (this.api.isConnected) {
-      await this.api.disconnect()
+    debug(`Stopping substrate service`)
+    this.shouldStop = true
+    const api = await getApiPromise()
+    if (api.isConnected) {
+      await api.disconnect()
+      debug(`Api disconnected`)
     }
+    debug(`Done`)
   }
 }

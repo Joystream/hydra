@@ -28,12 +28,17 @@ mappings:
   mappingsModule: mappings/lib/mappings
   imports:
     - mappings/lib/mappings/generated/types
+  range:
+    from: 0 
+    to: 20
   eventHandlers:
     - event: balances.Transfer 
-      handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
+      handler: balancesTransfer
   extrinsicHandlers:
     - extrinsic: timestamp.set 
-      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
+      handler: timestampCall
   preBlockHooks:
+    - handler: preHook
   postBlockHooks:
+    - handler: postHook
   

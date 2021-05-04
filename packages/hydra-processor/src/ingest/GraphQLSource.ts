@@ -1,9 +1,12 @@
-import { IProcessorSource, EventQuery, IndexerStatus } from './'
+import { IEventsSource } from './'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
 import { getConfig as conf } from '../start/config'
 import { quotedJoin } from '../util/utils'
+import { GraphQLQuery, IndexerQuery } from './IEventsSource'
+import { IndexerStatus } from '../state'
+import { collectNamedQueries } from './graphql-query-builder'
 
 const debug = Debug('hydra-processor:graphql-source')
 
@@ -17,7 +20,7 @@ query {
 }
 `
 
-export class GraphQLSource implements IProcessorSource {
+export class GraphQLSource implements IEventsSource {
   private graphClient: GraphQLClient
 
   constructor() {
@@ -36,55 +39,80 @@ export class GraphQLSource implements IProcessorSource {
     const status = await this.graphClient.request<{
       indexerStatus: IndexerStatus
     }>(GET_INDEXER_STATUS)
-    return status.indexerStatus
+    return status.indexerStatus as IndexerStatus
   }
 
-  async nextBatch(
-    queries: EventQuery[],
-    size: number
-  ): Promise<SubstrateEvent[]> {
-    const query = collectQueries(
-      queries.map((f) => getEventsGraphQLQuery(f, size))
-    )
+  async nextBatch<T>(
+    queries: {
+      [K in keyof T]: IndexerQuery
+    }
+  ): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }> {
+    const query = collectQueries(queries)
     if (conf().VERBOSE) debug(`GraphqQL Query: ${query}`)
 
     const raw = await this.graphClient.request<
-      Record<string, SubstrateEvent[]>
+      { [K in keyof typeof queries]: SubstrateEvent[] }
     >(query)
 
-    const data: SubstrateEvent[] = Object.keys(raw)
-      .reduce((acc: SubstrateEvent[], key) => [...acc, ...raw[key]], [])
-      .sort((a, b) => (a.id < b.id ? -1 : 1))
+    debug(
+      `Fetched ${Object.keys(raw).reduce(
+        (total, k) => total + raw[k as keyof typeof raw].length,
+        0
+      )} events`
+    )
 
-    debug(`Fetched ${data.length} events`)
+    if (conf().VERBOSE) debug(`Results: ${JSON.stringify(raw, null, 2)}`)
 
-    if (conf().VERBOSE) debug(`Events: ${JSON.stringify(data, null, 2)} events`)
+    return raw as { [K in keyof typeof queries]: SubstrateEvent[] }
+  }
 
-    return data.slice(0, size)
+  executeQueries<T, R>(
+    queries: {
+      [K in keyof T]: GraphQLQuery<T[K]>
+    }
+  ): Promise<R> {
+    const bigNamedQuery = collectNamedQueries(queries)
+    return this.graphClient.request<R>(bigNamedQuery)
   }
 }
 
-export function collectQueries(queries: string[]) {
+export function collectQueries(queries: {
+  [key: string]: IndexerQuery
+}): string {
   // we need to do this hack to be able to run multiple queries in a single request
   return `query {
-    ${queries.map((q, i) => `query${i}: ${q}`).join('\n')}
+    ${Object.keys(queries)
+      .map((name) => `${name}: ${getEventsGraphQLQuery(queries[name])}`)
+      .join('\n')}
   }`
 }
 
-export function getEventsGraphQLQuery(
-  { events, extrinsics, block_gte, block_lte, id_gt }: EventQuery,
-  limit: number
-): string {
+// FIXME: refactor into a generic GraphQL query builder
+export function getEventsGraphQLQuery({
+  event,
+  extrinsic,
+  block,
+  id,
+  limit = conf().QUEUE_BATCH_SIZE,
+}: IndexerQuery): string {
+  const event_in = event.in || []
   const eventsFilter =
-    events.length > 0 ? `name_in: [${quotedJoin(events)}],` : ''
+    event_in.length > 0 ? `name_in: [${quotedJoin(event_in as string[])}],` : ''
+
+  const extrinsic_in = extrinsic ? extrinsic.in || [] : []
   const extrinsicsFilter =
-    extrinsics && extrinsics.length > 0
-      ? `extrinsicName_in: [${quotedJoin(extrinsics)}],`
+    extrinsic_in.length > 0
+      ? `extrinsicName_in: [${quotedJoin(extrinsic_in as string[])}],`
       : ''
-  const idFilter = id_gt ? `afterID: "${id_gt}",` : ''
+
+  const idFilter = id.gt ? `afterID: "${id.gt}",` : ''
+
+  // FIXME: very rough...
+  const block_gt = block.gt || 0
+  const block_lte = block.lte || Number.MIN_SAFE_INTEGER
 
   return `
-  substrateEventsAfter(where: { ${eventsFilter}${extrinsicsFilter} blockNumber_gte: ${block_gte}, blockNumber_lte: ${block_lte} }, ${idFilter} limit: ${limit}) {
+  substrateEventsAfter(where: { ${eventsFilter}${extrinsicsFilter} blockNumber_gt: ${block_gt}, blockNumber_lte: ${block_lte} }, ${idFilter} limit: ${limit}) {
     id
     name 
     method 
@@ -93,7 +121,7 @@ export function getEventsGraphQLQuery(
       type
       value
     }
-    index 
+    indexInBlock 
     blockNumber
     blockTimestamp
     extrinsic {
