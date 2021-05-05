@@ -32,6 +32,9 @@ export interface FieldResolver {
   rootArgName: string
   rootArgType: string
   returnType: string
+  relatedTsProp: string | undefined
+  relationType: RelationTypeGuard
+  tableName: string
 }
 
 export interface EntityRelationship {
@@ -60,4 +63,21 @@ export enum RelationType {
 
   // ManyToOne
   MTO = 'mto',
+}
+interface RelationTypeGuard {
+  isOTO: boolean
+  isOTM: boolean
+  isMTO: boolean
+  isMTM: boolean
+  isModifier: boolean
+}
+
+export function getRelationType(r: Relation): RelationTypeGuard {
+  return {
+    isOTO: r.type === RelationType.OTO,
+    isOTM: r.type === RelationType.OTM,
+    isMTO: r.type === RelationType.MTO,
+    isMTM: r.type === RelationType.MTM,
+    isModifier: r.type === RelationType.OTM || r.type === RelationType.MTM,
+  }
 }

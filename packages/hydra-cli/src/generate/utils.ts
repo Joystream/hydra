@@ -78,6 +78,11 @@ export function generateEntityImport(entityName: string): string {
   return `import {${entityName}} from '../${kebabName}/${kebabName}.model'`
 }
 
+export function generateEntityServiceImport(name: string): string {
+  const kebabName = kebabCase(name)
+  return `import {${name}Service} from '../${kebabName}/${kebabName}.service'`
+}
+
 export function generateResolverReturnType(
   type: string,
   isList: boolean
