@@ -3,6 +3,7 @@ import { GeneratorContext } from './SourcesGenerator'
 import { AbstractRenderer } from './AbstractRenderer'
 import { ModelRenderer } from './ModelRenderer'
 import { withUnionType } from './union-context'
+import { generateEntityImport } from './utils'
 
 export class VariantsRenderer extends AbstractRenderer {
   constructor(model: WarthogModel, context: GeneratorContext = {}) {
@@ -11,11 +12,13 @@ export class VariantsRenderer extends AbstractRenderer {
 
   withImports(): { imports: string[] } {
     const moduleImports = new Set<string>()
-    this.model.variants.forEach((v) => {
-      if (v.fields.find((f) => f.type === 'BigInt')) {
-        moduleImports.add(`import BN from 'bn.js'\n`)
-      }
-    })
+    for (const variant of this.model.variants) {
+      variant.fields.map((f) => {
+        if (f.isEntity()) {
+          moduleImports.add(generateEntityImport(f.type))
+        }
+      })
+    }
     return { imports: Array.from(moduleImports) }
   }
 
