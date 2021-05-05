@@ -162,6 +162,7 @@ export function withDerivedNames(
     ...util.names(f.name),
     relFieldName: util.camelCase(entity.name),
     relFieldNamePlural: util.camelPlural(entity.name),
+    entityName: entity.name,
   }
 }
 
