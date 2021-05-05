@@ -80,4 +80,45 @@ describe('VariantsRenderer', () => {
 
     expect(rendered).include(`import BN from 'bn.js'`)
   })
+
+  it('Should generate data fetch method', () => {
+    const model = fromStringSchema(`
+    type BoughtMemberEvent @entity {
+      id: ID!
+      name: String
+    }
+
+    type MemberInvitation @variant {
+      event: BoughtMemberEvent!
+    }
+
+    type MemberPurchase @variant {
+      event: BoughtMemberEvent!
+    }
+
+    union MemberSource = MemberInvitation | MemberPurchase
+
+    type Member @entity {
+      id: ID!
+      handle: String!
+      source: MemberSource!
+    }`)
+
+    const gen = new VariantsRenderer(model)
+    const rendered = gen.render(variantsTemplate)
+    expect(rendered).to.include(
+      `static async fetchDataevent(records: any, unionFieldName: string) {`,
+      'should generate data fetching method'
+    )
+    expect(rendered).to.include(
+      `@Field(() => BoughtMemberEvent`,
+      'should add field decorator'
+    )
+    expect(rendered).to.include(
+      `
+  @StringField({ dbOnly: true })
+  eventId!: string;`,
+      'should generated additional field'
+    )
+  })
 })

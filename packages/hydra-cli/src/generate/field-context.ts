@@ -86,6 +86,7 @@ export function buildFieldContext(
     ...withDerivedNames(f, entity),
     ...withDescription(f),
     ...withTransformer(f),
+    ...withArrayProp(f),
   }
 }
 
@@ -95,6 +96,7 @@ export function withFieldTypeGuardProps(f: Field): GeneratorContext {
   is.scalar = f.isScalar()
   is.enum = f.isEnum()
   is.union = f.isUnion()
+  is.entity = f.isEntity()
   ;['mto', 'oto', 'otm', 'mtm'].map((s) => (is[s] = f.relation?.type === s))
   return {
     is: is,
@@ -160,6 +162,7 @@ export function withDerivedNames(
     ...util.names(f.name),
     relFieldName: util.camelCase(entity.name),
     relFieldNamePlural: util.camelPlural(entity.name),
+    entityName: entity.name,
   }
 }
 
@@ -176,6 +179,12 @@ export function withImport(f: Field): GeneratorContext {
 export function withRelation(f: Field): GeneratorContext {
   return {
     relation: f.relation,
+  }
+}
+
+export function withArrayProp(f: Field): GeneratorContext {
+  return {
+    array: f.isList,
   }
 }
 

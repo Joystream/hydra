@@ -87,13 +87,126 @@ export class {{className}}ConnectionWhereArgs extends ConnectionPageInputOptions
 
 @Resolver({{className}})
 export class {{className}}Resolver {
-  constructor(@Inject('{{className}}Service') public readonly service: {{className}}Service) {}
+  constructor(
+    @Inject('{{className}}Service') public readonly service: {{className}}Service,
+    {{#fieldResolvers}}
+      @Inject('{{returnTypeFunc}}Service') public readonly {{fieldName}}Service: {{returnTypeFunc}}Service,
+    {{/fieldResolvers}}
+  ) {}
 
   @Query(() => [{{className}}])
   async {{camelNamePlural}}(
     @Args() { where, orderBy, limit, offset }: {{className}}WhereArgs,
     @Fields() fields: string[]
   ): Promise<{{className}}[]> {
+    {{#crossFilters}}
+    if (where) {
+      const id_in = where.id_in;
+
+      {{#fieldResolvers}}
+        {{#relationType.isOTO}}
+        const { {{fieldName}} } = where 
+        if ({{fieldName}}) {
+          where.id_in = (
+            await this.{{fieldName}}Service
+              .getQueryBuilder({{fieldName}})
+              .leftJoinAndSelect('{{tableName}}.{{relatedTsProp}}', '{{relatedTsProp}}')
+              .getMany()
+          )
+            .filter(f => f.{{relatedTsProp}})
+            .map(f => f.{{relatedTsProp}}!.id);
+          delete where.{{fieldName}};
+        }
+        {{/relationType.isOTO}}
+
+        {{#relationType.isModifier}}
+          const { {{fieldName}}_some, {{fieldName}}_none, {{fieldName}}_every } = where
+          if ({{fieldName}}_some || {{fieldName}}_none || {{fieldName}}_every) {
+            const result = await this.{{fieldName}}Service
+              .getQueryBuilder({{fieldName}}_some || {{fieldName}}_none || {{fieldName}}_every)
+              .leftJoinAndSelect('{{tableName}}.{{relatedTsProp}}', '{{relatedTsProp}}')
+              .getMany();
+            let {{relatedTsProp}}Ids: string[] = []
+            {{#relationType.isOTM}}
+            {{relatedTsProp}}Ids = Array.from(new Set(result.map(v => v.{{relatedTsProp}}.id)));
+            {{/relationType.isOTM}}
+            {{#relationType.isMTM}}
+            Array.from(new Set(result.map(v => v.{{relatedTsProp}}.map(c => {{relatedTsProp}}Ids.push(c.id)))));
+            {{/relationType.isMTM}}
+
+            delete where.{{fieldName}}_some
+            delete where.{{fieldName}}_none
+            delete where.{{fieldName}}_every
+
+            {{#relationType.isOTM}}
+            if ({{fieldName}}_some) {
+              where.id_in = {{relatedTsProp}}Ids;
+            }
+            {{/relationType.isOTM}}
+
+            {{#relationType.isMTM}}
+            if ({{fieldName}}_some || {{fieldName}}_every) {
+              where.id_in = {{relatedTsProp}}Ids;
+            }
+            {{/relationType.isMTM}}
+            
+
+            if ({{fieldName}}_none) {
+              where.id_in = (
+                await getRepository({{returnTypeFunc}}).find({
+                  select: ['id'],
+                  where: { id: Not(In({{relatedTsProp}}Ids)) }
+                })
+              ).map(c => c.id);
+            }
+
+            {{#relationType.isOTM}}
+            if ({{fieldName}}_every) {
+              getConnection().transaction(async em => {
+                const finalIds = [];
+
+                // Group entity
+                const g = _.chain(result)
+                  .groupBy(v => v.{{relatedTsProp}}.id)
+                  .value();
+
+                // Get all entities with their relations without filtering them
+                for (const { id, {{fieldName}} } of await em.getRepository({{rootArgType}}).find({
+                  where: { id: In({{relatedTsProp}}Ids) },
+                  relations: ['{{fieldName}}']
+                })) {
+                  if ({{fieldName}} && {{fieldName}}.length === g[id].length) {
+                    finalIds.push(id);
+                  }
+                }
+                where.id_in = finalIds;
+              });
+            }
+            {{/relationType.isOTM}}
+          }
+        {{/relationType.isModifier}}
+
+        {{#relationType.isMTO}}
+        const { {{fieldName}} } = where 
+        if ({{fieldName}}) {
+          const entityIds: string[] = [];
+          (
+            await this.{{fieldName}}Service
+              .getQueryBuilder({{fieldName}})
+              .leftJoinAndSelect('{{tableName}}.{{relatedTsProp}}', '{{relatedTsProp}}')
+              .getMany()
+          ).map((c: any) => entityIds.push(...c.{{relatedTsProp}}!.map((v: any) => v.id)));
+          where.id_in = entityIds;
+          delete where.{{fieldName}};
+        }
+        {{/relationType.isMTO}}
+      {{/fieldResolvers}}
+      
+      if (id_in) {
+        where.id_in = where.id_in ? [...id_in, ...where.id_in] : id_in;
+      }
+    }
+    {{/crossFilters}}
     return this.service.find<{{className}}WhereInput>(where, orderBy, limit, offset, fields);
   }
 
