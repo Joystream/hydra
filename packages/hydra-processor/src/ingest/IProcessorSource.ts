@@ -132,7 +132,7 @@ export interface IProcessorSource {
     }
   ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>
 
-  indexerStatus(): Promise<IndexerStatus>
+  getIndexerStatus(): Promise<IndexerStatus>
 
   subscribe(events: string[]): Promise<void>
 

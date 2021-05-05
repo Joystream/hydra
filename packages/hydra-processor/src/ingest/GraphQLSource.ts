@@ -35,6 +35,7 @@ query {
   indexerStatus {
     head
     chainHeight
+    hydraVersion
   }
 }
 `
@@ -58,7 +59,7 @@ export class GraphQLSource implements IProcessorSource {
     throw new Error('Method not implemented.')
   }
 
-  async indexerStatus(): Promise<IndexerStatus> {
+  async getIndexerStatus(): Promise<IndexerStatus> {
     const status = await this.graphClient.request<{
       indexerStatus: IndexerStatus
     }>(GET_INDEXER_STATUS)
