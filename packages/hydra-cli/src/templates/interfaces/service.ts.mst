@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { getConnection } from 'typeorm';
 import { BaseService, WhereInput } from 'warthog';
-import { orderBy } from 'lodash';
+import { isArray, orderBy } from 'lodash';
 
 {{#subclasses}}
 import { {{className}}Service } from '../{{kebabName}}/{{kebabName}}.service'
@@ -19,7 +19,7 @@ export class {{className}}Service {
     {{/subclasses}}
   ) {}
 
-  async find<W extends WhereInput>(where?: any, ob?: string, limit?: number, offset?: number, fields?: string[]): Promise<{{className}}[]> {
+  async find<W extends WhereInput>(where?: any, ob?: string | string[], limit?: number, offset?: number, fields?: string[]): Promise<{{className}}[]> {
     let _limit = limit || 50;
 		let _offset = offset || 0;
 
@@ -47,14 +47,19 @@ export class {{className}}Service {
 
 		let collect: any[] = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];
 		if (ob) {
+      const directions: ('asc' | 'desc')[] = []
+      const attrs: string[] = []
+      if (!isArray(ob)) {
+        ob = [ob]
+      }
+      ob.map(o => {
 			// NB: copied from warthog's BaseService
-			// TODO: allow multiple sorts
-			const parts = ob.toString().split('_');
-			// TODO: ensure attr is one of the properties on the model
-			const attr = parts[0];
-			const direction: 'asc' | 'desc' = parts[1] as 'asc' | 'desc';
-
-			collect = orderBy(collect, [attr], [direction]);
+        const parts = o.toString().split('_');
+        const direction: 'asc' | 'desc' = parts[1] as 'asc' | 'desc';
+        directions.push(direction)
+        attrs.push(parts[0])
+      })
+			collect = orderBy(collect, attrs, directions);
 		}
 
 		const _end = Math.min(collect.length, _limit + _offset);
