@@ -1,4 +1,4 @@
-import { getEventSource } from '../ingest'
+import { getProcessorSource } from '../ingest'
 import { getConfig as conf, getManifest } from '../start/config'
 import { info } from '../util/log'
 import { uniq, last, first, union, mapValues } from 'lodash'
@@ -57,11 +57,11 @@ export class EventQueue implements IEventQueue {
     info(`Waiting for the indexer head to be initialized`)
 
     this.stateKeeper = await getStateKeeper()
-    this.dataSource = await getEventSource()
+    this.dataSource = await getProcessorSource()
     this.mappingFilter = getMappingFilter(getManifest().mappings)
 
     await pWaitFor(async () => {
-      this.indexerStatus = await this.dataSource.indexerStatus()
+      this.indexerStatus = await this.dataSource.getIndexerStatus()
       return this.indexerStatus.head >= 0
     })
 
@@ -105,7 +105,7 @@ export class EventQueue implements IEventQueue {
     // });
     // For now, simply update indexerHead regularly
     while (this._started && this._hasNext) {
-      this.indexerStatus = await this.dataSource.indexerStatus()
+      this.indexerStatus = await this.dataSource.getIndexerStatus()
       eventEmitter.emit(
         ProcessorEvents.INDEXER_STATUS_CHANGE,
         this.indexerStatus
@@ -214,7 +214,7 @@ export class EventQueue implements IEventQueue {
             }: fetched only ${events.length} events`
           )
 
-        this.shiftRangeFilter()
+        await this.shiftRangeFilter()
       }
 
       eventEmitter.emit(
@@ -227,12 +227,13 @@ export class EventQueue implements IEventQueue {
           \tIndexer head: ${this.indexerStatus.head}
           \tChain head: ${this.indexerStatus.chainHeight} 
           \tQueue size: ${this.eventQueue.length}
-          \tLast fetched event: ${this.rangeFilter.id.gt}`
+          \tLast fetched event: ${this.rangeFilter.id.gt}
+          \tBlock range: ${JSON.stringify(this.rangeFilter.block)}`
       )
     }
   }
 
-  private shiftRangeFilter() {
+  private async shiftRangeFilter(): Promise<void> {
     if (this.rangeFilter.block.lte >= this.mappingFilter.range.to) {
       info(
         `All the events up to block ${this.mappingFilter.range.to} has been fetched.`
@@ -241,6 +242,8 @@ export class EventQueue implements IEventQueue {
       this._hasNext = false
       return
     }
+    // wait until there're more blocks to fetch
+    await pWaitFor(() => this.rangeFilter.block.lte < this.indexerStatus.head)
 
     this.rangeFilter.block = this.nextBlockRange(this.rangeFilter.block)
     eventEmitter.emit(
@@ -344,29 +347,3 @@ export function prepareIndexerQueries(
   debug(`Queries: ${JSON.stringify(queries, null, 2)}`)
   return queries
 }
-
-// export function prepareBlockQueries(
-//   filter: MappingFilter
-// ): GraphQLQuery<SubstrateBlock> {
-//   const { events, extrinsics } = filter
-
-//   return {
-//     name: 'substrateBlocks',
-//     fields: [
-//       'id',
-//       'hash',
-//       'parentHash',
-//       'stateRoot',
-//       'runtimeVersion',
-//       'lastRuntimeUpgrade',
-//       { 'events': ['id', 'name'] },
-//       { 'extrinsics': ['id', 'name'] },
-//     ],
-//     query: {
-//       where: {
-//         events: { some: { name: { in: events } } },
-//         extrinsics: { some: { name: { in: extrinsics.names } } },
-//       },
-//     },
-//   }
-// }
