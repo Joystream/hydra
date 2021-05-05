@@ -75,4 +75,8 @@ export class Field {
   isUnion(): boolean {
     return this.modelType === ModelType.UNION
   }
+
+  isEntity(): boolean {
+    return this.modelType === ModelType.ENTITY
+  }
 }
