@@ -14,19 +14,19 @@ mappings:
     - test/fixtures/test-types.ts
   eventHandlers:
     # inver defaults here -> balances_Transfer
-    - event: Balances.Transfer 
     - event: Sudo.batchCall
       handler: handleSudoEvent
   extrinsicHandlers:
     # infer defaults here -> balances_TransferCall
-    - extrinsic: Balances.Transfer 
     - extrinsic: Sudo.batchCall 
       handler: handleSudoCall
-      range: '[4,5]'
+      filter:
+        height: '[4,5]'
   preBlockHooks:
     - handler: preBlockHook1
     - handler: preBlockHook2
   postBlockHooks:
     - handler: postBlockHook1
-      range: '[4,4]'
+      filter:
+        range: '[4,4]'
     - handler: postBlockHook2

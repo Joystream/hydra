@@ -11,7 +11,7 @@ import { isInRange, parseEventId } from '../util/utils'
 import { formatEventId, SubstrateEvent } from '@dzlzv/hydra-common'
 import { IndexerStatus } from '.'
 import { info, warn } from '../util/log'
-import { BlockRange } from '../start/manifest'
+import { Range } from '../start/manifest'
 const debug = Debug('hydra-processor:processor-state-handler')
 
 export class StateKeeper implements IStateKeeper {
@@ -114,7 +114,7 @@ export class StateKeeper implements IStateKeeper {
 }
 
 export function initState(
-  range: BlockRange,
+  range: Range,
   lastState: { eventId: string; lastScannedBlock: number } | undefined
 ): IProcessorState {
   info(

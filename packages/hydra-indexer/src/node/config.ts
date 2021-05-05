@@ -22,6 +22,16 @@ let conf: {
   DB_USER: string
   DB_PASS: string
   DB_LOGGING: string
+  // advanced consts
+  BLOCK_CACHE_TTL_SEC: number
+  INDEXER_HEAD_TTL_SEC: number
+  WORKERS_NUMBER: number
+  BLOCK_PRODUCER_FETCH_RETRIES: number
+  SUBSTRATE_API_TIMEOUT: number
+  SUBSTRATE_API_CALL_RETRIES: number
+  NEW_BLOCK_TIMEOUT_MS: number
+  HEADER_CACHE_CAPACITY: number
+  FINALITY_THRESHOLD: number
 }
 
 let dbConf: {
@@ -137,6 +147,63 @@ export function configure(): void {
       NODE_PING_INTERVAL: num({
         default: 60 * 1000,
         desc: 'Interval for pinging the substate node health',
+      }),
+      // advanced consts
+      // keep one hour of blocks by default
+      BLOCK_CACHE_TTL_SEC: num({
+        default: 60 * 60,
+        desc: 'TTL for keeping block cache',
+      }),
+      // expire indexer head key after 15 minutes
+      INDEXER_HEAD_TTL_SEC: num({
+        default: 60 * 15,
+        desc: 'TTL for indexer head ',
+      }),
+
+      // Number of indexer workers
+      WORKERS_NUMBER: num({ default: 5, desc: 'Number of workers' }),
+
+      // Number of time the worker tries to fetch a block
+      BLOCK_PRODUCER_FETCH_RETRIES: num({
+        default: 3,
+        desc:
+          'Number of times a worker retries to fetch a block before giving up',
+      }),
+
+      // Timeout (in milliseconds) for each API call
+      SUBSTRATE_API_TIMEOUT: num({
+        default: 1000 * 60 * 5,
+        desc: 'Timeout for API calls',
+      }),
+      // Number of times an API call is retried before giving up and throwing and error
+      SUBSTRATE_API_CALL_RETRIES: num({
+        default: 5,
+        desc:
+          'Number of times an API call is retried before giving up and throwing and error',
+      }),
+
+      // If the block producer does not recieve a new block within this time limit,
+      // panic and thow an error. This is needed to prevent the situation when the
+      // API is disconnected yet no error is thrown, with the block producer stuck in the waiting loop
+      NEW_BLOCK_TIMEOUT_MS: num({
+        default: 60 * 10 * 1000,
+        desc: `If the block producer does not recieve a new block within this time limit,
+panic and thow an error. This is needed to prevent the situation when the
+API is disconnected yet no error is thrown, with the block producer stuck in the waiting loop`,
+      }),
+
+      // number of finalized block headers retained in memory
+      HEADER_CACHE_CAPACITY: num({
+        desc: 'number of finalized block headers retained in memory',
+        default: 100,
+      }),
+
+      // before resolving the block hash by the height, wait until it's behind the chain height
+      // by at least that many blocks
+      FINALITY_THRESHOLD: num({
+        desc: ` before resolving the block hash by the height, wait until it's behind the chain height
+by at least that many blocks'FINALITY_THRESHOLD`,
+        default: 5,
       }),
     }),
     ...getDBConfig(),

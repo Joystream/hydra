@@ -12,5 +12,5 @@ export function error(message: string): void {
 
 export function info(message: string): void {
   // TODO: use a proper logger?
-  console.error(`${chalk.green(`INFO:`)} ${message}`)
+  console.info(`${chalk.green(`INFO:`)} ${message}`)
 }

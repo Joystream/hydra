@@ -1,28 +1,18 @@
-import { SubstrateBlock } from '@dzlzv/hydra-common'
+import { SubstrateBlock } from './substrate-interfaces'
 import { pick } from 'lodash'
 
+/**
+ * General block information. Typically used as a payload for lightweight subscription messages.
+ */
 export interface BlockPayload {
   height: number
   hash: string
+  parentHash: string
   ts: number
   events: { id: string; name: string }[]
   extrinsics: { id: string; name: string }[]
+  runtimeVersion: { specVersion?: string }
 }
-
-// export function toPayload(qeb: {
-//   blockNumber: number
-//   blockEvents: { eventName: string }[]
-// }): BlockPayload {
-//   return (withTs({
-//     height: qeb.blockNumber,
-//     events: qeb.blockEvents.map((e, index) => {
-//       return {
-//         name: e.eventName,
-//         id: formatEventId(qeb.blockNumber, index),
-//       }
-//     }),
-//   }) as unknown) as BlockPayload
-// }
 
 export function toPayload(sb: SubstrateBlock): BlockPayload {
   return <BlockPayload>{

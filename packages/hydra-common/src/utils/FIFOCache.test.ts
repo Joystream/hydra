@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import FIFOCache from './FIFOCache'
+import { FIFOCache } from './FIFOCache'
 
 describe('FIFOCache', () => {
   it('should return first key', () => {

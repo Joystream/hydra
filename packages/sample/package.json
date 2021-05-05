@@ -33,7 +33,8 @@
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
     "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 builder yarn db:bootstrap",
-    "docker:up": "docker-compose up -d"
+    "docker:up": "docker-compose up -d",
+    "indexer:start:dev": "bash docker/run-indexer-dev.sh"
   },
   "author": "",
   "license": "ISC",

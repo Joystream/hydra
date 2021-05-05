@@ -1,26 +1,27 @@
-import { SubstrateEvent } from '@dzlzv/hydra-common'
-import { BlockRange } from '../start/manifest'
+import { SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
+import { Range } from '../start/manifest'
 
-export enum MappingType {
+export enum Kind {
   EXTRINSIC = 'EXTRINSIC',
   EVENT = 'EVENT',
   BLOCK = 'BLOCK',
 }
 
-export interface MappingContext {
+export interface EventData {
   // TODO: update interfaces in hydra-common
   event: SubstrateEvent
-  type: MappingType
+  kind: Kind
 }
 
-export interface BlockContext {
-  blockNumber: number
-  eventCtxs: MappingContext[]
+export interface BlockData {
+  block: SubstrateBlock
+
+  events: EventData[]
 }
 
 export interface IEventQueue {
   isEmpty(): boolean
-  blocks(): AsyncGenerator<BlockContext, void, void>
+  blocks(): AsyncGenerator<BlockData, void, void>
   start(): Promise<void>
   stop(): void
 }
@@ -54,11 +55,12 @@ export interface RangeFilter {
  * mapping definition
  */
 export interface MappingFilter {
-  range: BlockRange
+  range: Range
   events: string[]
   extrinsics: {
     names: string[]
     triggerEvents: string[]
   }
-  blockHooks: BlockRange[]
+  // TODO: implement arbitrary block filters
+  // blockHooks: { height?: Range }[]
 }
