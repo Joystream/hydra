@@ -40,28 +40,38 @@ const manifestValidatorOptions = {
       'eventHandlers?': [
         {
           event: 'string',
-          'handler?': 'string',
-          'range?': 'string',
+          handler: 'string',
+          'filter?': {
+            'height?': 'string',
+            'specVersion?': 'string',
+          },
         },
       ],
       'extrinsicHandlers?': [
         {
           extrinsic: 'string',
-          'handler?': 'string',
+          handler: 'string',
           'triggerEvents?': ['string'],
-          'range?': 'string',
+          'filter?': {
+            'height?': 'string',
+            'specVersion?': 'string',
+          },
         },
       ],
       'preBlockHooks?': [
         {
           handler: 'string',
-          'range?': 'string',
+          'filter?': {
+            'height?': 'string',
+          },
         },
       ],
       'postBlockHooks?': [
         {
           handler: 'string',
-          'range?': 'string',
+          'filter?': {
+            'height?': 'string',
+          },
         },
       ],
     },
@@ -79,8 +89,11 @@ export interface DataSource {
 }
 
 interface HandlerInput {
-  handler?: string
-  range?: string
+  handler: string
+  filter?: {
+    height?: string
+    specVersion?: string
+  }
 }
 
 interface MappingsDefInput {
@@ -91,28 +104,33 @@ interface MappingsDefInput {
   extrinsicHandlers?: Array<
     { extrinsic: string; triggerEvents?: string[] } & HandlerInput
   >
-  preBlockHooks?: Array<{ handler: string } & HandlerInput>
-  postBlockHooks?: Array<{ handler: string } & HandlerInput>
+  preBlockHooks?: Array<HandlerInput>
+  postBlockHooks?: Array<HandlerInput>
 }
 
 export interface MappingsDef {
   mappingsModule: Record<string, unknown>
   imports: string[]
-  range: BlockRange
+  range: Range
   eventHandlers: EventHandler[]
   extrinsicHandlers: ExtrinsicHandler[]
   preBlockHooks: MappingHandler[]
   postBlockHooks: MappingHandler[]
 }
 
+export interface Filter {
+  height?: Range
+  specVersion?: Range
+}
+
 // inclusive
-export interface BlockRange {
+export interface Range {
   from: number
   to: number
 }
 
 export interface MappingHandler {
-  range?: BlockRange
+  filter: Filter
   handler: HandlerFunc
   types: string[]
 }
@@ -224,16 +242,14 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
   >
 
   const parseHandler = function (
-    def: (
-      | {
+    def:
+      | (HandlerInput & {
           event: string
-        }
-      | { extrinsic: string }
-      | { handler: string }
-    ) &
-      HandlerInput
+        })
+      | (HandlerInput & { extrinsic: string })
+      | HandlerInput
   ): MappingHandler {
-    const { handler, range } = def
+    const { handler, filter } = def
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const name = handler
       ? extractName(handler)
@@ -241,7 +257,13 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
 
     return {
       ...def,
-      range: parseRange(range),
+      filter: {
+        height: filter && filter.height ? parseRange(filter.height) : undefined,
+        specVersion:
+          filter && filter.specVersion
+            ? parseRange(filter.specVersion)
+            : undefined,
+      },
       handler: resolveHandler(resolvedModule, name),
       types: extractTypes(handler),
     }

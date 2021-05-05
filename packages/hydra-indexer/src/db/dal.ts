@@ -7,6 +7,7 @@ import {
 import { EVENT_TABLE_NAME } from '../entities/SubstrateEventEntity'
 import Debug from 'debug'
 import config from './dbconfig'
+import { getConfig as conf } from '../node'
 
 const debug = Debug('index-builder:helper')
 
@@ -36,7 +37,7 @@ export async function getIndexerHead(): Promise<number> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
     if (raw === undefined || raw.length === 0) {
-      return -1
+      return conf().BLOCK_HEIGHT - 1
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

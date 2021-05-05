@@ -21,7 +21,7 @@ mappings:
     - mappings/lib/mappings/generated/types
   eventHandlers:
     - event: balances.Transfer 
-      handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
+      handler: balancesTransfer
   extrinsicHandlers:
     - extrinsic: timestamp.set 
       # if no argument types were provided, a single 
@@ -29,8 +29,10 @@ mappings:
       handler: timestampCall
   preBlockHooks:
     - handler: preHook
-      range: '[1, 2]'
+      filter: 
+        height: '[1, 2]'
   postBlockHooks:
     - handler: postHook
-      range: '[2, 4)'
+      filter:  
+        height: '[2, 4)'
   
