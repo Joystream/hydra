@@ -6,6 +6,7 @@ import * as utils from './utils'
 import { GraphQLEnumType } from 'graphql'
 import { AbstractRenderer } from './AbstractRenderer'
 import { withEnum } from './enum-context'
+import { getRelationType } from '../model/Relation'
 
 const debug = Debug('qnode-cli:model-renderer')
 
@@ -134,26 +135,38 @@ export class ModelRenderer extends AbstractRenderer {
     for (const f of this.objType.fields) {
       if (!f.relation) continue
       const returnTypeFunc = f.relation.columnType
+
       fieldResolvers.push({
         returnTypeFunc,
         rootArgType: entityName,
         fieldName: f.name,
         rootArgName: 'r', // disable utils.camelCase(entityName) could be a reverved ts/js keyword ie `class`
         returnType: utils.generateResolverReturnType(returnTypeFunc, f.isList),
+        relatedTsProp: f.relation.relatedTsProp,
+        relationType: getRelationType(f.relation),
+        tableName: returnTypeFunc.toLowerCase(),
       })
       if (f.type !== this.objType.name) {
         fieldResolverImports.add(utils.generateEntityImport(returnTypeFunc))
+        fieldResolverImports.add(
+          utils.generateEntityServiceImport(returnTypeFunc)
+        )
       }
     }
     const imports = Array.from(fieldResolverImports.values())
     // If there is at least one field resolver then add typeorm to imports
     if (imports.length) {
-      imports.push(`import { getConnection } from 'typeorm';`)
+      imports.push(
+        `import { getConnection, getRepository, In, Not } from 'typeorm';
+        import _ from 'lodash';
+        `
+      )
     }
 
     return {
       fieldResolvers,
       fieldResolverImports: imports,
+      crossFilters: !!fieldResolvers.length,
     }
   }
 

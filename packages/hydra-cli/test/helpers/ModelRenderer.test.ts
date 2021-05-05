@@ -126,7 +126,7 @@ describe('ModelRenderer', () => {
       `Should render imports`
     )
     expect(rendered).to.include(
-      `@OneToMany(() => Post, (param: Post) => param.author)`,
+      `@OneToMany(() => Post, (param: Post) => param.author,`,
       'Should render OTM decorator'
     )
     expect(rendered).to.include(
@@ -155,7 +155,7 @@ describe('ModelRenderer', () => {
       `Should render imports`
     )
     expect(rendered).to.include(
-      `@ManyToOne(() => Author, (param: Author) => param.postauthor, { skipGraphQLField: true })`,
+      `@ManyToOne(() => Author, (param: Author) => param.postauthor,`,
       'Should render MTO decorator'
     ) // nullable: true is not includered?
     expect(rendered).to.include(
@@ -181,7 +181,9 @@ describe('ModelRenderer', () => {
     debug(`rendered: ${JSON.stringify(rendered, null, 2)}`)
 
     expect(rendered).to.include(
-      `@ManyToOne(() => Language, (param: Language) => param.channellanguage, { skipGraphQLField: true, nullable: true })`,
+      `@ManyToOne(() => Language, (param: Language) => param.channellanguage, {
+    skipGraphQLField: true,
+    nullable: true,`,
       'Should render MTO decorator with nullable option'
     )
   })
