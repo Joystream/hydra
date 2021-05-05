@@ -1,9 +1,4 @@
-import Debug from 'debug'
-import fs from 'fs'
 import { Range } from '../start/manifest'
-
-const debug = Debug('hydra-processor:util')
-
 
 export function parseEventId(
   eventId: string

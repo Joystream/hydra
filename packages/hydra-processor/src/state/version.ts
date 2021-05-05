@@ -23,7 +23,6 @@ export function validateIndexerVersion(
   indexerVersion: string,
   indexerVersionRange: string
 ): void {
-
   if (
     !semver.satisfies(indexerVersion, indexerVersionRange, {
       loose: true,

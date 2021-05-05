@@ -2,7 +2,7 @@
 import { logError } from '@dzlzv/hydra-common'
 import Debug from 'debug'
 
-import { IStateKeeper, getStateKeeper, IProcessorState } from '../state'
+import { IStateKeeper, getStateKeeper } from '../state'
 import { error, info } from '../util/log'
 import { BlockData, getEventQueue, IEventQueue } from '../queue'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
@@ -22,9 +22,6 @@ export class MappingsProcessor {
     this.mappingsExecutor = await getMappingExecutor()
     this.eventQueue = await getEventQueue()
     this.stateKeeper = await getStateKeeper()
-  
-
-
 
     await Promise.all([this.eventQueue.start(), this.processingLoop()])
   }
