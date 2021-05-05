@@ -1,46 +1,44 @@
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
 import { Transfer, BlockTimestamp } from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
 import { Balances, Timestamp } from './generated/types'
 import BN from 'bn.js'
+import {
+  ExtrinsicContext,
+  EventContext,
+  StoreContext,
+} from '@dzlzv/hydra-common'
 
-const start = Date.now()
-let total = 0
-
-export async function balancesTransfer(
-  db: DatabaseManager,
-  event: Balances.TransferEvent
-) {
+export async function balancesTransfer({
+  store,
+  event,
+  block,
+  extrinsic,
+}: EventContext & StoreContext) {
   const transfer = new Transfer()
-  transfer.from = Buffer.from(event.params[0].toHex())
-  transfer.to = Buffer.from(event.params[1].toHex())
-  transfer.value = event.params[2].toBn()
-  transfer.block = event.ctx.blockNumber
+  const [from, to, value] = new Balances.TransferEvent(event).params
+  transfer.from = Buffer.from(from.toHex())
+  transfer.to = Buffer.from(to.toHex())
+  transfer.value = value.toBn()
+  transfer.tip = extrinsic ? new BN(extrinsic.tip.toString(10)) : new BN(0)
+  transfer.insertedAt = new Date(block.timestamp)
+
+  transfer.block = block.height
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`
-  transfer.insertedAt = new Date()
-  await db.save<Transfer>(transfer)
+  transfer.timestamp = new BN(block.timestamp)
+  console.log(`Saving transfer: ${JSON.stringify(transfer, null, 2)}`)
+  await store.save<Transfer>(transfer)
 }
 
-export async function timestampCall(
-  db: DatabaseManager,
-  call: Timestamp.SetCall
-) {
-  benchmarkExtrinsics()
-  const block = new BlockTimestamp()
-  block.timestamp = call.args.now.toBn()
-  block.blockNumber = new BN(call.ctx.blockNumber)
-  console.log(`New block ${block.blockNumber} at ${block.timestamp}`)
-
-  await db.save<BlockTimestamp>(block)
-}
-
-function benchmarkExtrinsics() {
-  const millis = Date.now() - start
-  total = total + 1
-  if (total % 10 === 0) {
-    console.log(`seconds elapsed = ${Math.floor(millis / 1000)}`)
-    console.log(`Everage time ms: ${millis / total}, total events: ${total}`)
-  }
+export async function timestampCall({
+  store,
+  event,
+  block,
+}: ExtrinsicContext & StoreContext) {
+  const call = new Timestamp.SetCall(event)
+  const blockT = new BlockTimestamp()
+  blockT.timestamp = call.args.now.toBn()
+  blockT.blockNumber = block.height
+  await store.save<BlockTimestamp>(blockT)
 }

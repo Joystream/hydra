@@ -22,11 +22,11 @@ mappings:
     - mappings/lib/mappings/generated/types
   eventHandlers:
     - event: balances.Transfer 
-      handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
+      handler: balancesTransfer
   extrinsicHandlers:
     # infer defaults
     - extrinsic: timestamp.set 
-      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
+      handler: timestampCall
   preBlockHooks:
   postBlockHooks:
   
