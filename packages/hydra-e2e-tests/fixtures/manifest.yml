@@ -29,6 +29,9 @@ mappings:
       handler: timestampCall
   preBlockHooks:
     - handler: preHook
+      filter:
+        height: '[0,0]'
+    - handler: preHook
       filter: 
         height: '[1, 2]'
   postBlockHooks:

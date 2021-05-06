@@ -1,7 +1,7 @@
 import { getProcessorSource } from '../ingest'
 import { getConfig as conf, getManifest } from '../start/config'
 import { info } from '../util/log'
-import { uniq, last, first, union, mapValues, _ } from 'lodash'
+import { uniq, last, first, union, mapValues, chunk } from 'lodash'
 import pWaitFor from 'p-wait-for'
 import delay from 'delay'
 import Debug from 'debug'
@@ -278,7 +278,7 @@ export class BlockQueue implements IBlockQueue {
       .reduce((acc: number[], r) => [...acc, ...numbersIn(r)], [])
       .sort()
 
-    const chunks = _.chunk(heights, conf().BATCH_SIZE)
+    const chunks = chunk(heights, conf().BATCH_SIZE)
 
     for (const c of chunks) {
       const blocks = await this.dataSource.fetchBlocks(c)
