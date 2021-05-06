@@ -119,7 +119,7 @@ export function unionWith(range1: Range, ranges: Range[]): Range[] {
  * @param ranges2
  * @returns
  */
-export function unionAll(ranges1: Range[], ranges2: Range[]) {
+export function unionAll(ranges1: Range[], ranges2: Range[]): Range[] {
   const both = [...ranges1, ...ranges2]
     .filter((r) => !isEmpty(r))
     .sort((r1, r2) => r1.from - r2.from)

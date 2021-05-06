@@ -1,7 +1,7 @@
 import { getProcessorSource } from '../ingest'
 import { getConfig as conf, getManifest } from '../start/config'
 import { info } from '../util/log'
-import { uniq, last, first, union, mapValues } from 'lodash'
+import { uniq, last, first, union, mapValues, _ } from 'lodash'
 import pWaitFor from 'p-wait-for'
 import delay from 'delay'
 import Debug from 'debug'
@@ -20,8 +20,7 @@ import { MappingsDef } from '../start/manifest'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { IndexerQuery, IProcessorSource } from '../ingest/IProcessorSource'
 import { parseEventId } from '../util/utils'
-import { unionAll, Range, unionWith, numbersIn, intersectWith } from '../util'
-import _ from 'lodash'
+import { unionAll, Range, numbersIn, intersectWith } from '../util'
 
 const debug = Debug('hydra-processor:event-queue')
 
@@ -282,8 +281,8 @@ export class BlockQueue implements IBlockQueue {
     const chunks = _.chunk(heights, conf().BATCH_SIZE)
 
     for (const c of chunks) {
-      let blocks = await this.dataSource.fetchBlocks(c)
-      for (let block of blocks) {
+      const blocks = await this.dataSource.fetchBlocks(c)
+      for (const block of blocks) {
         yield { block, events: [] }
       }
     }
