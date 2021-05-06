@@ -2,6 +2,7 @@ import { loadState } from '../db/dal'
 import { ProcessedEventsLogEntity } from '../entities'
 import { getRepository, EntityManager } from 'typeorm'
 import { IProcessorState, IStateKeeper } from './IStateKeeper'
+import { getProcessorSource, IProcessorSource } from '../ingest'
 
 import Debug from 'debug'
 import pThrottle from 'p-throttle'
@@ -12,17 +13,19 @@ import { formatEventId, SubstrateEvent } from '@dzlzv/hydra-common'
 import { IndexerStatus } from '.'
 import { info, warn } from '../util/log'
 import { Range } from '../start/manifest'
+import { validateIndexerVersion } from './version'
 const debug = Debug('hydra-processor:processor-state-handler')
 
 export class StateKeeper implements IStateKeeper {
   private processorState!: IProcessorState
-  private indexerStatus: IndexerStatus
+  private indexerStatus!: IndexerStatus
+  private processorSource!: IProcessorSource
 
   constructor() {
-    this.indexerStatus = {
-      head: -1,
-      chainHeight: -1,
-    }
+    // this.indexerStatus = {
+    //   head: -1,
+    //   chainHeight: -1,
+    // }
     eventEmitter.on(
       ProcessorEvents.INDEXER_STATUS_CHANGE,
       (indexerStatus) => (this.indexerStatus = indexerStatus)
@@ -95,6 +98,17 @@ export class StateKeeper implements IStateKeeper {
 
   async init(): Promise<IProcessorState> {
     const lastState = await loadState(conf().ID)
+
+    const processorSource = await getProcessorSource()
+
+    this.indexerStatus = await processorSource.getIndexerStatus()
+
+    info(`Hydra Indexer version: ${this.indexerStatus.hydraVersion}`)
+
+    validateIndexerVersion(
+      this.indexerStatus.hydraVersion,
+      getManifest().indexerVersionRange
+    )
 
     const range = getManifest().mappings.range
 

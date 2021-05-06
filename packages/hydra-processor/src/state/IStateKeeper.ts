@@ -8,6 +8,7 @@ export interface IProcessorState {
 export interface IndexerStatus {
   head: number
   chainHeight: number
+  hydraVersion: string
 }
 
 export interface IStateKeeper {
