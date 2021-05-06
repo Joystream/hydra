@@ -6,11 +6,8 @@ import semver from 'semver'
 import { camelCase, upperFirst, compact } from 'lodash'
 import Debug from 'debug'
 import { HandlerFunc } from './QueryEventProcessingPack'
-import {
-  parseRange,
-  PROCESSOR_PACKAGE_NAME,
-  resolvePackageVersion,
-} from '../util/utils'
+import { parseRange } from '../util/utils'
+import { validateHydraVersion } from '../state/version'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
 export const CONTEXT_CLASS_NAME = 'SubstrateEvent'
@@ -25,6 +22,7 @@ const manifestValidatorOptions = {
     'description?': 'string',
     'repository?': 'string',
     hydraVersion: 'string',
+    'indexerVersionRange?': 'string?',
     dataSource: {
       kind: 'string',
       chain: 'string',
@@ -159,6 +157,7 @@ export function hasEvent(handler: unknown): handler is { event: string } {
 export interface ProcessorManifest {
   version: string
   hydraVersion: string
+  indexerVersionRange: string
   entities: string[]
   description?: string
   repository?: string
@@ -181,6 +180,7 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
     version: string
     entities: string[]
     hydraVersion: string
+    indexerVersionRange?: string
     description?: string
     repository?: string
     dataSource: DataSource
@@ -188,11 +188,18 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
   }
 
   const { mappings, entities, hydraVersion } = parsed
+  const indexerVersionRange = parsed.indexerVersionRange || parsed.hydraVersion
+  if (!semver.validRange(indexerVersionRange)) {
+    throw new Error(
+      `Invalid indexer version range format: ${indexerVersionRange}. Make sure it satisfies the semver format`
+    )
+  }
   validateHydraVersion(hydraVersion)
   validate(mappings)
 
   return {
     ...parsed,
+    indexerVersionRange,
     entities: entities.map((e) => path.resolve(e.trim())),
     mappings: buildMappingsDef(mappings),
   }
@@ -204,19 +211,6 @@ function validate(parsed: MappingsDefInput): void {
     parsed.extrinsicHandlers === undefined
   ) {
     throw new Error(`At least one event or extrinsic handler must be defined`)
-  }
-}
-
-function validateHydraVersion(hydraVersion: string) {
-  const oursHydraVersion = resolvePackageVersion(PROCESSOR_PACKAGE_NAME)
-  if (
-    !semver.satisfies(oursHydraVersion, hydraVersion, {
-      loose: true,
-      includePrerelease: true,
-    })
-  ) {
-    throw new Error(`The processor version ${oursHydraVersion} does \\
-not satisfy the required manifest version ${hydraVersion}`)
   }
 }
 
