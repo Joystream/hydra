@@ -138,5 +138,5 @@ export interface IProcessorSource {
 
   getBlock(blockNumber: number): Promise<SubstrateBlock>
 
-  fetchBlocks(heights: number[]): Promise<void>
+  fetchBlocks(heights: number[]): Promise<SubstrateBlock[]>
 }

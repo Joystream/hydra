@@ -1,5 +1,3 @@
-import { Range } from '../start/manifest'
-
 export function parseEventId(
   eventId: string
 ): { blockHeight: number; eventId: number; hash?: string } {
@@ -43,58 +41,4 @@ export function format(s: string): string {
 
 export function compact(s: string): string {
   return s.replace(/\s/g, '')
-}
-
-/**
- * checks if the given height is within a given range, [from, to] (inclusive)
- * By convention anything is withing the undefined range
- * @param height
- * @param range
- * @returns
- */
-export function isInRange(height: number, range: Range | undefined): boolean {
-  if (range === undefined) {
-    return true
-  }
-  const { from, to } = range
-  return from <= height && height <= to
-}
-
-/**
- * parses an interval. Square bracket mean inclusive, curly braces mean exclusive
- * @param range string of the form [<number>, <number>]
- * @throw throws if the range is empty or if theere's a parsing error
- */
-export function parseRange(range: string | undefined): Range {
-  const defaultEmpty = {
-    from: 0,
-    to: Number.POSITIVE_INFINITY,
-  }
-  if (range === undefined) {
-    return defaultEmpty
-  }
-
-  const trimmed = range.trim().replace(/\s/g, '')
-  if (!trimmed.match(/^[[(]-?\d*,-?\d*[)\]]$/)) {
-    throw new Error(`Malformed range: ${range}`)
-  }
-
-  const split = trimmed.replace(/[[()\]]/g, '').split(',')
-  let left = split[0].length === 0 ? 0 : Number.parseInt(split[0])
-  let right =
-    split[1].length === 0 ? Number.POSITIVE_INFINITY : Number.parseInt(split[1])
-
-  if (split[0].length !== 0 && trimmed.includes('(')) {
-    left++
-  }
-
-  if (Number.isFinite(right) && trimmed.includes(')')) {
-    right--
-  }
-
-  if (left > right) {
-    throw new Error(`The range ${range} is empty`)
-  }
-
-  return { from: left, to: right }
 }
