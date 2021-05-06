@@ -11,7 +11,7 @@ import {
 
 import { BlockData, EventData, Kind } from '../queue'
 import { getConfig as conf } from '../start/config'
-import { isInRange } from '../util/utils'
+import { isInRange } from '../util'
 import {
   MappingContext,
   EventContext,
