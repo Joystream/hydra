@@ -57,7 +57,7 @@ export function configure(): void {
     PROMETHEUS_PORT: num({ default: 3000 }),
     BLOCK_WINDOW: num({ default: 100000 }),
     PROCESSOR_NAME: str({ default: 'hydra-processor' }),
-    BATCH_SIZE: num({ default: 10 }),
+    BATCH_SIZE: num({ default: 1000 }),
     POLL_INTERVAL_MS: num({ default: 500 }),
     MIN_BLOCKS_AHEAD: num({ default: 0 }),
     MAPPINGS_FACTOR: num({ default: 1 }),

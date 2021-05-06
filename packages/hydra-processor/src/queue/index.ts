@@ -1,14 +1,14 @@
-import { EventQueue } from './EventQueue'
-import { IEventQueue } from './IEventQueue'
+import { BlockQueue } from './BlockQueue'
+import { IBlockQueue } from './IBlockQueue'
 
-export * from './IEventQueue'
+export * from './IBlockQueue'
 
-let eventQueue: EventQueue
+let blockQueue: BlockQueue
 
-export async function getEventQueue(): Promise<IEventQueue> {
-  if (!eventQueue) {
-    eventQueue = new EventQueue()
-    await eventQueue.init()
+export async function getBlockQueue(): Promise<IBlockQueue> {
+  if (!blockQueue) {
+    blockQueue = new BlockQueue()
+    await blockQueue.init()
   }
-  return eventQueue
+  return blockQueue
 }

@@ -28,7 +28,7 @@ describe('end-to-end hook tests', () => {
     const preHooks = hooks
       .filter((h) => h.type === 'PRE')
       .map((h) => h.blockNumber)
-    expect(preHooks).to.have.members([1, 2])
+    expect(preHooks).to.have.members([0, 1, 2])
   })
 
   it('finds post hooks', async () => {

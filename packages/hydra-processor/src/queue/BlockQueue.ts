@@ -1,7 +1,7 @@
 import { getProcessorSource } from '../ingest'
 import { getConfig as conf, getManifest } from '../start/config'
 import { info } from '../util/log'
-import { uniq, last, first, union, mapValues } from 'lodash'
+import { uniq, last, first, union, mapValues, chunk } from 'lodash'
 import pWaitFor from 'p-wait-for'
 import delay from 'delay'
 import Debug from 'debug'
@@ -10,16 +10,17 @@ import { IndexerStatus, IStateKeeper, getStateKeeper } from '../state'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import {
   BlockData,
-  IEventQueue,
+  IBlockQueue,
   MappingFilter,
   Kind,
   RangeFilter,
   EventData,
-} from './IEventQueue'
+} from './IBlockQueue'
 import { MappingsDef } from '../start/manifest'
 import { SubstrateEvent } from '@dzlzv/hydra-common'
 import { IndexerQuery, IProcessorSource } from '../ingest/IProcessorSource'
 import { parseEventId } from '../util/utils'
+import { unionAll, Range, numbersIn, intersectWith } from '../util'
 
 const debug = Debug('hydra-processor:event-queue')
 
@@ -42,7 +43,7 @@ export function getMappingFilter(mappingsDef: MappingsDef): MappingFilter {
   }
 }
 
-export class EventQueue implements IEventQueue {
+export class BlockQueue implements IBlockQueue {
   _started = false
   _hasNext = true
   indexerStatus!: IndexerStatus
@@ -52,6 +53,7 @@ export class EventQueue implements IEventQueue {
   mappingFilter!: MappingFilter
   rangeFilter!: RangeFilter
   indexerQueries!: { [key in Kind]?: Partial<IndexerQuery> }
+  heightsWithHooks!: Range[]
 
   async init(): Promise<void> {
     info(`Waiting for the indexer head to be initialized`)
@@ -67,6 +69,10 @@ export class EventQueue implements IEventQueue {
 
     this.rangeFilter = this.getInitialRange()
 
+    this.heightsWithHooks = unionAll(
+      getManifest().mappings.preBlockHooks.map((h) => h.filter.height),
+      getManifest().mappings.postBlockHooks.map((h) => h.filter.height)
+    )
     this.indexerQueries = prepareIndexerQueries(this.mappingFilter)
   }
 
@@ -132,7 +138,7 @@ export class EventQueue implements IEventQueue {
     return first(this.eventQueue)
   }
 
-  async *blocks(): AsyncGenerator<BlockData, void, void> {
+  async *blocksWithEvents(): AsyncGenerator<BlockData, void, void> {
     // FIXME: this method only produces blocks with some event.
 
     while (this._started) {
@@ -263,6 +269,25 @@ export class EventQueue implements IEventQueue {
     }
   }
 
+  async *blocksWithHooks(range: Range): AsyncGenerator<BlockData, void, void> {
+    const ranges = intersectWith(range, this.heightsWithHooks)
+
+    debug(`Fetching hooks in ranges: ${JSON.stringify(ranges)}`)
+
+    const heights = ranges
+      .reduce((acc: number[], r) => [...acc, ...numbersIn(r)], [])
+      .sort()
+
+    const chunks = chunk(heights, conf().BATCH_SIZE)
+
+    for (const c of chunks) {
+      const blocks = await this.dataSource.fetchBlocks(c)
+      for (const block of blocks) {
+        yield { block, events: [] }
+      }
+    }
+  }
+
   private async fetchNextBatch() {
     const queries = mapValues(
       this.indexerQueries,
@@ -287,6 +312,7 @@ export class EventQueue implements IEventQueue {
 
     if (conf().VERBOSE) debug(`Requesting blocks: ${blockHeights}`)
 
+    // prefetch to the cache
     await this.dataSource.fetchBlocks(blockHeights)
 
     return trimmed

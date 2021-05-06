@@ -1,5 +1,5 @@
 import { SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
-import { Range } from '../start/manifest'
+import { Range } from '../util'
 
 export enum Kind {
   EXTRINSIC = 'EXTRINSIC',
@@ -8,7 +8,6 @@ export enum Kind {
 }
 
 export interface EventData {
-  // TODO: update interfaces in hydra-common
   event: SubstrateEvent
   kind: Kind
 }
@@ -19,9 +18,10 @@ export interface BlockData {
   events: EventData[]
 }
 
-export interface IEventQueue {
+export interface IBlockQueue {
   isEmpty(): boolean
-  blocks(): AsyncGenerator<BlockData, void, void>
+  blocksWithEvents(): AsyncGenerator<BlockData, void, void>
+  blocksWithHooks(range: Range): AsyncGenerator<BlockData, void, void>
   start(): Promise<void>
   stop(): void
 }
@@ -41,15 +41,6 @@ export interface RangeFilter {
   limit: number // fetch at most that many events
 }
 
-// export interface FilterConfig extends RangeFilter {
-//   events: string[]
-//   extrinsics: {
-//     names: string[]
-//     triggerEvents: string[]
-//   }
-//   blocks: number[]
-// }
-
 /**
  * Describes a set of query filters derived from the
  * mapping definition
@@ -61,6 +52,4 @@ export interface MappingFilter {
     names: string[]
     triggerEvents: string[]
   }
-  // TODO: implement arbitrary block filters
-  // blockHooks: { height?: Range }[]
 }

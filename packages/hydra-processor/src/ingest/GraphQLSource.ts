@@ -12,6 +12,7 @@ import { quotedJoin } from '../util/utils'
 import { GraphQLQuery, IndexerQuery } from './IProcessorSource'
 import { IndexerStatus } from '../state'
 import { collectNamedQueries } from './graphql-query-builder'
+import { compact } from 'lodash'
 
 const debug = Debug('hydra-processor:graphql-source')
 
@@ -120,11 +121,17 @@ export class GraphQLSource implements IProcessorSource {
     return this.blockCache.get(blockNumber) as SubstrateBlock
   }
 
-  async fetchBlocks(heights: number[]): Promise<void> {
+  async fetchBlocks(heights: number[]): Promise<SubstrateBlock[]> {
+    if (conf().VERBOSE) debug(`Fetching blocks: ${JSON.stringify(heights)}`)
+
+    const cached = compact(heights.map((h) => this.blockCache.get(h)))
+
+    if (conf().VERBOSE) debug(`Cached blocks: ${JSON.stringify(cached)}`)
+
     const toFetch = heights.filter((h) => this.blockCache.get(h) === undefined)
     if (toFetch.length === 0) {
       debug(`All ${heights.length} blocks are cached.`)
-      return
+      return cached
     }
 
     const query: GraphQLQuery<SubstrateBlock> = {
@@ -145,6 +152,7 @@ export class GraphQLSource implements IProcessorSource {
           height: { in: toFetch },
         },
         orderBy: { asc: 'height' },
+        limit: Math.min(toFetch.length, conf().BLOCK_CACHE_CAPACITY),
       },
     }
 
@@ -157,6 +165,8 @@ export class GraphQLSource implements IProcessorSource {
     }
 
     debug(`Fetched and cached ${result.blocks.length} blocks`)
+
+    return [...cached, ...result.blocks].sort()
   }
 
   private requestSubstrateData<T>(query: string): Promise<T> {

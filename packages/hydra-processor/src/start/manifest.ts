@@ -6,7 +6,7 @@ import semver from 'semver'
 import { camelCase, upperFirst, compact } from 'lodash'
 import Debug from 'debug'
 import { HandlerFunc } from './QueryEventProcessingPack'
-import { parseRange } from '../util/utils'
+import { Range, parseRange } from '../util'
 import { validateHydraVersion } from '../state/version'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
@@ -117,14 +117,8 @@ export interface MappingsDef {
 }
 
 export interface Filter {
-  height?: Range
+  height: Range
   specVersion?: Range
-}
-
-// inclusive
-export interface Range {
-  from: number
-  to: number
 }
 
 export interface MappingHandler {
@@ -235,6 +229,8 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
     unknown
   >
 
+  const globalRange = parseRange(range)
+
   const parseHandler = function (
     def:
       | (HandlerInput & {
@@ -252,7 +248,8 @@ function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
     return {
       ...def,
       filter: {
-        height: filter && filter.height ? parseRange(filter.height) : undefined,
+        height:
+          filter && filter.height ? parseRange(filter.height) : globalRange,
         specVersion:
           filter && filter.specVersion
             ? parseRange(filter.specVersion)

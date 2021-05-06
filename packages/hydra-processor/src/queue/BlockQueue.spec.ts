@@ -1,13 +1,13 @@
-import { EventQueue } from './EventQueue'
+import { BlockQueue } from './BlockQueue'
 import { expect } from 'chai'
-import { RangeFilter, MappingFilter } from './IEventQueue'
+import { RangeFilter, MappingFilter } from './IBlockQueue'
 import { IndexerStatus, IProcessorState, IStateKeeper } from '../state'
 import { formatEventId } from '@dzlzv/hydra-common'
 import { getConfig as conf } from '../start/config'
 
 describe('EventQueue', () => {
   it('should properly set the initial filter', () => {
-    const eventQueue: EventQueue = new EventQueue()
+    const eventQueue: BlockQueue = new BlockQueue()
     eventQueue.stateKeeper = ({
       getState: () => {
         return {
@@ -39,7 +39,7 @@ describe('EventQueue', () => {
   })
 
   it('should update the next block range', () => {
-    const eventQueue: EventQueue = new EventQueue()
+    const eventQueue: BlockQueue = new BlockQueue()
 
     eventQueue.rangeFilter = ({
       block: {
