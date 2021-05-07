@@ -1,8 +1,8 @@
-version: '0.1'
+version: '3.0'
 description: Sample manifest
 repository: https://github.com/
 ## reserved but unused fields
-hydraVersion: "2"
+hydraVersion: "3"
 dataSource:
   kind: substrate 
   chain: node-template
@@ -34,19 +34,6 @@ mappings:
       handler: balancesTransfer
       filter:
         specVersion: '[0,)'
-  # extrinsicHandlers:
-  #   - extrinsic: timestamp.set 
-  #     handler: timestampCallV1
-  #     filter:
-  #       height: '[0, 5]'
-  #       specVersion: '[0,10)'
-        
-  #   - extrinsic: timestamp.set 
-  #     handler: timestampCallV2
-  #     filter:
-  #       height: '[6, )'
-  #       specVersion: '[11,)'
-
   preBlockHooks:
     - handler: preHook
   postBlockHooks:
