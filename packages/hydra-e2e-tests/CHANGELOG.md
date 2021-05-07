@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-beta.1](https://github.com/dzhelezov/hydra/compare/v2.1.0-beta.8...v3.0.0-beta.1) (2021-05-07)
+
+
+### Features
+
+* **hydra-indexer:** persist block data ([#366](https://github.com/dzhelezov/hydra/issues/366)) ([b11a7b2](https://github.com/dzhelezov/hydra/commit/b11a7b22a9cbbb0f99f2f9e5a4c733796d6d0c86))
+* **hydra-processor:** Hooks without events ([#386](https://github.com/dzhelezov/hydra/issues/386)) ([d3ff8e6](https://github.com/dzhelezov/hydra/commit/d3ff8e6afd6ff8486cb3610c27fcdf5a163f8f73))
+* **hydra-processor:** string-based ranges in manifest ([#347](https://github.com/dzhelezov/hydra/issues/347)) ([d343da1](https://github.com/dzhelezov/hydra/commit/d343da15b6b90e71bf69e85f93d5fe7fc1bf3e4e))
+* **hydra-processor:** use mappings contexts and support specVersion filters ([#375](https://github.com/dzhelezov/hydra/issues/375)) ([6a95a99](https://github.com/dzhelezov/hydra/commit/6a95a99b5d212de50ae83c3b8ec6cb42a66204af))
+* **typegen:** tuple return type for event.params ([#358](https://github.com/dzhelezov/hydra/issues/358)) ([bf16156](https://github.com/dzhelezov/hydra/commit/bf16156c63893ba5a4c6906341319a27a05b788d))
+
+
+
 ## 2.1.0-beta.8 (2021-04-29)
 
 
