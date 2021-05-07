@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-beta.0](https://github.com/dzhelezov/hydra/compare/v2.1.0-beta.7...v3.0.0-beta.0) (2021-05-07)
+
+
+### Features
+
+* **hydra-indexer-gateway:** add block queries ([#367](https://github.com/dzhelezov/hydra/issues/367)) ([fedd416](https://github.com/dzhelezov/hydra/commit/fedd4165017515eb8670ed4508895215f7f8ecd6))
+
+
+
 ## 2.1.0-beta.7 (2021-04-08)
 
 

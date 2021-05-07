@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-beta.0](https://github.com/dzhelezov/hydra/compare/v2.1.0-beta.7...v3.0.0-beta.0) (2021-05-07)
+
+
+### Features
+
+* **hydra-processor:** use mappings contexts and support specVersion filters ([#375](https://github.com/dzhelezov/hydra/issues/375)) ([8b520d7](https://github.com/dzhelezov/hydra/commit/8b520d73cbc9dcde54f95c726f20b40f211c1e35))
+
+
+
 ## 2.1.0-beta.7 (2021-04-08)
 
 

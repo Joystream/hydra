@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-beta.0](https://github.com/dzhelezov/hydra/compare/v2.1.0-beta.7...v3.0.0-beta.0) (2021-05-07)
+
+
+### Features
+
+* **hydra-indexer:** persist block data ([#366](https://github.com/dzhelezov/hydra/issues/366)) ([6891dd6](https://github.com/dzhelezov/hydra/commit/6891dd69438dbec7b3ad11fa064d41aaf33b29a7))
+* **hydra-processor:** Hooks without events ([#386](https://github.com/dzhelezov/hydra/issues/386)) ([9bc65b2](https://github.com/dzhelezov/hydra/commit/9bc65b22ffd6f15dd68829e68b0ed06c269d4bc3))
+* **hydra-processor:** string-based ranges in manifest ([#347](https://github.com/dzhelezov/hydra/issues/347)) ([eba965b](https://github.com/dzhelezov/hydra/commit/eba965bdb52431dc8209b7ce98ebea9ba578d24e))
+* **hydra-processor:** use mappings contexts and support specVersion filters ([#375](https://github.com/dzhelezov/hydra/issues/375)) ([8b520d7](https://github.com/dzhelezov/hydra/commit/8b520d73cbc9dcde54f95c726f20b40f211c1e35))
+* **typegen:** tuple return type for event.params ([#358](https://github.com/dzhelezov/hydra/issues/358)) ([5b35dfc](https://github.com/dzhelezov/hydra/commit/5b35dfc5d825bca6fb2449009429bc554c8157b6))
+
+
+
 ## 2.1.0-beta.7 (2021-04-08)
 
 

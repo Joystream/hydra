@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-beta.0](https://github.com/Joystream/hydra/compare/v2.1.0-beta.7...v3.0.0-beta.0) (2021-05-07)
+
+
+### Features
+
+* **hydra-cli:** support cross filters for entity relationship ([#381](https://github.com/Joystream/hydra/issues/381)) ([3133976](https://github.com/Joystream/hydra/commit/31339762a31968c9a9f6b5d451c5d87cb6667857))
+* **hydra-cli:** support multiple orderBy clauses ([#378](https://github.com/Joystream/hydra/issues/378)) ([05fedee](https://github.com/Joystream/hydra/commit/05fedeea3a1bb31a90d29dc2356504f17e8fde58))
+* **hydra-cli:** support variant relations v3 ([#380](https://github.com/Joystream/hydra/issues/380)) ([42f5d91](https://github.com/Joystream/hydra/commit/42f5d91b797182a794aa61762b4692c1ebbeb6c1)), closes [#357](https://github.com/Joystream/hydra/issues/357)
+* **typegen:** tuple return type for event.params ([#358](https://github.com/Joystream/hydra/issues/358)) ([5b35dfc](https://github.com/Joystream/hydra/commit/5b35dfc5d825bca6fb2449009429bc554c8157b6))
+
+
+### Bug Fixes
+
+* **hydra-cli:** update scaffold templates ([#383](https://github.com/Joystream/hydra/issues/383)) ([b8fbf61](https://github.com/Joystream/hydra/commit/b8fbf61776774afb818ab7799831a41e9c41c057))
+
+
+
 ## 2.1.0-beta.7 (2021-04-08)
 
 
