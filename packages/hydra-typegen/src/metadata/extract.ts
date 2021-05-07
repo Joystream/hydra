@@ -127,11 +127,7 @@ export function stripTypes(argTypes: string[] | Text[] | Vec<Text>): string[] {
   const types: string[] = []
   argTypes.forEach((a: string | Text) => {
     const type = a.toString().trim()
-    if (type.includes('<') || type.includes('&') || type.includes('|')) {
-      types.push(...type.split(/[<>&|]/).map((t) => t.trim()))
-    } else {
-      types.push(type)
-    }
+    types.push(...type.split(/[<>&|,()]/).map((t) => t.trim()))
   })
   return compact(uniq(types))
 }
