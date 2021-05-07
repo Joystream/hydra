@@ -7,7 +7,8 @@
 | :--- | :--- | :--- |
 | **version** | _String_ | A Semver version indicating which version of this API is being used. |
 | **description** | _String_ | An optional description of the substrate chain. |
-| **hydraVersion** | String | Version of Hydra used by the mappings |
+| **hydraVersion** | String | SemVer range of Hydra Processor used by the mappings.  |
+| **indexerVersionRange** | String | Semver version range of supported Hydra Indexers. If not set, same as `hydraVersion` |
 | **repository** | _String_ | An optional link to where the subgraph lives. |
 | **dataSources** | Data Source Spec | Each data source spec defines the data that will be ingested |
 | **entities** | _String_ | Glob path to schema model files \(with typeorm metadata\) |
