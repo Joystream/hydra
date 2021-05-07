@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.0.0-hydra-v3.0 (2021-05-07)
+
+
+### Bug Fixes
+
+* **hydra-processor:** fix missing dependency in hydra-procesor ([#387](https://github.com/Joystream/hydra/issues/387)) ([9f6046c](https://github.com/Joystream/hydra/commit/9f6046ca76e5315a592e9223b43d0fd2a84a81b7))
+
+
+
 ## [3.0.0-beta.0](https://github.com/dzhelezov/hydra/compare/v2.1.0-beta.7...v3.0.0-beta.0) (2021-05-07)
 
 
