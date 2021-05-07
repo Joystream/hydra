@@ -10,7 +10,7 @@ const debug = Debug('index-server:index')
 
 async function bootstrap() {
   debug('Bootstrapping the server')
-  await loadConfig()
+  loadConfig()
   const server = getServer()
   debug('Server created!')
   initServices()

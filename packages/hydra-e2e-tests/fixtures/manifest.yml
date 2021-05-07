@@ -21,11 +21,21 @@ mappings:
     - mappings/lib/mappings/generated/types
   eventHandlers:
     - event: balances.Transfer 
-      handler: balancesTransfer(DatabaseManager, Balances.TransferEvent)
+      handler: balancesTransfer
   extrinsicHandlers:
-    # infer defaults
     - extrinsic: timestamp.set 
-      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
+      # if no argument types were provided, a single 
+      # context argument is passed
+      handler: timestampCall
   preBlockHooks:
+    - handler: preHook
+      filter:
+        height: '[0,0]'
+    - handler: preHook
+      filter: 
+        height: '[1, 2]'
   postBlockHooks:
+    - handler: postHook
+      filter:  
+        height: '[2, 4)'
   

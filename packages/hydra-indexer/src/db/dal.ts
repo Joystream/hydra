@@ -1,8 +1,13 @@
-import { QueryRunner, Connection, createConnection } from 'typeorm'
+import {
+  EntityManager,
+  Connection,
+  createConnection,
+  getConnection,
+} from 'typeorm'
 import { EVENT_TABLE_NAME } from '../entities/SubstrateEventEntity'
-import { doInTransaction } from '@dzlzv/hydra-db-utils'
 import Debug from 'debug'
-import config from './ormconfig'
+import config from './dbconfig'
+import { getConfig as conf } from '../node'
 
 const debug = Debug('index-builder:helper')
 
@@ -18,8 +23,8 @@ export async function createDBConnection(
 }
 
 export async function getIndexerHead(): Promise<number> {
-  return await doInTransaction(async (qr: QueryRunner) => {
-    const raw = (await qr.query(`
+  return await getConnection().transaction(async (em: EntityManager) => {
+    const raw = (await em.query(`
       SELECT block_number 
       FROM ${EVENT_TABLE_NAME} e1 
       WHERE 
@@ -32,7 +37,7 @@ export async function getIndexerHead(): Promise<number> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
     if (raw === undefined || raw.length === 0) {
-      return -1
+      return conf().BLOCK_HEIGHT - 1
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

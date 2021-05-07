@@ -1,7 +1,5 @@
 // @ts-check
-
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
-import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { DatabaseManager, SubstrateEvent } from '@dzlzv/hydra-common'
 
 export type QueryEventProcessorResult = void | Promise<void>
 export type EventHandlerFunc = (
@@ -13,4 +11,4 @@ export interface QueryEventProcessingPack {
   [index: string]: EventHandlerFunc
 }
 
-export type HandlerFunc = (...args: any[]) => void | Promise<void>
+export type HandlerFunc = (...args: unknown[]) => void | Promise<void>

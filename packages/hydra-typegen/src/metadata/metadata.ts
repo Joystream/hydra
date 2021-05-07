@@ -89,6 +89,7 @@ async function fromChain(
         )
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       websocket.onmessage = (message: any): void => {
         const data = JSON.parse(message.data)
         if (data.error) {

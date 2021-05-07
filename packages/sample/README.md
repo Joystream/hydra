@@ -57,6 +57,18 @@ and the GraphQL server (opens a GraphQL playground at localhost by default):
 yarn query-node:start:dev
 ```
 
+## Locally run indexer and indexer-gateway
+
+Run
+
+```bash
+yarn indexer:start:dev
+```
+
+It will build local images for `hydra-indexer` and `hydra-indexer-gateway` and run the docker-compose stack defined in `docker-compose-indexer-dev.yml`
+
+To run the processor against the local indexer, make sure  `INDEXER_ENDPOINT_URL` is set to the local indexer-gateway (`http://localhost:4001/graphql` by default).
+
 ## Custom chains
 
 If there is no public Hydra Indexer readily available, one should set-up a self-hosted [indexer](../hydra-indexer/README.md) and [indexer-api-gateway](../hydra-indexer-gateway/README.md). The simplest way is set it up is to run pre-built docker images for `indexer` and `indexer-api-gateway` as defined in `docker-compose.yml`.

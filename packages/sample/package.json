@@ -5,11 +5,11 @@
     "./generated/*",
     "./mappings"
   ],
-  "version": "2.1.0-beta.8",
+  "version": "3.0.0-beta.1",
   "description": "GraphQL-based query node and Substrate processor. Generated with ♥ by Hydra-CLI",
   "scripts": {
     "build": "yarn clean && yarn codegen",
-    "rebuild": "yarn db:drop && yarn clean:query-node && yarn codegen:query-node && yarn db:prepare && yarn db:migrate",
+    "rebuild": "yarn db:drop ; yarn clean:query-node && yarn codegen && yarn db:prepare && yarn db:migrate",
     "lint": "echo \"Skippinng\"",
     "clean": "rm -rf ./generated",
     "clean:query-node": "rm -rf ./generated/graphql-server",
@@ -33,7 +33,8 @@
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
     "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 builder yarn db:bootstrap",
-    "docker:up": "docker-compose up -d"
+    "docker:up": "docker-compose up -d",
+    "indexer:start:dev": "bash docker/run-indexer-dev.sh"
   },
   "author": "",
   "license": "ISC",
@@ -43,11 +44,11 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "^2.1.0-beta.8",
-    "@dzlzv/hydra-common": "^2.1.0-beta.8",
-    "@dzlzv/hydra-db-utils": "^2.1.0-beta.8",
-    "@dzlzv/hydra-processor": "^2.1.0-beta.8",
-    "@dzlzv/hydra-typegen": "^2.1.0-beta.8",
+    "@dzlzv/hydra-cli": "^3.0.0-beta.1",
+    "@dzlzv/hydra-common": "^3.0.0-beta.1",
+    "@dzlzv/hydra-db-utils": "^3.0.0-beta.1",
+    "@dzlzv/hydra-processor": "^3.0.0-beta.1",
+    "@dzlzv/hydra-typegen": "^3.0.0-beta.1",
     "envsub": "^4.0.7"
   }
 }

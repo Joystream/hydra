@@ -67,3 +67,13 @@ export function pushToDictionary<V>(
     dict[key].push(...values)
   }
 }
+
+/**
+ * replace all whitespaces and carriage returns
+ *
+ * @param s
+ * @returns the same string with all whitecharacters removed
+ */
+export function compact(s: string): string {
+  return s.replace(/\s/g, '')
+}

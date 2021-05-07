@@ -5,11 +5,13 @@ type Transfer @entity {
   value: BigInt!
   comment: String @fulltext(query: "commentSearch")
   block: Int!
+  tip: BigInt!
+  timestamp: BigInt!
   insertedAt: DateTime!
 }
 
 " Tracks block timestamps "
 type BlockTimestamp @entity {
-  blockNumber: BigInt!
+  blockNumber: Int!
   timestamp: BigInt!
 }

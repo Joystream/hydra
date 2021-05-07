@@ -1,5 +1,10 @@
 // Export here all the event handler functions
 // so that the indexer picks them up
 //export { balancesTransfer as balances_Transfer } from './transfer'
-export { balancesTransfer, timestampCall } from './mappings'
-
+export {
+  balancesTransfer,
+  timestampCallV1,
+  timestampCallV2,
+  preHook,
+  postHook,
+} from './mappings'

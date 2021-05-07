@@ -4,7 +4,7 @@ export namespace Balances {
   export class TransferEvent {
     constructor(public readonly ctx: SubstrateEvent) {}
 
-    get testProp() {
+    get testProp(): string {
       return 'TestProp'
     }
   }

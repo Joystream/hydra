@@ -85,3 +85,12 @@ export const PROCESSOR_SUBSCRIPTION = gql`
     }
   }
 `
+
+export const HOOKS = gql`
+  query {
+    blockHooks {
+      blockNumber
+      type
+    }
+  }
+`

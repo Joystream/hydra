@@ -1,0 +1,2 @@
+# GraphQL Entity Relationships
+

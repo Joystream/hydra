@@ -9,6 +9,7 @@ import { getManifest } from './config'
 import { error, info } from '../util/log'
 import pWaitFor from 'p-wait-for'
 import { Server } from 'http'
+import { getHydraVersion } from '../state/version'
 
 const debug = Debug('hydra-processor:runner')
 
@@ -23,12 +24,7 @@ export class ProcessorRunner {
   private promServer: Server | undefined
 
   constructor() {
-    // TODO: a bit hacky, but okay for now
-    debug(
-      `Hydra processor lib version: ${
-        process.env.npm_package_dependencies__dzlzv_hydra_processor || 'UNKNOWN'
-      }`
-    )
+    info(`Hydra processor lib version: ${getHydraVersion()}`)
     // Hook into application
     // eslint-disable-next-line
     process.on('exit', () =>

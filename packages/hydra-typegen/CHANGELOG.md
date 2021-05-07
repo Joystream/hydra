@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0-beta.1](https://github.com/Joystream/hydra/compare/v2.1.0-beta.8...v3.0.0-beta.1) (2021-05-07)
+
+
+### Features
+
+* **typegen:** tuple return type for event.params ([#358](https://github.com/Joystream/hydra/issues/358)) ([bf16156](https://github.com/Joystream/hydra/commit/bf16156c63893ba5a4c6906341319a27a05b788d))
+
+
+
 ## 2.1.0-beta.8 (2021-04-29)
 
 
