@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.0.0-beta.2 (2021-05-07)
+
+
+### Bug Fixes
+
+* **hydra-cli:** bump hydraVersion -> 3 in manifest files ([#388](https://github.com/Joystream/hydra/issues/388)) ([f837191](https://github.com/Joystream/hydra/commit/f8371914dae087ac5edd9bcc0d0bdeac8c4d9d93))
+
+
+
 ## [3.0.0-beta.1](https://github.com/Joystream/hydra/compare/v2.1.0-beta.8...v3.0.0-beta.1) (2021-05-07)
 
 

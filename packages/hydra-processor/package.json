@@ -1,6 +1,6 @@
 {
   "name": "@dzlzv/hydra-processor",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-beta.2",
   "description": "Hydra Processor CLI",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -33,8 +33,8 @@
     "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
   },
   "dependencies": {
-    "@dzlzv/hydra-common": "^3.0.0-beta.1",
-    "@dzlzv/hydra-db-utils": "^3.0.0-beta.1",
+    "@dzlzv/hydra-common": "^3.0.0-beta.2",
+    "@dzlzv/hydra-db-utils": "^3.0.0-beta.2",
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.3.3",
