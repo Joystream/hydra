@@ -18,16 +18,6 @@
     "lint": "yarn workspaces run lint",
     "postinstall": "is-ci || husky install"
   },
-  "resolutions": {
-    "@polkadot/keyring": "6.0.5",
-    "@polkadot/util": "6.0.5",
-    "@polkadot/util-crypto": "6.0.5",
-    "@polkadot/x-rxjs": "6.0.5",
-    "@polkadot/x-global": "6.0.5",
-    "@polkadot/networks": "6.0.5",
-    "@polkadot/x-ws": "6.0.5",
-    "@polkadot/x-fetch": "6.0.5"
-  },
   "devDependencies": {
     "@commitlint/cli": "^12.0.1",
     "@commitlint/config-conventional": "^12.0.1",

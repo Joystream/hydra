@@ -52,7 +52,8 @@
     "ioredis": "^4.17.3",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.2.26",
-    "warthog": "^2.20.0"
+    "warthog": "^2.20.0",
+    "pg": "^8.3.2"
   },
   "devDependencies": {
     "@types/bn.js": "^4.11.6",

@@ -1,4 +1,4 @@
-FROM node:12-alpine 
+FROM node:14-alpine 
 
 RUN mkdir -p /home/hydra-cli && chown -R node:node /home/hydra-cli
 RUN mkdir -p /home/hydra && chown -R node:node /home/hydra

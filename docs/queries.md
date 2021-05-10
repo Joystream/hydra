@@ -177,11 +177,7 @@ query Query2 {
 }
 ```
 
-<<<<<<< HEAD
 **Text search or pattern matching operators \(`_contains`, `_startsWith`, `_endsWith`\)**
-=======
-**Text search or pattern matching operators (`_contains`, `_startsWith`, `_endsWith`)**
->>>>>>> docs: Docs for queries, pagination, sorting (#4)
 
 The `_contains`, `_startsWith`, `_endsWith` operators are used for pattern matching on string fields.
 
