@@ -81,7 +81,7 @@ OPTIONS
   -t, --typedefs=typedefs    A relative path to a file with JSON definitions for custom types used by the chain
 ```
 
-_See code: [src/commands/typegen/index.ts](https://github.com/Joystream/hydra/blob/v3.0.0-beta.3/src/commands/typegen/index.ts)_
+_See code: [src/commands/typegen/index.ts](https://github.com/Joystream/hydra/blob/v3.0.0-beta.4/src/commands/typegen/index.ts)_
 <!-- commandsstop -->
 
 A full sample Hydra project can be found [here](https://github.com/Joystream/hydra/tree/master/packages/sample)

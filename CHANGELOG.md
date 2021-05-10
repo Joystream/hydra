@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.0.0-beta.4 (2021-05-10)
+
+
+### Features
+
+* **hydra-cli:** upgrade Node version to 14: hydra-cli, hydra-indexer, hydra-indexer-gateway ([#390](https://github.com/Joystream/hydra/issues/390)) ([bc57996](https://github.com/Joystream/hydra/commit/bc57996d228109e8f84816dccd0baf99f35b0f05)), closes [#4](https://github.com/Joystream/hydra/issues/4)
+
+
+
 ## 3.0.0-beta.3 (2021-05-07)
 
 
