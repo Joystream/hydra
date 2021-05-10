@@ -75,6 +75,7 @@
   },
   "queryNodeDependencies": {
     "lodash": "^4.17.20",
+    "pg": "^8.3.2",
     "pg-listen": "^1.7.0",
     "warthog": "https://github.com/metmirr/warthog/releases/download/v2.30.0/warthog-v2.30.0.tgz",
     "typeorm": "^0.2.31"

@@ -2,13 +2,13 @@
 description: GraphQL queries are used to fetch data from the server.
 ---
 
-# Query Node Queries
+# Queries
 
 ## Introduction
 
 Hydra cli tooling auto-generates queries as part of the GraphQL schema from your input schema. It generates a range of possible queries and operators that also work with relationships defined in your input schema.
 
-All entities of the input schema tracked by the cli \(re-generation is required when any change happens to the input schema\) can be queried over the GraphQL endpoint.
+All entities of the input schema tracked by the cli (re-generation is required when any change happens to the input schema) can be queried over the GraphQL endpoint.
 
 ## Exploring queries
 
@@ -16,11 +16,11 @@ You can explore the entire schema and the available queries using the GraphiQL i
 
 Let’s take a look at the different queries you can run using the GraphQL server. We’ll use examples based on a typical channel/video schema for reference.
 
-* Simple entity queries
-* Relation entity queries
-* Filter query results / search queries
-* Sort query results
-* Paginate query results
+- Simple entity queries
+- Relation entity queries
+- Filter query results / search queries
+- Sort query results
+- Paginate query results
 
 ### Simple entity queries
 
@@ -86,15 +86,15 @@ query {
 
 Hydra supports following scalar types:
 
-* String
-* Int
-* Float
-* BigInt
-* Boolean
-* Bytes
-* DateTime
+- String
+- Int
+- Float
+- BigInt
+- Boolean
+- Bytes
+- DateTime
 
-**Equality Operators \(`_eq`\)**
+**Equality Operators (`_eq`)**
 
 `_eq` is supported by all the scalar types
 
@@ -127,9 +127,9 @@ query Query3 {
 }
 ```
 
-**Greater than or less than operators \(`gt`, `lt`, `gte`, `lte`\)**
+**Greater than or less than operators (`gt`, `lt`, `gte`, `lte`)**
 
-The `_gt` \(greater than\), `_lt` \(less than\), `_gte` \(greater than or equal to\), `_lte` \(less than or equal to\) operators are available on `Int, BigInt, Float, DataTime` types.
+The `_gt` (greater than), `_lt` (less than), `_gte` (greater than or equal to), `_lte` (less than or equal to) operators are available on `Int, BigInt, Float, DataTime` types.
 
 The following are examples of using these operators on different types:
 
@@ -152,7 +152,7 @@ query Query2 {
 }
 ```
 
-**List based search operators \(`_in`\)**
+**List based search operators (`_in`)**
 
 `_in` operator is available on all scalar types except `DataTime`.
 
@@ -199,7 +199,7 @@ query Query2 {
 }
 ```
 
-#### Using multiple filters in the same query \(`AND`, `OR`\)
+#### Using multiple filters in the same query (`AND`, `OR`)
 
 You can group multiple parameters in the same where argument using the `AND` or the `OR` operators to filter results based on more than one criteria.
 
@@ -239,4 +239,3 @@ query {
   }
 }
 ```
-
