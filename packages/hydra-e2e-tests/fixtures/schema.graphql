@@ -2,6 +2,8 @@
 type Transfer @entity {
   from: Bytes!
   to: Bytes!
+  fromAccount: Account
+  toAccount: Account
   value: BigInt!
   comment: String @fulltext(query: "commentSearch")
   block: Int!
@@ -25,6 +27,15 @@ type BlockHook @entity {
 enum HookType {
   PRE
   POST
+}
+
+type Account @entity {
+  "Account address"
+  id: ID!
+  hex: String!
+  balance: BigInt!
+  incoming: [Transfer!] @derivedFrom(field: "toAccount")
+  outgoing: [Transfer!] @derivedFrom(field: "fromAccount")
 }
 
 ############## Test purpose only @hydra-e2e-tests #################

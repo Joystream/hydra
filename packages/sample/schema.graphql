@@ -1,13 +1,23 @@
 " All transfers "
 type Transfer @entity {
-  from: Bytes!
-  to: Bytes!
+  from: Account
+  to: Account
   value: BigInt!
   comment: String @fulltext(query: "commentSearch")
   block: Int!
   tip: BigInt!
   timestamp: BigInt!
   insertedAt: DateTime!
+}
+
+
+type Account @entity {
+  "Account address"
+  id: ID!
+  hex: String!
+  balance: BigInt!
+  incoming: [Transfer!] @derivedFrom(field: "to")
+  outgoing: [Transfer!] @derivedFrom(field: "from")
 }
 
 " Tracks block timestamps "
