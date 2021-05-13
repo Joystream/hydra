@@ -11,6 +11,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+## [2.1.0-beta.9](https://github.com/dzhelezov/hydra/compare/v2.1.0-beta.8...v2.1.0-beta.9) (2021-05-13)
+
+**Note:** Version bump only for package @dzlzv/bn-typeorm
+
+
+
+
+
 ## 2.1.0-beta.8 (2021-04-29)
 
 
