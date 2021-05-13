@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0-beta.9](https://github.com/Joystream/hydra/compare/v2.1.0-beta.8...v2.1.0-beta.9) (2021-05-13)
+
+
+### Bug Fixes
+
+* **hydra-indexer:** do not coerce null to empty string for extrinsic args ([#394](https://github.com/Joystream/hydra/issues/394)) ([07977de](https://github.com/Joystream/hydra/commit/07977deed13b2683e0d0a1245ff591866f099331)), closes [#393](https://github.com/Joystream/hydra/issues/393)
+
+
+
 ## 2.1.0-beta.8 (2021-04-29)
 
 
