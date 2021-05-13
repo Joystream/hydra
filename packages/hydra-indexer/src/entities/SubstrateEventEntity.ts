@@ -147,7 +147,7 @@ export class SubstrateEventEntity extends AbstractWarthogModel {
 
       e.method.args.forEach((data, index) => {
         const name = e.meta.args[index].name.toString()
-        const value = (data.toJSON() || '') as AnyJsonField
+        const value = data.toJSON() as AnyJsonField
         const type = data.toRawType()
 
         extr.args.push({
