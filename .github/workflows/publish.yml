@@ -10,6 +10,10 @@ on:
         description: 'Graduate from prerelease'     
         required: false
         default: 'false'
+      releaseTag:
+        description: 'Tag the release (next, latest)'
+        required: false
+        default: 'next'
       
 
 env:
@@ -43,9 +47,13 @@ jobs:
         if: github.event.inputs.graduate == 'true'
         run: |
           yarn lerna version --conventional-commits --conventional-graduate '${{ github.event.inputs.packages }}' --yes
-          yarn lerna publish from-git --dist-tag latest --yes --conventional-commits 
+          yarn lerna publish from-git --dist-tag $RELEASE_TAG --yes --conventional-commits 
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.releaseTag }}
 
       - name: Lerna publish current package
         if: github.event.inputs.graduate == 'false'
         run: |
-          yarn lerna publish from-package --dist-tag next --yes --conventional-commits --conventional-prerelease '${{ github.event.inputs.packages }}' 
+          yarn lerna publish from-package --dist-tag $RELEASE_TAG --yes --conventional-commits --conventional-prerelease '${{ github.event.inputs.packages }}'
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.releaseTag }}
