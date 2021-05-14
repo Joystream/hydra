@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.0.0-beta.5 (2021-05-14)
+
+
+### Bug Fixes
+
+* **hydra-cli:** fix ts compilation error in generated relationship resolver ([#392](https://github.com/Joystream/hydra/issues/392)) ([22a18e3](https://github.com/Joystream/hydra/commit/22a18e30cfccd5985f09772f4cccd2f551d39679))
+
+
+
 ## 3.0.0-beta.4 (2021-05-10)
 
 
