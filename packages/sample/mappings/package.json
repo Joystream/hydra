@@ -1,7 +1,7 @@
 {
   "name": "sample-mappings",
   "private": true,
-  "version": "3.0.0-beta.5",
+  "version": "3.0.0-beta.6",
   "description": "Mappings for hydra-processor",
   "main": "lib/mappings/index.js",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "clean": "rimraf lib"
   },
   "dependencies": {
-    "@dzlzv/hydra-common": "^3.0.0-beta.5",
+    "@dzlzv/hydra-common": "^3.0.0-beta.6",
     "@polkadot/types": "4.2.1"
   },
   "devDependencies": {
