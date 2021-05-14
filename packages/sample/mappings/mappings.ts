@@ -3,6 +3,7 @@ import {
   BlockTimestamp,
   BlockHook,
   HookType,
+  Account,
 } from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
@@ -14,12 +15,29 @@ import {
   EventContext,
   BlockContext,
   StoreContext,
+  DatabaseManager,
 } from '@dzlzv/hydra-common'
 
 const start = Date.now()
 let blockTime = 0
 let totalEvents = 0
 let totalBlocks = 0
+
+async function getOrCreate<T>(
+  e: { new (...args: any[]): T },
+  id: string,
+  store: DatabaseManager
+): Promise<T> {
+  let entity: T | undefined = await store.get<T>(e, {
+    where: { id },
+  })
+
+  if (entity === undefined) {
+    entity = new e() as T
+    ;(<any>entity).id = id
+  }
+  return entity
+}
 
 export async function balancesTransfer({
   store,
@@ -29,10 +47,25 @@ export async function balancesTransfer({
 }: EventContext & StoreContext) {
   const transfer = new Transfer()
   const [from, to, value] = new Balances.TransferEvent(event).params
-  transfer.from = Buffer.from(from.toHex())
-  transfer.to = Buffer.from(to.toHex())
+  const fromAcc = await getOrCreate<Account>(Account, from.toString(), store)
+  fromAcc.hex = from.toHex()
+  const toAcc = await getOrCreate<Account>(Account, to.toString(), store)
+  toAcc.hex = to.toHex()
+
   transfer.value = value.toBn()
   transfer.tip = extrinsic ? new BN(extrinsic.tip.toString(10)) : new BN(0)
+
+  fromAcc.balance = fromAcc.balance.sub(value)
+  fromAcc.balance = fromAcc.balance.sub(transfer.tip)
+
+  await store.save<Account>(fromAcc)
+
+  toAcc.balance = toAcc.balance.add(value)
+  await store.save<Account>(toAcc)
+
+  transfer.from = fromAcc
+  transfer.to = toAcc
+
   transfer.insertedAt = new Date(block.timestamp)
   transfer.block = block.height
   transfer.comment = `Transferred ${transfer.value} from ${transfer.from} to ${transfer.to}`

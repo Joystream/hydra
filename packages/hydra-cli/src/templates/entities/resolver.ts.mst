@@ -128,10 +128,10 @@ export class {{className}}Resolver {
               .getMany();
             let {{relatedTsProp}}Ids: string[] = []
             {{#relationType.isOTM}}
-            {{relatedTsProp}}Ids = Array.from(new Set(result.map(v => v.{{relatedTsProp}}.id)));
+            {{relatedTsProp}}Ids = Array.from(new Set(result.map(v => v!.{{relatedTsProp}}!.id)));
             {{/relationType.isOTM}}
             {{#relationType.isMTM}}
-            Array.from(new Set(result.map(v => v.{{relatedTsProp}}.map(c => {{relatedTsProp}}Ids.push(c.id)))));
+            Array.from(new Set(result.map(v => v!.{{relatedTsProp}}!.map(c => {{relatedTsProp}}Ids.push(c.id)))));
             {{/relationType.isMTM}}
 
             delete where.{{fieldName}}_some
@@ -167,7 +167,7 @@ export class {{className}}Resolver {
 
                 // Group entity
                 const g = _.chain(result)
-                  .groupBy(v => v.{{relatedTsProp}}.id)
+                  .groupBy(v => v!.{{relatedTsProp}}!.id)
                   .value();
 
                 // Get all entities with their relations without filtering them

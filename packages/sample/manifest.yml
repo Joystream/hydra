@@ -34,8 +34,8 @@ mappings:
       handler: balancesTransfer
       filter:
         specVersion: '[0,)'
-  preBlockHooks:
-    - handler: preHook
-  postBlockHooks:
-    - handler: postHook
+  # preBlockHooks:
+  #   - handler: preHook
+  # postBlockHooks:
+  #   - handler: postHook
   
