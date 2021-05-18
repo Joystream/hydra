@@ -1,0 +1,10 @@
+import { ObjectLiteral } from 'typeorm';
+
+export function mergeParameters(params: any[]): ObjectLiteral {
+  return params
+    .filter((p) => p !== undefined && p !== '')
+    .reduce((acc, p, i) => {
+      acc[`param${i}`] = p;
+      return acc;
+    }, {});
+}
