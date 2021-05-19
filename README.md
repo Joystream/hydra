@@ -6,7 +6,7 @@ A Substrate query node framework. Inspired by [TheGraph](http://thegraph.com/), 
 
 ## What's Hydra?
 
-[Hydra](https://joystream.org/hydra) is a query node for Substrate-based blockchains. A query node ingests data from a substrate chain and provides rich, domain-specific, and highly customizable access to the blockchain data, far beyond the scope of direct RPC calls. For example, expired [Kusama Treasury](https://wiki.polkadot.network/docs/en/learn-treasury) spending [proposals](https://kusama.subscan.io/event?module=Treasury&event=Proposed) are pruned from the state of the [Kusama blockchain](https://polkascan.io/kusama), so querying, say, one-year-old proposals is problematic. Indeed, one has to track the evolution of the state by sequentially applying the Treasury events and extrinsics in each historical block.
+[Hydra](https://joystream.org/hydra) is a query node for Substrate-based blockchain. A query node ingests data from a substrate chain and provides rich, domain-specific, and highly customizable access to the blockchain data, far beyond the scope of direct RPC calls. For example, expired [Kusama Treasury](https://wiki.polkadot.network/docs/en/learn-treasury) spending [proposals](https://kusama.subscan.io/event?module=Treasury&event=Proposed) are pruned from the state of the [Kusama blockchain](https://polkascan.io/kusama), so querying, say, one-year-old proposals is problematic. Indeed, one has to track the evolution of the state by sequentially applying the Treasury events and extrinsic in each historical block.
 
 That's where Hydra gets you covered. Define your data model and the Hydra indexer will get it in sync with the chain. On top of that, you get a batteries-included GraphQL server with comprehensive filtering, pagination, and even full-text search capabilities.
 
@@ -38,7 +38,7 @@ The monorepo contains the following sub-packages:
 * [Hydra Indexer](./packages/hydra-indexer/README.md): Hydra indexer for ingesting raw events and extrinsics
 * [Hydra Indexer Gateway](./packages/hydra-indexer-gateway/README.md): GraphQL interface for the Indexer
 * [Hydra Processor](./packages/hydra-processor/README.md): Processing part of the pipeline for transforming events into rich business-level objects
-* [Hydra Typegen](./packages/hydra-typegen/README.md): A tool for generating typesafe typescript classes for events and extrinsics from the runtime metadata. No more manual deserialization of the event data.
+* [Hydra Typegen](./packages/hydra-typegen/README.md): A tool for generating typesafe typescript classes for events and extrinsic from the runtime metadata. No more manual deserialization of the event data.
 * [Sample Project](./packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
 * [Docs](./docs/README.md): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
 
