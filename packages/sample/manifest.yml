@@ -34,8 +34,11 @@ mappings:
       handler: balancesTransfer
       filter:
         specVersion: '[0,)'
-  # preBlockHooks:
-  #   - handler: preHook
-  # postBlockHooks:
-  #   - handler: postHook
+  extrinsicHandlers:
+    - extrinsic: timestamp.set 
+      handler: timestampCall
+  preBlockHooks:
+    - handler: preHook
+  postBlockHooks:
+    - handler: postHook
   
