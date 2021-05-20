@@ -24,8 +24,6 @@ mappings:
       handler: balancesTransfer
   extrinsicHandlers:
     - extrinsic: timestamp.set 
-      # if no argument types were provided, a single 
-      # context argument is passed
       handler: timestampCall
   preBlockHooks:
     - handler: preHook

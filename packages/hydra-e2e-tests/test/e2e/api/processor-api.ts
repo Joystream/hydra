@@ -145,3 +145,16 @@ export async function queryInterface(): Promise<{ events: [] }> {
     events: []
   }>(INTERFACE_TYPES_WITH_RELATIONSHIP)
 }
+
+export async function accountByOutgoingTxValue(
+  query: string,
+  value: BigInt
+): Promise<{ id: string }[]> {
+  const result = await getGQLClient().request<{
+    accounts: {
+      id: string
+    }[]
+  }>(query, { value: value.toString() })
+
+  return result.accounts
+}
