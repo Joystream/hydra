@@ -17,7 +17,7 @@ import { Inject } from 'typedi';
 import { Min } from 'class-validator'
 import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields, NestedFields } from 'warthog';
 
-import { mergeParameters } from '../../utils';
+import { mergeParameterKeys } from '../../utils';
 
 import {
   {{className}}CreateInput,
@@ -123,13 +123,15 @@ export class {{className}}Resolver {
     {{/relationType.isTM}}    
     {{/fieldResolvers}}
 
-    let mainQuery = this.service.buildFindQuery(
+    let mainQuery = this.service.buildFindQueryWithParams(
       <any>where,
       orderBy,
       { limit: limit || 50, offset },
-      fields
+      fields,
+      'main'
     );
-    let parameters = mainQuery.getQueryAndParameters()[1];
+
+    let parameters = mergeParameterKeys({}, 'main', mainQuery.getQueryAndParameters()[1]);
 
     {{#crossFilters}}
     
@@ -138,11 +140,12 @@ export class {{className}}Resolver {
         
         if ({{fieldName}}) {
           // OTO or MTO
-          const {{fieldName}}Query = this.{{fieldName}}Service.buildFindQuery(
+          const {{fieldName}}Query = this.{{fieldName}}Service.buildFindQueryWithParams(
                 <any>{{fieldName}},
                 undefined,
                 undefined,
-                ['id']
+                ['id'],
+                '{{fieldName}}'
             ).take(undefined); // remove the default LIMIT 
 
 
@@ -150,7 +153,10 @@ export class {{className}}Resolver {
             .leftJoin('{{typeormAliasName}}.{{fieldName}}', '{{fieldName}}')
             .andWhere(`{{fieldName}}.id IN (${ {{fieldName}}Query.getQuery() })`);
 
-          parameters = [...parameters, ...{{fieldName}}Query.getQueryAndParameters()[1]];
+          parameters = parameters = mergeParameterKeys(
+                parameters,
+                '{{fieldName}}',
+                {{fieldName}}Query.getQueryAndParameters()[1]);;
           
         }
         {{/relationType.isTO}}
@@ -161,51 +167,77 @@ export class {{className}}Resolver {
 
           if ({{fieldName}}Filter) {
 
-            const {{fieldName}}Query = this.{{fieldName}}Service.buildFindQuery(<any>{{fieldName}}Filter,
+            const {{fieldName}}Query = this.{{fieldName}}Service.buildFindQueryWithParams(<any>{{fieldName}}Filter,
                 undefined,
                 undefined,
-                ['id']
+                ['id'],
+                '{{fieldName}}'
             ).take(undefined); //remove the default LIMIT
 
-            parameters = [...parameters, ...{{fieldName}}Query.getQueryAndParameters()[1]];
+            parameters = mergeParameterKeys(
+                parameters,
+                '{{fieldName}}',
+                {{fieldName}}Query.getQueryAndParameters()[1]);
 
-            const subQuery = this.service
+            const subQueryFiltered = this.service
                 .getQueryBuilder()
-                .select(['{{typeormAliasName}}.id'])
+                .select([])
                 .leftJoin(
-                    '{{typeormAliasName}}.{{fieldName}}',
-                    '{{fieldName}}_filtered',
-                    `{{fieldName}}_filtered.id IN (${ {{fieldName}}Query.getQuery() })`
+                '{{typeormAliasName}}.{{fieldName}}',
+                '{{fieldName}}_filtered',
+                `{{fieldName}}_filtered.id IN (${ {{fieldName}}Query.getQuery() })`
                 )
-                .leftJoin('{{typeormAliasName}}.{{fieldName}}', '{{fieldName}}_total')
+                .groupBy('{{typeormAliasName}}_id')
                 .addSelect('count({{fieldName}}_filtered.id)', 'cnt_filtered')
+                .addSelect('{{typeormAliasName}}.id', '{{typeormAliasName}}_id');
+
+            const subQueryTotal = this.service
+                .getQueryBuilder()
+                .select([])
+                .leftJoin('{{typeormAliasName}}.{{fieldName}}', '{{fieldName}}_total')
+                .groupBy('{{typeormAliasName}}_id')
                 .addSelect('count({{fieldName}}_total.id)', 'cnt_total')
-                .groupBy('{{typeormAliasName}}.id');
+                .addSelect('{{typeormAliasName}}.id', '{{typeormAliasName}}_id');
+
+            const subQuery = `
+                SELECT 
+                    f.{{typeormAliasName}}_id {{typeormAliasName}}_id, f.cnt_filtered cnt_filtered, t.cnt_total cnt_total 
+                FROM 
+                    (${subQueryTotal.getQuery()}) t, (${subQueryFiltered.getQuery()}) f 
+                WHERE 
+                    t.{{typeormAliasName}}_id = f.{{typeormAliasName}}_id`;
+
 
             if ({{fieldName}}_none) {
               mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
                 (SELECT 
-                    {{fieldName}}_subq.{{typeormAliasName}}_id 
-                FROM (${subQuery.getQuery()}) {{fieldName}}_subq 
-                WHERE {{fieldName}}_subq.cnt_filtered = 0
+                    {{fieldName}}_subq.{{typeormAliasName}}_id
+                FROM 
+                    (${subQuery}) {{fieldName}}_subq 
+                WHERE 
+                    {{fieldName}}_subq.cnt_filtered = 0
                 )`)
             }
 
             if ({{fieldName}}_some) {
               mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
                 (SELECT 
-                    {{fieldName}}_subq.{{typeormAliasName}}_id 
-                FROM (${subQuery.getQuery()}) {{fieldName}}_subq 
-                WHERE {{fieldName}}_subq.cnt_filtered > 0
+                    {{fieldName}}_subq.{{typeormAliasName}}_id
+                FROM 
+                    (${subQuery}) {{fieldName}}_subq 
+                WHERE 
+                    {{fieldName}}_subq.cnt_filtered > 0
                 )`)
             }
 
             if ({{fieldName}}_every) {
               mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
                 (SELECT 
-                    {{fieldName}}_subq.{{typeormAliasName}}_id 
-                FROM (${subQuery.getQuery()}) {{fieldName}}_subq 
-                WHERE {{fieldName}}_subq.cnt_filtered > 0 
+                    {{fieldName}}_subq.{{typeormAliasName}}_id
+                FROM 
+                    (${subQuery}) {{fieldName}}_subq 
+                WHERE 
+                    {{fieldName}}_subq.cnt_filtered > 0 
                     AND {{fieldName}}_subq.cnt_filtered = {{fieldName}}_subq.cnt_total
                 )`)
             }
@@ -216,8 +248,7 @@ export class {{className}}Resolver {
     
     {{/crossFilters}}
 
-
-    mainQuery = mainQuery.setParameters(mergeParameters(parameters));
+    mainQuery = mainQuery.setParameters(parameters);
 
     return mainQuery.getMany();
   }

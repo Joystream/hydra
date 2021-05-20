@@ -162,6 +162,7 @@ export default class WarthogWrapper {
       'src/server.ts',
       'src/pubsub.ts',
       'src/utils.ts',
+      'src/WarthogBaseService.ts',
       'src/processor.resolver.ts',
       'tsconfig.json',
     ]

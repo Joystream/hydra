@@ -8,3 +8,14 @@ export function mergeParameters(params: any[]): ObjectLiteral {
       return acc;
     }, {});
 }
+
+export function mergeParameterKeys(
+  params: ObjectLiteral,
+  keyPrefix: string,
+  values: any[]
+): ObjectLiteral {
+  return values.reduce((acc, p, i) => {
+    acc[`${keyPrefix}${i}`] = p;
+    return acc;
+  }, params);
+}
