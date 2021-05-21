@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.0.0-beta.7 (2021-05-21)
+
+
+### Bug Fixes
+
+* **hydra-typegen:** do proper handling of tuples in typegen ([#403](https://github.com/Joystream/hydra/issues/403)) ([bf89dc8](https://github.com/Joystream/hydra/commit/bf89dc8ae10673332539091dd1065688bdea37b4)), closes [#398](https://github.com/Joystream/hydra/issues/398)
+
+
+
 ## 3.0.0-beta.6 (2021-05-14)
 
 
