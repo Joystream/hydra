@@ -126,10 +126,10 @@ export class {{className}}Resolver {
     let mainQuery = this.service.buildFindQueryWithParams(
       <any>where,
       orderBy,
-      { limit: limit || 50, offset },
+      undefined,
       fields,
       'main'
-    );
+    ).take(undefined); // remove LIMIT
 
     let parameters = mergeParameterKeys({}, 'main', mainQuery.getQueryAndParameters()[1]);
 
@@ -250,7 +250,7 @@ export class {{className}}Resolver {
 
     mainQuery = mainQuery.setParameters(parameters);
 
-    return mainQuery.getMany();
+    return mainQuery.take(limit || 50).skip(offset || 0).getMany();
   }
 
   @Query(() => {{className}}, { nullable: true })
