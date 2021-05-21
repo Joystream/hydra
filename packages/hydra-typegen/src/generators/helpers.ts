@@ -47,7 +47,8 @@ export function renderNamedArgs(
 }
 
 export function renderTypedParams(argTypes: string[]): string {
-  const returnType = `[${argTypes.join(',')}]`
+  const returnType = `[${argTypes.map((a) => convertTuples(a)).join(',')}]`
+  console.log(`Return type: ${returnType}`)
   const returnObjects = argTypes.map((argType, index) =>
     renderCreateTypeStmt(argType, eventParamValueGetter(index))
   )
@@ -57,8 +58,26 @@ export function renderTypedParams(argTypes: string[]): string {
 }
 
 function renderCreateTypeStmt(argType: string, ctxValueGetter: string) {
-  return `createTypeUnsafe<${argType} & Codec>(
+  return `createTypeUnsafe<${convertTuples(argType)} & Codec>(
             typeRegistry, '${argType}', ${ctxValueGetter}) `
+}
+
+/**
+ * Converts tuple types (X, Y, Z) to [X, Y, Z] & Codec
+ * @param type
+ * @returns
+ */
+export function convertTuples(type: string): string {
+  let _type = type
+
+  // recursively find typles and replace them
+  // eslint-disable-next-line no-useless-escape
+  while (_type.match(/\(([^\(].*)\)/g)) {
+    // eslint-disable-next-line no-useless-escape
+    _type = _type.replace(/\(([^\(].*)\)/, '[$1] & Codec')
+  }
+
+  return _type
 }
 
 export const helper: Handlebars.HelperDeclareSpec = {
@@ -89,7 +108,7 @@ export const helper: Handlebars.HelperDeclareSpec = {
 
   paramsReturnType() {
     const { args } = (this as unknown) as { args: string[] }
-    return `[${args.join(',')}]`
+    return `[${args.map((a) => convertTuples(a)).join(',')}]`
   },
 
   paramsReturnStmt() {
