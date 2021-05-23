@@ -49,8 +49,10 @@ export class ModelRenderer extends AbstractRenderer {
     this.model
       .getSubclasses(this.objType.name)
       .map((o) => subclasses.push(utils.withNames(o)))
+    const interfaceRelations = utils.interfaceRelations(this.objType)
     return {
       subclasses,
+      interfaceRelations,
     }
   }
 

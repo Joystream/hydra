@@ -1,14 +1,16 @@
-import { Service } from 'typedi';
-import { getConnection } from 'typeorm';
-import { BaseService, WhereInput } from 'warthog';
+import { Service, Inject } from 'typedi';
+import { getConnection, EntityManager } from 'typeorm';
+import { WhereInput } from 'warthog';
 import { isArray, orderBy } from 'lodash';
 
 {{#subclasses}}
 import { {{className}}Service } from '../{{kebabName}}/{{kebabName}}.service'
 {{/subclasses}}
 
-import { Inject } from 'typedi';
-import _ from 'lodash';
+
+import { {{#subclasses}} {{className}}, {{/subclasses}} } from '../../../model';
+
+
 import { {{className}} } from './{{kebabName}}.model';
 
 @Service('{{className}}Service')
@@ -20,30 +22,40 @@ export class {{className}}Service {
   ) {}
 
   async find<W extends WhereInput>(where?: any, ob?: string | string[], limit?: number, offset?: number, fields?: string[]): Promise<{{className}}[]> {
-    let _limit = limit || 50;
+    const _limit = limit || 50;
 		let _offset = offset || 0;
 
 		if (_limit + _offset > 1000) {
 			throw new Error('Limit or offset are too large');
 		}
 
-		const connection = getConnection();
-		const queryRunner = connection.createQueryRunner();
-		// establish real database connection using our new query runner
-		await queryRunner.connect();
-		await queryRunner.startTransaction('REPEATABLE READ');
-
 		{{#subclasses}}
-      let  {{camelNamePlural}} = [];
+      let  {{camelNamePlural}}: {{className}}[] = [];
     {{/subclasses}}
-		try {
-      // fetching all the fields to allow type-dependent field resolutions
-			{{#subclasses}}
-        {{camelNamePlural}} = await this.{{camelName}}Service.find(where, ob, _limit + _offset, 0);
+
+    await getConnection().transaction(async (manager: EntityManager) => {
+      {{#subclasses}}
+        const {{camelNamePlural}}Query = this.{{camelName}}Service.getQueryBuilder(
+          where,
+          ob,
+          _limit + _offset,
+          0,
+          undefined,
+          { manager }
+        );
       {{/subclasses}}
-		} finally {
-			await queryRunner.commitTransaction();
-		}
+
+      {{#interfaceRelations}}
+        // relation field is requested
+        {{#subclasses}}
+          {{camelNamePlural}}Query.leftJoin(`{{typeormAliasName}}.{{fieldName}}`, `{{fieldName}}`);
+        {{/subclasses}}
+      {{/interfaceRelations}}
+      
+      {{#subclasses}}
+        {{camelNamePlural}} = await {{camelNamePlural}}Query.getMany();
+      {{/subclasses}}
+    })
 
 		let collect: any[] = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];
 		if (ob) {

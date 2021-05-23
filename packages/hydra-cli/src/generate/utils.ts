@@ -1,4 +1,4 @@
-import _, { upperFirst, kebabCase, camelCase, snakeCase } from 'lodash'
+import _, { upperFirst, kebabCase, camelCase, snakeCase, toLower } from 'lodash'
 import { GeneratorContext } from './SourcesGenerator'
 import { ObjectType, Field } from '../model'
 import pluralize from 'pluralize'
@@ -27,6 +27,7 @@ export function names(name: string): { [key: string]: string } {
     camelName: camelCase(name),
     kebabName: kebabCase(name),
     relClassName: pascalCase(name),
+    typeormAliasName: toLower(name),
     relCamelName: camelCase(name),
     // Not proper pluralization, but good enough and easy to fix in generated code
     camelNamePlural: camelPlural(name),
@@ -63,6 +64,14 @@ export function ownFields(o: ObjectType): Field[] {
     if (!f.isBuildinType && f.relation) fields.push(f)
   })
   return fields
+}
+
+export function interfaceRelations(o: ObjectType): { fieldName: string }[] {
+  return o.fields
+    .filter((f) => !f.isBuildinType)
+    .map((f) => {
+      return { fieldName: toLower(f.name) }
+    })
 }
 
 export function generateJoinColumnName(name: string): string {
