@@ -62,7 +62,7 @@ describe('model index render', () => {
       'should import entities'
     )
     expect(c(rendered)).to.include(
-      c(`export { MyEntity } `),
+      c(`export { MyEntity }`),
       'should export entities'
     )
     expect(c(rendered)).to.include(
@@ -72,7 +72,7 @@ describe('model index render', () => {
       'should import interfaces'
     )
     expect(c(rendered)).to.include(
-      c(`export { MyInterface } `),
+      c(`export { MyInterface }`),
       'should export interfaces'
     )
   })

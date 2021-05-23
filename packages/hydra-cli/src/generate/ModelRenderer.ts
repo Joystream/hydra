@@ -54,6 +54,16 @@ export class ModelRenderer extends AbstractRenderer {
     }
   }
 
+  withInterfaceRelationOptions(): GeneratorContext {
+    if (this.objType.isInterface !== true) {
+      return {}
+    }
+    return {
+      interfaceRelations: utils.interfaceRelations(this.objType),
+      interfaceEnumName: `${this.objType.name}TypeOptions`,
+    }
+  }
+
   withEnums(): GeneratorContext {
     // we need to have a state to render exports only once
     const referncedEnums = new Set<GraphQLEnumType>()
@@ -70,11 +80,10 @@ export class ModelRenderer extends AbstractRenderer {
   }
 
   withFields(): GeneratorContext {
-    const fields: GeneratorContext[] = []
+    const fields: GeneratorContext[] = this.objType.fields.map((f) =>
+      buildFieldContext(f, this.objType)
+    )
 
-    utils
-      .ownFields(this.objType)
-      .map((f) => fields.push(buildFieldContext(f, this.objType)))
     return {
       fields,
     }
@@ -210,6 +219,7 @@ export class ModelRenderer extends AbstractRenderer {
       ...this.withFieldResolvers(),
       ...utils.withNames(this.objType),
       ...this.withVariantNames(),
+      ...this.withInterfaceRelationOptions(),
     }
   }
 }

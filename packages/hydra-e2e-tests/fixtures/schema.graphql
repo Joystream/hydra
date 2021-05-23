@@ -57,19 +57,49 @@ type MiddleClass @variant {
 
 union Status = MiddleClass | HappyPoor | Miserable
 
-############## Test purpose only @hydra-e2e-tests #################
-# To make sure graphql api is generated as expected
+
 type Extrinsic @entity {
   id: ID!
   hash: String!
 }
+
 interface Event @entity {
   indexInBlock: Int!
-  inExtrinsic: Extrinsic
+  inExtrinsic: String
+  inBlock: Int!
+  network: Network!
 }
-type BoughtMemberEvent implements Event @entity {
+
+type EventA implements Event @entity { 
   id: ID!
+  inExtrinsic: String
+  inBlock: Int!
+  network: Network!
   indexInBlock: Int!
-  inExtrinsic: Extrinsic
+  field1: String!
 }
-###################################################
+
+type EventB implements Event @entity { 
+  id: ID!
+  inExtrinsic: String
+  inBlock: Int!
+  network: Network!
+  indexInBlock: Int!
+  field2: String!
+}
+
+type EventC implements Event @entity {
+  id: ID!
+  inExtrinsic: String
+  inBlock: Int!
+  network: Network!
+  indexInBlock: Int!  
+  field3: String!
+}
+
+enum Network {
+  BABYLON
+  ALEXANDRIA
+  ROME
+  OLYMPIA
+}
