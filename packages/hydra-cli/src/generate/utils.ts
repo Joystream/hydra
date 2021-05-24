@@ -29,7 +29,7 @@ export function names(name: string): { [key: string]: string } {
     camelName: camelCase(name),
     kebabName: kebabCase(name),
     relClassName: pascalCase(name),
-    typeormAliasName: toLower(name),
+    aliasName: toLower(name),
     relCamelName: camelCase(name),
     // Not proper pluralization, but good enough and easy to fix in generated code
     camelNamePlural: camelPlural(name),

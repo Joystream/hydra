@@ -51,7 +51,7 @@ export class {{className}}Service {
       {{#interfaceRelations}}
         // relation field is requested
         {{#subclasses}}
-          {{camelNamePlural}}Query.leftJoin(`{{typeormAliasName}}.{{fieldName}}`, `{{fieldName}}`);
+          {{camelNamePlural}}Query.leftJoin(`{{aliasName}}.{{fieldName}}`, `{{fieldName}}`);
         {{/subclasses}}
       {{/interfaceRelations}}
       
