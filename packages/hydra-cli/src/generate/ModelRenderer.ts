@@ -49,10 +49,18 @@ export class ModelRenderer extends AbstractRenderer {
     this.model
       .getSubclasses(this.objType.name)
       .map((o) => subclasses.push(utils.withNames(o)))
-    const interfaceRelations = utils.interfaceRelations(this.objType)
     return {
       subclasses,
-      interfaceRelations,
+    }
+  }
+
+  withInterfaceRelationOptions(): GeneratorContext {
+    if (this.objType.isInterface !== true) {
+      return {}
+    }
+    return {
+      interfaceRelations: utils.interfaceRelations(this.objType),
+      interfaceEnumName: `${this.objType.name}TypeOptions`,
     }
   }
 
@@ -211,6 +219,7 @@ export class ModelRenderer extends AbstractRenderer {
       ...this.withFieldResolvers(),
       ...utils.withNames(this.objType),
       ...this.withVariantNames(),
+      ...this.withInterfaceRelationOptions(),
     }
   }
 }

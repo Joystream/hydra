@@ -13,6 +13,8 @@ import { {{#subclasses}} {{className}}, {{/subclasses}} } from '../../../model';
 
 import { {{className}} } from './{{kebabName}}.model';
 
+import { {{className}}TypeOptions } from '../enums/enums';
+
 @Service('{{className}}Service')
 export class {{className}}Service {
   constructor(
@@ -55,7 +57,7 @@ export class {{className}}Service {
       
       if (filteredTypes.length) {
         {{#subclasses}}
-          if (filteredTypes.includes('{{className}}')) {
+          if (filteredTypes.includes({{interfaceEnumName}}.{{className}})) {
             {{camelNamePlural}} = await {{camelNamePlural}}Query.getMany();
           }
         {{/subclasses}}
