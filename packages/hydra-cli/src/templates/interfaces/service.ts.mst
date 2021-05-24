@@ -29,6 +29,8 @@ export class {{className}}Service {
 			throw new Error('Limit or offset are too large');
 		}
 
+    const filteredTypes: string[] = where && where.type_in ? where.type_in : [];
+
 		{{#subclasses}}
       let  {{camelNamePlural}}: {{className}}[] = [];
     {{/subclasses}}
@@ -40,8 +42,7 @@ export class {{className}}Service {
           ob,
           _limit + _offset,
           0,
-          undefined,
-          { manager }
+          undefined
         );
       {{/subclasses}}
 
@@ -52,9 +53,17 @@ export class {{className}}Service {
         {{/subclasses}}
       {{/interfaceRelations}}
       
-      {{#subclasses}}
-        {{camelNamePlural}} = await {{camelNamePlural}}Query.getMany();
-      {{/subclasses}}
+      if (filteredTypes.length) {
+        {{#subclasses}}
+          if (filteredTypes.includes('{{className}}')) {
+            {{camelNamePlural}} = await {{camelNamePlural}}Query.getMany();
+          }
+        {{/subclasses}}
+      } else {
+        {{#subclasses}}
+          {{camelNamePlural}} = await {{camelNamePlural}}Query.getMany();
+        {{/subclasses}}
+      }
     })
 
 		let collect: any[] = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];

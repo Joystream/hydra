@@ -144,7 +144,8 @@ export {{#isInterface}}abstract{{/isInterface}} class {{className}}
   {{#is.enum}}
     @EnumField('{{tsType}}', {{tsType}}, { 
       {{^required}}nullable: true,{{/required}} 
-      {{#description}}description: `{{{description}}}`{{/description}} })
+      {{#description}}description: `{{{description}}}`{{/description}}
+      {{#apiOnly}}, apiOnly: true {{/apiOnly}} })
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}} 
   {{/is.enum}}
 

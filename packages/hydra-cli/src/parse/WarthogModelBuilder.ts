@@ -18,6 +18,11 @@ import { FTSDirective, FULL_TEXT_SEARCHABLE_DIRECTIVE } from './FTSDirective'
 import { availableTypes } from '../model/ScalarTypes'
 import * as DerivedFrom from './DerivedFromDirective'
 import { RelationshipGenerator } from '../generate/RelationshipGenerator'
+import {
+  generateEnumField,
+  generateEnumOptions,
+  generateGraphqlEnumType,
+} from '../generate/utils'
 
 const debug = Debug('qnode-cli:model-generator')
 
@@ -122,6 +127,7 @@ export class WarthogModelBuilder {
       isInterface: o.kind === 'InterfaceTypeDefinition',
       interfaces:
         o.kind === 'ObjectTypeDefinition' ? this.getInterfaces(o) : [],
+      implementers: [],
     } as ObjectType
   }
 
@@ -179,6 +185,10 @@ export class WarthogModelBuilder {
         return field
       })
     debug(`Read and parsed fields: ${JSON.stringify(fields, null, 2)}`)
+
+    if (o.kind === 'InterfaceTypeDefinition') {
+      fields.push(generateEnumField(`${o.name.value}TypeOptions`))
+    }
 
     // ---Temporary Solution---
     // Warthog's BaseModel already has `id` member so we remove id field from object
@@ -248,6 +258,23 @@ export class WarthogModelBuilder {
     }
   }
 
+  /**
+   * It generate enums for interfaces defined in the schema to support type base filtering for
+   * interface types.
+   */
+  generateEnumsForInterface(): void {
+    this._model.interfaces.map(({ name }) => {
+      this._model.addEnum(
+        generateGraphqlEnumType(
+          `${name}TypeOptions`,
+          generateEnumOptions(
+            this._model.getSubclasses(name).map(({ name }) => name)
+          )
+        )
+      )
+    })
+  }
+
   buildWarthogModel(): WarthogModel {
     this._model = new WarthogModel()
 
@@ -261,6 +288,8 @@ export class WarthogModelBuilder {
 
     DerivedFrom.validateDerivedFields(this._model)
     new RelationshipGenerator(this._model).generate()
+
+    this.generateEnumsForInterface()
 
     return this._model
   }

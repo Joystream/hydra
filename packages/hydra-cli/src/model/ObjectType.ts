@@ -12,4 +12,5 @@ export interface ObjectType {
   description?: string
   isInterface?: boolean
   interfaces?: ObjectType[] // interface names
+  implementers: string[] // List of interface implementer names
 }
