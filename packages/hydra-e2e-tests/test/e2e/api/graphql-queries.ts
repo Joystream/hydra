@@ -28,6 +28,30 @@ query FindTransferByValue($value: BigInt, $block: Int) {
 }
 `
 
+export const ACCOUNTS_BY_VALUE_GT_SOME = `
+query accountsByValueGtSome($value: BigInt) {
+	accounts(where: { outgoingTx_some: { value_gt:  $value } }) {
+    id
+  }
+}
+`
+
+export const ACCOUNTS_BY_VALUE_GT_EVERY = `
+query accountsByValueGtEvery($value: BigInt) {
+	accounts(where: { outgoingTx_every: { value_gt:  $value } }) {
+    id
+  }
+}
+`
+
+export const ACCOUNTS_BY_VALUE_GT_NONE = `
+query accountsByValueGtNone($value: BigInt) {
+	accounts(where: { outgoingTx_none: { value_gt:  $value } }) {
+    id
+  }
+}
+`
+
 export const FTS_COMMENT_QUERY = `
 query Search($text: String!) {
   commentSearch(text: $text) {

@@ -76,13 +76,22 @@ export async function balancesTransfer({
 export async function timestampCall({
   store,
   event,
-  block,
+  block: { height, hash, timestamp },
 }: ExtrinsicContext & StoreContext) {
   const call = new Timestamp.SetCall(event)
-  const blockT = new BlockTimestamp()
-  blockT.timestamp = call.args.now.toBn()
-  blockT.blockNumber = block.height
-  await store.save<BlockTimestamp>(blockT)
+  const ts = call.args.now.toBn()
+
+  const blockTs = new BlockTimestamp()
+
+  blockTs.blockNumber = height
+  blockTs.id = hash
+  blockTs.timestamp = new BN(ts)
+
+  if (ts.toNumber() !== timestamp) {
+    throw new Error(`Block timestamp does not match timestamp.setcall argument`)
+  }
+
+  await store.save<BlockTimestamp>(blockTs)
 }
 
 export async function preHook({
@@ -90,17 +99,29 @@ export async function preHook({
   store,
 }: BlockContext & StoreContext) {
   const hook = new BlockHook()
+
   hook.blockNumber = height
   hook.type = HookType.PRE
+
   await store.save<BlockHook>(hook)
 }
 
 export async function postHook({
-  block: { height },
+  block: { height, hash },
   store,
 }: BlockContext & StoreContext) {
   const hook = new BlockHook()
   hook.blockNumber = height
+
+  hook.timestamp = <BlockTimestamp>(
+    await store.get(BlockTimestamp, { where: { id: hash } })
+  )
+
+  if (hook.timestamp === undefined) {
+    throw new Error(`BlockTimestamp should be created`)
+  }
+
   hook.type = HookType.POST
+
   await store.save<BlockHook>(hook)
 }

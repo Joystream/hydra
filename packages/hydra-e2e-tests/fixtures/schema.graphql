@@ -22,6 +22,7 @@ type BlockTimestamp @entity {
 type BlockHook @entity {
   blockNumber: Int!
   type: HookType!
+  timestamp: BlockTimestamp
 }
 
 enum HookType {
@@ -34,8 +35,8 @@ type Account @entity {
   id: ID!
   hex: String!
   balance: BigInt!
-  incoming: [Transfer!] @derivedFrom(field: "toAccount")
-  outgoing: [Transfer!] @derivedFrom(field: "fromAccount")
+  incomingTx: [Transfer!] @derivedFrom(field: "toAccount")
+  outgoingTx: [Transfer!] @derivedFrom(field: "fromAccount")
 }
 
 ############## Test purpose only @hydra-e2e-tests #################
@@ -46,11 +47,11 @@ type Extrinsic @entity {
 }
 interface Event @entity {
   indexInBlock: Int!
-  inExtrinsic: Extrinsic!
+  inExtrinsic: Extrinsic
 }
 type BoughtMemberEvent implements Event @entity {
   id: ID!
   indexInBlock: Int!
-  inExtrinsic: Extrinsic!
+  inExtrinsic: Extrinsic
 }
 ###################################################

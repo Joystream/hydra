@@ -1,4 +1,4 @@
-import _, { upperFirst, kebabCase, camelCase, snakeCase } from 'lodash'
+import _, { upperFirst, kebabCase, camelCase, snakeCase, toLower } from 'lodash'
 import { GeneratorContext } from './SourcesGenerator'
 import { ObjectType, Field } from '../model'
 import pluralize from 'pluralize'
@@ -25,6 +25,7 @@ export function names(name: string): { [key: string]: string } {
   return {
     className: pascalCase(name),
     camelName: camelCase(name),
+    typeormAliasName: toLower(name), // FIXME: do we have to support other namings?
     kebabName: kebabCase(name),
     relClassName: pascalCase(name),
     relCamelName: camelCase(name),
