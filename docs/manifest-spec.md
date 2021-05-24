@@ -2,12 +2,11 @@
 
 ## Overview
 
-
 | Field | Type | Description |
 | :--- | :--- | :--- |
 | **version** | _String_ | A Semver version indicating which version of this API is being used. |
 | **description** | _String_ | An optional description of the substrate chain. |
-| **hydraVersion** | String | SemVer range of Hydra Processor used by the mappings.  |
+| **hydraVersion** | String | SemVer range of Hydra Processor used by the mappings. |
 | **indexerVersionRange** | String | Semver version range of supported Hydra Indexers. If not set, same as `hydraVersion` |
 | **repository** | _String_ | An optional link to where the subgraph lives. |
 | **dataSources** | Data Source Spec | Each data source spec defines the data that will be ingested |
@@ -28,9 +27,9 @@
 | **metadata** | _String_ | The type of data source. Possible values: _substrate_. |
 | **metadata.source** | _String_ | Chain name |
 | **metadata.blockHash** | String | block hash to from where the metadata is fetched |
-| **events** | List  | A list of event names for which the typescript classes will be generated |
+| **events** | List | A list of event names for which the typescript classes will be generated |
 | **calls** | List | A list of extrinsics to be generated |
-| **outDir** | String | The root directory of the generated classes  |
+| **outDir** | String | The root directory of the generated classes |
 | **customTypes.typedefsLoc** | String | Location of the type definitions json |
 
 ### Mapping
@@ -47,15 +46,13 @@ The `mapping` field may be one of the following supported mapping manifests:
 | **preBlockHooks** | List of Handler Spec | Specification of hooks run before all the events in the block |
 | **postBlockHooks** | List of Handler Spec | Specification of hooks run after all the events in the block |
 
-#### 
-
 #### Handler
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
 | **handler** | String | Handler name |
-| **event** | _String_ | \(For eventHandlers only\) An identifier for an event that will be handled in the mapping script.  |
-| **extrinsic** | _String_ | \(For extrinsicHandlers only\) An identifier for an extrinsic that will be handled in the mapping script.  |
+| **event** | _String_ | \(For eventHandlers only\) An identifier for an event that will be handled in the mapping script. |
+| **extrinsic** | _String_ | \(For extrinsicHandlers only\) An identifier for an extrinsic that will be handled in the mapping script. |
 | **triggerEvents** | String | \(For extrinsicHandlers only\) A list of event identifier that triggers the extrinsic handlers. Default: `system.ExtrinsicSuccess` |
 | **filter** | _Filter Spec_ | Additional filter specifying the condition for the handler to be triggered |
 | **filter.height** | _String_ | String representation of the block height range |
@@ -72,3 +69,4 @@ From X to Y, exclusive: `(X, Y)`
 From X \(excl\) to Y, incl: `(X, Y]`
 
 From X \(excl\) to infinity: `(X, )`
+

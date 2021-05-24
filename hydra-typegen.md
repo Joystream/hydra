@@ -2,7 +2,7 @@
 
 ## Motivation
 
-Hydra Typegen is a code generation tool for creating Typescript types for substrate events and extrinsics. Its primary use-case is to provide type-safe interfaces for Hydra mappings. For example, once a typescript class for the  `Balances.Transfer` event is generated, a mapping can look like
+Hydra Typegen is a code generation tool for creating Typescript types for substrate events and extrinsics. Its primary use-case is to provide type-safe interfaces for Hydra mappings. For example, once a typescript class for the `Balances.Transfer` event is generated, a mapping can look like
 
 ```typescript
 export async function balancesTransfer(
@@ -23,17 +23,16 @@ export async function balancesTransfer(
 }
 ```
 
-
 ## Commands
-<!-- commands -->
-* [`hydra-typegen help [COMMAND]`](#hydra-typegen-help-command)
-* [`hydra-typegen typegen [CONFIG]`](#hydra-typegen-typegen-config)
+
+* [`hydra-typegen help [COMMAND]`](hydra-typegen.md#hydra-typegen-help-command)
+* [`hydra-typegen typegen [CONFIG]`](hydra-typegen.md#hydra-typegen-typegen-config)
 
 ## `hydra-typegen help [COMMAND]`
 
 display help for hydra-typegen
 
-```
+```text
 USAGE
   $ hydra-typegen help [COMMAND]
 
@@ -44,13 +43,13 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)_
+_See code:_ [_@oclif/plugin-help_](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)
 
 ## `hydra-typegen typegen [CONFIG]`
 
 Generate Typescript classes for the Substrate events
 
-```
+```text
 USAGE
   $ hydra-typegen typegen [CONFIG]
 
@@ -81,8 +80,7 @@ OPTIONS
   -t, --typedefs=typedefs    A relative path to a file with JSON definitions for custom types used by the chain
 ```
 
-_See code: [src/commands/typegen/index.ts](https://github.com/Joystream/hydra/blob/v3.0.1-alpha.2/src/commands/typegen/index.ts)_
-<!-- commandsstop -->
+_See code:_ [_src/commands/typegen/index.ts_](https://github.com/Joystream/hydra/blob/v3.0.0-beta.8/src/commands/typegen/index.ts) 
 
 A full sample Hydra project can be found [here](https://github.com/Joystream/hydra/tree/master/packages/sample)
 
@@ -102,7 +100,7 @@ hydra-typegen typegen typegen.yml --debug
 
 The config file `typegen.yml` can look like this:
 
-```yml
+```text
 # Typegen will pull the metadata from Kusama at block with the given hash
 metadata:
   source: wss://kusama-rpc.polkadot.io
@@ -117,7 +115,7 @@ outDir: ./generated
 
 Hydra-typegen also supports config files like the one below:
 
-```yml
+```text
 metadata:
   source: wss://kusama-rpc.polkadot.io
   blockHash: '0x45eb7ddd324361adadd4f8cfafadbfb7e0a26393a70a70e5bee6204fc46af62e'
@@ -132,20 +130,20 @@ Simply run `hydra-typegen <path-to-config-file>`
 
 ## Custom types
 
-Hydra Typegen supports custom substrate types via the `--typedefs` flag. The provided `.json` file should include type definitions
-for the arguments and parameters of the events and extrinsics to be generated. The type definitions file is copied to the generated sources.
+Hydra Typegen supports custom substrate types via the `--typedefs` flag. The provided `.json` file should include type definitions for the arguments and parameters of the events and extrinsics to be generated. The type definitions file is copied to the generated sources.
 
 In the config file, place the definition into the `customTypes` section. It assumes that all the custom runtime types are already available for import from a library, so that e.g. the generated import statement
 
-```
+```text
 import { MyCustomRuntimeClass } from 'my/types/definitions
 ```
 
 is correctly resolved.
 
-```yml
+```text
 ...
 customTypes: 
     lib: <from where the custom types are imported>,
     typedefs: <path to a json file with custom runtime types definitions>,
 ```
+

@@ -2,7 +2,7 @@
 description: Filter query results with related entity fields
 ---
 
-# Cross-relation filters
+# Cross filtering
 
 Cross-relation filters allows you to filter query results with the related entity fields.
 
@@ -56,15 +56,13 @@ query {
 }
 ```
 
-**Modifiers**
-There are three modifiers can be use for M-1 and M-M relationships.
+**Modifiers** There are three modifiers can be use for M-1 and M-M relationships.
 
-- some: if any of the entities in the relation satify a condition
-- every: if all of the entities in the relation satify a condition
-- none: if none of the entities in the relation satify a condition
+* some: if any of the entities in the relation satify a condition
+* every: if all of the entities in the relation satify a condition
+* none: if none of the entities in the relation satify a condition
 
-**Fetch if any of the entities in the relation satify a condition**
-Example:
+**Fetch if any of the entities in the relation satify a condition** Example:
 
 Fetch all channels which have at least one video with a title that contains `kid`
 
@@ -79,8 +77,7 @@ query {
 }
 ```
 
-**Fetch if all of the entities in the relation satify a condition**
-Example:
+**Fetch if all of the entities in the relation satify a condition** Example:
 
 Fetch all channels which have all of their videos `publishedBefore_eq: true`:
 
@@ -109,3 +106,4 @@ query {
   }
 }
 ```
+

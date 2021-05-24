@@ -2,10 +2,10 @@
 description: Build a Hydra Indexer and GraphQL server from scratch under five minutes
 ---
 
-# Tutorial
+# Quickstart
 
 {% hint style="info" %}
-Before starting, make sure`hydra-cli`is [installed](install-hydra.md) on your machine together with all the prerequisites.
+Before starting, make sure`hydra-cli`is [installed](docs/install-hydra.md) on your machine together with all the prerequisites. Use @dzlzv/hydra-cli@next version to get the latest features.
 {% endhint %}
 
 ## 0. Hello Hydra!
@@ -18,7 +18,7 @@ mkdir hello-hydra && cd hello-hydra
 
 ## 1. From zero to one
 
-Next, run the scaffold command, which generates all the required files:
+Run the scaffold command, which generates all the required files:
 
 ```bash
 hydra-cli scaffold
@@ -26,8 +26,8 @@ hydra-cli scaffold
 
 Answer the prompts and the scaffolder will generate a sample backbone for our Hydra project. This includes:
 
-* Sample GraphQL data [schema](schema-spec/) in `schema.graphql` describing proposals in the Kusama network
-* Sample [mapping](mappings/) scripts in the `./mapping` folder translating substrate events into the `Proposal` entity CRUD operations
+* Sample GraphQL data [schema](docs/schema-spec/) in `schema.graphql` describing proposals in the Kusama network
+* Sample [mapping](docs/mappings/) scripts in the `./mapping` folder translating substrate events into the `Proposal` entity CRUD operations
 * `docker-compose.yml` for running a Postgres instance locally as a Docker service.
 * `.env` with all the necessary environment variables.
 * `package.json` with a few utility yarn scripts to be used later on.
@@ -126,7 +126,7 @@ $ docker-compose up
 ## What to do next?
 
 * Explore more [examples](https://github.com/Joystream/hydra/tree/master/examples)
-* Describe your own [schema](schema-spec/) in `schema.graphql`
-* Write your indexer [mappings](mappings/)
+* Describe your own [schema](docs/schema-spec/) in `schema.graphql`
+* Write your indexer [mappings](docs/mappings/)
 * Push your Hydra indexer and GraphQL Docker images to [Docker Hub](https://hub.docker.com/) and deploy  
 
