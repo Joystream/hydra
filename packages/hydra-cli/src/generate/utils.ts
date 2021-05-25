@@ -72,7 +72,7 @@ export function interfaceRelations(o: ObjectType): { fieldName: string }[] {
   return o.fields
     .filter((f) => f.isEntity())
     .map((f) => {
-      return { fieldName: toLower(f.name) }
+      return { fieldName: camelCase(f.name) }
     })
 }
 
