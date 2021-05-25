@@ -61,7 +61,16 @@ export class {{className}}Service {
 			throw new Error('Limit or offset are too large');
 		}
 
-    const filteredTypes: string[] = where && where.type_in ? where.type_in : [];
+    const filteredTypes: string[] = [];
+    if (where) {
+      const { type_in, type_eq } = where;
+      if (type_in) {
+        filteredTypes.push(type_in);
+      }
+      if (type_eq) {
+        filteredTypes.push(type_eq);
+      }
+    }
 
     let requestedRelations: { [key: string]: boolean } = {};
 
