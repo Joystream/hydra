@@ -2,6 +2,7 @@ import { Service, Inject } from 'typedi';
 import { getConnection, EntityManager } from 'typeorm';
 import { WhereInput } from 'warthog';
 import { isArray, orderBy } from 'lodash';
+import { GraphQLResolveInfo } from 'graphql';
 
 {{#subclasses}}
 import { {{className}}Service } from '../{{kebabName}}/{{kebabName}}.service'
@@ -23,7 +24,36 @@ export class {{className}}Service {
     {{/subclasses}}
   ) {}
 
-  async find<W extends WhereInput>(where?: any, ob?: string | string[], limit?: number, offset?: number, fields?: string[]): Promise<{{className}}[]> {
+  // TODO: Move to utils
+  requestedRelations(_info: GraphQLResolveInfo) {
+    const relations: { [key: string]: boolean } = {};
+    [{{#interfaceRelations}}'{{fieldName}}',{{/interfaceRelations}}].map(relation => (relations[relation] = false));
+
+    _info.fieldNodes.map(f => {
+      f.selectionSet?.selections.map(s => {
+        if (s.kind === 'InlineFragment') {
+          s.selectionSet.selections.filter(slc => {
+            if (slc.kind === 'Field') {
+              const isN = relations[slc.name.value];
+              if (isN !== undefined) {
+                relations[slc.name.value] = true;
+              }
+            }
+          });
+        }
+      });
+    });
+    return relations;
+  }
+
+  async find<W extends WhereInput>(
+    where?: any,
+    ob?: string | string[],
+    limit?: number,
+    offset?: number,
+    fields?: string[],
+    info?: GraphQLResolveInfo | string
+  ): Promise<{{className}}[]> {
     const _limit = limit || 50;
 		let _offset = offset || 0;
 
@@ -32,6 +62,13 @@ export class {{className}}Service {
 		}
 
     const filteredTypes: string[] = where && where.type_in ? where.type_in : [];
+
+    let requestedRelations: { [key: string]: boolean } = {};
+
+    if (info && typeof info !== 'string') {
+      const _info = info as GraphQLResolveInfo;
+      requestedRelations = this.requestedRelations(_info);
+    }
 
 		{{#subclasses}}
       let  {{camelNamePlural}}: {{className}}[] = [];
@@ -50,9 +87,11 @@ export class {{className}}Service {
 
       {{#interfaceRelations}}
         // relation field is requested
-        {{#subclasses}}
-          {{camelNamePlural}}Query.leftJoin(`{{aliasName}}.{{fieldName}}`, `{{fieldName}}`);
-        {{/subclasses}}
+        if (requestedRelations['{{fieldName}}']) {
+          {{#subclasses}}
+            {{camelNamePlural}}Query.leftJoin(`{{aliasName}}.{{fieldName}}`, `{{fieldName}}`);
+          {{/subclasses}}
+        }
       {{/interfaceRelations}}
       
       if (filteredTypes.length) {
