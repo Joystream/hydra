@@ -19,7 +19,10 @@ services:
     environment:
       - INDEXER_WORKERS=5
       - DB_NAME=indexer-db
-    # Also provide DB_USER, DB_PASS, DB_PORT
+      - DB_HOST=db
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_PORT=${DB_PORT}
       - REDIS_URI=redis://redis:6379/0
       - DEBUG=index*
     # - BLOCK_HEIGHT=0 <- Block height the indexer starts from. 0 by default
