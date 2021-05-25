@@ -1,6 +1,6 @@
 {
   "name": "@dzlzv/bn-typeorm",
-  "version": "3.0.0",
+  "version": "3.0.1-alpha.0",
   "description": "TypeORM transformer for BigNumber",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
