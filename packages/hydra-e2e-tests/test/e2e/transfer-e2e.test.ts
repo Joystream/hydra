@@ -7,6 +7,7 @@ import {
   findTransfersByValue,
   queryInterface,
   getProcessorStatus,
+  queryInterfacesByEnum,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
 import pWaitFor from 'p-wait-for'
@@ -90,5 +91,10 @@ describe('end-to-end transfer tests', () => {
     const { events } = await queryInterface()
     // We don't expect any data only testing Graphql API types
     expect(events.length).to.be.equal(0, 'should not find any event.')
+  })
+
+  it('perform filtering on interfaces by implementers enum types', async () => {
+    const { events } = await queryInterfacesByEnum()
+    expect(events.length).to.be.equal(0, 'shoud be empty event list')
   })
 })

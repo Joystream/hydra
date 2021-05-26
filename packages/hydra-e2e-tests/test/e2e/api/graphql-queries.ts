@@ -94,3 +94,11 @@ export const HOOKS = gql`
     }
   }
 `
+
+export const INTERFACES_FILTERING_BY_ENUM = gql`
+  query InterfaceQuery {
+    events(where: { type_in: [BoughtMemberEvent] }) {
+      indexInBlock
+    }
+  }
+`
