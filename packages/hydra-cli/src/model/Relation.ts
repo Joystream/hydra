@@ -69,7 +69,8 @@ interface RelationTypeGuard {
   isOTM: boolean
   isMTO: boolean
   isMTM: boolean
-  isModifier: boolean
+  isTM: boolean
+  isTO: boolean
 }
 
 export function getRelationType(r: Relation): RelationTypeGuard {
@@ -78,6 +79,7 @@ export function getRelationType(r: Relation): RelationTypeGuard {
     isOTM: r.type === RelationType.OTM,
     isMTO: r.type === RelationType.MTO,
     isMTM: r.type === RelationType.MTM,
-    isModifier: r.type === RelationType.OTM || r.type === RelationType.MTM,
+    isTM: r.type === RelationType.OTM || r.type === RelationType.MTM,
+    isTO: r.type === RelationType.OTO || r.type === RelationType.MTO,
   }
 }

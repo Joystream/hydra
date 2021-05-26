@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### 3.0.1-alpha.0 (2021-05-25)
+
+
+### Bug Fixes
+
+* **hydra-cli:** add DB env variables to indexer docker-compose stack ([#405](https://github.com/Joystream/hydra/issues/405)) ([fb53385](https://github.com/Joystream/hydra/commit/fb53385682287ae0653a152f6d466cb68d4c0c2a))
+
+
+
+## [3.0.0](https://github.com/Joystream/hydra/compare/v3.0.0-beta.8...v3.0.0) (2021-05-24)
+
+**Note:** Version bump only for package @dzlzv/hydra-typegen
+
+
+
+
+
+## 3.0.0-beta.8 (2021-05-24)
+
+**Note:** Version bump only for package @dzlzv/hydra-typegen
+
+
+
+
+
+## 3.0.0-beta.7 (2021-05-21)
+
+
+### Bug Fixes
+
+* **hydra-typegen:** do proper handling of tuples in typegen ([#403](https://github.com/Joystream/hydra/issues/403)) ([bf89dc8](https://github.com/Joystream/hydra/commit/bf89dc8ae10673332539091dd1065688bdea37b4)), closes [#398](https://github.com/Joystream/hydra/issues/398)
+
+
+
 ## 3.0.0-beta.6 (2021-05-14)
 
 

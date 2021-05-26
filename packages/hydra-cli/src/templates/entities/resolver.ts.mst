@@ -15,7 +15,9 @@ import {
 import graphqlFields from 'graphql-fields';
 import { Inject } from 'typedi';
 import { Min } from 'class-validator'
-import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields } from 'warthog';
+import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields, NestedFields } from 'warthog';
+
+import { mergeParameterKeys } from '../../utils';
 
 import {
   {{className}}CreateInput,
@@ -96,118 +98,159 @@ export class {{className}}Resolver {
 
   @Query(() => [{{className}}])
   async {{camelNamePlural}}(
-    @Args() { where, orderBy, limit, offset }: {{className}}WhereArgs,
+    @Args() { where: _where, orderBy, limit, offset }: {{className}}WhereArgs,
     @Fields() fields: string[]
   ): Promise<{{className}}[]> {
-    {{#crossFilters}}
-    if (where) {
-      const id_in = where.id_in;
+    const where = <{{className}}WhereInput>(_where || {})
 
-      {{#fieldResolvers}}
-        {{#relationType.isOTO}}
+    {{#fieldResolvers}}
+    // remove relation filters to enable warthog query builders 
+    {{#relationType.isTO}}
         const { {{fieldName}} } = where 
-        if ({{fieldName}}) {
-          where.id_in = (
-            await this.{{fieldName}}Service
-              .getQueryBuilder({{fieldName}})
-              .leftJoinAndSelect('{{tableName}}.{{relatedTsProp}}', '{{relatedTsProp}}')
-              .getMany()
-          )
-            .filter(f => f.{{relatedTsProp}})
-            .map(f => f.{{relatedTsProp}}!.id);
-          delete where.{{fieldName}};
+        delete where.{{fieldName}};
+    {{/relationType.isTO}}
+    
+    {{#relationType.isTM}}
+        const { {{fieldName}}_some, {{fieldName}}_none, {{fieldName}}_every } = where 
+        
+        if ((+!!{{fieldName}}_some) + (+!!{{fieldName}}_none) + (+!!{{fieldName}}_every) > 1) {
+            throw new Error(`A query can have at most one of none, some, every clauses on a relation field`)
         }
-        {{/relationType.isOTO}}
 
-        {{#relationType.isModifier}}
-          const { {{fieldName}}_some, {{fieldName}}_none, {{fieldName}}_every } = where
-          if ({{fieldName}}_some || {{fieldName}}_none || {{fieldName}}_every) {
-            const result = await this.{{fieldName}}Service
-              .getQueryBuilder({{fieldName}}_some || {{fieldName}}_none || {{fieldName}}_every)
-              .leftJoinAndSelect('{{tableName}}.{{relatedTsProp}}', '{{relatedTsProp}}')
-              .getMany();
-            let {{relatedTsProp}}Ids: string[] = []
-            {{#relationType.isOTM}}
-            {{relatedTsProp}}Ids = Array.from(new Set(result.map(v => v!.{{relatedTsProp}}!.id)));
-            {{/relationType.isOTM}}
-            {{#relationType.isMTM}}
-            Array.from(new Set(result.map(v => v!.{{relatedTsProp}}!.map(c => {{relatedTsProp}}Ids.push(c.id)))));
-            {{/relationType.isMTM}}
+        delete where.{{fieldName}}_some;
+        delete where.{{fieldName}}_none;
+        delete where.{{fieldName}}_every;
+    {{/relationType.isTM}}    
+    {{/fieldResolvers}}
 
-            delete where.{{fieldName}}_some
-            delete where.{{fieldName}}_none
-            delete where.{{fieldName}}_every
+    let mainQuery = this.service.buildFindQueryWithParams(
+      <any>where,
+      orderBy,
+      undefined,
+      fields,
+      'main'
+    ).take(undefined); // remove LIMIT
 
-            {{#relationType.isOTM}}
-            if ({{fieldName}}_some) {
-              where.id_in = {{relatedTsProp}}Ids;
-            }
-            {{/relationType.isOTM}}
+    let parameters = mergeParameterKeys({}, 'main', mainQuery.getQueryAndParameters()[1]);
 
-            {{#relationType.isMTM}}
-            if ({{fieldName}}_some || {{fieldName}}_every) {
-              where.id_in = {{relatedTsProp}}Ids;
-            }
-            {{/relationType.isMTM}}
-            
+    {{#crossFilters}}
+    
+    {{#fieldResolvers}}
+        {{#relationType.isTO}}
+        
+        if ({{fieldName}}) {
+          // OTO or MTO
+          const {{fieldName}}Query = this.{{fieldName}}Service.buildFindQueryWithParams(
+                <any>{{fieldName}},
+                undefined,
+                undefined,
+                ['id'],
+                '{{fieldName}}'
+            ).take(undefined); // remove the default LIMIT 
+
+
+          mainQuery = mainQuery
+            .leftJoin('{{typeormAliasName}}.{{fieldName}}', '{{fieldName}}')
+            .andWhere(`{{fieldName}}.id IN (${ {{fieldName}}Query.getQuery() })`);
+
+          parameters = parameters = mergeParameterKeys(
+                parameters,
+                '{{fieldName}}',
+                {{fieldName}}Query.getQueryAndParameters()[1]);;
+          
+        }
+        {{/relationType.isTO}}
+
+        {{#relationType.isTM}}
+       
+          const {{fieldName}}Filter = {{fieldName}}_some || {{fieldName}}_none || {{fieldName}}_every
+
+          if ({{fieldName}}Filter) {
+
+            const {{fieldName}}Query = this.{{fieldName}}Service.buildFindQueryWithParams(<any>{{fieldName}}Filter,
+                undefined,
+                undefined,
+                ['id'],
+                '{{fieldName}}'
+            ).take(undefined); //remove the default LIMIT
+
+            parameters = mergeParameterKeys(
+                parameters,
+                '{{fieldName}}',
+                {{fieldName}}Query.getQueryAndParameters()[1]);
+
+            const subQueryFiltered = this.service
+                .getQueryBuilder()
+                .select([])
+                .leftJoin(
+                '{{typeormAliasName}}.{{fieldName}}',
+                '{{fieldName}}_filtered',
+                `{{fieldName}}_filtered.id IN (${ {{fieldName}}Query.getQuery() })`
+                )
+                .groupBy('{{typeormAliasName}}_id')
+                .addSelect('count({{fieldName}}_filtered.id)', 'cnt_filtered')
+                .addSelect('{{typeormAliasName}}.id', '{{typeormAliasName}}_id');
+
+            const subQueryTotal = this.service
+                .getQueryBuilder()
+                .select([])
+                .leftJoin('{{typeormAliasName}}.{{fieldName}}', '{{fieldName}}_total')
+                .groupBy('{{typeormAliasName}}_id')
+                .addSelect('count({{fieldName}}_total.id)', 'cnt_total')
+                .addSelect('{{typeormAliasName}}.id', '{{typeormAliasName}}_id');
+
+            const subQuery = `
+                SELECT 
+                    f.{{typeormAliasName}}_id {{typeormAliasName}}_id, f.cnt_filtered cnt_filtered, t.cnt_total cnt_total 
+                FROM 
+                    (${subQueryTotal.getQuery()}) t, (${subQueryFiltered.getQuery()}) f 
+                WHERE 
+                    t.{{typeormAliasName}}_id = f.{{typeormAliasName}}_id`;
+
 
             if ({{fieldName}}_none) {
-              where.id_in = (
-                await getRepository({{returnTypeFunc}}).find({
-                  select: ['id'],
-                  where: { id: Not(In({{relatedTsProp}}Ids)) }
-                })
-              ).map(c => c.id);
+              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
+                (SELECT 
+                    {{fieldName}}_subq.{{typeormAliasName}}_id
+                FROM 
+                    (${subQuery}) {{fieldName}}_subq 
+                WHERE 
+                    {{fieldName}}_subq.cnt_filtered = 0
+                )`)
             }
 
-            {{#relationType.isOTM}}
+            if ({{fieldName}}_some) {
+              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
+                (SELECT 
+                    {{fieldName}}_subq.{{typeormAliasName}}_id
+                FROM 
+                    (${subQuery}) {{fieldName}}_subq 
+                WHERE 
+                    {{fieldName}}_subq.cnt_filtered > 0
+                )`)
+            }
+
             if ({{fieldName}}_every) {
-              getConnection().transaction(async em => {
-                const finalIds = [];
-
-                // Group entity
-                const g = _.chain(result)
-                  .groupBy(v => v!.{{relatedTsProp}}!.id)
-                  .value();
-
-                // Get all entities with their relations without filtering them
-                for (const { id, {{fieldName}} } of await em.getRepository({{rootArgType}}).find({
-                  where: { id: In({{relatedTsProp}}Ids) },
-                  relations: ['{{fieldName}}']
-                })) {
-                  if ({{fieldName}} && {{fieldName}}.length === g[id].length) {
-                    finalIds.push(id);
-                  }
-                }
-                where.id_in = finalIds;
-              });
+              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
+                (SELECT 
+                    {{fieldName}}_subq.{{typeormAliasName}}_id
+                FROM 
+                    (${subQuery}) {{fieldName}}_subq 
+                WHERE 
+                    {{fieldName}}_subq.cnt_filtered > 0 
+                    AND {{fieldName}}_subq.cnt_filtered = {{fieldName}}_subq.cnt_total
+                )`)
             }
-            {{/relationType.isOTM}}
           }
-        {{/relationType.isModifier}}
+        {{/relationType.isTM}}
 
-        {{#relationType.isMTO}}
-        const { {{fieldName}} } = where 
-        if ({{fieldName}}) {
-          const entityIds: string[] = [];
-          (
-            await this.{{fieldName}}Service
-              .getQueryBuilder({{fieldName}})
-              .leftJoinAndSelect('{{tableName}}.{{relatedTsProp}}', '{{relatedTsProp}}')
-              .getMany()
-          ).map((c: any) => entityIds.push(...c.{{relatedTsProp}}!.map((v: any) => v.id)));
-          where.id_in = entityIds;
-          delete where.{{fieldName}};
-        }
-        {{/relationType.isMTO}}
-      {{/fieldResolvers}}
-      
-      if (id_in) {
-        where.id_in = where.id_in ? [...id_in, ...where.id_in] : id_in;
-      }
-    }
+    {{/fieldResolvers}}
+    
     {{/crossFilters}}
-    return this.service.find<{{className}}WhereInput>(where, orderBy, limit, offset, fields);
+
+    mainQuery = mainQuery.setParameters(parameters);
+
+    return mainQuery.take(limit || 50).skip(offset || 0).getMany();
   }
 
   @Query(() => {{className}}, { nullable: true })

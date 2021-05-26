@@ -55,11 +55,13 @@ export async function balancesTransfer({
   transfer.value = value.toBn()
   transfer.tip = extrinsic ? new BN(extrinsic.tip.toString(10)) : new BN(0)
 
+  fromAcc.balance = fromAcc.balance || new BN(0)
   fromAcc.balance = fromAcc.balance.sub(value)
   fromAcc.balance = fromAcc.balance.sub(transfer.tip)
 
   await store.save<Account>(fromAcc)
 
+  toAcc.balance = toAcc.balance || new BN(0)
   toAcc.balance = toAcc.balance.add(value)
   await store.save<Account>(toAcc)
 
@@ -75,48 +77,57 @@ export async function balancesTransfer({
   await store.save<Transfer>(transfer)
 }
 
-export async function timestampCallV1({
-  store,
-  event,
-}: EventContext & StoreContext) {
-  const call = new Timestamp.SetCall(event)
-  const block = new BlockTimestamp()
-  block.timestamp = call.args.now.toBn()
-  block.blockNumber = new BN(call.ctx.blockNumber)
-  totalEvents++
-  await store.save<BlockTimestamp>(block)
-}
-
-export async function timestampCallV2({
+export async function timestampCall({
   store,
   event,
   block,
 }: ExtrinsicContext & StoreContext) {
   const call = new Timestamp.SetCall(event)
-  const blockT = new BlockTimestamp()
-  blockT.timestamp = new BN(block.timestamp)
-  blockT.blockNumber = new BN(block.height)
-  totalEvents++
-  await store.save<BlockTimestamp>(blockT)
+  const ts = call.args.now.toBn()
+  const blockTs = await store.get(BlockTimestamp, {
+    where: { timestamp: ts },
+  })
+
+  if (blockTs === undefined) {
+    throw new Error(`Expected the timestamp ${ts.toString()} to be saved`)
+  }
+
+  if (block.timestamp !== ts.toNumber()) {
+    throw new Error(`Block timestamp should match the time int TimeStamp`)
+  }
 }
 
 export async function preHook({
-  block: { height },
+  block: { height, timestamp, hash },
   store,
 }: BlockContext & StoreContext) {
   const hook = new BlockHook()
+
+  const ts = new BlockTimestamp()
+
+  ts.blockNumber = new BN(height)
+  ts.id = hash
+  ts.timestamp = new BN(timestamp)
+
+  await store.save<BlockTimestamp>(ts)
+  hook.timestamp = ts
   hook.blockNumber = new BN(height)
   hook.type = HookType.PRE
   await store.save<BlockHook>(hook)
 }
 
 export async function postHook({
-  block: { height },
+  block: { height, hash },
   store,
 }: BlockContext & StoreContext) {
   const hook = new BlockHook()
   hook.blockNumber = new BN(height)
+
+  hook.timestamp = <BlockTimestamp>(
+    await store.get(BlockTimestamp, { where: { id: hash } })
+  )
   hook.type = HookType.POST
+
   await store.save<BlockHook>(hook)
   totalBlocks++
   benchmark()

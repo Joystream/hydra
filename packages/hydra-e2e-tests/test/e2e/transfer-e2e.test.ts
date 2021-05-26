@@ -8,21 +8,36 @@ import {
   queryInterface,
   getProcessorStatus,
   queryInterfacesByEnum,
+  accountByOutgoingTxValue,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
 import pWaitFor from 'p-wait-for'
+import {
+  ACCOUNTS_BY_VALUE_GT_EVERY,
+  ACCOUNTS_BY_VALUE_GT_NONE,
+  ACCOUNTS_BY_VALUE_GT_SOME,
+} from './api/graphql-queries'
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
 
+const txAmount1 = 232323
+const txAmount2 = 1000
+
 describe('end-to-end transfer tests', () => {
-  let amount: number
   let blockHeight: number
 
   before(async () => {
-    amount = 213423
-    blockHeight = await transfer(ALICE, BOB, amount)
-    console.log(`Transfer of ${amount} schmeks done at height ${blockHeight}`)
+    blockHeight = await transfer(ALICE, BOB, txAmount1)
+
+    console.log(
+      `Transfer of ${txAmount1} schmeks done at height ${blockHeight}`
+    )
+
+    blockHeight = await transfer(ALICE, BOB, txAmount2)
+    console.log(
+      `Transfer of ${txAmount2} schmeks done at height ${blockHeight}`
+    )
     // wait until the indexer indexes the block and the processor picks it up
     await pWaitFor(
       async () => {
@@ -36,7 +51,7 @@ describe('end-to-end transfer tests', () => {
   })
 
   it('indexes and finds transfers', async () => {
-    const transfers = await findTransfersByValue(amount, blockHeight)
+    const transfers = await findTransfersByValue(txAmount2, blockHeight)
     expect(transfers).length.gte(1, 'The processor should find the transfer')
   })
 
@@ -96,5 +111,48 @@ describe('end-to-end transfer tests', () => {
   it('perform filtering on interfaces by implementers enum types', async () => {
     const { events } = await queryInterfacesByEnum()
     expect(events.length).to.be.equal(0, 'shoud be empty event list')
+  })
+
+  it('founds an account by incoming tx value (some)', async () => {
+    let accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_SOME,
+      BigInt(300000)
+    )
+    expect(accs.length).to.be.equal(0, 'some tx vals > 300000: false')
+
+    accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_SOME,
+      BigInt(200000)
+    )
+    expect(accs.length).to.be.equal(1, 'some tx vals > 200000: true')
+  })
+
+  it('founds an account by incoming tx value (none)', async () => {
+    let accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_NONE,
+      BigInt(300000)
+    )
+    expect(accs.length).to.be.equal(2, 'none tx vals > 300000: true') // BOTH BOB AND ALICE
+
+    accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_NONE,
+      BigInt(200000)
+    )
+    expect(accs.length).to.be.equal(1, 'none tx vals > 200000: false') // ONLY BOB, it has no outgoing txs
+  })
+
+  it('founds an account by incoming tx value (every)', async () => {
+    let accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_EVERY,
+      BigInt(txAmount2) // since the value filter is gt,
+      // the second transfer does not satisfy the condition
+    )
+    expect(accs.length).to.be.equal(0, 'every tx val > 1000: false')
+
+    accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_EVERY,
+      BigInt(20)
+    )
+    expect(accs.length).to.be.equal(1, 'every tx val > 20: true')
   })
 })

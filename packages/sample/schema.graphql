@@ -16,8 +16,8 @@ type Account @entity {
   id: ID!
   hex: String!
   balance: BigInt!
-  incoming: [Transfer!] @derivedFrom(field: "to")
-  outgoing: [Transfer!] @derivedFrom(field: "from")
+  incomingTx: [Transfer!] @derivedFrom(field: "to")
+  outgoingTx: [Transfer!] @derivedFrom(field: "from")
 }
 
 " Tracks block timestamps "
@@ -30,6 +30,7 @@ type BlockTimestamp @entity {
 type BlockHook @entity {
   blockNumber: BigInt!
   type: HookType!
+  timestamp: BlockTimestamp!
 }
 
 enum HookType {
@@ -37,3 +38,18 @@ enum HookType {
   POST
 }
 
+type Extrinsic @entity {
+  id: ID!
+  hash: String!
+}
+
+interface Event @entity {
+  indexInBlock: Int!
+  inExtrinsic: Extrinsic
+}
+
+type TransferEvent implements Event @entity {
+  id: ID!
+  indexInBlock: Int!
+  inExtrinsic: Extrinsic
+}

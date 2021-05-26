@@ -5,7 +5,7 @@
     "./generated/*",
     "./mappings"
   ],
-  "version": "3.0.0-beta.6",
+  "version": "3.0.1-alpha.0",
   "description": "GraphQL-based query node and Substrate processor. Generated with ♥ by Hydra-CLI",
   "scripts": {
     "build": "yarn clean && yarn codegen",
@@ -15,8 +15,8 @@
     "clean:query-node": "rm -rf ./generated/graphql-server",
     "processor:start": "DEBUG=${DEBUG} hydra-processor run -e .env",
     "query-node:start:dev": "yarn workspace query-node start:dev",
-    "query-node:start:prod": "yarn workspace query-node start:prod",
-    "query-node:configure": "yarn workspace query-node config:dev",
+    "query-node:start:prod": "dotenv -- yarn workspace query-node start:prod",
+    "query-node:configure": "dotenv -- yarn workspace query-node config:dev",
     "query-node:compile": "yarn workspace query-node compile",
     "db:up": "yarn docker:db:up",
     "db:drop": "yarn workspace query-node db:drop",
@@ -44,11 +44,11 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "^3.0.0-beta.6",
-    "@dzlzv/hydra-common": "^3.0.0-beta.6",
-    "@dzlzv/hydra-db-utils": "^3.0.0-beta.6",
-    "@dzlzv/hydra-processor": "^3.0.0-beta.6",
-    "@dzlzv/hydra-typegen": "^3.0.0-beta.6",
+    "@dzlzv/hydra-cli": "^3.0.1-alpha.0",
+    "@dzlzv/hydra-common": "^3.0.1-alpha.0",
+    "@dzlzv/hydra-db-utils": "^3.0.1-alpha.0",
+    "@dzlzv/hydra-processor": "^3.0.1-alpha.0",
+    "@dzlzv/hydra-typegen": "^3.0.1-alpha.0",
     "envsub": "^4.0.7"
   }
 }

@@ -27,6 +27,7 @@ export function names(name: string): { [key: string]: string } {
   return {
     className: pascalCase(name),
     camelName: camelCase(name),
+    typeormAliasName: toLower(name), // FIXME: do we have to support other namings?
     kebabName: kebabCase(name),
     relClassName: pascalCase(name),
     aliasName: toLower(name),
