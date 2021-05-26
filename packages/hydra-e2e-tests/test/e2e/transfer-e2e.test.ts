@@ -8,6 +8,7 @@ import {
   queryInterface,
   getProcessorStatus,
   accountByOutgoingTxValue,
+  getGQLClient,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
 import pWaitFor from 'p-wait-for'
@@ -15,6 +16,7 @@ import {
   ACCOUNTS_BY_VALUE_GT_EVERY,
   ACCOUNTS_BY_VALUE_GT_NONE,
   ACCOUNTS_BY_VALUE_GT_SOME,
+  TRANSFER_IN_QUERY,
 } from './api/graphql-queries'
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
@@ -133,6 +135,17 @@ describe('end-to-end transfer tests', () => {
       BigInt(200000)
     )
     expect(accs.length).to.be.equal(1, 'none tx vals > 200000: false') // ONLY BOB, it has no outgoing txs
+  })
+
+  it('correctly handles IN query', async () => {
+    const transfers = (
+      await getGQLClient().request<{
+        transfers: { id: string }[]
+      }>(TRANSFER_IN_QUERY)
+    ).transfers
+
+    // simply check it executes normally
+    expect(transfers.length).to.be.equal(0, 'should execute IN query')
   })
 
   it('founds an account by incoming tx value (every)', async () => {

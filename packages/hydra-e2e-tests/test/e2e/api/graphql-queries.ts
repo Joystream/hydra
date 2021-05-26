@@ -118,3 +118,13 @@ export const HOOKS = gql`
     }
   }
 `
+
+export const TRANSFER_IN_QUERY = gql`
+  query {
+    transfers(
+      where: { id_in: ["xxxx", "yyyy"], fromAccount: { hex_endsWith: "abc" } }
+    ) {
+      id
+    }
+  }
+`

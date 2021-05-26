@@ -29,6 +29,7 @@ export interface Relation {
 export interface FieldResolver {
   returnTypeFunc: string
   fieldName: string
+  fieldNameColumnName: string
   rootArgName: string
   rootArgType: string
   returnType: string

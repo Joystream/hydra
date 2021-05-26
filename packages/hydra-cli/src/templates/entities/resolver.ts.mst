@@ -17,8 +17,6 @@ import { Inject } from 'typedi';
 import { Min } from 'class-validator'
 import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields, NestedFields } from 'warthog';
 
-import { mergeParameterKeys } from '../../utils';
-
 import {
   {{className}}CreateInput,
   {{className}}CreateManyArgs,
@@ -131,7 +129,7 @@ export class {{className}}Resolver {
       'main'
     ).take(undefined); // remove LIMIT
 
-    let parameters = mergeParameterKeys({}, 'main', mainQuery.getQueryAndParameters()[1]);
+    let parameters = mainQuery.getParameters();
 
     {{#crossFilters}}
     
@@ -150,13 +148,9 @@ export class {{className}}Resolver {
 
 
           mainQuery = mainQuery
-            .leftJoin('{{typeormAliasName}}.{{fieldName}}', '{{fieldName}}')
-            .andWhere(`{{fieldName}}.id IN (${ {{fieldName}}Query.getQuery() })`);
+            .andWhere(`"{{typeormAliasName}}"."{{fieldNameColumnName}}_id" IN (${ {{fieldName}}Query.getQuery() })`);
 
-          parameters = parameters = mergeParameterKeys(
-                parameters,
-                '{{fieldName}}',
-                {{fieldName}}Query.getQueryAndParameters()[1]);;
+          parameters = { ...parameters, ...{{fieldName}}Query.getParameters() };
           
         }
         {{/relationType.isTO}}
@@ -174,10 +168,7 @@ export class {{className}}Resolver {
                 '{{fieldName}}'
             ).take(undefined); //remove the default LIMIT
 
-            parameters = mergeParameterKeys(
-                parameters,
-                '{{fieldName}}',
-                {{fieldName}}Query.getQueryAndParameters()[1]);
+            parameters = { ...parameters, ...{{fieldName}}Query.getParameters() }
 
             const subQueryFiltered = this.service
                 .getQueryBuilder()

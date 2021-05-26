@@ -6,7 +6,7 @@ import * as utils from './utils'
 import { GraphQLEnumType } from 'graphql'
 import { AbstractRenderer } from './AbstractRenderer'
 import { withEnum } from './enum-context'
-import { camelCase } from 'lodash'
+import { camelCase, snakeCase } from 'lodash'
 import { getRelationType } from '../model/Relation'
 
 const debug = Debug('qnode-cli:model-renderer')
@@ -141,6 +141,7 @@ export class ModelRenderer extends AbstractRenderer {
         returnTypeFunc,
         rootArgType: entityName,
         fieldName: f.name,
+        fieldNameColumnName: snakeCase(f.name),
         rootArgName: 'r', // disable utils.camelCase(entityName) could be a reverved ts/js keyword ie `class`
         returnType: utils.generateResolverReturnType(returnTypeFunc, f.isList),
         relatedTsProp: f.relation.relatedTsProp,
