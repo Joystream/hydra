@@ -17,6 +17,7 @@ import {
   ACCOUNTS_BY_VALUE_GT_NONE,
   ACCOUNTS_BY_VALUE_GT_SOME,
   TRANSFER_IN_QUERY,
+  VARIANT_FILTER_MISREABLE_ACCOUNTS,
 } from './api/graphql-queries'
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
@@ -161,5 +162,13 @@ describe('end-to-end transfer tests', () => {
       BigInt(20)
     )
     expect(accs.length).to.be.equal(1, 'every tx val > 20: true')
+  })
+
+  it('should find by a variant filter', async () => {
+    const result = await getGQLClient().request<{
+      accounts: unknown[]
+    }>(VARIANT_FILTER_MISREABLE_ACCOUNTS)
+
+    expect(result.accounts.length).gt(0, 'should find a miserable account')
   })
 })

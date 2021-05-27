@@ -56,11 +56,16 @@ export async function balancesTransfer({
   fromAcc.balance = fromAcc.balance || new BN(0)
   fromAcc.balance = fromAcc.balance.sub(value)
   fromAcc.balance = fromAcc.balance.sub(transfer.tip)
+  fromAcc.status = { hates: 'ALICE', isTypeOf: 'Miserable' }
 
   await store.save<Account>(fromAcc)
 
   toAcc.balance = toAcc.balance || new BN(0)
   toAcc.balance = toAcc.balance.add(value)
+  toAcc.status = {
+    father: { hates: 'BOB', isTypeOf: 'Miserable' },
+    isTypeOf: 'MiddleClass',
+  }
   await store.save<Account>(toAcc)
 
   transfer.fromAccount = fromAcc

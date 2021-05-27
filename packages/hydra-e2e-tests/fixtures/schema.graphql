@@ -35,9 +35,27 @@ type Account @entity {
   id: ID!
   hex: String!
   balance: BigInt!
+  status: Status!
   incomingTx: [Transfer!] @derivedFrom(field: "toAccount")
   outgoingTx: [Transfer!] @derivedFrom(field: "fromAccount")
 }
+
+type Miserable @variant {
+  hates: String!
+}
+
+type HappyPoor @variant {
+  isMale: Boolean
+}
+
+union Poor = HappyPoor | Miserable
+
+type MiddleClass @variant {
+  father: Poor
+  mother: Poor
+}
+
+union Status = MiddleClass | HappyPoor | Miserable
 
 ############## Test purpose only @hydra-e2e-tests #################
 # To make sure graphql api is generated as expected
