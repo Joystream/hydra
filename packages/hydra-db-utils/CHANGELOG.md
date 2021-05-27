@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### 3.0.1-alpha.1 (2021-05-27)
+
+
+### Bug Fixes
+
+* **hydra-cli:** fix relationships IN query ([#407](https://github.com/Joystream/hydra/issues/407)) ([a4019a3](https://github.com/Joystream/hydra/commit/a4019a3239b77eefc23a4f1e2a0b1cf351879b8c))
+
+
+
 ### 3.0.1-alpha.0 (2021-05-25)
 
 
