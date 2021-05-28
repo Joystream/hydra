@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### 3.0.1-alpha.2 (2021-05-28)
+
+
+### Bug Fixes
+
+* **hydra-cli:** move relationship handling from resolver to service ([#409](https://github.com/Joystream/hydra/issues/409)) ([6fec247](https://github.com/Joystream/hydra/commit/6fec247488ca03d24ad17ac0a2ba52bbfce95e84)), closes [#408](https://github.com/Joystream/hydra/issues/408)
+
+
+
 ### 3.0.1-alpha.1 (2021-05-27)
 
 
