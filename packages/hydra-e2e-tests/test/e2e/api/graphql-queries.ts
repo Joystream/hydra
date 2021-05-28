@@ -128,3 +128,16 @@ export const TRANSFER_IN_QUERY = gql`
     }
   }
 `
+
+export const VARIANT_FILTER_MISREABLE_ACCOUNTS = gql`
+  query {
+    accounts(where: { status_json: { isTypeOf_eq: "Miserable" } }) {
+      status {
+        __typename
+        ... on Miserable {
+          hates
+        }
+      }
+    }
+  }
+`
