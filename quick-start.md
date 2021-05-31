@@ -5,7 +5,7 @@ description: Build a Hydra Indexer and GraphQL server from scratch under five mi
 # Quickstart
 
 {% hint style="info" %}
-Before starting, make sure`hydra-cli`is [installed](docs/install-hydra.md) on your machine together with all the prerequisites. Use @dzlzv/hydra-cli@next version to get the latest features.
+Before starting, make sure`hydra-cli`is [installed](install-hydra.md) on your machine together with all the prerequisites. Use @dzlzv/hydra-cli@next version to use the latest features.
 {% endhint %}
 
 ## 0. Hello Hydra!
@@ -18,39 +18,56 @@ mkdir hello-hydra && cd hello-hydra
 
 ## 1. From zero to one
 
-Run the scaffold command, which generates all the required files:
+Run the scaffold command, which generates all the required files in a new folder `hydra-sample`
 
 ```bash
-hydra-cli scaffold
+hydra-cli scaffold -d hydra-sample
 ```
 
 Answer the prompts and the scaffolder will generate a sample backbone for our Hydra project. This includes:
 
 * Sample GraphQL data [schema](docs/schema-spec/) in `schema.graphql` describing proposals in the Kusama network
 * Sample [mapping](docs/mappings/) scripts in the `./mapping` folder translating substrate events into the `Proposal` entity CRUD operations
-* `docker-compose.yml` for running a Postgres instance locally as a Docker service.
-* `.env` with all the necessary environment variables.
+* `docker` folder with scripts for running a Hydra Indexer and Hydra Processor locally
+* `.env` with all the necessary environment variables. It is pre-populated with the prompt answers but can be edited at any time.
 * `package.json` with a few utility yarn scripts to be used later on.
 
 ## 2. Codegen
 
-Run
+Make sure a Postgres database is up and running in the background and is accessible with the credentials provided during the scaffolding. Run
 
 ```bash
 yarn && yarn bootstrap
 ```
 
-It will generate the model files as defined in `schema.graphql`, create the database and run all the necessary migrations in one shot.
+It will generate the model files as defined in `schema.graphql`, create the database schema and run all the necessary migrations.
 
-NB! Use with caution in production, as it will delete all the existing records.
+NB! Use with caution in production, as it will delete all the existing records in the processor database.
 
-Under the fold, `yarn booststrap` creates a folder `generated/graphql-server` with an Apollo-based GraphQL server for the query node.
+Under the fold, `yarn booststrap` creates  `generated/graphql-server` with a ready-to-use Apollo GraphQL server powering the query node API. 
 
 ## 3. Typegen for events and extrinsics
 
-List the events and extrinsics to be used by the mappings and generated type-safe classes using the typegen tool. One can define in a separate yml file or modify the `typegen` section in `manifest.yml`
+Now let's inspect `manifest.yml` which defines which events and extrinsics are going to be processed by Hydra Processor. Two most important sections are `typegen` and `mappings`
 
-Typegen fetches the metadata from the chain from the block with a given hash \(or from the top block if no hash is provided\)
+`hydra-typegen` is an auxiliary tool for generating typesafe event and extrinsic classes from the on-chain metadata. It is not strictly necessary to use it, but type safety significantly simplifies the development of the event and extrinsic handlers.
+
+The typegen section of the manifest lists the events and extrinsics for which typescript classes will be generated together with the metadata source and the output directory. 
+
+```yaml
+typegen:
+  typegen:
+  metadata:
+    source: wss://rpc.polkadot.io
+    blockHash: '0xab5c9230a7dde8bb90a6728ba4a0165423294dac14336b1443f865b796ff682c'
+  events:
+    - balances.Transfer
+  calls:
+    - timestamp.set
+  outDir: ./mappings/generated/types
+```
+
+Typegen fetches the metadata from the chain from the block with a given hash \(or from the top block if no hash is provided\). For chains with non-standard types one should additionally provide custom type definitions, as below:
 
 ```yaml
 typegen:
@@ -69,9 +86,17 @@ typegen:
   outDir: ./mappings/generated/types
 ```
 
-## 4. Mappings and the manifest file
+Run 
 
-Modify the default mappings in the mappings folder and make sure all the mapping functions are exported. Define the mappings in the `mappings` section
+```text
+yarn typegen
+```
+
+and inspect `mappings/generated/types` where the newly created classes for the declared events and extrinsics will be generated. 
+
+## 4. Mappings 
+
+Mapping are defined in the `mappings` section of the manifest file and reside in the `mappings` folder. 
 
 ```yaml
 mappings:
@@ -84,14 +109,86 @@ mappings:
       # event to handle
     - event: posts.PostCreated
       # handler function with argument types
-      handler: postCreated(DatabaseManager, Posts.PostCreatedEvent)
+      handler: postCreated
   extrinsicHandlers:
       # extrinsic to handle
     - extrinsic: timestamp.set 
-      handler: timestampCall(DatabaseManager, Timestamp.SetCall)
+      handler: timestampCall
 ```
 
-## 5. Dockerize
+Run
+
+```text
+yarn mappings:build
+```
+
+to build the mappings into a js module. Make sure the mappings are rebuilt after each change.
+
+## 5. Run Hydra Indexer locally
+
+Hydra's two-tier architecture separates data ingesting and indexing \(done by Hydra Indexer\) and processing \(done by Hydra Processor, of course\). Hydra Indexer + API gateway is a set-and-forget service which requires maintainance only when there is a major runtime upgrade.  The scaffolder conveniently creatres a stub for running the indexer stack with docker-compose, as defined in `docker-compose-indexer.yml`
+
+The `WS_PROVIDER_ENDPOINT_URI`environment variable defines the node to connect. Additionally, one can map volumes as json files with runtime type definitions. The following environment variables 
+
+* `TYPES_JSON`  
+* `SPEC_TYPES`
+* `CHAIN_TYPES`
+* `BUNDLE_TYPES`
+
+can be used to inject custom types and type overrides for spec, chain and bundle definitions. For more info, consult [polkadot.js docs](https://polkadot.js.org/docs/api/start/types.extend) 
+
+Let's run a local indexer against a Polkadot chain. Since all Polkadot type definitions are already included in polkadot.js library, there is no need to add type definition and the only change is to set `WS_PROVIDER_ENDPOINT_URI=wss://rpc.polkadot.io` together with the database variables and run
+
+```bash
+docker-compose -f docker-compose-indexer.yml up -d 
+```
+
+Check the status of the indexer by navigating to the indexer playground at `localhost:4001/graphql` and querying
+
+```graphql
+query {
+  indexerStatus {
+    chainHeight # current chain height
+    head # last indexed block
+    inSync # if the processor is fully in sync
+    hydraVersion # processor version
+  }
+}
+```
+
+Make sure the major `hydraVersion` matches the one of `hydra-cli` and declared in `manifest.yml`
+
+## 6. Run Hydra Processor locally
+
+Hydra Processor connects to a Hydra Indexer gateway for sourcing the indexed block, event and extrinsic data for processing. 
+
+Set `INDEXER_ENDPOINT_URL` in `.env` to the local indexer `http://localhost:4001/graphql` and run
+
+```text
+yarn processor:run
+```
+
+## 7. Run Query Node API
+
+Run
+
+```text
+yarn query-node:start:dev
+```
+
+The query node API is now available at `http://localhost:4000/graphql` and you can find some transfers:
+
+```graphql
+query {
+  transfers(orderBy:block_ASC) {
+    from
+    to
+    block
+  }
+}
+```
+
+## 7. Dockerize & deploy
 
 Among other things, the scaffolder generates a `docker` folder with Dockerfiles.
 

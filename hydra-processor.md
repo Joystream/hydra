@@ -56,7 +56,7 @@ OPTIONS
 
 ## Qickstart
 
-Before the first run, the processor should set up auxiliary database tables required for its stable work:
+Before the first run, the processor should set up auxiliary database tables required for its work:
 
 ```text
 hydra-processor migrate
