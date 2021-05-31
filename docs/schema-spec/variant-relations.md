@@ -2,12 +2,12 @@
 description: Define variant types with relations
 ---
 
-# Variant Relations
+# Variant relations
 
 Variant types support entity relationship in a different way unlike the normal entity relationship. There are some limitations with variant relations:
 
-- Only one-to-many and many-to-one relations are supported
-- Reverse lookup is not supported
+* Only one-to-many and many-to-one relations are supported
+* Reverse lookup is not supported
 
 Let's take a look an example:
 
@@ -44,11 +44,11 @@ type Member @entity {
 }
 ```
 
-2. Mappings: insert data into database
+1. Mappings: insert data into database
 
-For variant relations to work an additional field is added to variant type which is db only field (which means it is not visible in the graphql API). This field is will be generated from relation field name + 'id' ie. in the schema above relation name is `event` so the auto generated field name is `eventId`. This field is not optional and mapping author must set it properly.
+For variant relations to work an additional field is added to variant type which is db only field \(which means it is not visible in the graphql API\). This field is will be generated from relation field name + 'id' ie. in the schema above relation name is `event` so the auto generated field name is `eventId`. This field is not optional and mapping author must set it properly.
 
-```ts
+```typescript
 async function handle_Member(db: DB, event: SubstrateEvent) {
   // Create an event from BoughtMemberEvent or MemberInvitation and save to db
   let event = new InvitedMemberEvent({ handle: 'joy' })
@@ -66,7 +66,7 @@ async function handle_Member(db: DB, event: SubstrateEvent) {
 }
 ```
 
-3. Query: fetch all members' `source`:
+1. Query: fetch all members' `source`:
 
 ```graphql
 query {
@@ -84,3 +84,4 @@ query {
   }
 }
 ```
+

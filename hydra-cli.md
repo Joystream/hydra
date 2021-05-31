@@ -27,29 +27,29 @@ $ hydra-cli [COMMAND]
 Run
 
 ```text
-$ hydra-cli scaffold 
+$ hydra-cli scaffold
 ```
+
 and answer the prompts. This will generate a sample project and README with setup instructions.
 
-
 ## Commands
-<!-- commands -->
-* [`hydra-cli codegen`](#hydra-cli-codegen)
-* [`hydra-cli help [COMMAND]`](#hydra-cli-help-command)
-* [`hydra-cli plugins`](#hydra-cli-plugins)
-* [`hydra-cli plugins:inspect PLUGIN...`](#hydra-cli-pluginsinspect-plugin)
-* [`hydra-cli plugins:install PLUGIN...`](#hydra-cli-pluginsinstall-plugin)
-* [`hydra-cli plugins:link PLUGIN`](#hydra-cli-pluginslink-plugin)
-* [`hydra-cli plugins:uninstall PLUGIN...`](#hydra-cli-pluginsuninstall-plugin)
-* [`hydra-cli plugins:update`](#hydra-cli-pluginsupdate)
-* [`hydra-cli preview`](#hydra-cli-preview)
-* [`hydra-cli scaffold`](#hydra-cli-scaffold)
+
+* [`hydra-cli codegen`](hydra-cli.md#hydra-cli-codegen)
+* [`hydra-cli help [COMMAND]`](hydra-cli.md#hydra-cli-help-command)
+* [`hydra-cli plugins`](hydra-cli.md#hydra-cli-plugins)
+* [`hydra-cli plugins:inspect PLUGIN...`](hydra-cli.md#hydra-cli-pluginsinspect-plugin)
+* [`hydra-cli plugins:install PLUGIN...`](hydra-cli.md#hydra-cli-pluginsinstall-plugin)
+* [`hydra-cli plugins:link PLUGIN`](hydra-cli.md#hydra-cli-pluginslink-plugin)
+* [`hydra-cli plugins:uninstall PLUGIN...`](hydra-cli.md#hydra-cli-pluginsuninstall-plugin)
+* [`hydra-cli plugins:update`](hydra-cli.md#hydra-cli-pluginsupdate)
+* [`hydra-cli preview`](hydra-cli.md#hydra-cli-preview)
+* [`hydra-cli scaffold`](hydra-cli.md#hydra-cli-scaffold)
 
 ## `hydra-cli codegen`
 
 Code generator
 
-```
+```text
 Code generator
 
 USAGE
@@ -65,7 +65,7 @@ OPTIONS
 
 display help for hydra-cli
 
-```
+```text
 display help for <%= config.bin %>
 
 USAGE
@@ -78,13 +78,13 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
+_See code:_ [_@oclif/plugin-help_](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)
 
 ## `hydra-cli plugins`
 
 list installed plugins
 
-```
+```text
 list installed plugins
 
 USAGE
@@ -97,13 +97,13 @@ EXAMPLE
   $ hydra-cli plugins
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/index.ts)_
+_See code:_ [_@oclif/plugin-plugins_](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/index.ts)
 
 ## `hydra-cli plugins:inspect PLUGIN...`
 
 displays installation properties of a plugin
 
-```
+```text
 displays installation properties of a plugin
 
 USAGE
@@ -120,13 +120,13 @@ EXAMPLE
   $ hydra-cli plugins:inspect myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/inspect.ts)_
+_See code:_ [_@oclif/plugin-plugins_](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/inspect.ts)
 
 ## `hydra-cli plugins:install PLUGIN...`
 
 installs a plugin into the CLI
 
-```
+```text
 installs a plugin into the CLI
 Can be installed from npm or a git url.
 
@@ -164,13 +164,13 @@ EXAMPLES
   $ hydra-cli plugins:install someuser/someplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/install.ts)_
+_See code:_ [_@oclif/plugin-plugins_](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/install.ts)
 
 ## `hydra-cli plugins:link PLUGIN`
 
 links a plugin into the CLI for development
 
-```
+```text
 links a plugin into the CLI for development
 Installation of a linked plugin will override a user-installed or core plugin.
 
@@ -197,13 +197,13 @@ EXAMPLE
   $ hydra-cli plugins:link myplugin
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/link.ts)_
+_See code:_ [_@oclif/plugin-plugins_](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/link.ts)
 
 ## `hydra-cli plugins:uninstall PLUGIN...`
 
 removes a plugin from the CLI
 
-```
+```text
 removes a plugin from the CLI
 
 USAGE
@@ -221,13 +221,13 @@ ALIASES
   $ hydra-cli plugins:remove
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/uninstall.ts)_
+_See code:_ [_@oclif/plugin-plugins_](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/uninstall.ts)
 
 ## `hydra-cli plugins:update`
 
 update installed plugins
 
-```
+```text
 update installed plugins
 
 USAGE
@@ -238,13 +238,13 @@ OPTIONS
   -v, --verbose
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/update.ts)_
+_See code:_ [_@oclif/plugin-plugins_](https://github.com/oclif/plugin-plugins/blob/v1.10.0/src/commands/plugins/update.ts)
 
 ## `hydra-cli preview`
 
 Preview GraphQL API schema
 
-```
+```text
 Preview GraphQL API schema
 
 USAGE
@@ -258,7 +258,7 @@ OPTIONS
 
 Starter kit: generates a directory layout and a sample schema file
 
-```
+```text
 Starter kit: generates a directory layout and a sample schema file
 
 USAGE
@@ -278,4 +278,4 @@ OPTIONS
   --rewrite                      Clear the folder before scaffolding
   --silent                       If present, the scaffolder is non-interactive and uses only provided CLI flags
 ```
-<!-- commandsstop -->
+

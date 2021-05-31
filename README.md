@@ -34,11 +34,11 @@ and answer the prompts. It will generate a sample project and README with setup 
 
 The monorepo contains the following sub-packages:
 
-* [Hydra CLI](./packages/hydra-cli/README.md): Codegen tools to set up and run a Hydra pipeline
-* [Hydra Indexer](./packages/hydra-indexer/README.md): Hydra indexer for ingesting raw events and extrinsics
-* [Hydra Indexer Gateway](./packages/hydra-indexer-gateway/README.md): GraphQL interface for the Indexer
-* [Hydra Processor](./packages/hydra-processor/README.md): Processing part of the pipeline for transforming events into rich business-level objects
-* [Hydra Typegen](./packages/hydra-typegen/README.md): A tool for generating typesafe typescript classes for events and extrinsics from the runtime metadata. No more manual deserialization of the event data.
-* [Sample Project](./packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
-* [Docs](./docs/README.md): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
+* [Hydra CLI](hydra-cli.md): Codegen tools to set up and run a Hydra pipeline
+* [Hydra Indexer](hydra-indexer.md): Hydra indexer for ingesting raw events and extrinsics
+* [Hydra Indexer Gateway](hydra-indexer-gateway.md): GraphQL interface for the Indexer
+* [Hydra Processor](hydra-processor.md): Processing part of the pipeline for transforming events into rich business-level objects
+* [Hydra Typegen](hydra-typegen.md): A tool for generating typesafe typescript classes for events and extrinsics from the runtime metadata. No more manual deserialization of the event data.
+* [Sample Project](https://github.com/dzhelezov/hydra/tree/e71d8145d55183b406ee4ac5a47b4bd089976e6f/packages/sample/README.md): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
+* [Docs](https://dzhelezov.gitbook.io/hydra/): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
 

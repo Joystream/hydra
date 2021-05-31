@@ -13,8 +13,8 @@ description: 'Introducing Hydra, a GraphQL query node for substrate chains'
 ## What's next?
 
 * Explore live Hydra Indexer  [playground](https://indexer-kusama.joystream.app/graphql) and query Kusama events and extrinsics
-* [Install](install-hydra.md) Hydra toolkit 
-* Hydra [tutorial](quick-start.md): spin a query node in under five minutes
+* [Install](../install-hydra.md) Hydra toolkit 
+* Hydra [tutorial](../quick-start.md): spin a query node in under five minutes
 * Look at the [examples](./) 
 * Learn how to define your own data [schema](schema-spec/) and [mappings](mappings/) to run a Hydra Indexer
 

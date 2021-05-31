@@ -1,20 +1,18 @@
-# Hydra processor
+# Hydra Processor
 
-Hydra processor is a client-side 'sink' tool used to fetch substrate events from a Hydra indexer.
-It sequentially applies the event handlers one by one in the order the events have been emitted.
-
+Hydra processor is a client-side 'sink' tool used to fetch substrate events from a Hydra indexer. It sequentially applies the event handlers one by one in the order the events have been emitted.
 
 ## Commands
-<!-- commands -->
-* [`hydra-processor help [COMMAND]`](#hydra-processor-help-command)
-* [`hydra-processor migrate`](#hydra-processor-migrate)
-* [`hydra-processor run`](#hydra-processor-run)
+
+* [`hydra-processor help [COMMAND]`](hydra-processor.md#hydra-processor-help-command)
+* [`hydra-processor migrate`](hydra-processor.md#hydra-processor-migrate)
+* [`hydra-processor run`](hydra-processor.md#hydra-processor-run)
 
 ## `hydra-processor help [COMMAND]`
 
 display help for hydra-processor
 
-```
+```text
 display help for <%= config.bin %>
 
 USAGE
@@ -27,11 +25,11 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
+_See code:_ [_@oclif/plugin-help_](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)
 
 ## `hydra-processor migrate`
 
-```
+```text
 undefined
 
 USAGE
@@ -43,7 +41,7 @@ OPTIONS
 
 ## `hydra-processor run`
 
-```
+```text
 undefined
 
 USAGE
@@ -55,19 +53,18 @@ OPTIONS
   --id=id                  ID of the processor (useful for multi-processor setups)
   --indexer=indexer        Indexer URL to source events
 ```
-<!-- commandsstop -->
 
 ## Qickstart
 
-Before the first run, the processor should set up auxiliary database tables required for its stable work:
+Before the first run, the processor should set up auxiliary database tables required for its work:
 
-```
-hydra-processor migrate 
+```text
+hydra-processor migrate
 ```
 
-Then `hydra-processor` can be run against the manifest file (by default, it looks up `manifest.yml` in the current folder) 
+Then `hydra-processor` can be run against the manifest file \(by default, it looks up `manifest.yml` in the current folder\)
 
-```
+```text
 hydra-processor run -m <path/to/manifest> -e <path to a file with env variables>
 ```
 
@@ -75,31 +72,29 @@ hydra-processor run -m <path/to/manifest> -e <path to a file with env variables>
 
 Hydra processor requires a manifest file and certain environment variables to be set.
 
-
-| Variable        | Default           | Required  | Description |
-| -------|:------:| --------:| ---------------------------:|
-| INDEXER_ENDPOINT_URL      | - | **Yes** | Hydra indexer endpoint to source the raw event and extrinsic data |
-| MANIFEST_PATH      | manifest.yml | **No** | Path to the manifest file |
-| DB_NAME | - | **Yes** | Database name |
-| DB_PORT | - | **Yes** | Database port |
-| DB_HOST | - | **Yes** | Database host |
-| DB_USER | - | **Yes** | Database user |
-| DB_PASS | - | **Yes** | Database password |
-| PROMETHEUS_PORT | 3000 | **No** | A prometheus metrics endpoint is started at this port |
-| POLL_INTERVAL_MS | 1 sec (60000 msec) | **No** | How often the processor polls the indexer for new blocks |
-
+| Variable | Default | Required | Description |
+| :--- | :---: | ---: | ---: |
+| INDEXER\_ENDPOINT\_URL | - | **Yes** | Hydra indexer endpoint to source the raw event and extrinsic data |
+| MANIFEST\_PATH | manifest.yml | **No** | Path to the manifest file |
+| DB\_NAME | - | **Yes** | Database name |
+| DB\_PORT | - | **Yes** | Database port |
+| DB\_HOST | - | **Yes** | Database host |
+| DB\_USER | - | **Yes** | Database user |
+| DB\_PASS | - | **Yes** | Database password |
+| PROMETHEUS\_PORT | 3000 | **No** | A prometheus metrics endpoint is started at this port |
+| POLL\_INTERVAL\_MS | 1 sec \(60000 msec\) | **No** | How often the processor polls the indexer for new blocks |
 
 The required variables can either be set externally or loaded from a file using the `-e` flag, e.g.:
-```
+
+```text
 hydra-processor migrate -e .env
 ```
 
 ## Manifest file
 
-The manifest file describes which and how the events and extrinsics should be processed.
-Here is an example for Kusama blockchain:
+The manifest file describes which and how the events and extrinsics should be processed. Here is an example for Kusama blockchain:
 
-```yml
+```text
 version: '0.1'
 description: Test manifest
 repository: https://github.com/
@@ -134,3 +129,4 @@ mappings:
   preBlockHooks:
   postBlockHooks:
 ```
+

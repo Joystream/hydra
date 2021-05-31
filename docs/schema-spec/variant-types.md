@@ -8,7 +8,7 @@ type Miserable @variant {
 }
 
 type HappyPoor @variant {
-  isMale: boolean
+  isMale: Boolean
 }
 
 union Poor = HappyPoor | Miserable
@@ -19,10 +19,10 @@ type MiddleClass @variant {
 }
 
 type Rich @variant {
-  bank: EntityC
+  bank: String!
 }
 
-union Status = Poor | MiddleClass | HappyPoor | Miserable
+union Status = Rich | MiddleClass | HappyPoor | Miserable
 
 type Account @entity {
   status: Status!
