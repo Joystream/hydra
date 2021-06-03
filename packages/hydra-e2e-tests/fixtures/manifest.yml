@@ -29,6 +29,9 @@ mappings:
     - handler: preHook
       filter:
         height: '[0,0]'
+    - handler: loader
+      filter:
+        height: '[0,0]'
     - handler: preHook
       filter: 
         height: '[1, 2]'

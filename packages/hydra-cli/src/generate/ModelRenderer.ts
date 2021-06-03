@@ -70,11 +70,10 @@ export class ModelRenderer extends AbstractRenderer {
   }
 
   withFields(): GeneratorContext {
-    const fields: GeneratorContext[] = []
+    const fields: GeneratorContext[] = this.objType.fields.map((f) =>
+      buildFieldContext(f, this.objType)
+    )
 
-    utils
-      .ownFields(this.objType)
-      .map((f) => fields.push(buildFieldContext(f, this.objType)))
     return {
       fields,
     }

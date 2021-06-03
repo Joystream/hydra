@@ -5,7 +5,6 @@ import {
   findTransfersByComment,
   findTransfersByCommentAndWhereCondition,
   findTransfersByValue,
-  queryInterface,
   getProcessorStatus,
   accountByOutgoingTxValue,
   getGQLClient,
@@ -102,12 +101,6 @@ describe('end-to-end transfer tests', () => {
       0,
       'Full text search with filtering should find some comment'
     )
-  })
-
-  it('performs query on interface types, expect implementer to hold relationship', async () => {
-    const { events } = await queryInterface()
-    // We don't expect any data only testing Graphql API types
-    expect(events.length).to.be.equal(0, 'should not find any event.')
   })
 
   it('founds an account by incoming tx value (some)', async () => {

@@ -346,7 +346,7 @@ describe('ModelRenderer', () => {
     )
   })
 
-  it('should extend interface type', function () {
+  it('Should render all fields in the interface implementations', () => {
     const model = fromStringSchema(`
         interface IEntity @entity {
             field1: String
@@ -354,15 +354,30 @@ describe('ModelRenderer', () => {
         type A implements IEntity @entity {
             field1: String
             field2: String
-    }`)
+        }`)
     generator = new ModelRenderer(model, model.lookupEntity('A'))
     const rendered = generator.render(modelTemplate)
-    expect(rendered).to.include('extends IEntity')
-    expect(rendered).to.include(
-      `import { IEntity } from '../i-entity/i-entity.model'`,
-      'should import interface type'
-    )
+    expect(rendered).to.include('field1', 'should render both fields')
+    expect(rendered).to.include('field2', 'should render both fields')
   })
+  // THIS IS NO LONGER THE CASE
+  // it('should extend interface type', function () {
+  //   const model = fromStringSchema(`
+  //       interface IEntity @entity {
+  //           field1: String
+  //       }
+  //       type A implements IEntity @entity {
+  //           field1: String
+  //           field2: String
+  //   }`)
+  //   generator = new ModelRenderer(model, model.lookupEntity('A'))
+  //   const rendered = generator.render(modelTemplate)
+  //   expect(rendered).to.include('extends IEntity')
+  //   expect(rendered).to.include(
+  //     `import { IEntity } from '../i-entity/i-entity.model'`,
+  //     'should import interface type'
+  //   )
+  // })
 
   it('should import two unions from variants', async function () {
     const model = fromStringSchema(`
@@ -401,19 +416,20 @@ describe('ModelRenderer', () => {
     )
   })
 
-  it('should not include interface field', function () {
-    const model = fromStringSchema(`
-        interface IEntity @entity {
-            field1: String
-        }
-        type A implements IEntity @entity {
-            field1: String
-            field2: String
-    }`)
-    generator = new ModelRenderer(model, model.lookupEntity('A'))
-    const rendered = generator.render(modelTemplate)
-    expect(rendered).to.not.include('field1')
-  })
+  // TODO: THIS TEST DOES NOT APPLY, we render all the interface fields
+  // it('should not include interface field', function () {
+  //   const model = fromStringSchema(`
+  //       interface IEntity @entity {
+  //           field1: String
+  //       }
+  //       type A implements IEntity @entity {
+  //           field1: String
+  //           field2: String
+  //   }`)
+  //   generator = new ModelRenderer(model, model.lookupEntity('A'))
+  //   const rendered = generator.render(modelTemplate)
+  //   expect(rendered).to.not.include('field1')
+  // })
 
   it('should render interface', function () {
     const model = fromStringSchema(`

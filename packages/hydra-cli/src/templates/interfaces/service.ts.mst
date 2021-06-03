@@ -1,70 +1,133 @@
+<<<<<<< HEAD
 import { Service } from 'typedi';
 import { getConnection } from 'typeorm';
 import { BaseService, WhereInput } from 'warthog';
 import { isArray, orderBy } from 'lodash';
+=======
+import { Service, Inject } from 'typedi';
+import { getManager, SelectQueryBuilder, ObjectLiteral } from 'typeorm';
+import { BaseModel, WhereInput } from 'warthog';
+import { snakeCase, camelCase, uniq, orderBy } from 'lodash';
+import { GraphQLResolveInfo } from 'graphql';
+>>>>>>> 0ed985c... feat(hydra-cli): implementators no longer directly extend the interface classes and so the fields ar
 
 {{#subclasses}}
 import { {{className}}Service } from '../{{kebabName}}/{{kebabName}}.service'
+import { {{className}} } from '../{{kebabName}}/{{kebabName}}.model';
 {{/subclasses}}
 
-import { Inject } from 'typedi';
-import _ from 'lodash';
 import { {{className}} } from './{{kebabName}}.model';
+
+import { {{className}}TypeOptions } from '../enums/enums';
+
+import {
+  WarthogBaseService,
+  addOrderBy,
+  orderByFields,
+  parseOrderBy,
+} from '../../WarthogBaseService';
 
 @Service('{{className}}Service')
 export class {{className}}Service {
+  public readonly typeToService: { [key: string]: WarthogBaseService<any> } = {};
+
   constructor(
     {{#subclasses}}
      @Inject('{{className}}Service') public readonly {{camelName}}Service: {{className}}Service,
     {{/subclasses}}
-  ) {}
-
-  async find<W extends WhereInput>(where?: any, ob?: string | string[], limit?: number, offset?: number, fields?: string[]): Promise<{{className}}[]> {
-    let _limit = limit || 50;
-		let _offset = offset || 0;
-
-		if (_limit + _offset > 1000) {
-			throw new Error('Limit or offset are too large');
-		}
-
-		const connection = getConnection();
-		const queryRunner = connection.createQueryRunner();
-		// establish real database connection using our new query runner
-		await queryRunner.connect();
-		await queryRunner.startTransaction('REPEATABLE READ');
-
-	{{#subclasses}}
-    let  {{camelNamePlural}}: {{className}}[] = [];
+  ) {
+    {{#subclasses}}  
+    this.typeToService['{{className}}'] = {{camelName}}Service;
     {{/subclasses}}
-		try {
-      // fetching all the fields to allow type-dependent field resolutions
-			{{#subclasses}}
-        {{camelNamePlural}} = await this.{{camelName}}Service.find(where, ob, _limit + _offset, 0);
-      {{/subclasses}}
-		} finally {
-			await queryRunner.commitTransaction();
-		}
+  }
 
-		let collect: any[] = [{{#subclasses}}...{{camelNamePlural}}, {{/subclasses}}];
-		if (ob) {
-      const directions: ('asc' | 'desc')[] = []
-      const attrs: string[] = []
-      if (!isArray(ob)) {
-        ob = [ob]
-      }
-      ob.map(o => {
-			// NB: copied from warthog's BaseService
-        const parts = o.toString().split('_');
-        const direction: 'asc' | 'desc' = parts[1] as 'asc' | 'desc';
-        directions.push(direction)
-        attrs.push(parts[0])
-      })
-			collect = orderBy(collect, attrs, directions);
-		}
+  async find<W extends WhereInput>(
+    where?: any,
+    ob?: string | string[],
+    _limit?: number,
+    _offset?: number,
+    _fields?: string[],
+    info?: GraphQLResolveInfo | string
+  ): Promise<Event[]> {
+    const limit = _limit ?? 50;
+    const offset = _offset ?? 0;
+    const fields = uniq([...(_fields || []), ...orderByFields(ob)]);
 
-		const _end = Math.min(collect.length, _limit + _offset);
-		_offset = Math.min(collect.length, _offset);
+    if (limit > 10000) {
+      throw new Error('Cannot fetch more than 10000 at a time');
+    }
 
-		return collect.slice(_offset, _end);
+    const { type_in, type_eq } = where;
+    const types: string[] = (type_eq
+      ? [type_eq]
+      : type_in || [ {{#subclasses}}  {{className}}, {{/subclasses}} ]
+    ).map((t: EventTypeOptions) => t.toString());
+
+    delete where.type_in;
+    delete where.type_eq;
+    // take fields that are present in all implemetations
+    const commonFields = fields.filter((f) =>
+      types.reduce(
+        (hasField: boolean, t) => this.typeToService[t].columnMap[f] !== undefined && hasField,
+        true
+      )
+    );
+
+    const queries: SelectQueryBuilder<unknown>[] = types.map(
+      (t) =>
+        (this.typeToService[t]
+          .buildFindQueryWithParams(
+            <any>where,
+            undefined,
+            undefined,
+            commonFields,
+            camelCase(t),
+            (field) => snakeCase(field)
+          )
+          .addSelect(`'${t}'`, 'type')
+          .take(undefined) as unknown) as SelectQueryBuilder<unknown>
+    );
+
+    const parameters = queries.reduce((params: ObjectLiteral, q: SelectQueryBuilder<any>) => {
+      return { ...params, ...q.getParameters() };
+    }, {} as ObjectLiteral);
+
+    let rawQuery = queries.map((q) => `(  ${q.getQuery()} )`).join(' UNION ALL ');
+
+    let qb = getManager()
+      .createQueryBuilder()
+      .select('u.id', 'u_id')
+      .addSelect('u.type', 'u_type')
+      .from(`( ${rawQuery} )`, 'u')
+      .setParameters(parameters)
+      .take(limit)
+      .skip(offset);
+
+    qb = (addOrderBy(
+      ob,
+      <any>qb,
+      (attr) => `u.${snakeCase(attr)}`
+    ) as unknown) as SelectQueryBuilder<unknown>;
+
+    const results = await qb.getRawMany<{ u_id: string; u_type: string }>();
+
+    const entityPromises: Promise<Event[]>[] = types.map((t) => {
+      const service = this.typeToService[t];
+      return service.find(
+        { id_in: results.filter((r) => r.u_type === t).map((r) => r.u_id) },
+        undefined,
+        limit,
+        undefined,
+        fields.filter((f) => service.columnMap[f] !== undefined)
+      );
+    });
+
+    const result = (await Promise.all<Event[]>(entityPromises)).reduce(
+      (acc, curr) => [...acc, ...curr],
+      [] as Event[]
+    );
+    const [attrs, dirs] = parseOrderBy(ob);
+
+    return orderBy(result, attrs, dirs);
   }
 }

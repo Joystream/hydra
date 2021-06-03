@@ -109,6 +109,18 @@ describe('WarthogModel', () => {
     )
   })
 
+  it('Should add all fields to interface implementations', () => {
+    const model = fromStringSchema(`
+        interface IEntity @entity {
+            field1: String
+        }
+        type A implements IEntity @entity {
+            field1: String
+            field2: String
+        }`)
+    expect(model.lookupEntity('A').fields).length(2, 'Should add both fields')
+  })
+
   it('Should lookup types', () => {
     const model = fromStringSchema(`
     union Poor = HappyPoor | Miserable

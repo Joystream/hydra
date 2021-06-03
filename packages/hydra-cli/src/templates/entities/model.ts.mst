@@ -52,8 +52,7 @@ import { InterfaceType } from 'type-graphql';
 {{#isInterface}}
 @InterfaceType({{#description}} { description: `{{{description}}}` } {{/description}})
 {{/isInterface}}
-export {{#isInterface}}abstract{{/isInterface}} class {{className}} 
-  extends {{^interfaces}}BaseModel{{/interfaces}} {{#interfaces}} {{className}} {{/interfaces}} {
+export class {{className}} {{^isInterface}}extends BaseModel{{/isInterface}} {
 
 {{#fields}}
   {{#is.otm}}
@@ -160,10 +159,10 @@ export {{#isInterface}}abstract{{/isInterface}} class {{className}}
 
 {{/fields}}
 
-{{^interfaces}}
+{{^isInterface}}
   constructor(init?: Partial<{{className}}>) {
 		super();
 		Object.assign(this, init);
 	}
-{{/interfaces}}
+{{/isInterface}}
 }

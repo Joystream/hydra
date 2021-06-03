@@ -85,19 +85,19 @@ query {
 }
 `
 
-export const INTERFACE_TYPES_WITH_RELATIONSHIP = gql`
-  query InterfaceQuery {
-    events {
-      indexInBlock
-      ... on BoughtMemberEvent {
-        inExtrinsic {
-          id
-          hash
-        }
-      }
-    }
-  }
-`
+// export const INTERFACE_TYPES_WITH_RELATIONSHIP = gql`
+//   query InterfaceQuery {
+//     events {
+//       indexInBlock
+//       ... on BoughtMemberEvent {
+//         inExtrinsic {
+//           id
+//           hash
+//         }
+//       }
+//     }
+//   }
+// `
 
 export const PROCESSOR_SUBSCRIPTION = gql`
   subscription {
@@ -119,6 +119,14 @@ export const HOOKS = gql`
   }
 `
 
+// export const INTERFACES_FILTERING_BY_ENUM = gql`
+//   query InterfaceQuery {
+//     events(where: { type_in: [BoughtMemberEvent] }) {
+//       indexInBlock
+//     }
+//   }
+// `
+
 export const TRANSFER_IN_QUERY = gql`
   query {
     transfers(
@@ -137,6 +145,28 @@ export const VARIANT_FILTER_MISREABLE_ACCOUNTS = gql`
         ... on Miserable {
           hates
         }
+      }
+    }
+  }
+`
+
+export const EVENT_INTERFACE_QUERY = gql`
+  query {
+    events(
+      where: { inBlock_lt: 2, type_in: [EventA, EventB, EventC] }
+      orderBy: [indexInBlock_DESC, network_DESC]
+    ) {
+      indexInBlock
+      inExtrinsic
+      network
+      ... on EventA {
+        field1
+      }
+      ... on EventB {
+        field2
+      }
+      ... on EventC {
+        field3
       }
     }
   }

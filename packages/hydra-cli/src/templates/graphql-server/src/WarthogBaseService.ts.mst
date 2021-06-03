@@ -16,7 +16,8 @@ export class WarthogBaseService<E extends BaseModel> extends BaseService<E> {
     orderBy?: string | string[],
     pageOptions?: LimitOffset,
     fields?: string[],
-    paramKeyPrefix: string = 'param'
+    paramKeyPrefix: string = 'param',
+    aliases: (field: string) => string | undefined = () => undefined
   ): SelectQueryBuilder<E> {
     const DEFAULT_LIMIT = 50;
     let qb = this.manager.createQueryBuilder<E>(this.entityClass, this.klass);
@@ -39,24 +40,13 @@ export class WarthogBaseService<E extends BaseModel> extends BaseService<E> {
       }
       // Querybuilder requires you to prefix all fields with the table alias.  It also requires you to
       // specify the field name using it's TypeORM attribute name, not the camel-cased DB column name
-      const selection = fields.map((field) => `${this.klass}.${field}`);
-      qb = qb.select(selection);
+      qb = qb.select(`${this.klass}.id`, aliases('id'));
+      fields.forEach(
+        (field) => field !== 'id' && qb.addSelect(`${this.klass}.${field}`, aliases(field))
+      );
     }
 
-    if (orderBy) {
-      if (!Array.isArray(orderBy)) {
-        orderBy = [orderBy];
-      }
-
-      orderBy.forEach((orderByItem: string) => {
-        const parts = orderByItem.toString().split('_');
-        // TODO: ensure attr is one of the properties on the model
-        const attr = parts[0];
-        const direction: 'ASC' | 'DESC' = parts[1] as 'ASC' | 'DESC';
-
-        qb = qb.addOrderBy(this.attrToDBColumn(attr), direction);
-      });
-    }
+    qb = addOrderBy(orderBy, qb, (attr) => this.attrToDBColumn(attr));
 
     // Soft-deletes are filtered out by default, setting `deletedAt_all` is the only way to turn this off
     const hasDeletedAts = Object.keys(where).find((key) => key.indexOf('deletedAt_') === 0);
@@ -168,4 +158,54 @@ export class WarthogBaseService<E extends BaseModel> extends BaseService<E> {
 
     return qb;
   }
+}
+
+export function addOrderBy<T>(
+  orderBy: string | string[] | undefined,
+  qb: SelectQueryBuilder<T>,
+  attrToDBColumn: (attr: string) => string
+): SelectQueryBuilder<T> {
+  const [attrs, directions] = parseOrderBy(orderBy);
+
+  if (attrs.length !== directions.length) {
+    throw new Error('Number of attributes and sorting directions must match');
+  }
+
+  attrs.forEach((attr: string, index: number) => {
+    qb = qb.addOrderBy(attrToDBColumn(attr), directions[index].toUpperCase() as 'ASC' | 'DESC');
+  });
+  return qb;
+}
+
+export function parseOrderBy(
+  orderBy: string | string[] | undefined
+): [string[], ('asc' | 'desc')[]] {
+  const attrs: string[] = [];
+  const directions: ('asc' | 'desc')[] = [];
+  if (orderBy) {
+    if (!Array.isArray(orderBy)) {
+      orderBy = [orderBy];
+    }
+
+    orderBy.forEach((orderByItem: string) => {
+      const parts = orderByItem.toString().split('_');
+      // TODO: ensure attr is one of the properties on the model
+      const attr = parts[0];
+      const direction: 'asc' | 'desc' = parts[1].toLowerCase() as 'asc' | 'desc';
+
+      attrs.push(attr);
+      directions.push(direction);
+    });
+  }
+  return [attrs, directions];
+}
+
+export function orderByFields(orderBy: string | string[] | undefined): string[] {
+  if (orderBy === undefined) {
+    return [];
+  }
+  if (!Array.isArray(orderBy)) {
+    orderBy = [(orderBy as unknown) as string];
+  }
+  return orderBy.map((o) => o.toString().split('_')[0]);
 }
