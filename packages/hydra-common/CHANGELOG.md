@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.0 (2021-06-09)
+
+
+### Features
+
+* **hydra-cli:** optimized implementation of interface queries ([#415](https://github.com/Joystream/hydra/issues/415)) ([05c930f](https://github.com/Joystream/hydra/commit/05c930f30774b066d9ac010cd82e6714f2e61832))
+
+
+
 ### 3.0.1-alpha.2 (2021-05-28)
 
 
