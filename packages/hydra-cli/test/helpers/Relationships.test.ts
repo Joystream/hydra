@@ -4,6 +4,7 @@ import { ModelRenderer } from '../../src/generate/ModelRenderer'
 import { RelationshipGenerator } from '../../src/generate/RelationshipGenerator'
 import { WarthogModel } from '../../src/model'
 import { fromStringSchema } from './model'
+import { compact as c } from '../../src/generate/utils'
 
 describe('ReletionshipGenerator', () => {
   let model: WarthogModel
@@ -77,6 +78,39 @@ describe('ReletionshipGenerator', () => {
     const resolver = generator.render(resolverTemplate)
     expect(resolver).to.include(
       `async eventinExtrinsic(@Root() r: Extrinsic): Promise<Event[] | null> {`
+    )
+  })
+
+  it('should handle names with interfaces and numbers', () => {
+    model = fromStringSchema(`
+    type Extrinsic @entity {
+      hash: String!
+    }
+
+    interface ExtrinsicOnlyEvent @entity {
+      extrinsic: Extrinsic!
+    }
+
+    type MembershipExtrinsicOnlyEvent1 implements ExtrinsicOnlyEvent @entity {
+      extrinsic: Extrinsic!
+      handle: String!
+    }`)
+
+    generator = new ModelRenderer(
+      model,
+      model.lookupEntity('MembershipExtrinsicOnlyEvent1')
+    )
+    const rendered = generator.render(modelTemplate)
+
+    expect(c(rendered)).to.include(
+      c(`
+    @ManyToOne(() => Extrinsic, (param: Extrinsic) => param.membershipextrinsiconlyevent1Extrinsic, {
+      skipGraphQLField: true,
+      modelName: 'MembershipExtrinsicOnlyEvent1',
+      relModelName: 'Extrinsic',
+      propertyName: 'extrinsic',
+    })
+    extrinsic!: Extrinsic`)
     )
   })
 })

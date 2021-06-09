@@ -5,7 +5,6 @@ import {
   findTransfersByComment,
   findTransfersByCommentAndWhereCondition,
   findTransfersByValue,
-  queryInterface,
   getProcessorStatus,
   accountByOutgoingTxValue,
   getGQLClient,
@@ -104,10 +103,47 @@ describe('end-to-end transfer tests', () => {
     )
   })
 
-  it('performs query on interface types, expect implementer to hold relationship', async () => {
-    const { events } = await queryInterface()
-    // We don't expect any data only testing Graphql API types
-    expect(events.length).to.be.equal(0, 'should not find any event.')
+  it('founds an account by incoming tx value (some)', async () => {
+    let accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_SOME,
+      BigInt(300000)
+    )
+    expect(accs.length).to.be.equal(0, 'some tx vals > 300000: false')
+
+    accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_SOME,
+      BigInt(200000)
+    )
+    expect(accs.length).to.be.equal(1, 'some tx vals > 200000: true')
+  })
+
+  it('founds an account by incoming tx value (none)', async () => {
+    let accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_NONE,
+      BigInt(300000)
+    )
+    expect(accs.length).to.be.equal(2, 'none tx vals > 300000: true') // BOTH BOB AND ALICE
+
+    accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_NONE,
+      BigInt(200000)
+    )
+    expect(accs.length).to.be.equal(1, 'none tx vals > 200000: false') // ONLY BOB, it has no outgoing txs
+  })
+
+  it('founds an account by incoming tx value (every)', async () => {
+    let accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_EVERY,
+      BigInt(txAmount2) // since the value filter is gt,
+      // the second transfer does not satisfy the condition
+    )
+    expect(accs.length).to.be.equal(0, 'every tx val > 1000: false')
+
+    accs = await accountByOutgoingTxValue(
+      ACCOUNTS_BY_VALUE_GT_EVERY,
+      BigInt(20)
+    )
+    expect(accs.length).to.be.equal(1, 'every tx val > 20: true')
   })
 
   it('founds an account by incoming tx value (some)', async () => {

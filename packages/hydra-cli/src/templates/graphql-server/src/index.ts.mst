@@ -22,7 +22,7 @@ class CustomNamingStrategy extends SnakeNamingStrategy {
 async function bootstrap() {
   loadConfig();
 
-  const server = getServer({}, { namingStrategy: new CustomNamingStrategy(), maxQueryExecutionTime: 1000, logging: ["error"] });
+  const server = getServer({}, { namingStrategy: new CustomNamingStrategy(), maxQueryExecutionTime: 1000, logging: [ process.env.WARTHOG_DB_LOGGING || "error"] });
 
   // Create database tables. Warthog migrate command does not support CustomNamingStrategy thats why
   // we have this code

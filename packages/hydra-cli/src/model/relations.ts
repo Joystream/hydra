@@ -6,6 +6,7 @@ import {
   RelationType,
 } from '.'
 import {
+  camelCase,
   generateJoinColumnName,
   generateJoinTableName,
 } from '../generate/utils'
@@ -77,7 +78,7 @@ function addOne2One(rel: EntityRelationship): void {
 // Typeorm requires to have ManyToOne field on the related object if the relation is OneToMany
 function createAdditionalField(entity: ObjectType, field: Field): Field {
   const f = new Field(
-    entity.name.toLowerCase() + field.name,
+    camelCase(entity.name.toLowerCase() + field.name),
     entity.name,
     true,
     false,

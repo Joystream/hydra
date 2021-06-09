@@ -85,19 +85,19 @@ query {
 }
 `
 
-export const INTERFACE_TYPES_WITH_RELATIONSHIP = gql`
-  query InterfaceQuery {
-    events {
-      indexInBlock
-      ... on BoughtMemberEvent {
-        inExtrinsic {
-          id
-          hash
-        }
-      }
-    }
-  }
-`
+// export const INTERFACE_TYPES_WITH_RELATIONSHIP = gql`
+//   query InterfaceQuery {
+//     events {
+//       indexInBlock
+//       ... on BoughtMemberEvent {
+//         inExtrinsic {
+//           id
+//           hash
+//         }
+//       }
+//     }
+//   }
+// `
 
 export const PROCESSOR_SUBSCRIPTION = gql`
   subscription {
@@ -138,6 +138,36 @@ export const VARIANT_FILTER_MISREABLE_ACCOUNTS = gql`
           hates
         }
       }
+    }
+  }
+`
+
+export const EVENT_INTERFACE_QUERY = gql`
+  query {
+    events(
+      where: { inBlock_lt: 2, type_in: [EventA, EventB, EventC] }
+      orderBy: [indexInBlock_DESC, network_DESC]
+    ) {
+      indexInBlock
+      inExtrinsic
+      network
+      ... on EventA {
+        field1
+      }
+      ... on EventB {
+        field2
+      }
+      ... on EventC {
+        field3
+      }
+    }
+  }
+`
+
+export const INTERFACES_FILTERING_BY_ENUM = gql`
+  query InterfaceQuery {
+    events(where: { type_in: [EventA] }) {
+      indexInBlock
     }
   }
 `

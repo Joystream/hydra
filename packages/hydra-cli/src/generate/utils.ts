@@ -2,6 +2,8 @@ import _, { upperFirst, kebabCase, camelCase, snakeCase, toLower } from 'lodash'
 import { GeneratorContext } from './SourcesGenerator'
 import { ObjectType, Field } from '../model'
 import pluralize from 'pluralize'
+import { ModelType } from '../model/WarthogModel'
+import { GraphQLEnumType, GraphQLEnumValueConfigMap } from 'graphql'
 
 export { upperFirst, kebabCase, camelCase }
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -28,6 +30,7 @@ export function names(name: string): { [key: string]: string } {
     typeormAliasName: toLower(name), // FIXME: do we have to support other namings?
     kebabName: kebabCase(name),
     relClassName: pascalCase(name),
+    aliasName: toLower(name),
     relCamelName: camelCase(name),
     // Not proper pluralization, but good enough and easy to fix in generated code
     camelNamePlural: camelPlural(name),
@@ -66,6 +69,14 @@ export function ownFields(o: ObjectType): Field[] {
   return fields
 }
 
+export function interfaceRelations(o: ObjectType): { fieldName: string }[] {
+  return o.fields
+    .filter((f) => f.isEntity())
+    .map((f) => {
+      return { fieldName: camelCase(f.name) }
+    })
+}
+
 export function generateJoinColumnName(name: string): string {
   return snakeCase(name.concat('_id'))
 }
@@ -98,5 +109,40 @@ export function generateResolverReturnType(
  * @returns the same string with all whitecharacters removed
  */
 export function compact(s: string): string {
-  return s.replace(/\s/g, '')
+  return s.replace(/\s+/g, ' ')
+}
+
+/**
+ * Generate EnumField for interface filtering; filter interface by implementers
+ * e.g where: {type_in: [Type1, Type2]}
+ */
+export function generateEnumField(typeName: string, apiOnly = true): Field {
+  const enumField = new Field(`type`, typeName)
+  enumField.modelType = ModelType.ENUM
+  enumField.description = 'Filtering options for interface implementers'
+  enumField.isBuildinType = false
+  enumField.apiOnly = apiOnly
+  return enumField
+}
+
+export function generateGraphqlEnumType(
+  name: string,
+  values: GraphQLEnumValueConfigMap
+): GraphQLEnumType {
+  return new GraphQLEnumType({
+    name,
+    values,
+  })
+}
+
+export function generateEnumOptions(
+  options: string[]
+): GraphQLEnumValueConfigMap {
+  // const values: GraphQLEnumValueConfigMap = this._model
+  //   .getSubclasses(i.name)
+
+  return options.reduce((init, option) => {
+    init[option] = { value: option }
+    return init
+  }, {})
 }

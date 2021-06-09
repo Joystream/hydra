@@ -78,15 +78,22 @@ export function buildFieldContext(
 ): GeneratorContext {
   return {
     ...withFieldTypeGuardProps(f),
-    ...withRequired(f),
-    ...withUnique(f),
     ...withRelation(f),
     ...withArrayCustomFieldConfig(f),
     ...withTsTypeAndDecorator(f),
     ...withDerivedNames(f, entity),
-    ...withDescription(f),
     ...withTransformer(f),
-    ...withArrayProp(f),
+    ...withDecoratorOptions(f),
+  }
+}
+
+export function withDecoratorOptions(f: Field): GeneratorContext {
+  return {
+    required: !f.nullable,
+    description: f.description,
+    unique: f.unique,
+    array: f.isList,
+    apiOnly: f.apiOnly,
   }
 }
 
@@ -100,24 +107,6 @@ export function withFieldTypeGuardProps(f: Field): GeneratorContext {
   ;['mto', 'oto', 'otm', 'mtm'].map((s) => (is[s] = f.relation?.type === s))
   return {
     is: is,
-  }
-}
-
-export function withRequired(f: Field): GeneratorContext {
-  return {
-    required: !f.nullable,
-  }
-}
-
-export function withDescription(f: Field): GeneratorContext {
-  return {
-    description: f.description,
-  }
-}
-
-export function withUnique(f: Field): GeneratorContext {
-  return {
-    unique: f.unique,
   }
 }
 
@@ -179,12 +168,6 @@ export function withImport(f: Field): GeneratorContext {
 export function withRelation(f: Field): GeneratorContext {
   return {
     relation: f.relation,
-  }
-}
-
-export function withArrayProp(f: Field): GeneratorContext {
-  return {
-    array: f.isList,
   }
 }
 

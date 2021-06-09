@@ -23,8 +23,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "lint": "eslint . --cache --ext .ts",
     "prepack": "yarn build && oclif-dev manifest",
-    "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\"",
-    "version": "oclif-dev readme && git add README.md"
+    "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
   },
   "oclif": {
     "commands": "./lib/commands",

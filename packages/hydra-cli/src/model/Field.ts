@@ -33,6 +33,8 @@ export class Field {
 
   derivedFrom?: DerivedFrom
 
+  apiOnly?: boolean
+
   constructor(
     name: string,
     type: string,
