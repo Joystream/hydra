@@ -19,6 +19,8 @@ export interface Transfer {
   from: string
   to: string
   block: number
+  fromAccount?: { hex: string }
+  toAccount?: { hex: string }
 }
 
 export interface ProcessorStatus {
@@ -55,6 +57,8 @@ export async function findTransfersByValue(
       from: string
       to: string
       block: number
+      fromAccount: { hex: string }
+      toAccount: { hex: string }
     }[]
   }>(FIND_TRANSFER_BY_VALUE, { value: value.toString(), block })
 

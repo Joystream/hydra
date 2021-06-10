@@ -4,14 +4,19 @@ import {
   EventB,
   EventC,
   Network,
+  ComplexEntity,
 } from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
 import { BlockContext, StoreContext } from '@dzlzv/hydra-common'
 
+export async function loader(ctx: BlockContext & StoreContext) {
+  await eventLoader(ctx)
+}
+
 // run before genesis
-export async function loader({ store }: BlockContext & StoreContext) {
+export async function eventLoader({ store }: BlockContext & StoreContext) {
   console.log(`Loading events`)
   const a = new EventA({
     inExtrinsic: 'test',
@@ -29,12 +34,16 @@ export async function loader({ store }: BlockContext & StoreContext) {
     field2: 'field2',
   })
 
+  const ce = new ComplexEntity({ arg1: 'xxx', arg2: 'yyy' })
+  await store.save<ComplexEntity>(ce)
+
   const c = new EventC({
     inExtrinsic: 'test',
     inBlock: 0,
     network: Network.OLYMPIA,
     indexInBlock: 2,
     field3: 'field3',
+    complexField: ce,
   })
 
   await Promise.all([

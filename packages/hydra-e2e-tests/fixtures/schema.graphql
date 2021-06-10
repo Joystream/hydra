@@ -95,6 +95,12 @@ type EventC implements Event @entity {
   network: Network!
   indexInBlock: Int!  
   field3: String!
+  complexField: ComplexEntity!
+}
+
+type ComplexEntity @entity {
+  arg1: String
+  arg2: String
 }
 
 enum Network {

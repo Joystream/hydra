@@ -28,6 +28,16 @@ describe('end-to-end interfaces tests', () => {
       'field3',
       'should return eventC with field3'
     )
+    expect(result.events[0].complexField).not.to.be.an(
+      'undefiend',
+      'should load complexField'
+    )
+
+    expect(result.events[0].complexField.arg1).to.be.equal(
+      'xxx',
+      'should load complexField.arg1'
+    )
+
     expect(result.events[1].field2).to.be.equal(
       'field2',
       'should return eventB with field2'
