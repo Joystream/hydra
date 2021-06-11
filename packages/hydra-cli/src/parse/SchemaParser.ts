@@ -12,13 +12,17 @@ import {
   InterfaceTypeDefinitionNode,
   GraphQLUnionType,
   GraphQLNamedType,
+  extendSchema,
+  Source,
 } from 'graphql'
-import * as fs from 'fs-extra'
 import Debug from 'debug'
-import { SCHEMA_DEFINITIONS_PREAMBLE } from './constant'
+import path from 'path'
+import * as fs from 'fs-extra'
+
 import { SchemaDirective } from './SchemaDirective'
 import { FTSDirective } from './FTSDirective'
-import path from 'path'
+import { scalars } from '../schema/scalars'
+import { directives } from '../schema/directives'
 
 const debug = Debug('qnode-cli:schema-parser')
 
@@ -101,22 +105,17 @@ export class GraphQLSchemaParser {
     return schemaString
   }
 
-  private static buildPreamble(): string {
-    let preamble = SCHEMA_DEFINITIONS_PREAMBLE
-    DIRECTIVES.map((d) => (preamble += d.preamble + '\n'))
-    return preamble
+  private static buildPreamble(): GraphQLSchema {
+    const schema = buildASTSchema(scalars)
+    return extendSchema(schema, directives)
   }
 
   /**
    * Read GrapqhQL schema and build a schema from it
    */
   static buildSchema(contents: string): GraphQLSchema {
-    const schema = GraphQLSchemaParser.buildPreamble().concat(contents)
-    const ast = parse(schema)
-    // in order to build AST with undeclared directive, we need to
-    // switch off SDL validation
-    const schemaAST = buildASTSchema(ast)
-
+    const doc = parse(new Source(contents))
+    const schemaAST = extendSchema(this.buildPreamble(), doc)
     const errors = validateSchema(schemaAST)
 
     if (errors.length > 0) {

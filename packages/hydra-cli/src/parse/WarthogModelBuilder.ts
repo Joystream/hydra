@@ -13,7 +13,7 @@ import {
   ENTITY_DIRECTIVE,
   UNIQUE_DIRECTIVE,
   VARIANT_DIRECTIVE,
-} from './constant'
+} from '../schema/directives'
 import { FTSDirective, FULL_TEXT_SEARCHABLE_DIRECTIVE } from './FTSDirective'
 import { availableTypes } from '../model/ScalarTypes'
 import * as DerivedFrom from './DerivedFromDirective'

@@ -1,6 +1,6 @@
 import { FieldDefinitionNode, StringValueNode } from 'graphql'
 import { Field, WarthogModel } from '../model'
-import { DERIVED_FROM_DIRECTIVE } from './constant'
+import { DERIVED_FROM_DIRECTIVE } from '../schema/directives'
 
 export function addDerivedFromIfy(
   fieldDef: FieldDefinitionNode,
