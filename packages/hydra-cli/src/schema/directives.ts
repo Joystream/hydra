@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 export const ENTITY_DIRECTIVE = 'entity'
 export const UNIQUE_DIRECTIVE = 'unique'
 export const VARIANT_DIRECTIVE = 'variant'
-export const DERIVED_FROM_DIRECTIVE = `derivedFrom`
+export const DERIVED_FROM_DIRECTIVE = 'derivedFrom'
 export const JSON_FIELD_DIRECTIVE = 'jsonField'
 
 export const directives = gql`

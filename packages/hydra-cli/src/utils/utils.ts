@@ -132,3 +132,7 @@ export function getWarthogDependency(): string {
   }
   return warthogPackageJson.hydra as string
 }
+
+export const verifySchemaExt = (file: string) =>
+  path.extname(file) === '.graphql' || path.extname(file) === '.gql'
+export const isFile = (file: string) => fs.lstatSync(file).isFile()

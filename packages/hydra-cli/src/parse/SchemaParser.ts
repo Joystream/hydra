@@ -23,6 +23,7 @@ import { SchemaDirective } from './SchemaDirective'
 import { FTSDirective } from './FTSDirective'
 import { scalars } from '../schema/scalars'
 import { directives } from '../schema/directives'
+import { isFile, verifySchemaExt } from '../utils/utils'
 
 const debug = Debug('qnode-cli:schema-parser')
 
@@ -71,8 +72,9 @@ export class GraphQLSchemaParser {
     if (!fs.existsSync(schemaPath)) {
       throw new Error('Schema not found')
     }
-    const contents = this.getUnifiedSchema(schemaPath)
-    this.schema = GraphQLSchemaParser.buildSchema(contents)
+    this.schema = GraphQLSchemaParser.buildSchema(
+      this.getUnifiedSchema(schemaPath)
+    )
     this.namedTypes = [
       ...Object.values(this.schema.getTypeMap()).filter(
         (t) => !t.name.startsWith('__') // filter out auxiliarry GraphQL types;
@@ -84,25 +86,23 @@ export class GraphQLSchemaParser {
   }
 
   private getUnifiedSchema(schemaPath: string): string {
-    let schemaString = ''
+    if (isFile(schemaPath)) return fs.readFileSync(schemaPath, 'utf8')
+
     if (fs.lstatSync(schemaPath).isDirectory()) {
+      let schemaString = ''
       fs.readdirSync(schemaPath).forEach((file) => {
-        if (
-          fs.lstatSync(path.resolve(schemaPath, file)).isFile() &&
-          path.extname(file) === '.graphql'
-        ) {
+        const resolvedPath = path.resolve(schemaPath, file)
+
+        if (isFile(resolvedPath) && verifySchemaExt(file)) {
           schemaString = schemaString.concat(
-            fs.readFileSync(path.resolve(schemaPath, file), 'utf8'),
+            fs.readFileSync(resolvedPath, 'utf8'),
             '\n\n'
           )
         }
       })
-    } else if (fs.lstatSync(schemaPath).isFile()) {
-      schemaString = fs.readFileSync(schemaPath, 'utf8')
-    } else {
-      throw new Error('Error reading schema file(s)')
+      return schemaString
     }
-    return schemaString
+    throw Error('Error reading schema file(s)')
   }
 
   private static buildPreamble(): GraphQLSchema {
