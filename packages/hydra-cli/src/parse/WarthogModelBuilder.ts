@@ -6,11 +6,13 @@ import {
   TypeDefinitionNode,
   InterfaceTypeDefinitionNode,
 } from 'graphql'
+import Debug from 'debug'
+
 import { GraphQLSchemaParser, Visitors, SchemaNode } from './SchemaParser'
 import { WarthogModel, Field, ObjectType } from '../model'
-import Debug from 'debug'
 import {
   ENTITY_DIRECTIVE,
+  JSON_FIELD_DIRECTIVE,
   UNIQUE_DIRECTIVE,
   VARIANT_DIRECTIVE,
 } from '../schema/directives'
@@ -23,6 +25,8 @@ import {
   generateEnumOptions,
   generateGraphqlEnumType,
 } from '../generate/utils'
+
+import * as validate from '../validation'
 
 const debug = Debug('qnode-cli:model-generator')
 
@@ -104,6 +108,14 @@ export class WarthogModelBuilder {
     )
   }
 
+  private isJsonField(o: TypeDefinitionNode): boolean {
+    if (o.directives === undefined) return false
+    debug(`JSON DIRECTIVE`, o.directives)
+    return (
+      o.directives.findIndex((d) => d.name.value === JSON_FIELD_DIRECTIVE) >= 0
+    )
+  }
+
   private isUnique(field: FieldDefinitionNode): boolean {
     const entityDirective = field.directives?.find(
       (d) => d.name.value === UNIQUE_DIRECTIVE
@@ -123,6 +135,7 @@ export class WarthogModelBuilder {
       fields: this.getFields(o),
       isEntity: this.isEntity(o),
       isVariant: this.isVariant(o),
+      isJsonField: this.isJsonField(o),
       description: o.description?.value,
       isInterface: o.kind === 'InterfaceTypeDefinition',
       interfaces:
@@ -225,6 +238,16 @@ export class WarthogModelBuilder {
       })
   }
 
+  private generateJsonFields() {
+    this._schemaParser
+      .getObjectDefinations()
+      .filter((o) => this.isJsonField(o))
+      .map((o) => {
+        const objType = this.generateTypeDefination(o)
+        this._model.addJsonField(objType)
+      })
+  }
+
   private generateUnions() {
     this._schemaParser.getUnionTypes().map((u) => {
       const types: string[] = []
@@ -283,6 +306,8 @@ export class WarthogModelBuilder {
     this.generateVariants()
     this.generateUnions()
     this.generateEntities()
+    this.generateJsonFields()
+
     this.postProcessFields()
     this.genereateQueries()
 
@@ -290,6 +315,8 @@ export class WarthogModelBuilder {
     new RelationshipGenerator(this._model).generate()
 
     this.generateEnumsForInterface()
+
+    validate.jsonFieldTypes(this._model.jsonFields)
 
     return this._model
   }

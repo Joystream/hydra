@@ -14,6 +14,7 @@ export enum ModelType {
   UNION,
   INTERFACE,
   SCALAR,
+  JSON,
 }
 
 export class WarthogModel {
@@ -23,6 +24,8 @@ export class WarthogModel {
   private _interfaces: ObjectType[] = []
   private _variants: ObjectType[] = []
   private _unions: UnionType[] = []
+  private _jsonFields: ObjectType[] = []
+
   private _name2query: { [key: string]: FTSQuery } = {}
   private _name2type: { [key: string]: ObjectType } = {}
 
@@ -80,6 +83,10 @@ export class WarthogModel {
 
   addEnum(_enum: GraphQLEnumType): void {
     this._enums.push(_enum)
+  }
+
+  addJsonField(_jsonField: ObjectType): void {
+    this._jsonFields.push(_jsonField)
   }
 
   /**
@@ -142,6 +149,10 @@ export class WarthogModel {
 
   get unions(): UnionType[] {
     return this._unions
+  }
+
+  get jsonFields(): ObjectType[] {
+    return this._jsonFields
   }
 
   /**
@@ -252,7 +263,12 @@ export class WarthogModel {
     if (this._enums.find((e) => e.name === name)) {
       return ModelType.ENUM
     }
-    throw new Error(`Type ${name} is undefined`)
+
+    if (this._jsonFields.find((j) => j.name === name)) {
+      return ModelType.JSON
+    }
+
+    throw Error(`Type ${name} is undefined`)
   }
 }
 

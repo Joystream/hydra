@@ -49,10 +49,6 @@ export class Field {
     this.isList = isList
   }
 
-  // get isBuiltInType(): boolean {
-  //   return this.modelType == ModelType.SCALAR
-  // }
-
   columnType(): string {
     if (this.relation) return this.relation?.type
     return this.isBuildinType ? availableTypes[this.type] : this.type
@@ -80,5 +76,9 @@ export class Field {
 
   isEntity(): boolean {
     return this.modelType === ModelType.ENTITY
+  }
+
+  isJson(): boolean {
+    return this.modelType === ModelType.JSON
   }
 }

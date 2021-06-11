@@ -14,7 +14,8 @@ import {
   {{#has.oto}}OneToOne, OneToOneJoin,{{/has.oto}}
   {{#has.array}}CustomField,{{/has.array}}
   {{#has.enum}}EnumField,{{/has.enum}}
-  StringField
+  StringField,
+  JSONField,
 } from 'warthog';  {{! we don't need extra twists here }}
 
 {{#has.numeric}} import BN from 'bn.js' {{/has.numeric}}
@@ -157,6 +158,11 @@ export class {{className}} {{^isInterface}}extends BaseModel{{/isInterface}} {
       {{#description}}description: `{{{description}}}`{{/description}} })
 	{{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: typeof {{tsType}}
   {{/is.union}}
+
+  {{#is.json}}
+  @JSONField({filter: true, gqlFieldType: {{tsType}}, {{^required}}nullable: true,{{/required}} })
+  {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: {{tsType}}
+  {{/is.json}}
 
 {{/fields}}
 

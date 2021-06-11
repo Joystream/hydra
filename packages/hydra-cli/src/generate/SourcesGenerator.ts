@@ -47,6 +47,7 @@ export class SourcesGenerator {
     this.generateModels()
     this.generateQueries()
     this.generateModelIndex()
+    this.generateJsonFields()
   }
 
   generateModels(): void {
@@ -146,6 +147,20 @@ export class SourcesGenerator {
       this.readTemplate('entities/enums.ts.mst')
     )
     this.writeFile(path.join(enumsDir, `enums.ts`), rendered)
+  }
+
+  generateJsonFields(): void {
+    const [dir, tmplName] = JSONFIELDS_FOLDER
+
+    const jsonFieldsDir = this.config.getDestFolder(dir)
+    createDir(path.resolve(process.cwd(), jsonFieldsDir), false, true)
+
+    this.writeFile(
+      path.join(jsonFieldsDir, tmplName.slice(0, -4)),
+      new JsonFieldRenderer(this.model).render(
+        this.readTemplate(path.join(dir, tmplName))
+      )
+    )
   }
 
   generateModelIndex(): string {

@@ -37,7 +37,11 @@ export function withFieldTypeGuardProps(f: Field): GeneratorContext {
   is.enum = f.isEnum()
   is.union = f.isUnion()
   is.entity = f.isEntity()
-  ;['mto', 'oto', 'otm', 'mtm'].map((s) => (is[s] = f.relation?.type === s))
+  is.json = f.isJson()
+  ;['mto', 'oto', 'otm', 'mtm'].map(
+    (s) => (is[s] = f.relation && f.relation.type === s)
+  )
+
   return {
     is: is,
   }
