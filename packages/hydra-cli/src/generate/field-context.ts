@@ -3,74 +3,7 @@ import { Field, ObjectType } from '../model'
 import * as util from './utils'
 import { withRelativePathForEnum } from './enum-context'
 
-export const TYPE_FIELDS: { [key: string]: { [key: string]: string } } = {
-  bool: {
-    decorator: 'BooleanField',
-    tsType: 'boolean',
-  },
-  date: {
-    decorator: 'DateTimeField',
-    tsType: 'Date',
-  },
-  int: {
-    decorator: 'IntField',
-    tsType: 'number',
-  },
-  float: {
-    decorator: 'FloatField',
-    tsType: 'number',
-  },
-  json: {
-    decorator: 'JSONField',
-    tsType: 'JsonObject',
-  },
-  otm: {
-    decorator: 'OneToMany',
-    tsType: '---',
-  },
-  mto: {
-    decorator: 'ManyToOne',
-    tsType: '---',
-  },
-  mtm: {
-    decorator: 'ManyToMany',
-    tsType: '---',
-  },
-  string: {
-    decorator: 'StringField',
-    tsType: 'string',
-  },
-  numeric: {
-    decorator: 'NumericField',
-    tsType: 'BN',
-  },
-  decimal: {
-    decorator: 'NumericField',
-    tsType: 'BN',
-  },
-  oto: {
-    decorator: 'OneToOne',
-    tsType: '---',
-  },
-  array: {
-    decorator: 'ArrayField',
-    tsType: '', // will be updated with the correct type
-  },
-  bytes: {
-    decorator: 'BytesField',
-    tsType: 'Buffer',
-  },
-}
-
-const graphQLFieldTypes: { [key: string]: string } = {
-  bool: 'boolean',
-  int: 'integer',
-  string: 'string',
-  float: 'float',
-  date: 'date',
-  numeric: 'numeric',
-  decimal: 'numeric',
-}
+import { TYPE_FIELDS, GRAPHQL_DATA_TYPES } from './constants'
 
 export function buildFieldContext(
   f: Field,
@@ -128,7 +61,7 @@ export function withArrayCustomFieldConfig(f: Field): GeneratorContext {
     return {}
   }
   const type = f.columnType()
-  const apiType = graphQLFieldTypes[type]
+  const apiType = GRAPHQL_DATA_TYPES[type]
 
   let dbType = apiType
   if (dbType === 'string') {

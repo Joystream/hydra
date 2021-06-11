@@ -12,13 +12,15 @@ import { ConfigProvider } from './ConfigProvider'
 import { VariantsRenderer } from './VariantsRenderer'
 import { render } from './AbstractRenderer'
 import { indexContext } from './model-index-context'
+import { JsonFieldRenderer } from './JsonFieldRenderer'
+import {
+  ENUMS_FOLDER,
+  VARIANTS_FOLDER,
+  JSONFIELDS_FOLDER,
+  QUERIES_FOLDER,
+} from './constants'
 
 const debug = Debug('qnode-cli:sources-generator')
-
-export const QUERIES_FOLDER = 'queries'
-export const ENUMS_FOLDER = 'enums'
-export const VARIANTS_FOLDER = 'variants'
-export const INTERFACES_FOLDER = 'interfaces'
 
 /**
  * additional context to be passed to the generator,
