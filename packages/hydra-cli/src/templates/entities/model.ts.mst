@@ -38,6 +38,8 @@ import { InterfaceType } from 'type-graphql';
   {{{ . }}}
 {{/relatedEntityImports}}
 
+import * as jsonTypes from '../jsonfields/jsonfields.model';
+
 {{#enums}}
   import { {{name}} } from '../enums/enums';
   export { {{name}} }; {{! we need to re-export enums for type-GraphQL to resolve types correctly }}
@@ -160,8 +162,8 @@ export class {{className}} {{^isInterface}}extends BaseModel{{/isInterface}} {
   {{/is.union}}
 
   {{#is.json}}
-  @JSONField({filter: true, gqlFieldType: {{tsType}}, {{^required}}nullable: true,{{/required}} })
-  {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: {{tsType}}
+  @JSONField({filter: true, gqlFieldType: jsonTypes.{{tsType}}, {{^required}}nullable: true,{{/required}} })
+  {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: jsonTypes.{{tsType}}
   {{/is.json}}
 
 {{/fields}}
