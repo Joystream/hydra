@@ -4,7 +4,7 @@ import { ObjectType, WarthogModel } from '../model'
  * Validate json type fields
  * @param jsonObjType: ObjectType
  */
-export function jsonFieldTypes(jsonObjType: ObjectType): void {
+export function jsonField(jsonObjType: ObjectType): void {
   const fields = jsonObjType.fields.filter(
     (field) => !field.isScalar() && !field.isJson()
   )

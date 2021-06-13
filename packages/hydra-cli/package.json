@@ -65,6 +65,7 @@
     "glob": "^7.1.6",
     "gluegun": "^4.3.1",
     "graphql": "^15.0.0",
+    "graphql-tag": "^2.12.4",
     "listr": "^0.14.3",
     "lodash": "^4.17.15",
     "mustache": "^4.0.1",
