@@ -15,9 +15,10 @@ import {
   JSON_FIELD_DIRECTIVE,
   UNIQUE_DIRECTIVE,
   VARIANT_DIRECTIVE,
+  FULL_TEXT_SEARCHABLE_DIRECTIVE,
 } from '../schema/directives'
-import { FTSDirective, FULL_TEXT_SEARCHABLE_DIRECTIVE } from './FTSDirective'
-import { availableTypes } from '../model/ScalarTypes'
+import { FTSDirective } from './FTSDirective'
+import { availableTypes } from '../schema/scalars'
 import * as DerivedFrom from './DerivedFromDirective'
 import { RelationshipGenerator } from '../generate/RelationshipGenerator'
 import {
@@ -311,12 +312,10 @@ export class WarthogModelBuilder {
     this.postProcessFields()
     this.genereateQueries()
 
-    DerivedFrom.validateDerivedFields(this._model)
+    validate.derivedFields(this._model)
     new RelationshipGenerator(this._model).generate()
 
     this.generateEnumsForInterface()
-
-    validate.jsonFieldTypes(this._model.jsonFields)
 
     return this._model
   }

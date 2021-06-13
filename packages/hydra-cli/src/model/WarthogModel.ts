@@ -1,9 +1,9 @@
 import { GraphQLEnumType } from 'graphql'
 import Debug from 'debug'
-import { validateVariantField } from './validate'
-import { availableTypes } from './ScalarTypes'
 
 import { ObjectType, Field, FTSQuery } from '.'
+import { availableTypes } from '../schema/scalars'
+import * as validate from '../validation'
 
 const debug = Debug('qnode-cli:model')
 
@@ -53,10 +53,7 @@ export class WarthogModel {
       throw new Error('An entity cannot be a variant')
     }
 
-    type.fields.forEach((f) => {
-      validateVariantField(f)
-    })
-
+    validate.variantType(type)
     this._variants.push(type)
   }
 
@@ -86,6 +83,7 @@ export class WarthogModel {
   }
 
   addJsonField(_jsonField: ObjectType): void {
+    validate.jsonFieldTypes(_jsonField)
     this._jsonFields.push(_jsonField)
   }
 

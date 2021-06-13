@@ -1,10 +1,6 @@
 import { Relation } from '.'
-import { availableTypes } from './ScalarTypes'
+import { availableTypes } from '../schema/scalars'
 import { ModelType } from './WarthogModel'
-
-interface DerivedFrom {
-  argument: string
-}
 
 /**
  * Reperenst GraphQL object type field
@@ -31,7 +27,9 @@ export class Field {
   // Relation
   relation?: Relation
 
-  derivedFrom?: DerivedFrom
+  derivedFrom?: {
+    argument: string
+  }
 
   apiOnly?: boolean
 
