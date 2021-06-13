@@ -45,6 +45,11 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
           f = [...f, '{{camelName}}'];
         }
       {{/is.union}}
+      {{#is.json}}
+        if (!f.includes('{{camelName}}')) {
+          f = [...f, '{{camelName}}'];
+        }
+      {{/is.json}}
     {{/fields}}
     
     {{#has.union}}

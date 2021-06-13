@@ -33,18 +33,22 @@ export class Field {
 
   apiOnly?: boolean
 
+  directives!: string[]
+
   constructor(
     name: string,
     type: string,
     nullable = true,
     isBuildinType = true,
-    isList = false
+    isList = false,
+    directives: string[] = []
   ) {
     this.name = name
     this.type = type
     this.nullable = nullable
     this.isBuildinType = isBuildinType
     this.isList = isList
+    this.directives = directives
   }
 
   columnType(): string {
@@ -57,7 +61,7 @@ export class Field {
   }
 
   isScalar(): boolean {
-    return this.isBuildinType && !this.isList
+    return this.isBuildinType
   }
 
   isRelationType(): boolean {

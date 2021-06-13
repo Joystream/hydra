@@ -28,6 +28,7 @@ import {
 } from '../generate/utils'
 
 import * as validate from '../validation'
+import { getDirectiveNames } from '../utils/utils'
 
 const debug = Debug('qnode-cli:model-generator')
 
@@ -196,6 +197,7 @@ export class WarthogModelBuilder {
         field.description = fieldNode.description?.value
         field.unique = this.isUnique(fieldNode)
         DerivedFrom.addDerivedFromIfy(fieldNode, field)
+        field.directives = getDirectiveNames(fieldNode)
         return field
       })
     debug(`Read and parsed fields: ${JSON.stringify(fields, null, 2)}`)
@@ -314,6 +316,8 @@ export class WarthogModelBuilder {
 
     validate.derivedFields(this._model)
     new RelationshipGenerator(this._model).generate()
+
+    validate.jsonField(this._model.jsonFields)
 
     this.generateEnumsForInterface()
 

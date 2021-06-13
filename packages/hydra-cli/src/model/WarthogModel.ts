@@ -83,7 +83,6 @@ export class WarthogModel {
   }
 
   addJsonField(_jsonField: ObjectType): void {
-    validate.jsonField(_jsonField)
     this._jsonFields.push(_jsonField)
   }
 

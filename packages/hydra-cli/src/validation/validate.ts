@@ -1,19 +1,29 @@
 import { ObjectType, WarthogModel } from '../model'
+import { ModelType } from '../model/WarthogModel'
 
 /**
  * Validate json type fields
  * @param jsonObjType: ObjectType
  */
-export function jsonField(jsonObjType: ObjectType): void {
-  const fields = jsonObjType.fields.filter(
-    (field) => !field.isScalar() && !field.isJson()
-  )
-  if (fields.length) {
-    throw Error(
-      `"${jsonObjType.name}" @jsonField should have members with scalar or json types. Fix the following field(s) \n` +
-        `${JSON.stringify(fields)}`
-    )
-  }
+export function jsonField(jsonObjTypes: ObjectType[]): void {
+  const _filter = [ModelType.SCALAR, ModelType.JSON]
+
+  jsonObjTypes.forEach((jsonObjType) => {
+    jsonObjType.fields.forEach(({ modelType, directives, name }) => {
+      if (!_filter.includes(modelType)) {
+        throw Error(
+          `"${jsonObjType.name}" should have members with scalar or json types. Fix the "${name}" field type!`
+        )
+      }
+      if (directives.length) {
+        throw Error(
+          `A Json type members can not have any directive. Remove [${directives.join(
+            ','
+          )}] directives(s) from the "${name}" field!`
+        )
+      }
+    })
+  })
 }
 
 /**
