@@ -26,6 +26,7 @@ The indexer is set up using the following environment variables
 | DB\_HOST | - | **Yes** | Database host |
 | DB\_USER | - | **Yes** | Database user |
 | DB\_PASS | - | **Yes** | Database password |
+| DB\_LOGGING | `error` | No | TypeORM logging level |
 | TYPES\_JSON | - | No | Path to a JSON type definition with custom Substrate types |
 | BLOCK\_HEIGHT | 0 | No | Block height to start indexing. Ignored if the database already contains indexed blocks |
 

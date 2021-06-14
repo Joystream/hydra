@@ -23,6 +23,10 @@ import { fromBlockExtrinsic } from '../entities/SubstrateExtrinsicEntity'
 
 const debug = Debug('index-builder:indexer')
 
+/**
+ *  This class is responsible for fetching blocks from the `BlockProducer` and saving them into the database.
+ *  Internally, it creates an intance of `PooledExecutor` to asyncronously process blocks using multiple workers.
+ */
 export class IndexBuilder {
   private _stopped = false
   private producer!: BlockProducer
@@ -81,7 +85,7 @@ export class IndexBuilder {
     await this.producer.stop()
   }
 
-  _indexBlock(): (h: number) => Promise<void> {
+  private _indexBlock(): (h: number) => Promise<void> {
     return async (h: number) => {
       debug(`Processing block #${h.toString()}`)
 
@@ -103,6 +107,12 @@ export class IndexBuilder {
     }
   }
 
+  /**
+   * Extracts events, extrinsics and block info from `BlockData` and
+   * creates the corresponding entities to be saved into DB.
+   *
+   * @param blockData - raw block data to be saved into the DB
+   */
   async transformAndPersist(blockData: BlockData): Promise<void> {
     const blockEntity = SubstrateBlockEntity.fromBlockData(blockData)
 

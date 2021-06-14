@@ -53,7 +53,8 @@ export function hasInterfaces(o: ObjectType): boolean {
 
 /**
  * Return fields which are not definded in the interface
- * @param o ObjecType definition
+ *
+ * @param o - ObjecType definition
  */
 export function ownFields(o: ObjectType): Field[] {
   if (!hasInterfaces(o) || o.interfaces === undefined) {
@@ -103,9 +104,9 @@ export function generateResolverReturnType(
 }
 
 /**
- * replace all whitespaces and carriage returns
+ * replace all whitespaces and carriage returns with a whitesapace
  *
- * @param s
+ * @param s - string to compat
  * @returns the same string with all whitecharacters removed
  */
 export function compact(s: string): string {
@@ -114,7 +115,9 @@ export function compact(s: string): string {
 
 /**
  * Generate EnumField for interface filtering; filter interface by implementers
- * e.g where: {type_in: [Type1, Type2]}
+ * e.g `where: {type_in: [Type1, Type2]}`
+ *
+ * @param typeName - field type
  */
 export function generateEnumField(typeName: string, apiOnly = true): Field {
   const enumField = new Field(`type`, typeName)
