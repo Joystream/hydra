@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.1 (2021-06-14)
+
+
+### Features
+
+* **hydra-cli:** Relationship fetching via dataloaders ([#416](https://github.com/Joystream/hydra/issues/416)) ([08595f7](https://github.com/Joystream/hydra/commit/08595f74f6e070b1f5c0dd7ccd3fcfaab11e34cf))
+
+
+
 ## 3.1.0-alpha.0 (2021-06-09)
 
 
