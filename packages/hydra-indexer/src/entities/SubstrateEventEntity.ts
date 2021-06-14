@@ -20,6 +20,9 @@ import { SubstrateBlockEntity } from './SubstrateBlockEntity'
 
 export const EVENT_TABLE_NAME = 'substrate_event'
 
+/**
+ * TypeORM Entity class representing `SubstrateEvent` persistent data
+ */
 @Entity({
   name: EVENT_TABLE_NAME,
 })

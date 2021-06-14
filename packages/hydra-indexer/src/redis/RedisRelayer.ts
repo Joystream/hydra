@@ -9,7 +9,7 @@ const debug = Debug('index-builder:redis-relayer')
 
 /**
  *  This class is listening to local events and relays them to Redis
- *  The main reason for it is to decouple most of the core classes from the
+ *  Its main purpose is to decouple most of the core classes from the
  *  Redis infrastructure
  **/
 class RedisRelayer implements PubSub {
