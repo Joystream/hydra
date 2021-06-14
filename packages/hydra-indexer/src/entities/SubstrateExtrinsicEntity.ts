@@ -22,10 +22,14 @@ import { fullName } from '../model'
 
 export const EXTRINSIC_TABLE_NAME = 'substrate_extrinsic'
 
+/**
+ * TypeORM Entity class representing Extrinsic data
+ */
 @Entity({
   name: EXTRINSIC_TABLE_NAME,
 })
-export class SubstrateExtrinsicEntity extends AbstractWarthogModel
+export class SubstrateExtrinsicEntity
+  extends AbstractWarthogModel
   implements SubstrateExtrinsic {
   @PrimaryColumn()
   id!: string
