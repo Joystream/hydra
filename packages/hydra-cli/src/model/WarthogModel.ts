@@ -200,6 +200,12 @@ export class WarthogModel {
     return this._name2query[queryName]
   }
 
+  lookupJsonField(name: string): ObjectType {
+    const jsonField = this._jsonFields.find((e) => e.name === name)
+    if (!jsonField) throw Error(`Cannot find JsonField with name ${name}`)
+    return jsonField
+  }
+
   /**
    * Get subclasses of a given interface
    *

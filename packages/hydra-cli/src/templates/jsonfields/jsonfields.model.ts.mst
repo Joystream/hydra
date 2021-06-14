@@ -46,8 +46,8 @@ export class {{name}} {
     {{/is.enum}}
     
     {{#is.json}}
-    @JSONField({filter: false, gqlFieldType: {{tsType}}, {{^required}}nullable: true,{{/required}} })
-    {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: {{tsType}}
+    @Field(() => {{#array}}[{{/array}}{{tsType}}{{#array}}]{{/array}}, {{^required}}{ nullable: true }{{/required}})
+    {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: {{tsType}}{{#array}}[]{{/array}}
     {{/is.json}}
     
   {{/fields}}
