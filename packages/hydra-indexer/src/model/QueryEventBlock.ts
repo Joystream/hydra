@@ -41,6 +41,13 @@ export function fromBlockData({
   return { blockNumber, blockEvents }
 }
 
+/**
+ * If the event record was emitted by an extrinsic call,
+ * and can extract the extrinsic index by looking at the `phase` object.
+ *
+ * @param record - event record as decoded by Polkadot API
+ * @returns extrinsic index, if the phase is `applyExtrinsic` or `undefined` otherwise
+ */
 export function getExtrinsicIndex(record: {
   phase: { isApplyExtrinsic: boolean; asApplyExtrinsic: u32 }
 }): number | undefined {
@@ -61,9 +68,17 @@ export function getExtrinsic(eventInBlock: {
   return getOrUndefined(extrinsicIndex, eventInBlock.extrinsics)
 }
 
+/**
+ *
+ * @param e - event record
+ * @returns full event name `${section}.${method}`
+ */
 export const fullName = (e: { section: string; method: string }): string =>
   `${e.section}.${e.method}`
 
+/**
+ * Safely get an element from an array allowing the index and the array itself to be undefined
+ */
 export function getOrUndefined<T>(
   index: number | undefined,
   from: T[] | undefined

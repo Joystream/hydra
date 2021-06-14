@@ -1,4 +1,7 @@
 module.exports = {
+  plugins: [
+    "eslint-plugin-tsdoc"
+  ],
   extends: [
     "@joystream/eslint-config",
     'plugin:sonarjs/recommended',
@@ -7,6 +10,7 @@ module.exports = {
     "@typescript-eslint/no-unused-vars": "error",
     "no-useless-constructor": "off",
     "@typescript-eslint/no-namespace": "off",
+    "tsdoc/syntax": "warn",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/naming-convention": [
       "warn",

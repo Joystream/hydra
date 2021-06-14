@@ -13,7 +13,9 @@ import BN from 'bn.js'
 import { BlockData } from '../model'
 
 /**
- * @description ...
+ * A wrapper over Polkadot JS API incapsulating
+ * RPC calls to the node.
+ *
  */
 export interface ISubstrateService {
   getFinalizedHead(): Promise<Hash>
@@ -29,10 +31,20 @@ export interface ISubstrateService {
   runtimeVersion(hash: Hash): Promise<RuntimeVersion>
   timestamp(hash: Hash): Promise<BN>
 
+  /**
+   * Performs multiple RPC calls and collect into a `BlockData` object.
+   *
+   * @param hash block hash to fetch
+   */
   getBlockData(hash: Hash): Promise<BlockData>
+
   /**
    * calls the rpc endpoint to make sure it's alive
    */
   ping(): Promise<void>
+
+  /**
+   * Disconnects from the node
+   */
   stop(): Promise<void>
 }

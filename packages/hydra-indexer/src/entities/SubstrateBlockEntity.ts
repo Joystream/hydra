@@ -9,6 +9,9 @@ import { Column, Entity, Index, PrimaryColumn } from 'typeorm'
 import { BlockData, fullName, getExtrinsic } from '../model'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
 
+/**
+ * TypeORM Entity class representing block data
+ */
 @Entity({
   name: 'substrate_block',
 })

@@ -48,7 +48,7 @@ export class BlockProducer implements IBlockProducer<BlockData> {
     const header = await this.substrateService.getHeader(finalizedHeadHash)
     this._chainHeight = header.number.toNumber()
 
-    //
+    // We cache block headers to save on API calls
     eventEmitter.on(IndexerEvents.NEW_FINALIZED_HEAD, ({ header, height }) => {
       debug(`New finalized head: ${JSON.stringify(header)}, height: ${height}`)
       this._headerCache.put(height, header)
@@ -85,9 +85,10 @@ export class BlockProducer implements IBlockProducer<BlockData> {
     }
     debug(`Fetching block #${height.toString()}`)
     const targetHash = await this.getBlockHash(height)
+    // retry if the there was an error for some reason
     return pRetry(() => this._doBlockProduce(targetHash), {
       retries: conf().BLOCK_PRODUCER_FETCH_RETRIES,
-    }) // retry after 5 seconds
+    })
   }
 
   public async *blockHeights(): AsyncGenerator<number> {
@@ -102,7 +103,6 @@ export class BlockProducer implements IBlockProducer<BlockData> {
   /**
    * This sub-routine does the actual fetching and block processing.
    * It can throw errors which should be handled by the top-level code
-   * (in this case _produce_block())
    */
   private async _doBlockProduce(targetHash: Hash): Promise<BlockData> {
     debug(`\tHash ${targetHash.toString()}.`)
@@ -131,6 +131,14 @@ export class BlockProducer implements IBlockProducer<BlockData> {
     )
   }
 
+  /**
+   * Returns the canonical block at the given height. Currently, only finalized blocks are processed,
+   * and thus we can identify the block hash in a non-ambigous way. This method should replaced with a more
+   * robust hash-only indexing in the future.
+   *
+   * @param h - height of the block
+   * @returns Hash of the canonical block at this height
+   */
   private async getBlockHash(h: number): Promise<Hash> {
     const cachedHeader = this._headerCache.get(h)
 
