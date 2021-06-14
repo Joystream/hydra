@@ -13,7 +13,7 @@ Hydra processor is a client-side 'sink' tool used to fetch substrate events from
 display help for hydra-processor
 
 ```text
-display help for <%= config.bin %>
+display help 
 
 USAGE
   $ hydra-processor help [COMMAND]
@@ -30,7 +30,7 @@ _See code:_ [_@oclif/plugin-help_](https://github.com/oclif/plugin-help/blob/v2.
 ## `hydra-processor migrate`
 
 ```text
-undefined
+Run migrations to setup the schema required for the processor operations
 
 USAGE
   $ hydra-processor migrate
@@ -42,7 +42,7 @@ OPTIONS
 ## `hydra-processor run`
 
 ```text
-undefined
+Run the processor
 
 USAGE
   $ hydra-processor run
@@ -83,6 +83,11 @@ Hydra processor requires a manifest file and certain environment variables to be
 | DB\_PASS | - | **Yes** | Database password |
 | PROMETHEUS\_PORT | 3000 | **No** | A prometheus metrics endpoint is started at this port |
 | POLL\_INTERVAL\_MS | 1 sec \(60000 msec\) | **No** | How often the processor polls the indexer for new blocks |
+| MIN\_BLOCKS\_AHEAD | 0 | **No** | The processor waits until the indexer is ahead by at least that number of blocks |
+| BATCH_SIZE | 1000 | **No** | Batch size, used to gauge the size of the event and processing queue. Bigger values increase the startup time, but reduce the average processing time per event |
+| BLOCK_CACHE_CAPACITY | 10000 | **No** | Number of blocks retained in in-memory cache |
+| DEBUG | `hydra-indexer:*` | **No** | Debug template |
+
 
 The required variables can either be set externally or loaded from a file using the `-e` flag, e.g.:
 
