@@ -28,9 +28,17 @@ The indexer is set up using the following environment variables
 | DB\_PASS | - | **Yes** | Database password |
 | DB\_LOGGING | `error` | No | TypeORM logging level |
 | TYPES\_JSON | - | No | Path to a JSON type definition with custom Substrate types |
+| SPEC\_TYPES | - | No | Path to JSON with spec-level type definitions |
+| CHAIN\_TYPES | - | No | Path to JSON with chain-level type definitions |
+| BUNDLE\_TYPES | - | No | Path to JSON with bundle type definitions |
 | BLOCK\_HEIGHT | 0 | No | Block height to start indexing. Ignored if the database already contains indexed blocks |
 
 ### Manual setup
+
+Prerequisites:
+
+* Postgres 12 instance accepting connections
+* Redis instance accepting connections
 
 Run
 
@@ -58,6 +66,8 @@ Then run the indexer \(make sure that all the required environment variables are
 docker run -e ... joystream/hydra-indexer
 ```
 
+Examples for Joystream, Subsocial and node-template networks with complete docker-compose stacks are available in `examples/indexers`.
+
 ## Advanced environment variables
 
 Some optional environment variables are available for fine-tuning.
@@ -67,7 +77,9 @@ Some optional environment variables are available for fine-tuning.
 | BLOCK\_CACHE\_TTL\_SEC | `60*60` | TTL for processed blocks in the Redis cache |
 | INDEXER\_HEAD\_TTL\_SEC | `60*15` | TTL for the indexer head block entry |
 | WORKERS\_NUMBER | 5 | Number of concurrent workers fetching the blocks |
-| BLOCK\_PRODUCER\_FETCH\_RETRIES | 3 | Number of attempts fetching each a block before throwing an error. Set to `-1` for indefinite attempts |
+| BLOCK\_PRODUCER\_FETCH\_RETRIES | 3 | Number of attempts fetching a block before throwing an error. Set to `-1` for infinite retries |
 | SUBSTRATE\_API\_TIMEOUT | `1000 * 60 * 5` | Timeout in \(milliseconds\) for API calls |
-| NEW\_BLOCK\_TIMEOUT\_MS | `60 * 10 * 1000` | Panic if no blockchain blocks have been received within this time |
-
+| SUBSTRATE\_API\_CALL\_RETRIES | `5` | Number of times an API call is retried before giving up and throwing and error |
+| NEW\_BLOCK\_TIMEOUT\_MS | `60 * 10 * 1000` | Panic if no blocks were received within this time |
+| HEADER\_CACHE\_CAPACITY | `100` | Number of finalized block headers retained in in-memory cache |
+| FINALITY\_THRESHOLD | `5` | Number of block confirmations to consider a block final. Lower thresholds reduce the indexing latency |
