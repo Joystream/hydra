@@ -188,7 +188,7 @@ export function configure(): void {
       NEW_BLOCK_TIMEOUT_MS: num({
         default: 60 * 10 * 1000,
         desc: `If the block producer does not recieve a new block within this time limit,
-panic and thow an error. This is needed to prevent the situation when the
+panic and throw an error. This is needed to prevent the situation when the
 API is disconnected yet no error is thrown, with the block producer stuck in the waiting loop`,
       }),
 
@@ -202,7 +202,7 @@ API is disconnected yet no error is thrown, with the block producer stuck in the
       // by at least that many blocks
       FINALITY_THRESHOLD: num({
         desc: ` before resolving the block hash by the height, wait until it's behind the chain height
-by at least that many blocks'FINALITY_THRESHOLD`,
+by at least that many blocks`,
         default: 5,
       }),
     }),

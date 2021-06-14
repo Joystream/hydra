@@ -76,8 +76,10 @@ describe('ReletionshipGenerator', () => {
 
     // Resolver return type should be ok as well
     const resolver = generator.render(resolverTemplate)
-    expect(resolver).to.include(
-      `async eventinExtrinsic(@Root() r: Extrinsic): Promise<Event[] | null> {`
+    expect(c(resolver)).to.include(
+      c(
+        `async eventinExtrinsic(@Root() r: Extrinsic, @Ctx() ctx: BaseContext): Promise<Event[] | null>`
+      )
     )
   })
 

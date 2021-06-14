@@ -182,9 +182,9 @@ export class SourcesGenerator {
 
   /**
    *
-   * @param template relative path to a template from the templates folder, e.g. 'db-helper.mst'
-   * @param destPath relative path to the `generated/graphql-server' folder, e.g. 'src/index.ts'
-   * @param render function which transforms the template contents
+   * @param template - relative path to a template from the templates folder, e.g. 'db-helper.mst'
+   * @param destPath - relative path to the `generated/graphql-server` folder, e.g. 'src/index.ts'
+   * @param render - function which transforms the template contents
    */
   private renderAndWrite(
     template: string,

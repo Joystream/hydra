@@ -1,39 +1,45 @@
 import { gql } from 'graphql-request'
 
 // to be replaced with a ws subsription
-export const GET_INDEXER_HEAD = `
-query {
-  indexerStatus {
-    head
+export const GET_INDEXER_HEAD = gql`
+  query {
+    indexerStatus {
+      head
+    }
   }
-}
 `
 
-export const SUBSTRATE_EVENTS_LIMIT_BY_ONE = `
-query {
-  substrateEvents(limit: 1) {
-    blockTimestamp
+export const SUBSTRATE_EVENTS_LIMIT_BY_ONE = gql`
+  query {
+    substrateEvents(limit: 1) {
+      blockTimestamp
+    }
   }
-}
 `
 
-export const FIND_TRANSFER_BY_VALUE = `
-query FindTransferByValue($value: BigInt, $block: Int) {
-	transfers(where: { value_eq: $value, block_eq: $block }) {
-        value
-        to
-        from
-        block
-    }  
-}
+export const FIND_TRANSFER_BY_VALUE = gql`
+  query FindTransferByValue($value: BigInt, $block: Int) {
+    transfers(where: { value_eq: $value, block_eq: $block }) {
+      value
+      to
+      from
+      block
+      fromAccount {
+        hex
+      }
+      toAccount {
+        hex
+      }
+    }
+  }
 `
 
-export const ACCOUNTS_BY_VALUE_GT_SOME = `
-query accountsByValueGtSome($value: BigInt) {
-	accounts(where: { outgoingTx_some: { value_gt:  $value } }) {
-    id
+export const ACCOUNTS_BY_VALUE_GT_SOME = gql`
+  query accountsByValueGtSome($value: BigInt) {
+    accounts(where: { outgoingTx_some: { value_gt: $value } }) {
+      id
+    }
   }
-}
 `
 
 export const ACCOUNTS_BY_VALUE_GT_EVERY = `
@@ -44,12 +50,12 @@ query accountsByValueGtEvery($value: BigInt) {
 }
 `
 
-export const ACCOUNTS_BY_VALUE_GT_NONE = `
-query accountsByValueGtNone($value: BigInt) {
-	accounts(where: { outgoingTx_none: { value_gt:  $value } }) {
-    id
+export const ACCOUNTS_BY_VALUE_GT_NONE = gql`
+  query accountsByValueGtNone($value: BigInt) {
+    accounts(where: { outgoingTx_none: { value_gt: $value } }) {
+      id
+    }
   }
-}
 `
 
 export const FTS_COMMENT_QUERY = `
@@ -60,12 +66,12 @@ query Search($text: String!) {
 }
 `
 
-export const FETCH_INSERTED_AT_FIELD_FROM_TRANSFER = `
-query {
-	transfers(limit: 1) {
-    insertedAt
-  }  
-}
+export const FETCH_INSERTED_AT_FIELD_FROM_TRANSFER = gql`
+  query {
+    transfers(limit: 1) {
+      insertedAt
+    }
+  }
 `
 
 export const FTS_COMMENT_QUERY_WITH_WHERE_CONDITION = gql`
@@ -77,12 +83,12 @@ export const FTS_COMMENT_QUERY_WITH_WHERE_CONDITION = gql`
   }
 `
 
-export const LAST_BLOCK_TIMESTAMP = `
-query {
-  blockTimestamps(limit: 1, orderBy: blockNumber_DESC ) {
-    timestamp
+export const LAST_BLOCK_TIMESTAMP = gql`
+  query {
+    blockTimestamps(limit: 1, orderBy: blockNumber_DESC) {
+      timestamp
+    }
   }
-}
 `
 
 // export const INTERFACE_TYPES_WITH_RELATIONSHIP = gql`
@@ -159,6 +165,10 @@ export const EVENT_INTERFACE_QUERY = gql`
       }
       ... on EventC {
         field3
+        complexField {
+          arg1
+          arg2
+        }
       }
     }
   }
