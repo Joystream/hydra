@@ -10,12 +10,13 @@ import {
   Field,
   Int,
   ArgsType,
-  Info
+  Info,
+  Ctx
 } from 'type-graphql';
 import graphqlFields from 'graphql-fields';
 import { Inject } from 'typedi';
 import { Min } from 'class-validator'
-import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields, NestedFields } from 'warthog';
+import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields, NestedFields, BaseContext } from 'warthog';
 
 import {
   {{className}}CreateInput,
@@ -145,12 +146,8 @@ export class {{className}}Resolver {
 
   {{#fieldResolvers}}
     @FieldResolver(() => {{returnTypeFunc}})
-    async {{fieldName}}(@Root() {{rootArgName}}: {{rootArgType}}): {{{returnType}}} {
-      const result = await getConnection().getRepository({{rootArgType}}).findOne({{rootArgName}}.id, { relations: ['{{fieldName}}'] })
-      if (result && result.{{fieldName}} !== undefined) {
-        return result.{{fieldName}};
-      }
-      return null;
+    async {{fieldName}}(@Root() {{rootArgName}}: {{rootArgType}}, @Ctx() ctx: BaseContext): {{{returnType}}} {
+      return ctx.dataLoader.loaders.{{className}}.{{fieldName}}.load({{rootArgName}}); 
     }
 
   {{/fieldResolvers}}
