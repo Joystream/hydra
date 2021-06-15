@@ -16,7 +16,8 @@ import { compact } from 'lodash'
 
 const debug = Debug('hydra-processor:graphql-source')
 
-type SubstrateType = SubstrateBlock | SubstrateEvent | SubstrateExtrinsic
+// a union of all substrate type
+type SubstrateType = SubstrateBlock & SubstrateEvent & SubstrateExtrinsic
 
 const REVIVE_SUBSTRATE_FIELDS: Partial<
   {
@@ -41,6 +42,9 @@ query {
 }
 `
 
+/**
+ * A concrete implementation of `IProcessorSource` which sends GraphQL queries to a indexer-gateway
+ */
 export class GraphQLSource implements IProcessorSource {
   private graphClient: GraphQLClient
   private blockCache: FIFOCache<number, SubstrateBlock>
@@ -97,6 +101,12 @@ export class GraphQLSource implements IProcessorSource {
     }
   }
 
+  /**
+   * Batch execution of indexer queries. Useful when we need to fetch different data in one go
+   *
+   * @param queries - a set of named queries to execute
+   * @returns an aggegated result of the queries as returned by the indexer
+   */
   executeQueries<T>(
     queries: {
       [K in keyof T]: GraphQLQuery<T[K]>
@@ -121,6 +131,12 @@ export class GraphQLSource implements IProcessorSource {
     return this.blockCache.get(blockNumber) as SubstrateBlock
   }
 
+  /**
+   * Queries the indexer and fetches all the relavant data on the blocks of given heights
+   *
+   * @param heights - an array of block heights to be queried
+   * @returns `SubstrateBlock` data from the indexer
+   */
   async fetchBlocks(heights: number[]): Promise<SubstrateBlock[]> {
     if (conf().VERBOSE) debug(`Fetching blocks: ${JSON.stringify(heights)}`)
 
@@ -169,6 +185,11 @@ export class GraphQLSource implements IProcessorSource {
     return [...cached, ...result.blocks].sort()
   }
 
+  /**
+   *
+   * @param query - a query to fetch
+   * @returns a typed response with revived BigInt/BN fields (as they are not deserialized properly by default)
+   */
   private requestSubstrateData<T>(query: string): Promise<T> {
     // TODO: use timeouts?
     return this.request<T, SubstrateType>(query, REVIVE_SUBSTRATE_FIELDS)
@@ -208,7 +229,12 @@ export function collectQueries(queries: {
   }`
 }
 
-// FIXME: refactor into a generic GraphQL query builder
+// FIXME: refactor using GraphQL query builder
+/**
+ *
+ * @param param0 - an `IndexerQuery` object containing all the filtering information to query the indexer
+ * @returns a query string to be passed to `GraphQLClient`
+ */
 export function getEventsGraphQLQuery({
   event,
   extrinsic,

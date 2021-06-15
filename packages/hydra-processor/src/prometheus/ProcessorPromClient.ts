@@ -8,6 +8,9 @@ import { getConfig as conf } from '../start/config'
 
 const debug = Debug('index-builder:processor-prom-client')
 
+/**
+ * A simple prometheus client exposing key processor metrics
+ */
 export class ProcessorPromClient {
   protected lastScannedBlock = new Gauge({
     name: 'hydra_processor_last_scanned_block',

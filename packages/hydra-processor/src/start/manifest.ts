@@ -159,6 +159,13 @@ export interface ProcessorManifest {
   mappings: MappingsDef
 }
 
+/**
+ * This function parses the manifest file and transforms it into
+ * a `ProcessorManifest` instance
+ *
+ * @param manifestLoc - path to the manifest file
+ * @returns a manifest object
+ */
 export function parseManifest(manifestLoc: string): ProcessorManifest {
   const validator = new YamlValidator(manifestValidatorOptions)
   validator.validate([manifestLoc])

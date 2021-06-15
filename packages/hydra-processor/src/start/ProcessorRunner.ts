@@ -13,11 +13,10 @@ import { getHydraVersion } from '../state/version'
 
 const debug = Debug('hydra-processor:runner')
 
-// Respondible for creating, starting up and shutting down the query node.
-// Currently this class is a bit thin, but it will almost certainly grow
-// as the integration logic between the library types and the application
-// evolves, and that will pay abstraction overhead off in terms of testability of otherwise
-// anonymous code in root file scope.
+/**
+ * This is a starter class, which sets up the DB connection,
+ * instantiates the `MappingProcessor`, Promtheus Client and so on
+ */
 export class ProcessorRunner {
   private connection: Connection | undefined
   private processor: MappingsProcessor | undefined

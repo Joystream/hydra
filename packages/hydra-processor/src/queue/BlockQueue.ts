@@ -76,6 +76,10 @@ export class BlockQueue implements IBlockQueue {
     this.indexerQueries = prepareIndexerQueries(this.mappingFilter)
   }
 
+  /**
+   *
+   * @returns initial range based on the persisted processor state and manifest
+   */
   getInitialRange(): RangeFilter {
     const { lastScannedBlock, lastProcessedEvent } = this.stateKeeper.getState()
 
@@ -138,12 +142,17 @@ export class BlockQueue implements IBlockQueue {
     return first(this.eventQueue)
   }
 
+  /**
+   *
+   * @returns a generator for blocks filled with mappable events
+   */
   async *blocksWithEvents(): AsyncGenerator<BlockData, void, void> {
     // FIXME: this method only produces blocks with some event.
 
     while (this._started) {
       debug(`Sealing new block`)
 
+      // get the event at the top of the queue
       let nextEventData = await this.poll()
 
       if (nextEventData === undefined) {
@@ -153,6 +162,7 @@ export class BlockQueue implements IBlockQueue {
 
       const events = [nextEventData]
 
+      // load the block data for this event
       const block = await this.dataSource.getBlock(
         nextEventData.event.blockNumber
       )
@@ -161,6 +171,7 @@ export class BlockQueue implements IBlockQueue {
       // wait until all the events up to blockNumber are fully fetched
       pWaitFor(() => this.rangeFilter.block.gt >= block.height)
 
+      // and then fill up the block data with events in the same block
       while (
         !this.isEmpty() &&
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -186,9 +197,14 @@ export class BlockQueue implements IBlockQueue {
     return this.eventQueue.length === 0
   }
 
-  // Long running loop where events are fetched
+  /**
+   * This is a long-running loop where the queue is constantly replenished
+   * When the queue approaces its max capacity, the filler waits until it's drained
+   * by the downstream `MappingProcessor`
+   */
   private async fill(): Promise<void> {
     while (this._started && this._hasNext) {
+      // if we're at max capacity, wait until the queue is drained
       await pWaitFor(
         () =>
           this.eventQueue.length <=
@@ -201,6 +217,7 @@ export class BlockQueue implements IBlockQueue {
         }`
       )
 
+      // fetch events from the dataSource (indexer-gateway) and fill up the queue
       const events: EventData[] = await this.fetchNextBatch()
 
       this.eventQueue.push(...events)
@@ -211,6 +228,9 @@ export class BlockQueue implements IBlockQueue {
         this.rangeFilter.id.gt = last(events)?.event.id as string
       }
 
+      // if the number of fetched events is smaller then the batch size,
+      // it means that we have scooped all the events in the current filter range,
+      // so we slide the range filter further
       if (events.length < conf().QUEUE_BATCH_SIZE) {
         // This means that we have exhausted all the events up to lastScannedblock + WINDOW
         if (conf().VERBOSE)
@@ -269,6 +289,13 @@ export class BlockQueue implements IBlockQueue {
     }
   }
 
+  /**
+   * Fitch blocks in the given range, for which there are registered hooks.
+   *
+   * TODO: this implementation is sub-optimal and the perfomarmance can be improved
+   *
+   * @param range - range filter to restrict the search
+   */
   async *blocksWithHooks(range: Range): AsyncGenerator<BlockData, void, void> {
     const ranges = intersectWith(range, this.heightsWithHooks)
 
@@ -288,6 +315,13 @@ export class BlockQueue implements IBlockQueue {
     }
   }
 
+  /**
+   * Fetch the next batch of events from the indexer gateway. It takes the current range filter,
+   * and fetches all events that follow after the last fetched events.
+   * Additionally, the total number of fetched events is limited by BATCH_SIZE
+   *
+   * @returns batch of events restricted to the current range filter and the max batch size
+   */
   private async fetchNextBatch() {
     const queries = mapValues(
       this.indexerQueries,
@@ -348,6 +382,13 @@ export function sortAndTrim(
   return mappingData
 }
 
+/**
+ * Build an `IndexerQuery` based on the event and extrinsic names, as well as the mapping
+ * filters defined in the manifest.
+ *
+ * @param filter - a fitler restricting the event search
+ * @returns
+ */
 export function prepareIndexerQueries(
   filter: MappingFilter
 ): { [key in Kind]?: Partial<IndexerQuery> } {

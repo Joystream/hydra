@@ -10,9 +10,12 @@ import { getMappingExecutor, IMappingExecutor, isTxAware } from '../executor'
 import { getManifest } from '../start/config'
 const debug = Debug('hydra-processor:mappings-processor')
 
+/**
+ * Main class responsible for passing the data to the mapping executor
+ */
 export class MappingsProcessor {
   private _started = false
-  private eventQueue!: IBlockQueue
+  private blockQueue!: IBlockQueue
   private stateKeeper!: IStateKeeper
   private mappingsExecutor!: IMappingExecutor
 
@@ -21,14 +24,14 @@ export class MappingsProcessor {
     this._started = true
 
     this.mappingsExecutor = await getMappingExecutor()
-    this.eventQueue = await getBlockQueue()
+    this.blockQueue = await getBlockQueue()
     this.stateKeeper = await getStateKeeper()
 
-    await Promise.all([this.eventQueue.start(), this.processingLoop()])
+    await Promise.all([this.blockQueue.start(), this.processingLoop()])
   }
 
   stop(): void {
-    this.eventQueue.stop()
+    this.blockQueue.stop()
     this._started = false
   }
 
@@ -36,7 +39,10 @@ export class MappingsProcessor {
     return !this._started
   }
 
-  // Long running loop where events are fetched and the mappings are applied
+  /**
+   * Long running loop where the event and block data is retrieved from
+   * the blockQueue, and passed to the mapping executor in the right order
+   */
   private async processingLoop(): Promise<void> {
     while (this.shouldWork()) {
       try {
@@ -44,7 +50,7 @@ export class MappingsProcessor {
         // in the requested blocks, so we simply fast-forward `lastScannedBlock`
         debug('awaiting')
 
-        const next = await this.eventQueue.blocksWithEvents().next()
+        const next = await this.blockQueue.blocksWithEvents().next()
 
         // range of heights where there might be blocks with hooks
         const hookLookupRange = {
@@ -55,7 +61,7 @@ export class MappingsProcessor {
         }
 
         // process blocks with hooks that preceed the event block
-        for await (const b of this.eventQueue.blocksWithHooks(
+        for await (const b of this.blockQueue.blocksWithHooks(
           hookLookupRange
         )) {
           await this.processBlock(b)
@@ -79,6 +85,11 @@ export class MappingsProcessor {
     info(`Terminating the processor`)
   }
 
+  /**
+   * Here we do the actual processing by forwarding the block data to the Mapping Executor
+   *
+   * @param nextBlock - a block data to process
+   */
   private async processBlock(nextBlock: BlockData) {
     info(
       `Processing block: ${nextBlock.block.id}, events count: ${nextBlock.events.length} `

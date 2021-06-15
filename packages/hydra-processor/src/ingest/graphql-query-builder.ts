@@ -89,6 +89,11 @@ export function collectFieldClauses<T>(where: ObjectFilter<T>): string {
   return `${compact(whereBody).join(', ')}`
 }
 
+/**
+ * 
+ * @param where - filter object
+ * @returns the `where` part of the GQL query
+ */
 export function buildWhere<T>(where: ObjectFilter<T>): string {
   // let whereBody: string[] = Object.keys(where).reduce((acc, f) => {
   //   acc.push(...clauses(f, where[f as keyof typeof where]))
@@ -127,6 +132,11 @@ export function buildQueryFields<T>(fields: QueryFields<T>): string {
   return format(output)
 }
 
+/**
+ *
+ * @param orderBy - order by object
+ * @returns an orderBy part of the query, following the OpenCRUD standard
+ */
 export function formatOrderBy(
   orderBy:
     | Partial<{
@@ -150,6 +160,20 @@ export function formatOrderBy(
   return `orderBy: ${field}_${suffix}`
 }
 
+/**
+ * Builds a gql query string based off the `GraphQLQuery` object, following the OpenCRUD standard.
+ * Essentially it follows the tempalte
+ * ```
+ * query {
+ *  ${name} (where: { <filtering parts> }, <limit parts>, <order by parts>) {
+ *    <fields>
+ *  }
+ * }
+ * ```
+ *
+ * @param - a `GraphQLQuery` object representing the query
+ * @returns a string that can be used with any GraphQL client
+ */
 export function buildQuery<T>({
   name,
   query: { where, limit, orderBy },
@@ -166,6 +190,21 @@ export function buildQuery<T>({
   }`)
 }
 
+/**
+ * Builds multple named queries off `GraphQLQuery` and builds an aggregated
+ * query of the form
+ *
+ * ```
+ * query {
+ *  <name1>: <first query>,
+ *  <name2>: <second query>,
+ *   ...
+ * }
+ * ```
+ *
+ * @param queries
+ * @returns a string to be passed to any `GraphQLClient>
+ */
 export function collectNamedQueries<T>(
   queries: {
     [K in keyof T]: GraphQLQuery<T[K]>

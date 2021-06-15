@@ -8,6 +8,9 @@ export interface BlockMappings {
   mappings: MappingHandler[]
 }
 
+/**
+ * An interface for looking up the right handler for the given data and proving an execution context for it
+ */
 export interface IMappingsLookup {
   lookupHandlers(ctx: BlockData): BlockMappings
 
