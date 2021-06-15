@@ -30,10 +30,10 @@ export interface ISubstrateService {
   lastRuntimeUpgrade(hash: Hash): Promise<LastRuntimeUpgradeInfo | undefined>
   runtimeVersion(hash: Hash): Promise<RuntimeVersion>
   timestamp(hash: Hash): Promise<BN>
-  
+
   /**
    * Performs multiple RPC calls and collect into a `BlockData` object.
-   * 
+   *
    * @param hash block hash to fetch
    */
   getBlockData(hash: Hash): Promise<BlockData>
