@@ -57,7 +57,6 @@ type MiddleClass @variant {
 
 union Status = MiddleClass | HappyPoor | Miserable
 
-
 type Extrinsic @entity {
   id: ID!
   hash: String!
@@ -70,7 +69,7 @@ interface Event @entity {
   network: Network!
 }
 
-type EventA implements Event @entity { 
+type EventA implements Event @entity {
   id: ID!
   inExtrinsic: String
   inBlock: Int!
@@ -79,7 +78,7 @@ type EventA implements Event @entity {
   field1: String!
 }
 
-type EventB implements Event @entity { 
+type EventB implements Event @entity {
   id: ID!
   inExtrinsic: String
   inBlock: Int!
@@ -93,7 +92,7 @@ type EventC implements Event @entity {
   inExtrinsic: String
   inBlock: Int!
   network: Network!
-  indexInBlock: Int!  
+  indexInBlock: Int!
   field3: String!
   complexField: ComplexEntity!
 }
@@ -108,4 +107,21 @@ enum Network {
   ALEXANDRIA
   ROME
   OLYMPIA
+}
+
+type ArrayData @jsonField {
+  data: Bytes
+}
+
+type EventParam @jsonField {
+  name: String
+  type: String
+  value: String
+
+  arrayData: [ArrayData!]
+}
+
+type SystemEvent @entity {
+  id: ID!
+  params: EventParam!
 }

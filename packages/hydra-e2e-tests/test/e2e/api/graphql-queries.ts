@@ -42,12 +42,12 @@ export const ACCOUNTS_BY_VALUE_GT_SOME = gql`
   }
 `
 
-export const ACCOUNTS_BY_VALUE_GT_EVERY = `
-query accountsByValueGtEvery($value: BigInt) {
-	accounts(where: { outgoingTx_every: { value_gt:  $value } }) {
-    id
+export const ACCOUNTS_BY_VALUE_GT_EVERY = gql`
+  query accountsByValueGtEvery($value: BigInt) {
+    accounts(where: { outgoingTx_every: { value_gt: $value } }) {
+      id
+    }
   }
-}
 `
 
 export const ACCOUNTS_BY_VALUE_GT_NONE = gql`
@@ -58,12 +58,12 @@ export const ACCOUNTS_BY_VALUE_GT_NONE = gql`
   }
 `
 
-export const FTS_COMMENT_QUERY = `
-query Search($text: String!) {
-  commentSearch(text: $text) {
-    highlight
+export const FTS_COMMENT_QUERY = gql`
+  query Search($text: String!) {
+    commentSearch(text: $text) {
+      highlight
+    }
   }
-}
 `
 
 export const FETCH_INSERTED_AT_FIELD_FROM_TRANSFER = gql`
@@ -178,6 +178,21 @@ export const INTERFACES_FILTERING_BY_ENUM = gql`
   query InterfaceQuery {
     events(where: { type_in: [EventA] }) {
       indexInBlock
+    }
+  }
+`
+
+export const TYPED_JSONFIELD_FILTERING = gql`
+  query {
+    systemEvents {
+      params {
+        name
+        type
+        value
+        arrayData {
+          data
+        }
+      }
     }
   }
 `

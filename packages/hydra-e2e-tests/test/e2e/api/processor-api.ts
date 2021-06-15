@@ -13,6 +13,7 @@ import {
 } from './graphql-queries'
 import { SubscriptionClient } from 'graphql-subscriptions-client'
 import pWaitFor = require('p-wait-for')
+import { SystemEvent } from './types'
 
 export interface Transfer {
   value: string
@@ -159,4 +160,13 @@ export async function accountByOutgoingTxValue(
   }>(query, { value: value.toString() })
 
   return result.accounts
+}
+
+export async function fetchTypedJsonFields(
+  query: string
+): Promise<SystemEvent[]> {
+  const { systemEvents } = await getGQLClient().request<{
+    systemEvents: SystemEvent[]
+  }>(query)
+  return systemEvents
 }

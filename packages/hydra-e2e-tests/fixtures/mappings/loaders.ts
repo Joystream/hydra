@@ -5,6 +5,9 @@ import {
   EventC,
   Network,
   ComplexEntity,
+  SystemEvent,
+  EventParams,
+  ArrayData,
 } from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
@@ -52,4 +55,21 @@ export async function eventLoader({ store }: BlockContext & StoreContext) {
     store.save<EventC>(c),
   ])
   console.log(`Loaded events`)
+}
+
+export async function jsonFieldLoader({ store }: BlockContext & StoreContext) {
+  const e = new SystemEvent()
+  const params = new EventParams()
+  const arrayData = new ArrayData()
+
+  params.name = 'account'
+  params.type = 'string'
+  params.value = '0x000'
+
+  arrayData.data = Buffer.from(`0x000`)
+
+  params.arrayData = [arrayData]
+  e.params = params
+
+  await store.save<SystemEvent>(e)
 }
