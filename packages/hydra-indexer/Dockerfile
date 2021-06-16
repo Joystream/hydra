@@ -26,7 +26,7 @@ RUN yarn --frozen-lockfile --non-interactive
 COPY --chown=node:node tsconfig.json ./packages/hydra-indexer/
 COPY --chown=node:node src ./packages/hydra-indexer/src
 
-RUN yarn workspace @dzlzv/hydra-indexer build
+RUN yarn workspace @subsquid/hydra-indexer build
 
 WORKDIR /home/hydra/packages/hydra-indexer
 

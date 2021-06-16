@@ -19,8 +19,8 @@ yarn hydra-cli scaffold --dir hydra-test --name hydra-test --silent
 cp -R fixtures/* hydra-test
 docker build . -t hydra-test:latest
 
-(cd ../ && yarn workspace @dzlzv/hydra-indexer docker:build)
-(cd ../ && yarn workspace @dzlzv/hydra-indexer-gateway docker:build)
+(cd ../ && yarn workspace @subsquid/hydra-indexer docker:build)
+(cd ../ && yarn workspace @subsquid/hydra-indexer-gateway docker:build)
 
 docker-compose up -d
 

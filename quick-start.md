@@ -5,7 +5,7 @@ description: Build a Hydra Indexer and GraphQL server from scratch under five mi
 # Quickstart
 
 {% hint style="info" %}
-Before starting, make sure`hydra-cli`is [installed](install-hydra.md) on your machine together with all the prerequisites. Use @dzlzv/hydra-cli@next version to use the latest features.
+Before starting, make sure`hydra-cli`is [installed](install-hydra.md) on your machine together with all the prerequisites. Use @subsquid/hydra-cli@next version to use the latest features.
 {% endhint %}
 
 ## 0. Hello Hydra!

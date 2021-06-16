@@ -1,5 +1,5 @@
 import { ConnectionOptions } from 'typeorm'
-import { SnakeNamingStrategy } from '@dzlzv/hydra-db-utils'
+import { SnakeNamingStrategy } from '@subsquid/hydra-db-utils'
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 
 const config: () => ConnectionOptions = () => {

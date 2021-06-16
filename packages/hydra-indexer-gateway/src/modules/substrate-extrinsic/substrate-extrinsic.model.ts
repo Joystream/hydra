@@ -11,7 +11,7 @@ import {
 import { Field } from 'type-graphql'
 import { SubstrateEvent } from '../substrate-event/substrate-event.model'
 import * as BN from 'bn.js'
-import { NumericTransformer } from '@dzlzv/bn-typeorm'
+import { NumericTransformer } from '@subsquid/bn-typeorm'
 import { GraphQLBigNumber } from '../../types/bn-graphql'
 import { OneToOne, Column } from 'typeorm'
 

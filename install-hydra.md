@@ -12,13 +12,13 @@
 ## Installation
 
 {% hint style="warning" %}
-Use `@dzlzv/hydra-cli@next` for the most recent development version 
+Use `@subsquid/hydra-cli@next` for the most recent development version 
 {% endhint %}
 
 _Global installation:_
 
 ```bash
-npm install -g @dzlzv/hydra-cli
+npm install -g @subsquid/hydra-cli
 ```
 
 The path to `hydra-cli` binaries will be added to the system-wide `$PATH`.
@@ -26,7 +26,7 @@ The path to `hydra-cli` binaries will be added to the system-wide `$PATH`.
 _Local installation:_
 
 ```bash
-npm install @dzlzv/hydra-cli
+npm install @subsquid/hydra-cli
 ```
 
 The binaries will be installed to the local `.bin` folder. You can execute `hydra-cli` commands by adding the`.bin`folder within your local `node_modules` to `$PATH`.
@@ -36,7 +36,7 @@ _Isolated set-up:_
 Execute `hydra-cli` commands directly by typing
 
 ```bash
-npx @dzlzv/hydra-cli <command>
+npx @subsquid/hydra-cli <command>
 ```
 
 This provides an isolated way to execute `hydra-cli` commands.
@@ -49,13 +49,13 @@ Run `hydra-cli --version` to check your installation
 It may be convenient to create an alias for quick access to `hydra-cli` e.g.
 
 ```text
-alias hydra-cli='npx @dzlzv/hydra-cli'
+alias hydra-cli='npx @subsquid/hydra-cli'
 ```
 
 Or on Windows you can use:
 
 ```text
-doskey hydra-cli=npx @dzlzv/hydra-cli
+doskey hydra-cli=npx @subsquid/hydra-cli
 ```
 {% endhint %}
 

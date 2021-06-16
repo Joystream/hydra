@@ -241,11 +241,11 @@ export function withDependenciesResolutions(
     ...ctx,
     hydraVersion:
       process.env.HYDRA_CLI_VERSION ||
-      resolvePackageVersion('@dzlzv/hydra-cli'),
-    hydraCommonVersion: resolvePackageVersion('@dzlzv/hydra-common'),
-    hydraDbUtilsVersion: resolvePackageVersion('@dzlzv/hydra-db-utils'),
-    hydraProcessorVersion: resolvePackageVersion('@dzlzv/hydra-processor'),
-    hydraTypegenVersion: resolvePackageVersion('@dzlzv/hydra-typegen'),
+      resolvePackageVersion('@subsquid/hydra-cli'),
+    hydraCommonVersion: resolvePackageVersion('@subsquid/hydra-common'),
+    hydraDbUtilsVersion: resolvePackageVersion('@subsquid/hydra-db-utils'),
+    hydraProcessorVersion: resolvePackageVersion('@subsquid/hydra-processor'),
+    hydraTypegenVersion: resolvePackageVersion('@subsquid/hydra-typegen'),
     hydraWarthogVersion: getWarthogDependency(),
   }
 }

@@ -49,9 +49,9 @@
     "bn.js": "^5.1.2"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "{{{hydraVersion}}}",
-    "@dzlzv/hydra-processor": "{{{hydraProcessorVersion}}}",
-    "@dzlzv/hydra-typegen": "{{{hydraTypegenVersion}}}",
+    "@subsquid/hydra-cli": "{{{hydraVersion}}}",
+    "@subsquid/hydra-processor": "{{{hydraProcessorVersion}}}",
+    "@subsquid/hydra-typegen": "{{{hydraTypegenVersion}}}",
     "dotenv-cli": "^4.0.0"
   }
 }

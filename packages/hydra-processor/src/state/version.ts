@@ -4,7 +4,7 @@ import fs from 'fs'
 
 const debug = Debug('hydra-processor:util')
 
-export const PROCESSOR_PACKAGE_NAME = '@dzlzv/hydra-processor'
+export const PROCESSOR_PACKAGE_NAME = '@subsquid/hydra-processor'
 
 export function validateHydraVersion(hydraVersion: string): void {
   const oursHydraVersion = getHydraVersion()

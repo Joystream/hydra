@@ -16,7 +16,7 @@ import {
   BlockContext,
   StoreContext,
   DatabaseManager,
-} from '@dzlzv/hydra-common'
+} from '@subsquid/hydra-common'
 
 const start = Date.now()
 let blockTime = 0

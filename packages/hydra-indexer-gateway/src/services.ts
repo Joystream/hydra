@@ -1,6 +1,6 @@
 import Container from 'typedi'
 import { Config } from 'warthog'
-import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
+import { RedisClientFactory } from '@subsquid/hydra-db-utils'
 import Debug from 'debug'
 const debug = Debug('index-server:index')
 /**

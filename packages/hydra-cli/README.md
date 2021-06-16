@@ -7,13 +7,13 @@ A cli tool for running a [Hydra](https://joystream.org/hydra) query node
 Using `npx`:
 
 ```bash
-$ alias hydra-cli='npx @dzlzv/hydra-cli'
+$ alias hydra-cli='npx @subsquid/hydra-cli'
 ```
 
 or install via npm:
 
 ```bash
-npm install -g @dzlzv/hydra-cli
+npm install -g @subsquid/hydra-cli
 ```
 
 and then

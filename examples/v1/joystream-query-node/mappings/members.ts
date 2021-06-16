@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import { Member } from '../generated/graphql-server/src/modules/member/member.model'
-import { SubstrateEvent, AnyJsonField, ExtrinsicArg } from '@dzlzv/hydra-common'
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import { SubstrateEvent, AnyJsonField, ExtrinsicArg } from '@subsquid/hydra-common'
+import { DatabaseManager } from '@subsquid/hydra-db-utils'
 
 interface CheckedUserInfo {
   handle: string

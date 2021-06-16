@@ -4,7 +4,7 @@ import {
   SubstrateBlock,
   SubstrateEvent,
   SubstrateExtrinsic,
-} from '@dzlzv/hydra-common'
+} from '@subsquid/hydra-common'
 import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
 import { getConfig as conf } from '../start/config'

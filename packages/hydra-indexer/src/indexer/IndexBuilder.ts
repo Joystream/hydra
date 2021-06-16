@@ -7,7 +7,7 @@ import {
 } from '../model'
 import _ from 'lodash'
 
-import { toPayload } from '@dzlzv/hydra-common'
+import { toPayload } from '@subsquid/hydra-common'
 
 import Debug from 'debug'
 import { PooledExecutor } from './PooledExecutor'

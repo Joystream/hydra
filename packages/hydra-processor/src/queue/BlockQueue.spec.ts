@@ -2,7 +2,7 @@ import { BlockQueue } from './BlockQueue'
 import { expect } from 'chai'
 import { RangeFilter, MappingFilter } from './IBlockQueue'
 import { IndexerStatus, IProcessorState, IStateKeeper } from '../state'
-import { formatEventId } from '@dzlzv/hydra-common'
+import { formatEventId } from '@subsquid/hydra-common'
 import { getConfig as conf } from '../start/config'
 
 describe('EventQueue', () => {

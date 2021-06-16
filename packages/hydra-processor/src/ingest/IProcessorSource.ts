@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { AnyJson, SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
+import { AnyJson, SubstrateBlock, SubstrateEvent } from '@subsquid/hydra-common'
 import { IndexerStatus } from '../state'
 
 export interface Filter {

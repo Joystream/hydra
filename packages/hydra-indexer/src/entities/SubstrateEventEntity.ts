@@ -12,7 +12,7 @@ import {
   SubstrateEvent,
   formatId,
   ExtrinsicArg,
-} from '@dzlzv/hydra-common'
+} from '@subsquid/hydra-common'
 import { EventRecord } from '@polkadot/types/interfaces'
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity'
 import { AbstractWarthogModel } from './AbstractWarthogModel'

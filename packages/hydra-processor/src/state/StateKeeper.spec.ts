@@ -1,4 +1,4 @@
-import { formatEventId } from '@dzlzv/hydra-common'
+import { formatEventId } from '@subsquid/hydra-common'
 import { expect } from 'chai'
 import { initState } from './StateKeeper'
 

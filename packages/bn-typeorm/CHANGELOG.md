@@ -50,7 +50,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.0.0](https://github.com/Joystream/hydra/compare/v3.0.0-beta.8...v3.0.0) (2021-05-24)
 
-**Note:** Version bump only for package @dzlzv/bn-typeorm
+**Note:** Version bump only for package @subsquid/bn-typeorm
 
 
 
@@ -58,7 +58,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## 3.0.0-beta.8 (2021-05-24)
 
-**Note:** Version bump only for package @dzlzv/bn-typeorm
+**Note:** Version bump only for package @subsquid/bn-typeorm
 
 
 
@@ -120,7 +120,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.0.0-beta.1](https://github.com/dzhelezov/hydra/compare/v2.1.0-beta.8...v3.0.0-beta.1) (2021-05-07)
 
-**Note:** Version bump only for package @dzlzv/bn-typeorm
+**Note:** Version bump only for package @subsquid/bn-typeorm
 
 
 
@@ -173,7 +173,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [2.1.0-beta.3](https://github.com/dzhelezov/hydra/compare/v2.0.1-beta.17...v2.1.0-beta.3) (2021-03-31)
 
-**Note:** Version bump only for package @dzlzv/bn-typeorm
+**Note:** Version bump only for package @subsquid/bn-typeorm
 
 
 
@@ -307,7 +307,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### 2.0.1-beta.4 (2021-03-05)
 
-**Note:** Version bump only for package @dzlzv/bn-typeorm
+**Note:** Version bump only for package @subsquid/bn-typeorm
 
 
 
@@ -324,4 +324,4 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## 2.0.1-beta.2 (2021-03-04)
 
-**Note:** Version bump only for package @dzlzv/bn-typeorm
+**Note:** Version bump only for package @subsquid/bn-typeorm

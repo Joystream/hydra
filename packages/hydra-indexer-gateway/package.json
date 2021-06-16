@@ -1,5 +1,5 @@
 {
-  "name": "@dzlzv/hydra-indexer-gateway",
+  "name": "@subsquid/hydra-indexer-gateway",
   "private": "true",
   "version": "3.1.0-alpha.1",
   "description": "Generated Warthog Project",
@@ -40,9 +40,9 @@
     "test:watch": "DEBUG= jest --watch"
   },
   "dependencies": {
-    "@dzlzv/bn-typeorm": "^3.1.0-alpha.1",
-    "@dzlzv/hydra-common": "^3.1.0-alpha.1",
-    "@dzlzv/hydra-db-utils": "^3.1.0-alpha.1",
+    "@subsquid/bn-typeorm": "^3.1.0-alpha.1",
+    "@subsquid/hydra-common": "^3.1.0-alpha.1",
+    "@subsquid/hydra-db-utils": "^3.1.0-alpha.1",
     "@types/ioredis": "^4.17.4",
     "bn.js": "^5.1.3",
     "dotenv": "^8.2.0",

@@ -9,7 +9,7 @@ import pThrottle from 'p-throttle'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import { getConfig as conf, getManifest } from '../start/config'
 import { isInRange, Range, parseEventId, info, warn } from '../util'
-import { formatEventId, SubstrateEvent } from '@dzlzv/hydra-common'
+import { formatEventId, SubstrateEvent } from '@subsquid/hydra-common'
 import { IndexerStatus } from '.'
 import { validateIndexerVersion } from './version'
 const debug = Debug('hydra-processor:processor-state-handler')

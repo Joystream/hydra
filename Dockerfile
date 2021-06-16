@@ -20,10 +20,10 @@ ADD --chown=node:node ./packages/hydra-typegen ./packages/hydra-typegen
 
 RUN yarn --frozen-lockfile 
 
-RUN yarn workspace @dzlzv/bn-typeorm build
-RUN yarn workspace @dzlzv/hydra-common build
-RUN yarn workspace @dzlzv/hydra-db-utils build
-RUN yarn workspace @dzlzv/hydra-processor build
-RUN yarn workspace @dzlzv/hydra-cli build
-RUN yarn workspace @dzlzv/hydra-typegen build
+RUN yarn workspace @subsquid/bn-typeorm build
+RUN yarn workspace @subsquid/hydra-common build
+RUN yarn workspace @subsquid/hydra-db-utils build
+RUN yarn workspace @subsquid/hydra-processor build
+RUN yarn workspace @subsquid/hydra-cli build
+RUN yarn workspace @subsquid/hydra-typegen build
 

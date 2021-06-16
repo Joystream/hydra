@@ -4,7 +4,7 @@ import {
   ExtrinsicInfo,
   formatId,
   SubstrateBlock,
-} from '@dzlzv/hydra-common'
+} from '@subsquid/hydra-common'
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm'
 import { BlockData, fullName, getExtrinsic } from '../model'
 import { AbstractWarthogModel } from './AbstractWarthogModel'

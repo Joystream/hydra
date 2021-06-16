@@ -1,4 +1,4 @@
-import { ExecContext } from '@dzlzv/hydra-common'
+import { ExecContext } from '@subsquid/hydra-common'
 import { BlockData } from '../queue'
 import { MappingHandler } from '../start/manifest'
 

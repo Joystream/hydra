@@ -1,5 +1,5 @@
 // @ts-check
-import { DatabaseManager, SubstrateEvent } from '@dzlzv/hydra-common'
+import { DatabaseManager, SubstrateEvent } from '@subsquid/hydra-common'
 
 export type QueryEventProcessorResult = void | Promise<void>
 export type EventHandlerFunc = (

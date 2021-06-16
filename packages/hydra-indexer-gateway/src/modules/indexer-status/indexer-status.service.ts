@@ -1,11 +1,11 @@
 import { Container, Service } from 'typedi'
 import * as IORedis from 'ioredis'
-import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
+import { RedisClientFactory } from '@subsquid/hydra-db-utils'
 import { IndexerStatus } from './indexer-status.resolver'
 import Debug from 'debug'
 import { hydraVersion } from '../../version'
 import { Logger } from '../../logger'
-import { logError } from '@dzlzv/hydra-common'
+import { logError } from '@subsquid/hydra-common'
 
 const debug = Debug('index-server:indexer-status-service')
 

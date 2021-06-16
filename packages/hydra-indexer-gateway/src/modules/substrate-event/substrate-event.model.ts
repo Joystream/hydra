@@ -12,8 +12,8 @@ import { ObjectType, Field } from 'type-graphql'
 import { Column, OneToOne, JoinColumn } from 'typeorm'
 import { GraphQLJSON } from 'graphql-type-json'
 
-import { NumericTransformer } from '@dzlzv/bn-typeorm'
-import { AnyJson, AnyJsonField } from '@dzlzv/hydra-common'
+import { NumericTransformer } from '@subsquid/bn-typeorm'
+import { AnyJson, AnyJsonField } from '@subsquid/hydra-common'
 
 import { SubstrateExtrinsic } from '../substrate-extrinsic/substrate-extrinsic.model'
 import GraphQLBigNumber from '../../types/bn-graphql'

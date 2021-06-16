@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { logError } from '@dzlzv/hydra-common'
+import { logError } from '@subsquid/hydra-common'
 import Debug from 'debug'
 
 import { IStateKeeper, getStateKeeper } from '../state'

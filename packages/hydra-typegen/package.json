@@ -1,5 +1,5 @@
 {
-  "name": "@dzlzv/hydra-typegen",
+  "name": "@subsquid/hydra-typegen",
   "version": "3.1.0-alpha.1",
   "description": "\"Hydra-cli pluging for generating typed events\"",
   "main": "lib/index.js",
@@ -12,6 +12,9 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "hydra-typegen": "./bin/run"
   },
@@ -28,7 +31,7 @@
   "oclif": {
     "commands": "./lib/commands",
     "bin": "hydra-typegen",
-    "scope": "@dzlzv",
+    "scope": "@subsquid",
     "plugins": [
       "@oclif/plugin-help",
       "@oclif/errors"
