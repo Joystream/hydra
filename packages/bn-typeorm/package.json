@@ -1,5 +1,5 @@
 {
-  "name": "@dzlzv/bn-typeorm",
+  "name": "@joystream/bn-typeorm",
   "version": "3.1.0-alpha.1",
   "description": "TypeORM transformer for BigNumber",
   "main": "lib/index.js",
@@ -8,6 +8,9 @@
     "/lib",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "scripts": {
     "pub": "yarn build && yarn publish --access public",

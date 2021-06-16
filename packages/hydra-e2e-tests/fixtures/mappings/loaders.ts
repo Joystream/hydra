@@ -9,7 +9,7 @@ import {
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
-import { BlockContext, StoreContext } from '@dzlzv/hydra-common'
+import { BlockContext, StoreContext } from '@joystream/hydra-common'
 
 export async function loader(ctx: BlockContext & StoreContext) {
   await eventLoader(ctx)

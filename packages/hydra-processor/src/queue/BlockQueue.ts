@@ -17,7 +17,7 @@ import {
   EventData,
 } from './IBlockQueue'
 import { MappingsDef } from '../start/manifest'
-import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { SubstrateEvent } from '@joystream/hydra-common'
 import { IndexerQuery, IProcessorSource } from '../ingest/IProcessorSource'
 import { parseEventId } from '../util/utils'
 import { unionAll, Range, numbersIn, intersectWith } from '../util'

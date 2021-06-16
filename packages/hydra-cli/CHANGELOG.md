@@ -50,7 +50,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [3.0.0](https://github.com/Joystream/hydra/compare/v3.0.0-beta.8...v3.0.0) (2021-05-24)
 
-**Note:** Version bump only for package @dzlzv/hydra-cli
+**Note:** Version bump only for package @joystream/hydra-cli
 
 
 
@@ -58,7 +58,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## 3.0.0-beta.8 (2021-05-24)
 
-**Note:** Version bump only for package @dzlzv/hydra-cli
+**Note:** Version bump only for package @joystream/hydra-cli
 
 
 
@@ -317,7 +317,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### 2.0.1-beta.4 (2021-03-05)
 
-**Note:** Version bump only for package @dzlzv/hydra-cli
+**Note:** Version bump only for package @joystream/hydra-cli
 
 
 
@@ -334,7 +334,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## 2.0.1-beta.2 (2021-03-04)
 
-**Note:** Version bump only for package @dzlzv/hydra-cli
+**Note:** Version bump only for package @joystream/hydra-cli
 
 # CHANGELOG
 

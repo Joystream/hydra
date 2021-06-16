@@ -1,4 +1,4 @@
-import { RedisClientFactory } from '@dzlzv/hydra-db-utils'
+import { RedisClientFactory } from '@joystream/hydra-db-utils'
 import { getConfig } from '..'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 import Debug from 'debug'
