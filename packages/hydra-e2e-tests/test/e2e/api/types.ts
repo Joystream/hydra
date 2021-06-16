@@ -1,4 +1,4 @@
-export interface ArrayData {
+export interface AdditionalData {
   data: Buffer
 }
 export interface EventParam {
@@ -6,7 +6,7 @@ export interface EventParam {
   type: string
   value: string
 
-  arrayData: ArrayData[]
+  additionalData: AdditionalData[]
 }
 
 export interface SystemEvent {

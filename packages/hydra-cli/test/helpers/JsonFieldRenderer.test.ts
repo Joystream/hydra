@@ -32,7 +32,7 @@ describe('JsonFieldRenderer', () => {
     )
 
     expect(rendered).include(
-      `@InputType('EventParamsInput')\n@ObjectType()\nexport class EventParams {`,
+      `@InputType('EventParamInput')\n@ObjectType()\nexport class EventParam {`,
       'shoud have class defination with decorators'
     )
   })
@@ -42,7 +42,7 @@ describe('JsonFieldRenderer', () => {
     )
 
     expect(rendered).include(
-      `@Field(() => [ArrayData])\n  arrayData!: ArrayData[]`,
+      `@Field(() => [AdditionalData])\n  additionalData!: AdditionalData[]`,
       'shoud have class defination with decorators'
     )
   })
@@ -54,7 +54,7 @@ describe('JsonFieldRenderer', () => {
     ).render(modelTemplate)
 
     expect(rendered).include(
-      `@JSONField({ filter: true, gqlFieldType: jsonTypes.EventParams })\n  params!: jsonTypes.EventParams;`,
+      `@JSONField({ filter: true, gqlFieldType: jsonTypes.EventParam })\n  params!: jsonTypes.EventParam;`,
       'shoud have a field with @JSONField decorator'
     )
   })

@@ -1,16 +1,16 @@
-type ArrayData @jsonField {
+type AdditionalData @jsonField {
   data: Bytes
 }
 
-type EventParams @jsonField {
+type EventParam @jsonField {
   name: String
   type: String
   value: String
 
-  arrayData: [ArrayData!]!
+  additionalData: [AdditionalData!]
 }
 
 type Event @entity {
   id: ID!
-  params: EventParams!
+  params: EventParam!
 }

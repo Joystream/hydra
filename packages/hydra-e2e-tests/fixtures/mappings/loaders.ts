@@ -6,8 +6,8 @@ import {
   Network,
   ComplexEntity,
   SystemEvent,
-  EventParams,
-  ArrayData,
+  EventParam,
+  AdditionalData,
 } from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
@@ -16,6 +16,7 @@ import { BlockContext, StoreContext } from '@dzlzv/hydra-common'
 
 export async function loader(ctx: BlockContext & StoreContext) {
   await eventLoader(ctx)
+  await jsonFieldLoader(ctx)
 }
 
 // run before genesis
@@ -59,16 +60,16 @@ export async function eventLoader({ store }: BlockContext & StoreContext) {
 
 export async function jsonFieldLoader({ store }: BlockContext & StoreContext) {
   const e = new SystemEvent()
-  const params = new EventParams()
-  const arrayData = new ArrayData()
+  const params = new EventParam()
+  const additionalData = new AdditionalData()
 
   params.name = 'account'
   params.type = 'string'
   params.value = '0x000'
 
-  arrayData.data = Buffer.from(`0x000`)
+  additionalData.data = Buffer.from(`0x000`)
 
-  params.arrayData = [arrayData]
+  params.additionalData = [additionalData]
   e.params = params
 
   await store.save<SystemEvent>(e)

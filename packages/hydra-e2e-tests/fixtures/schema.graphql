@@ -109,7 +109,7 @@ enum Network {
   OLYMPIA
 }
 
-type ArrayData @jsonField {
+type AdditionalData @jsonField {
   data: Bytes
 }
 
@@ -118,7 +118,7 @@ type EventParam @jsonField {
   type: String
   value: String
 
-  arrayData: [ArrayData!]
+  additionalData: [AdditionalData!]
 }
 
 type SystemEvent @entity {

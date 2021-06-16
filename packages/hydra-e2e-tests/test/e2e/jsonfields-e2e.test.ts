@@ -30,7 +30,7 @@ describe('end-to-end jsonfields tests', () => {
       'should return value of the param name'
     )
 
-    expect(systemEvent.params.arrayData.length).to.be.equal(
+    expect(systemEvent.params.additionalData.length).to.be.equal(
       1,
       'should have one element'
     )

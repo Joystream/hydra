@@ -189,7 +189,7 @@ export const TYPED_JSONFIELD_FILTERING = gql`
         name
         type
         value
-        arrayData {
+        additionalData {
           data
         }
       }
