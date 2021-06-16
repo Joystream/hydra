@@ -27,7 +27,7 @@ jobs:
         run: |
           yarn logout
           echo "always-auth=true" > .npmrc
-          echo "@dzlzv:registry=https://registry.npmjs.org/" >> .npmrc
+          echo "@joystream:registry=https://registry.npmjs.org/" >> .npmrc
           echo "registry=https://registry.npmjs.org/" >> .npmrc
           echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
           npm whoami
@@ -48,4 +48,4 @@ jobs:
       - name: Lerna publish current package
         if: github.event.inputs.graduate == 'false'
         run: |
-          yarn lerna publish from-package --dist-tag next --yes --conventional-commits --conventional-prerelease '${{ github.event.inputs.packages }}'
+          yarn lerna publish from-package --dist-tag next --yes --conventional-commits --conventional-prerelease '${{ github.event.inputs.packages }}' 

@@ -1,4 +1,4 @@
-import { DatabaseManager } from '@dzlzv/hydra-db-utils'
+import { DatabaseManager } from '@joystream/hydra-db-utils'
 import { Post } from '../generated/graphql-server/src/modules/post/post.model'
 
 import { Posts } from './generated/types'

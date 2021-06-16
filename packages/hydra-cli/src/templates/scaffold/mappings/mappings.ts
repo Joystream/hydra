@@ -8,7 +8,7 @@ import {
   ExtrinsicContext,
   EventContext,
   StoreContext,
-} from '@dzlzv/hydra-common'
+} from '@joystream/hydra-common'
 
 export async function balancesTransfer({
   store,

@@ -1,7 +1,7 @@
 import { RedisOptions } from 'ioredis'
 import * as IORedis from 'ioredis'
 import Debug from 'debug'
-import { logError } from '@dzlzv/hydra-common/lib'
+import { logError } from '@joystream/hydra-common/lib'
 const debug = Debug('index-builder:redis-factory')
 
 export class RedisClientFactory {

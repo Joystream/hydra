@@ -1,8 +1,8 @@
 {
-  "name": "@dzlzv/hydra-cli",
+  "name": "@joystream/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
   "version": "3.1.0-alpha.1",
-  "author": "metmirr @metmirr dzlzv @dzhelezov",
+  "author": "metmirr @metmirr joystream @dzhelezov",
   "license": "MIT",
   "bin": {
     "hydra-cli": "./bin/run"
@@ -16,12 +16,15 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "types": "lib/index.d.ts",
   "main": "lib/index.js",
   "oclif": {
     "commands": "./lib/src/commands",
     "bin": "hydra-cli",
-    "scope": "@dzlzv",
+    "scope": "@joystream",
     "plugins": [
       "@oclif/plugin-help",
       "@oclif/errors",

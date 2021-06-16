@@ -1,4 +1,4 @@
-import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { SubstrateEvent } from '@joystream/hydra-common'
 import { expect } from 'chai'
 import { format, stripSpaces, compact as c } from '../util/utils'
 import {

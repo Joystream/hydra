@@ -47,7 +47,7 @@ export function getTemplatePath(template: string): string {
  */
 export function resolveHydraCliPkgJson(): Record<string, unknown> {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const path = require.resolve('@dzlzv/hydra-cli/package.json')
+  const path = require.resolve('@joystream/hydra-cli/package.json')
 
   return JSON.parse(fs.readFileSync(path, 'utf-8')) as Record<string, unknown>
 }
@@ -79,7 +79,7 @@ export function resolvePackageVersion(pkgName: string): string {
   debug(`Resolved hydra-cli package.json: ${JSON.stringify(pkgJson, null, 2)}`)
 
   // all hydra packages use the same version now
-  if (pkgName.startsWith('@dzlzv/hydra')) {
+  if (pkgName.startsWith('@joystream/hydra')) {
     return pkgJson.version as string
   }
 

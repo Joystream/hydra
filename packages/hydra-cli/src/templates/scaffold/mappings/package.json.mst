@@ -10,7 +10,7 @@
     "clean": "rimraf lib"
   },
   "dependencies": {
-    "@dzlzv/hydra-common": "{{{hydraCommonVersion}}}",
+    "@joystream/hydra-common": "{{{hydraCommonVersion}}}",
     "@polkadot/types": "~2.10.2-7",
     "warthog": "{{{hydraWarthogVersion}}}"
   },

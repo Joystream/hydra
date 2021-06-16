@@ -1,6 +1,6 @@
 import { BLOCK_COMPLETE_CHANNEL, BLOCK_START_CHANNEL } from './redis-keys'
 import Debug from 'debug'
-import { logError } from '@dzlzv/hydra-common'
+import { logError } from '@joystream/hydra-common'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 import { getRedisFactory } from './client-factory'
 import * as IORedis from 'ioredis'

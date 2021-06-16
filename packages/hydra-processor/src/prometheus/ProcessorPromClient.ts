@@ -1,6 +1,6 @@
 import { Gauge, collectDefaultMetrics } from 'prom-client'
 import { IndexerStatus, IProcessorState } from '../state'
-import { SubstrateEvent, logError } from '@dzlzv/hydra-common'
+import { SubstrateEvent, logError } from '@joystream/hydra-common'
 import Debug from 'debug'
 import { countProcessedEvents } from '../db'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
