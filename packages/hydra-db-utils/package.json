@@ -7,6 +7,9 @@
   "files": [
     "/lib"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "scripts": {
     "pub": "yarn build && yarn publish --access public",

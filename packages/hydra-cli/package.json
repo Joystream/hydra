@@ -16,6 +16,9 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "types": "lib/index.d.ts",
   "main": "lib/index.js",
   "oclif": {

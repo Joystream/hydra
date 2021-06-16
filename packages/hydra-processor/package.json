@@ -9,6 +9,9 @@
     "/bin",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "hydra-processor": "./bin/run"
   },
