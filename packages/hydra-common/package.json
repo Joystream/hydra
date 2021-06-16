@@ -1,5 +1,5 @@
 {
-  "name": "@dzlzv/hydra-common",
+  "name": "@joystream/hydra-common",
   "version": "3.1.0-alpha.1",
   "description": "Common Hydra tools",
   "main": "lib/index.js",

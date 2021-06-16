@@ -27,7 +27,7 @@ jobs:
         run: |
           yarn logout
           echo "always-auth=true" > .npmrc
-          echo "@dzlzv:registry=https://registry.npmjs.org/" >> .npmrc
+          echo "@joystream:registry=https://registry.npmjs.org/" >> .npmrc
           echo "registry=https://registry.npmjs.org/" >> .npmrc
           echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
           npm whoami

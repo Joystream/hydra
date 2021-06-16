@@ -10,7 +10,7 @@ import {
   DeepPartial,
   FindOneOptions,
   DatabaseManager,
-} from '@dzlzv/hydra-common'
+} from '@joystream/hydra-common'
 import { TxAwareBlockContext } from './tx-aware'
 
 const debug = Debug('hydra-processor:mappings-executor')

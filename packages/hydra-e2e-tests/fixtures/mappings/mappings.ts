@@ -16,7 +16,7 @@ import {
   BlockContext,
   StoreContext,
   DatabaseManager,
-} from '@dzlzv/hydra-common'
+} from '@joystream/hydra-common'
 
 async function getOrCreate<T>(
   E: { new (...args: any[]): T },

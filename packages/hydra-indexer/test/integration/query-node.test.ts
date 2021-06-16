@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Container from 'typedi'
 import { QueryNode, QueryNodeState } from '../../src'
-import { sleep } from '@dzlzv/hydra-common'
+import { sleep } from '@joystream/hydra-common'
 
 describe('QueryNode', () => {
   before(async () => {

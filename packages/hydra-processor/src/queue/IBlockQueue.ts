@@ -1,4 +1,4 @@
-import { SubstrateBlock, SubstrateEvent } from '@dzlzv/hydra-common'
+import { SubstrateBlock, SubstrateEvent } from '@joystream/hydra-common'
 import { Range } from '../util'
 
 export enum Kind {

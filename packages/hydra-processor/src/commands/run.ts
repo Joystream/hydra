@@ -2,7 +2,7 @@ import { Command, flags } from '@oclif/command'
 import { ProcessorRunner } from '../start'
 import { error, info } from '../util/log'
 import dotenv from 'dotenv'
-import { logError } from '@dzlzv/hydra-common'
+import { logError } from '@joystream/hydra-common'
 
 export default class Run extends Command {
   static flags = {
