@@ -17,7 +17,7 @@ import {
   EventContext,
   ExtrinsicContext,
   ExecContext,
-} from '@dzlzv/hydra-common'
+} from '@joystream/hydra-common'
 import { IMappingsLookup, BlockMappings } from './IMappingsLookup'
 const debug = Debug('hydra-processor:handler-lookup-service')
 

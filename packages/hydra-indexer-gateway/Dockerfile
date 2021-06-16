@@ -24,7 +24,7 @@ COPY --chown=node:node *.js /home/hydra/packages/hydra-indexer-gateway/
 
 
 RUN yarn --frozen-lockfile --non-interactive 
-RUN yarn workspace @dzlzv/hydra-indexer-gateway build
+RUN yarn workspace @joystream/hydra-indexer-gateway build
 
 WORKDIR /home/hydra/packages/hydra-indexer-gateway
 

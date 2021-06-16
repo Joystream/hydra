@@ -1,7 +1,7 @@
 import { MappingsProcessor } from '../process/MappingsProcessor'
 import { Connection } from 'typeorm'
 import Debug from 'debug'
-import { logError } from '@dzlzv/hydra-common'
+import { logError } from '@joystream/hydra-common'
 import { log } from 'console'
 import { createDBConnection } from '../db/dal'
 import { ProcessorPromClient, startPromEndpoint } from '../prometheus'

@@ -49,9 +49,9 @@
     "bn.js": "^5.1.2"
   },
   "devDependencies": {
-    "@dzlzv/hydra-cli": "{{{hydraVersion}}}",
-    "@dzlzv/hydra-processor": "{{{hydraProcessorVersion}}}",
-    "@dzlzv/hydra-typegen": "{{{hydraTypegenVersion}}}",
+    "@joystream/hydra-cli": "{{{hydraVersion}}}",
+    "@joystream/hydra-processor": "{{{hydraProcessorVersion}}}",
+    "@joystream/hydra-typegen": "{{{hydraTypegenVersion}}}",
     "dotenv-cli": "^4.0.0"
   }
 }

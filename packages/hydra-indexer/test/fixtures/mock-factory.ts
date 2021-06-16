@@ -1,7 +1,7 @@
 import { QueryEventBlock, IQueryEvent } from '../../src'
 import { Phase, Event, EventRecord } from '@polkadot/types/interfaces'
 import { BlockPayload } from '../../src/model'
-import { withTs } from '@dzlzv/hydra-common'
+import { withTs } from '@joystream/hydra-common'
 
 export function blockPayload(height: number): BlockPayload {
   return (withTs({

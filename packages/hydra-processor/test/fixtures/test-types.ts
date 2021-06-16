@@ -1,4 +1,4 @@
-import { SubstrateEvent } from '@dzlzv/hydra-common'
+import { SubstrateEvent } from '@joystream/hydra-common'
 
 export namespace Balances {
   export class TransferEvent {

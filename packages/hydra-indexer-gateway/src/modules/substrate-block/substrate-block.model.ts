@@ -1,4 +1,4 @@
-import { AnyJson } from '@dzlzv/hydra-common'
+import { AnyJson } from '@joystream/hydra-common'
 import { Column } from 'typeorm'
 import { Field, ObjectType } from 'type-graphql'
 import {
