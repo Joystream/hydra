@@ -42,7 +42,7 @@
  * @returns {Promise<void>}
  */
 import Debug from 'debug'
-import { logError } from '@dzlzv/hydra-common'
+import { logError } from '@joystream/hydra-common'
 const debug = Debug('index-builder:pooled-executor')
 
 export class PooledExecutor<T, R, N> {

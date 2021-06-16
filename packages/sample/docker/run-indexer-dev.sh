@@ -12,7 +12,7 @@ set -e
 trap cleanup ERR EXIT SIGINT SIGTERM
 
 docker build ../../ -t hydra-builder:latest
-(cd ../../ && yarn workspace @dzlzv/hydra-indexer docker:build)
-(cd ../../ && yarn workspace @dzlzv/hydra-indexer-gateway docker:build)
+(cd ../../ && yarn workspace @joystream/hydra-indexer docker:build)
+(cd ../../ && yarn workspace @joystream/hydra-indexer-gateway docker:build)
 docker-compose -f docker-compose-indexer-dev.yml up 
 

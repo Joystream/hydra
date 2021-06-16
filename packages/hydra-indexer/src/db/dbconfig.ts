@@ -1,5 +1,5 @@
 import { ConnectionOptions } from 'typeorm'
-import { SnakeNamingStrategy } from '@dzlzv/hydra-db-utils'
+import { SnakeNamingStrategy } from '@joystream/hydra-db-utils'
 import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { getDBConfig } from '../node'
 import { SubstrateBlockEntity } from '../entities/SubstrateBlockEntity'

@@ -1,7 +1,7 @@
 import { getIndexerHead as slowIndexerHead } from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
-import { BlockPayload, logError } from '@dzlzv/hydra-common'
+import { BlockPayload, logError } from '@joystream/hydra-common'
 import * as pWaitFor from 'p-wait-for'
 import {
   INDEXER_HEAD_BLOCK,

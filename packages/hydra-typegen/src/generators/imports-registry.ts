@@ -13,7 +13,7 @@ const KNOWN_LOCATIONS = {
   typesCreate: '@polkadot/types/create',
   metadata: '@polkadot/metadata',
   local: '.',
-  hydraCommon: '@dzlzv/hydra-common',
+  hydraCommon: '@joystream/hydra-common',
 }
 
 const NO_CODEC = ['Tuple', 'VecFixed']

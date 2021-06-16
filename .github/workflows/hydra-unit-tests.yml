@@ -21,10 +21,10 @@ jobs:
       - name: run unit tests
         run: |
           yarn  
-          yarn workspace @dzlzv/hydra-cli test 
-          yarn workspace @dzlzv/hydra-typegen test
-          yarn workspace @dzlzv/hydra-common build
-          yarn workspace @dzlzv/hydra-db-utils build
-          yarn workspace @dzlzv/hydra-processor install
-          yarn workspace @dzlzv/hydra-processor test
+          yarn workspace @joystream/hydra-cli test 
+          yarn workspace @joystream/hydra-typegen test
+          yarn workspace @joystream/hydra-common build
+          yarn workspace @joystream/hydra-db-utils build
+          yarn workspace @joystream/hydra-processor install
+          yarn workspace @joystream/hydra-processor test
  
