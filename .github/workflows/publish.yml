@@ -48,4 +48,4 @@ jobs:
       - name: Lerna publish current package
         if: github.event.inputs.graduate == 'false'
         run: |
-          yarn lerna publish from-package --dist-tag next --yes --conventional-commits --conventional-prerelease '${{ github.event.inputs.packages }}'
+          yarn lerna publish from-package --dist-tag next --yes --conventional-commits --conventional-prerelease '${{ github.event.inputs.packages }}' 

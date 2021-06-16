@@ -12,6 +12,9 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "hydra-typegen": "./bin/run"
   },
