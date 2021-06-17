@@ -32,12 +32,19 @@ export function withVariantNames(
   return { variants: model.variants.map((v: ObjectType) => withNames(v)) }
 }
 
+export function withJsonFieldNames(
+  model: WarthogModel
+): { jsonFields: GeneratorContext[] } {
+  return { jsonFields: model.jsonFields.map((j) => withNames(j)) }
+}
+
 export function indexContext(model: WarthogModel): GeneratorContext {
   const out = {
     ...withModelNames(model),
     ...withEnumNames(model),
     ...withUnionNames(model),
     ...withVariantNames(model),
+    ...withJsonFieldNames(model),
   }
   debug(`Index context: ${JSON.stringify(out, null, 2)}`)
   return out

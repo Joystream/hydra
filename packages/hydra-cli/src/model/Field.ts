@@ -1,10 +1,6 @@
 import { Relation } from '.'
-import { availableTypes } from './ScalarTypes'
+import { availableTypes } from '../schema/scalars'
 import { ModelType } from './WarthogModel'
-
-interface DerivedFrom {
-  argument: string
-}
 
 /**
  * Reperenst GraphQL object type field
@@ -31,27 +27,29 @@ export class Field {
   // Relation
   relation?: Relation
 
-  derivedFrom?: DerivedFrom
+  derivedFrom?: {
+    argument: string
+  }
 
   apiOnly?: boolean
+
+  directives!: string[]
 
   constructor(
     name: string,
     type: string,
     nullable = true,
     isBuildinType = true,
-    isList = false
+    isList = false,
+    directives: string[] = []
   ) {
     this.name = name
     this.type = type
     this.nullable = nullable
     this.isBuildinType = isBuildinType
     this.isList = isList
+    this.directives = directives
   }
-
-  // get isBuiltInType(): boolean {
-  //   return this.modelType == ModelType.SCALAR
-  // }
 
   columnType(): string {
     if (this.relation) return this.relation?.type
@@ -63,7 +61,7 @@ export class Field {
   }
 
   isScalar(): boolean {
-    return this.isBuildinType && !this.isList
+    return this.isBuildinType
   }
 
   isRelationType(): boolean {
@@ -80,5 +78,9 @@ export class Field {
 
   isEntity(): boolean {
     return this.modelType === ModelType.ENTITY
+  }
+
+  isJson(): boolean {
+    return this.modelType === ModelType.JSON
   }
 }

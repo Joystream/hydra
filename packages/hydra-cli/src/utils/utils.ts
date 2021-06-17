@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import Debug from 'debug'
+import { FieldDefinitionNode } from 'graphql'
 
 const debug = Debug('hydra-cli:utils')
 
@@ -131,4 +132,19 @@ export function getWarthogDependency(): string {
     throw new Error(`Cannot resolve warthog version`)
   }
   return warthogPackageJson.hydra as string
+}
+
+export const verifySchemaExt = (file: string) =>
+  path.extname(file) === '.graphql' || path.extname(file) === '.gql'
+export const isFile = (file: string) => fs.lstatSync(file).isFile()
+
+/**
+ * Get available directive names from a FieldNode
+ * @param fieldNode FieldNode
+ * @returns string[]
+ */
+export function getDirectiveNames(fieldNode: FieldDefinitionNode): string[] {
+  const { directives } = fieldNode
+  if (!directives) return []
+  return directives.map((d) => d.name.value)
 }

@@ -1,6 +1,7 @@
-import { GeneratorContext, VARIANTS_FOLDER } from './SourcesGenerator'
+import { GeneratorContext } from './SourcesGenerator'
 import { UnionType } from '../model/WarthogModel'
 import { withNames } from './utils'
+import { VARIANTS_FOLDER } from './constants'
 
 export function withUnionType(unionType: UnionType): GeneratorContext {
   return {

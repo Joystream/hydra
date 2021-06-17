@@ -5,6 +5,9 @@ import {
   EventC,
   Network,
   ComplexEntity,
+  SystemEvent,
+  EventParam,
+  AdditionalData,
 } from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
@@ -13,6 +16,7 @@ import { BlockContext, StoreContext } from '@joystream/hydra-common'
 
 export async function loader(ctx: BlockContext & StoreContext) {
   await eventLoader(ctx)
+  await jsonFieldLoader(ctx)
 }
 
 // run before genesis
@@ -52,4 +56,21 @@ export async function eventLoader({ store }: BlockContext & StoreContext) {
     store.save<EventC>(c),
   ])
   console.log(`Loaded events`)
+}
+
+export async function jsonFieldLoader({ store }: BlockContext & StoreContext) {
+  const e = new SystemEvent()
+  const params = new EventParam()
+  const additionalData = new AdditionalData()
+
+  params.name = 'account'
+  params.type = 'string'
+  params.value = '0x000'
+
+  additionalData.data = Buffer.from(`0x000`)
+
+  params.additionalData = [additionalData]
+  e.params = params
+
+  await store.save<SystemEvent>(e)
 }

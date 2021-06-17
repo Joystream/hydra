@@ -18,3 +18,8 @@
   import { {{name}} } from '../src/modules/variants/variants.model'
   export { {{name}} };
 {{/unions}}
+
+{{#jsonFields}}
+  import { {{name}} } from '../src/modules/jsonfields/jsonfields.model'
+  export { {{name}} };
+{{/jsonFields}}
