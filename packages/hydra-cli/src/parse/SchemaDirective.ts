@@ -21,8 +21,8 @@ export interface DirectiveVisitor {
 export interface SchemaDirective {
   // directive definition to be added to the
   // schema preamble
-  preamble: string
-  name: string
+  // preamble: string
+  // name: string
   validate: (path: SchemaNode[]) => void
   generate: (path: SchemaNode[], model: WarthogModel) => WarthogModel
 }

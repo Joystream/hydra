@@ -68,18 +68,19 @@
     "glob": "^7.1.6",
     "gluegun": "^4.3.1",
     "graphql": "^15.0.0",
+    "graphql-tag": "^2.12.4",
     "listr": "^0.14.3",
     "lodash": "^4.17.15",
     "mustache": "^4.0.1",
     "pluralize": "^8.0.0",
     "tslib": "1.11.2",
-    "warthog": "https://github.com/metmirr/warthog/releases/download/v2.30.0/warthog-v2.30.0.tgz"
+    "warthog": "https://github.com/Joystream/warthog/releases/download/v2.32.0/warthog-v2.32.0.tgz"
   },
   "queryNodeDependencies": {
     "lodash": "^4.17.20",
     "pg": "^8.3.2",
     "pg-listen": "^1.7.0",
-    "warthog": "https://github.com/metmirr/warthog/releases/download/v2.30.0/warthog-v2.30.0.tgz",
+    "warthog": "https://github.com/Joystream/warthog/releases/download/v2.32.0/warthog-v2.32.0.tgz",
     "typeorm": "^0.2.31"
   },
   "devDependencies": {

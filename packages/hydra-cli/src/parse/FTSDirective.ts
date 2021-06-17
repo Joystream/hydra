@@ -1,6 +1,3 @@
-import { SchemaNode } from './SchemaParser'
-import { SchemaDirective } from './SchemaDirective'
-import { WarthogModel } from '../model'
 import {
   DirectiveNode,
   TypeNode,
@@ -10,12 +7,12 @@ import {
   ObjectTypeDefinitionNode,
 } from 'graphql'
 
-export const FULL_TEXT_SEARCHABLE_DIRECTIVE = 'fulltext'
+import { SchemaNode } from './SchemaParser'
+import { SchemaDirective } from './SchemaDirective'
+import { WarthogModel } from '../model'
+import { FULL_TEXT_SEARCHABLE_DIRECTIVE } from '../schema/directives'
 
 export class FTSDirective implements SchemaDirective {
-  preamble = `directive @${FULL_TEXT_SEARCHABLE_DIRECTIVE}(query: String!) on FIELD_DEFINITION`
-  name = FULL_TEXT_SEARCHABLE_DIRECTIVE
-
   validate(_path: SchemaNode[]): void {
     const path = [..._path]
 
