@@ -38,22 +38,8 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
 		offset?: number,
 		fields?: string[]
 	): Promise<{{className}}[]> {
-	let f = fields || [];
-    {{#fields}}
-      {{#is.union}}
-        if (!f.includes('{{camelName}}')) {
-          f = [...f, '{{camelName}}'];
-        }
-      {{/is.union}}
-      {{#is.json}}
-        if (!f.includes('{{camelName}}')) {
-          f = [...f, '{{camelName}}'];
-        }
-      {{/is.json}}
-    {{/fields}}
-    
     {{#has.union}}
-      let records = await this.findWithRelations<W>(where, orderBy, limit, offset, f);
+      let records = await this.findWithRelations<W>(where, orderBy, limit, offset, fields);
       if (records.length) {
         {{#fields}}
           {{#is.union}}
@@ -66,7 +52,7 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
       return records;
     {{/has.union}}
     
-    {{^has.union}} return this.findWithRelations<W>(where, orderBy, limit, offset, f); {{/has.union}}
+    {{^has.union}} return this.findWithRelations<W>(where, orderBy, limit, offset, fields); {{/has.union}}
   }
   
 
