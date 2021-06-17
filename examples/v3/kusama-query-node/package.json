@@ -1,5 +1,5 @@
 {
-  "name": "{{{name}}}",
+  "name": "hydra-scaffold",
   "private": "true",
   "version": "0.0.0",
   "description": "GraphQL server and Substrate indexer. Generated with \u2665 by Hydra-CLI",
@@ -20,8 +20,7 @@
     "clean:query-node": "rm -rf ./generated/graphql-server",
     "processor:start": "DEBUG=${DEBUG} hydra-processor run -e .env",
     "query-node:start:dev": "yarn workspace query-node start:dev",
-    "query-node:build:prod": "yarn workspace query-node compile",
-    "query-node:start:prod": "dotenv -- yarn workspace query-node start:prod",
+    "query-node:start:prod": "yarn workspace query-node start:prod",
     "query-node:configure": "yarn workspace query-node config:dev",
     "db:up": "yarn docker:db:up",
     "db:create": "yarn workspace query-node db:create",
@@ -30,12 +29,13 @@
     "db:schema:migrate": "yarn workspace query-node db:migrate",
     "db:processor:migrate": "hydra-processor migrate -e .env",
     "db:migrate": "yarn db:schema:migrate && yarn db:processor:migrate",
-    "db:bootstrap": "yarn db:drop; yarn db:create ; yarn db:prepare && yarn db:migrate",
+    "db:bootstrap": "yarn db:create ; yarn db:prepare && yarn db:migrate",
     "bootstrap": "yarn db:drop; hydra-cli codegen --createDb && yarn db:migrate",
     "codegen": "hydra-cli codegen",
-    "typegen:configure": "NODE_URL=${NODE_URL:-ws://localhost:9000} envsub typegen.template.yml typegen.yml",
-    "typegen": "rm -rf ./mappings/generated && hydra-typegen typegen manifest.yml --debug",
-    "mappings:build": "yarn workspace sample-mappings build",
+    "typegen-v1": "HASH=0x1617a8e164ee5ab58169c867157d0bee0e5dc726162f7a3f3f027c5aaa019009 PREFIX=V1 envsub typegen.template.yml typegen.yml && hydra-typegen typegen typegen.yml && rm -rf typegen.yml",
+    "typegen-v2": "HASH=0x4096f9043ca2804334862d5ddca0a6251c287909143c8ed7ee71afd683145d7b PREFIX=V2 envsub typegen.template.yml typegen.yml && hydra-typegen typegen typegen.yml && rm -rf typegen.yml",
+    "typegen": "rm -rf ./mappings/generated && yarn typegen-v1 && yarn typegen-v2",
+    "mappings:build": "yarn workspace kusama-example-mappings build",
     "docker:build": "docker build . -f docker/Dockerfile.hydra -t hydra-kit:latest",
     "docker:db:up": "docker-compose up -d db",
     "docker:db:migrate": "docker run --env-file .env --env DB_HOST=db --env TYPEORM_HOST=db --network container:${PWD##*/}_db_1 builder yarn db:bootstrap",
@@ -49,9 +49,9 @@
     "bn.js": "^5.1.2"
   },
   "devDependencies": {
-    "@subsquid/hydra-cli": "{{{hydraVersion}}}",
-    "@subsquid/hydra-processor": "{{{hydraProcessorVersion}}}",
-    "@subsquid/hydra-typegen": "{{{hydraTypegenVersion}}}",
-    "dotenv-cli": "^4.0.0"
+    "@joystream/hydra-cli": "^3.1.0-alpha",
+    "@joystream/hydra-processor": "^3.1.0-alpha",
+    "@joystream/hydra-typegen": "^3.1.0-alpha",
+    "envsub": "^4.0.7"
   }
 }
