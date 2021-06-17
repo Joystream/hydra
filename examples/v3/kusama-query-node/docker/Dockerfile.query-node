@@ -1,0 +1,20 @@
+FROM node:12-alpine 
+
+RUN mkdir -p /home/query-node && chown -R node:node /home/query-node
+WORKDIR /home/query-node
+
+COPY --from=builder /home/hydra-builder/generated/graphql-server/dist ./dist 
+COPY --from=builder /home/hydra-builder/generated/graphql-server/package.json .
+COPY --from=builder /home/hydra-builder/generated/graphql-server/warthog.config.js . 
+COPY --from=builder /home/hydra-builder/generated/graphql-server/env.yml . 
+COPY --from=builder /home/hydra-builder/generated/graphql-server/node_modules ./node_modules
+
+# TODO: fix env.yml instead
+
+ENV WARTHOG_ENV=production 
+ENV WARTHOG_SUBSCRIPTIONS=true
+ENV WARTHOG_DB_ENTITIES=dist/src/**/*.model.js
+ENV WARTHOG_DB_SUBSCRIBERS=dist/src/**/*.model.js
+ENV WARTHOG_RESOLVERS_PATH=dist/src/**/*.resolver.js
+
+CMD ["sh", "-c", "yarn dotenv:generate && node ./dist/src/index.js"]
