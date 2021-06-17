@@ -5,6 +5,7 @@ import { WarthogModel } from '../../src/model'
 import { ModelRenderer } from '../../src/generate/ModelRenderer'
 import { JsonFieldRenderer } from '../../src/generate/JsonFieldRenderer'
 import { WarthogModelBuilder } from '../../src/parse/WarthogModelBuilder'
+import { compact } from '../../src/generate/utils'
 
 describe('JsonFieldRenderer', () => {
   let warthogModel: WarthogModel
@@ -27,34 +28,36 @@ describe('JsonFieldRenderer', () => {
   })
 
   it('shoud render typed json object', () => {
-    const rendered = new JsonFieldRenderer(warthogModel).render(
-      jsonFieldTemplate
+    const rendered = compact(
+      new JsonFieldRenderer(warthogModel).render(jsonFieldTemplate)
     )
 
     expect(rendered).include(
-      `@InputType('EventParamInput')\n@ObjectType()\nexport class EventParam {`,
+      `@InputType('EventParamInput') @ObjectType() export class EventParam {`,
       'shoud have class defination with decorators'
     )
   })
   it('shoud render array typed json object', () => {
-    const rendered = new JsonFieldRenderer(warthogModel).render(
-      jsonFieldTemplate
+    const rendered = compact(
+      new JsonFieldRenderer(warthogModel).render(jsonFieldTemplate)
     )
 
     expect(rendered).include(
-      `@Field(() => [AdditionalData])\n  additionalData!: AdditionalData[]`,
+      `@Field(() => [AdditionalData]) additionalData!: AdditionalData[]`,
       'shoud have class defination with decorators'
     )
   })
 
   it('should add @JSONField to the entity defination', () => {
-    const rendered = new ModelRenderer(
-      warthogModel,
-      warthogModel.lookupEntity('Event')
-    ).render(modelTemplate)
+    const rendered = compact(
+      new ModelRenderer(
+        warthogModel,
+        warthogModel.lookupEntity('Event')
+      ).render(modelTemplate)
+    )
 
     expect(rendered).include(
-      `@JSONField({ filter: true, gqlFieldType: jsonTypes.EventParam })\n  params!: jsonTypes.EventParam;`,
+      `@JSONField({ filter: true, gqlFieldType: jsonTypes.EventParam }) params!: jsonTypes.EventParam;`,
       'shoud have a field with @JSONField decorator'
     )
   })
