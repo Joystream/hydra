@@ -12,13 +12,18 @@ import {
   InterfaceTypeDefinitionNode,
   GraphQLUnionType,
   GraphQLNamedType,
+  extendSchema,
+  Source,
 } from 'graphql'
-import * as fs from 'fs-extra'
 import Debug from 'debug'
-import { SCHEMA_DEFINITIONS_PREAMBLE } from './constant'
+import path from 'path'
+import * as fs from 'fs-extra'
+
 import { SchemaDirective } from './SchemaDirective'
 import { FTSDirective } from './FTSDirective'
-import path from 'path'
+import { scalars } from '../schema/scalars'
+import { directives } from '../schema/directives'
+import { isFile, verifySchemaExt } from '../utils/utils'
 
 const debug = Debug('qnode-cli:schema-parser')
 
@@ -67,8 +72,9 @@ export class GraphQLSchemaParser {
     if (!fs.existsSync(schemaPath)) {
       throw new Error('Schema not found')
     }
-    const contents = this.getUnifiedSchema(schemaPath)
-    this.schema = GraphQLSchemaParser.buildSchema(contents)
+    this.schema = GraphQLSchemaParser.buildSchema(
+      this.getUnifiedSchema(schemaPath)
+    )
     this.namedTypes = [
       ...Object.values(this.schema.getTypeMap()).filter(
         (t) => !t.name.startsWith('__') // filter out auxiliarry GraphQL types;
@@ -80,43 +86,36 @@ export class GraphQLSchemaParser {
   }
 
   private getUnifiedSchema(schemaPath: string): string {
-    let schemaString = ''
+    if (isFile(schemaPath)) return fs.readFileSync(schemaPath, 'utf8')
+
     if (fs.lstatSync(schemaPath).isDirectory()) {
+      let schemaString = ''
       fs.readdirSync(schemaPath).forEach((file) => {
-        if (
-          fs.lstatSync(path.resolve(schemaPath, file)).isFile() &&
-          path.extname(file) === '.graphql'
-        ) {
+        const resolvedPath = path.resolve(schemaPath, file)
+
+        if (isFile(resolvedPath) && verifySchemaExt(file)) {
           schemaString = schemaString.concat(
-            fs.readFileSync(path.resolve(schemaPath, file), 'utf8'),
+            fs.readFileSync(resolvedPath, 'utf8'),
             '\n\n'
           )
         }
       })
-    } else if (fs.lstatSync(schemaPath).isFile()) {
-      schemaString = fs.readFileSync(schemaPath, 'utf8')
-    } else {
-      throw new Error('Error reading schema file(s)')
+      return schemaString
     }
-    return schemaString
+    throw Error('Error reading schema file(s)')
   }
 
-  private static buildPreamble(): string {
-    let preamble = SCHEMA_DEFINITIONS_PREAMBLE
-    DIRECTIVES.map((d) => (preamble += d.preamble + '\n'))
-    return preamble
+  private static buildPreamble(): GraphQLSchema {
+    const schema = buildASTSchema(scalars)
+    return extendSchema(schema, directives)
   }
 
   /**
    * Read GrapqhQL schema and build a schema from it
    */
   static buildSchema(contents: string): GraphQLSchema {
-    const schema = GraphQLSchemaParser.buildPreamble().concat(contents)
-    const ast = parse(schema)
-    // in order to build AST with undeclared directive, we need to
-    // switch off SDL validation
-    const schemaAST = buildASTSchema(ast)
-
+    const doc = parse(new Source(contents))
+    const schemaAST = extendSchema(this.buildPreamble(), doc)
     const errors = validateSchema(schemaAST)
 
     if (errors.length > 0) {

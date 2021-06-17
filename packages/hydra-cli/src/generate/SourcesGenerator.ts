@@ -12,13 +12,15 @@ import { ConfigProvider } from './ConfigProvider'
 import { VariantsRenderer } from './VariantsRenderer'
 import { render } from './AbstractRenderer'
 import { indexContext } from './model-index-context'
+import { JsonFieldRenderer } from './JsonFieldRenderer'
+import {
+  ENUMS_FOLDER,
+  VARIANTS_FOLDER,
+  JSONFIELDS_FOLDER,
+  QUERIES_FOLDER,
+} from './constants'
 
 const debug = Debug('qnode-cli:sources-generator')
-
-export const QUERIES_FOLDER = 'queries'
-export const ENUMS_FOLDER = 'enums'
-export const VARIANTS_FOLDER = 'variants'
-export const INTERFACES_FOLDER = 'interfaces'
 
 /**
  * additional context to be passed to the generator,
@@ -45,6 +47,7 @@ export class SourcesGenerator {
     this.generateModels()
     this.generateQueries()
     this.generateModelIndex()
+    this.generateJsonFields()
   }
 
   generateModels(): void {
@@ -144,6 +147,20 @@ export class SourcesGenerator {
       this.readTemplate('entities/enums.ts.mst')
     )
     this.writeFile(path.join(enumsDir, `enums.ts`), rendered)
+  }
+
+  generateJsonFields(): void {
+    const [dir, tmplName] = JSONFIELDS_FOLDER
+
+    const jsonFieldsDir = this.config.getDestFolder(dir)
+    createDir(path.resolve(process.cwd(), jsonFieldsDir), false, true)
+
+    this.writeFile(
+      path.join(jsonFieldsDir, tmplName.slice(0, -4)),
+      new JsonFieldRenderer(this.model).render(
+        this.readTemplate(path.join(dir, tmplName))
+      )
+    )
   }
 
   generateModelIndex(): string {

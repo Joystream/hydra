@@ -14,7 +14,8 @@ import {
   {{#has.oto}}OneToOne, OneToOneJoin,{{/has.oto}}
   {{#has.array}}CustomField,{{/has.array}}
   {{#has.enum}}EnumField,{{/has.enum}}
-  StringField
+  StringField,
+  JSONField,
 } from 'warthog';  {{! we don't need extra twists here }}
 
 {{#has.numeric}} import BN from 'bn.js' {{/has.numeric}}
@@ -36,6 +37,8 @@ import { InterfaceType } from 'type-graphql';
 {{#relatedEntityImports}}
   {{{ . }}}
 {{/relatedEntityImports}}
+
+import * as jsonTypes from '../jsonfields/jsonfields.model';
 
 {{#enums}}
   import { {{name}} } from '../enums/enums';
@@ -157,6 +160,11 @@ export class {{className}} {{^isInterface}}extends BaseModel{{/isInterface}} {
       {{#description}}description: `{{{description}}}`{{/description}} })
 	{{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: typeof {{tsType}}
   {{/is.union}}
+
+  {{#is.json}}
+  @JSONField({filter: true, gqlFieldType: jsonTypes.{{tsType}}, {{^required}}nullable: true,{{/required}} })
+  {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: jsonTypes.{{tsType}}
+  {{/is.json}}
 
 {{/fields}}
 

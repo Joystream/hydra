@@ -34,16 +34,16 @@ and answer the prompts. This will generate a sample project and README with setu
 
 ## Commands
 
-* [`hydra-cli codegen`](hydra-cli.md#hydra-cli-codegen)
-* [`hydra-cli help [COMMAND]`](hydra-cli.md#hydra-cli-help-command)
-* [`hydra-cli plugins`](hydra-cli.md#hydra-cli-plugins)
-* [`hydra-cli plugins:inspect PLUGIN...`](hydra-cli.md#hydra-cli-pluginsinspect-plugin)
-* [`hydra-cli plugins:install PLUGIN...`](hydra-cli.md#hydra-cli-pluginsinstall-plugin)
-* [`hydra-cli plugins:link PLUGIN`](hydra-cli.md#hydra-cli-pluginslink-plugin)
-* [`hydra-cli plugins:uninstall PLUGIN...`](hydra-cli.md#hydra-cli-pluginsuninstall-plugin)
-* [`hydra-cli plugins:update`](hydra-cli.md#hydra-cli-pluginsupdate)
-* [`hydra-cli preview`](hydra-cli.md#hydra-cli-preview)
-* [`hydra-cli scaffold`](hydra-cli.md#hydra-cli-scaffold)
+- [`hydra-cli codegen`](hydra-cli.md#hydra-cli-codegen)
+- [`hydra-cli help [COMMAND]`](hydra-cli.md#hydra-cli-help-command)
+- [`hydra-cli plugins`](hydra-cli.md#hydra-cli-plugins)
+- [`hydra-cli plugins:inspect PLUGIN...`](hydra-cli.md#hydra-cli-pluginsinspect-plugin)
+- [`hydra-cli plugins:install PLUGIN...`](hydra-cli.md#hydra-cli-pluginsinstall-plugin)
+- [`hydra-cli plugins:link PLUGIN`](hydra-cli.md#hydra-cli-pluginslink-plugin)
+- [`hydra-cli plugins:uninstall PLUGIN...`](hydra-cli.md#hydra-cli-pluginsuninstall-plugin)
+- [`hydra-cli plugins:update`](hydra-cli.md#hydra-cli-pluginsupdate)
+- [`hydra-cli preview`](hydra-cli.md#hydra-cli-preview)
+- [`hydra-cli scaffold`](hydra-cli.md#hydra-cli-scaffold)
 
 ## `hydra-cli codegen`
 
@@ -151,15 +151,15 @@ DESCRIPTION
 
   Installation of a user-installed plugin will override a core plugin.
 
-  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command 
-  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in 
+  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command
+  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in
   the CLI without the need to patch and update the whole CLI.
 
 ALIASES
   $ hydra-cli plugins:add
 
 EXAMPLES
-  $ hydra-cli plugins:install myplugin 
+  $ hydra-cli plugins:install myplugin
   $ hydra-cli plugins:install https://github.com/someuser/someplugin
   $ hydra-cli plugins:install someuser/someplugin
 ```
@@ -190,7 +190,7 @@ OPTIONS
 DESCRIPTION
   Installation of a linked plugin will override a user-installed or core plugin.
 
-  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello' 
+  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello'
   command will override the user-installed or core plugin implementation. This is useful for development work.
 
 EXAMPLE
@@ -278,4 +278,3 @@ OPTIONS
   --rewrite                      Clear the folder before scaffolding
   --silent                       If present, the scaffolder is non-interactive and uses only provided CLI flags
 ```
-

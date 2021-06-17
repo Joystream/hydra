@@ -1,6 +1,6 @@
 import { FieldDefinitionNode, StringValueNode } from 'graphql'
-import { Field, WarthogModel } from '../model'
-import { DERIVED_FROM_DIRECTIVE } from './constant'
+import { Field } from '../model'
+import { DERIVED_FROM_DIRECTIVE } from '../schema/directives'
 
 export function addDerivedFromIfy(
   fieldDef: FieldDefinitionNode,
@@ -29,19 +29,4 @@ export function addDerivedFromIfy(
   field.derivedFrom = {
     argument: (directiveArgs.value as StringValueNode).value,
   }
-}
-
-export function validateDerivedFields(model: WarthogModel): void {
-  model.entities.forEach((objType) => {
-    objType.fields.forEach((f) => {
-      if (!f.derivedFrom) return
-
-      if (f.isScalar()) {
-        throw new Error('Derived field type is not an entity type')
-      }
-      if (!model.lookupField(f.type, f.derivedFrom?.argument)) {
-        throw new Error('Derived field does not exists on the related type')
-      }
-    })
-  })
 }

@@ -1,6 +1,7 @@
-import { GraphQLClient } from 'graphql-request'
 import Container from 'typedi'
 import fetch from 'node-fetch'
+import { GraphQLClient } from 'graphql-request'
+import { SubscriptionClient } from 'graphql-subscriptions-client'
 
 import {
   FTS_COMMENT_QUERY,
@@ -11,7 +12,8 @@ import {
   PROCESSOR_SUBSCRIPTION,
   INTERFACES_FILTERING_BY_ENUM,
 } from './graphql-queries'
-import { SubscriptionClient } from 'graphql-subscriptions-client'
+import { SystemEvent } from './types'
+
 import pWaitFor = require('p-wait-for')
 
 export interface Transfer {
@@ -159,4 +161,13 @@ export async function accountByOutgoingTxValue(
   }>(query, { value: value.toString() })
 
   return result.accounts
+}
+
+export async function fetchTypedJsonFields(
+  query: string
+): Promise<SystemEvent[]> {
+  const { systemEvents } = await getGQLClient().request<{
+    systemEvents: SystemEvent[]
+  }>(query)
+  return systemEvents
 }

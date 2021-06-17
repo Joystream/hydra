@@ -1,9 +1,9 @@
 import { GraphQLEnumType } from 'graphql'
 import Debug from 'debug'
-import { validateVariantField } from './validate'
-import { availableTypes } from './ScalarTypes'
 
 import { ObjectType, Field, FTSQuery } from '.'
+import { availableTypes } from '../schema/scalars'
+import * as validate from '../validation'
 
 const debug = Debug('qnode-cli:model')
 
@@ -14,6 +14,7 @@ export enum ModelType {
   UNION,
   INTERFACE,
   SCALAR,
+  JSON,
 }
 
 export class WarthogModel {
@@ -23,6 +24,8 @@ export class WarthogModel {
   private _interfaces: ObjectType[] = []
   private _variants: ObjectType[] = []
   private _unions: UnionType[] = []
+  private _jsonFields: ObjectType[] = []
+
   private _name2query: { [key: string]: FTSQuery } = {}
   private _name2type: { [key: string]: ObjectType } = {}
 
@@ -50,10 +53,7 @@ export class WarthogModel {
       throw new Error('An entity cannot be a variant')
     }
 
-    type.fields.forEach((f) => {
-      validateVariantField(f)
-    })
-
+    validate.variantType(type)
     this._variants.push(type)
   }
 
@@ -80,6 +80,10 @@ export class WarthogModel {
 
   addEnum(_enum: GraphQLEnumType): void {
     this._enums.push(_enum)
+  }
+
+  addJsonField(_jsonField: ObjectType): void {
+    this._jsonFields.push(_jsonField)
   }
 
   /**
@@ -144,6 +148,10 @@ export class WarthogModel {
     return this._unions
   }
 
+  get jsonFields(): ObjectType[] {
+    return this._jsonFields
+  }
+
   /**
    * Lookup ObjectType by it's name (as defined in the schema file)
    *
@@ -190,6 +198,12 @@ export class WarthogModel {
       throw new Error(`No query with name ${queryName} found`)
     }
     return this._name2query[queryName]
+  }
+
+  lookupJsonField(name: string): ObjectType {
+    const jsonField = this._jsonFields.find((e) => e.name === name)
+    if (!jsonField) throw Error(`Cannot find JsonField with name ${name}`)
+    return jsonField
   }
 
   /**
@@ -252,7 +266,12 @@ export class WarthogModel {
     if (this._enums.find((e) => e.name === name)) {
       return ModelType.ENUM
     }
-    throw new Error(`Type ${name} is undefined`)
+
+    if (this._jsonFields.find((j) => j.name === name)) {
+      return ModelType.JSON
+    }
+
+    throw Error(`Type ${name} is undefined`)
   }
 }
 
