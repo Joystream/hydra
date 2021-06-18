@@ -80,8 +80,28 @@ describe('end-to-end transfer tests', () => {
   })
 
   it('fetch datetime field from transfer', async () => {
-    const date = await fetchDateTimeFieldFromTransfer()
-    expect(date.getTime()).to.be.lessThan(Date.now())
+    const {
+      insertedAt,
+      createdAt,
+      updatedAt,
+      timestamp,
+    } = await fetchDateTimeFieldFromTransfer()
+    const ts = Number.parseInt(timestamp)
+
+    console.log(`Timestamp: ${timestamp}, ts: ${ts}`)
+
+    expect(new Date(updatedAt).getTime()).to.be.equal(
+      new Date(ts).getTime(),
+      'should set updatedAt'
+    )
+    expect(new Date(createdAt).getTime()).to.be.equal(
+      new Date(ts).getTime(),
+      'should set createdAt'
+    )
+    expect(new Date(insertedAt).getTime()).to.be.equal(
+      new Date(ts).getTime(),
+      'should set insertedAt'
+    )
   })
 
   it('performs full-text-search with filtering options with no result', async () => {

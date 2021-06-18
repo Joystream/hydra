@@ -70,6 +70,9 @@ export const FETCH_INSERTED_AT_FIELD_FROM_TRANSFER = gql`
   query {
     transfers(limit: 1) {
       insertedAt
+      createdAt
+      updatedAt
+      timestamp
     }
   }
 `
