@@ -9,7 +9,7 @@ import {
   BytesField,
   EnumField,
   StringField
-} from 'warthog';
+} from '@metmirr/warthog';
 import BN from 'bn.js'
 
 {{#imports}} 

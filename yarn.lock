@@ -1685,6 +1685,71 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
+"@metmirr/warthog@^2.34.0":
+  version "2.34.0"
+  resolved "https://registry.yarnpkg.com/@metmirr/warthog/-/warthog-2.34.0.tgz#b24f85b74b36678e6f344a61ec93eccd9a5f7311"
+  integrity sha512-wYpC+TNaXKf3gAe7NCYuVIWqTowyTiGmFJLOQupYAFZVk0Luo5Pk0Kt2Tg9PiLyW5WDDBi6DMegVRuM71irPuw==
+  dependencies:
+    "@types/app-root-path" "^1.2.4"
+    "@types/bn.js" "^4.11.6"
+    "@types/caller" "^1.0.0"
+    "@types/cosmiconfig" "^6.0.0"
+    "@types/debug" "^4.1.5"
+    "@types/dotenv" "^8.2.0"
+    "@types/express" "^4.17.2"
+    "@types/graphql" "^14.5.0"
+    "@types/graphql-fields" "^1.3.2"
+    "@types/graphql-iso-date" "^3.3.3"
+    "@types/graphql-type-json" "^0.3.2"
+    "@types/isomorphic-fetch" "^0.0.35"
+    "@types/lodash" "^4.14.148"
+    "@types/mkdirp" "^0.5.2"
+    "@types/node" "^12.12.8"
+    "@types/node-emoji" "^1.8.1"
+    "@types/open" "^6.2.1"
+    "@types/pg" "^7.14.11"
+    "@types/prettier" "^1.18.3"
+    "@types/shortid" "^0.0.29"
+    "@types/ws" "^6.0.3"
+    apollo-link-error "^1.1.12"
+    apollo-link-http "^1.5.16"
+    apollo-server "^2.9.9"
+    apollo-server-express "^2.9.9"
+    app-root-path "^3.0.0"
+    bn.js "^5.2.0"
+    caller "^1.0.1"
+    class-transformer "^0.2.3"
+    class-validator "^0.11.0"
+    cosmiconfig "^6.0.0"
+    cross-fetch "^3.0.4"
+    dataloader "^1.4.0"
+    debug "^4.1.1"
+    execa "^4.0.3"
+    express "^4.17.1"
+    gluegun "^4.1.0"
+    graphql "^14.5.8"
+    graphql-binding "^2.5.2"
+    graphql-fields "^2.0.3"
+    graphql-import-node "^0.0.4"
+    graphql-iso-date "^3.6.1"
+    graphql-scalars "^1.2.6"
+    graphql-tools "^4.0.6"
+    graphql-type-json "^0.3.0"
+    lodash "^4.17.15"
+    mkdirp "^0.5.1"
+    node-emoji "^1.10.0"
+    open "^7.0.0"
+    pg "^8.6.0"
+    pgtools "^0.3.1"
+    prettier "^1.19.1"
+    reflect-metadata "^0.1.13"
+    shortid "^2.2.15"
+    type-graphql "^0.17.5"
+    typedi "^0.8.0"
+    typeorm "^0.2.32"
+    typeorm-typedi-extensions "^0.4.1"
+    typescript "^3.9.7"
+
 "@microsoft/tsdoc-config@0.15.2":
   version "0.15.2"
   resolved "https://registry.yarnpkg.com/@microsoft/tsdoc-config/-/tsdoc-config-0.15.2.tgz#eb353c93f3b62ab74bdc9ab6f4a82bcf80140f14"
@@ -11961,10 +12026,24 @@ pg-connection-string@^2.4.0, pg-connection-string@^2.5.0:
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.5.0.tgz#538cadd0f7e603fc09a12590f3b8a452c2c0cf34"
   integrity sha512-r5o/V/ORTA6TmUnyWZR9nCj1klXCO2CEKNRlVuJptZe85QuhFayC7WeMic7ndayT5IRIR0S0xFxFi2ousartlQ==
 
+pg-format@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/pg-format/-/pg-format-1.0.4.tgz#27734236c2ad3f4e5064915a59334e20040a828e"
+  integrity sha1-J3NCNsKtP05QZJFaWTNOIAQKgo4=
+
 pg-int8@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/pg-int8/-/pg-int8-1.0.1.tgz#943bd463bf5b71b4170115f80f8efc9a0c0eb78c"
   integrity sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==
+
+pg-listen@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/pg-listen/-/pg-listen-1.7.0.tgz#5a5c68a1cabf88d2b78ed9cf133667f597d3b860"
+  integrity sha512-MKDwKLm4ryhy7iq1yw1K1MvUzBdTkaT16HZToddX9QaT8XSdt3Kins5mYH6DLECGFzFWG09VdXvWOIYogjXrsg==
+  dependencies:
+    debug "^4.1.1"
+    pg-format "^1.0.4"
+    typed-emitter "^0.1.0"
 
 pg-packet-stream@^1.1.0:
   version "1.1.0"
@@ -14288,7 +14367,7 @@ ts-mockito@^2.6.1:
   dependencies:
     lodash "^4.17.5"
 
-ts-node-dev@^1.0.0-pre.40, ts-node-dev@^1.0.0-pre.63:
+ts-node-dev@^1.0.0-pre.40, ts-node-dev@^1.0.0-pre.60, ts-node-dev@^1.0.0-pre.63:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/ts-node-dev/-/ts-node-dev-1.1.6.tgz#ee2113718cb5a92c1c8f4229123ad6afbeba01f8"
   integrity sha512-RTUi7mHMNQospArGz07KiraQcdgUVNXKsgO2HAi7FoiyPMdTDqdniB6K1dqyaIxT7c9v/VpSbfBZPS6uVpaFLQ==
@@ -14319,7 +14398,7 @@ ts-node@^7.0.1:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
-ts-node@^8:
+ts-node@^8, ts-node@^8.10:
   version "8.10.2"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.10.2.tgz#eee03764633b1234ddd37f8db9ec10b75ec7fb8d"
   integrity sha512-ISJJGgkIpDdBhWVu3jufsWpK3Rzo7bdiIXJjQc0ynKxVOVcg2oIrf2H2cejminGrptVc6q6/uynAHNCuWGbpVA==
@@ -14498,6 +14577,11 @@ type@^2.0.0:
   resolved "https://registry.yarnpkg.com/type/-/type-2.5.0.tgz#0a2e78c2e77907b252abe5f298c1b01c63f0db3d"
   integrity sha512-180WMDQaIMm3+7hGXWf12GtdniDEy7nYcyFMKJn/eZz/6tSLXrUN9V0wKSbMjej0I1WHWbpREDEKHtqPQa9NNw==
 
+typed-emitter@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/typed-emitter/-/typed-emitter-0.1.0.tgz#ca532f100ccbf850e3a73b8ebf43d43e4f1f3849"
+  integrity sha512-Tfay0l6gJMP5rkil8CzGbLthukn+9BN/VXWcABVFPjOoelJ+koW8BuPZYk+h/L+lEeIp1fSzVRiWRPIjKVjPdg==
+
 typedarray-to-buffer@^3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/typedarray-to-buffer/-/typedarray-to-buffer-3.1.5.tgz#a97ee7a9ff42691b9f783ff1bc5112fe3fca9080"
@@ -14548,7 +14632,7 @@ typeorm@^0.2.25, typeorm@^0.2.26:
     yargs "^16.2.0"
     zen-observable-ts "^1.0.0"
 
-typeorm@^0.2.32:
+typeorm@^0.2.31, typeorm@^0.2.32:
   version "0.2.34"
   resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-0.2.34.tgz#637b3cec2de54ee7f423012b813a2022c0aacc8b"
   integrity sha512-FZAeEGGdSGq7uTH3FWRQq67JjKu0mgANsSZ04j3kvDYNgy9KwBl/6RFgMVgiSgjf7Rqd7NrhC2KxVT7I80qf7w==

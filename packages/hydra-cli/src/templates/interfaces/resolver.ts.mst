@@ -1,6 +1,6 @@
 import { Arg, Args, Mutation, Query, Resolver, Info } from 'type-graphql';
 import { Inject } from 'typedi';
-import { Fields, StandardDeleteResponse, UserId } from 'warthog';
+import { Fields, StandardDeleteResponse, UserId } from '@metmirr/warthog';
 import { GraphQLResolveInfo } from 'graphql';
 
 import {
