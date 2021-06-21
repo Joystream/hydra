@@ -40,7 +40,7 @@ export class TransactionalExecutor implements IMappingExecutor {
 
       const { pre, post, mappings } = allMappings
 
-      const store = makeDatabaseManager(entityManager)
+      const store = makeDatabaseManager(entityManager, blockData)
 
       for (const hook of pre) {
         await this.mappingsLookup.call(hook, {
@@ -83,11 +83,12 @@ export class TransactionalExecutor implements IMappingExecutor {
  * @param entityManager EntityManager
  */
 export function makeDatabaseManager(
-  entityManager: EntityManager
+  entityManager: EntityManager,
+  blockData: BlockData
 ): DatabaseManager {
   return {
     save: async <T>(entity: DeepPartial<T>): Promise<void> => {
-      entity = fillRequiredWarthogFields(entity)
+      entity = fillRequiredWarthogFields(entity, blockData)
       await entityManager.save(entity)
     },
     remove: async <T>(entity: DeepPartial<T>): Promise<void> => {
@@ -119,7 +120,10 @@ export function makeDatabaseManager(
  *
  * @param entity: DeepPartial<T>
  */
-function fillRequiredWarthogFields<T>(entity: DeepPartial<T>): DeepPartial<T> {
+function fillRequiredWarthogFields<T>(
+  entity: DeepPartial<T>,
+  { block }: BlockData
+): DeepPartial<T> {
   // eslint-disable-next-line no-prototype-builtins
   if (!entity.hasOwnProperty('id')) {
     Object.assign(entity, { id: shortid.generate() })
@@ -132,5 +136,28 @@ function fillRequiredWarthogFields<T>(entity: DeepPartial<T>): DeepPartial<T> {
   if (!entity.hasOwnProperty('version')) {
     Object.assign(entity, { version: 1 })
   }
+
+  // set createdAt to the block timestamp if not set
+  if (
+    // eslint-disable-next-line no-prototype-builtins
+    !entity.hasOwnProperty('createdAt') ||
+    (entity as { createdAt: unknown }).createdAt === undefined
+  ) {
+    Object.assign(entity, {
+      createdAt: new Date(block.timestamp),
+    })
+  }
+
+  // set updatedAt to the block timestamp if not set
+  if (
+    // eslint-disable-next-line no-prototype-builtins
+    !entity.hasOwnProperty('updatedAt') ||
+    (entity as { updatedAt: unknown }).updatedAt === undefined
+  ) {
+    Object.assign(entity, {
+      updatedAt: new Date(block.timestamp),
+    })
+  }
+
   return entity
 }

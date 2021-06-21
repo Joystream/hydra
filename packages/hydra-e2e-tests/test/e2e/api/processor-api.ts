@@ -67,14 +67,22 @@ export async function findTransfersByValue(
   return result.transfers
 }
 
-export async function fetchDateTimeFieldFromTransfer(): Promise<Date> {
+export async function fetchDateTimeFieldFromTransfer(): Promise<{
+  insertedAt: string
+  updatedAt: string
+  createdAt: string
+  timestamp: string
+}> {
   const result = await getGQLClient().request<{
     transfers: {
       insertedAt: string
+      updatedAt: string
+      createdAt: string
+      timestamp: string
     }[]
   }>(FETCH_INSERTED_AT_FIELD_FROM_TRANSFER)
 
-  return new Date(result.transfers[0].insertedAt)
+  return result.transfers[0]
 }
 
 export async function findTransfersByCommentAndWhereCondition(
