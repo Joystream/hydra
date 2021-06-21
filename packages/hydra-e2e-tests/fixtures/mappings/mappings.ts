@@ -56,7 +56,11 @@ export async function balancesTransfer({
   fromAcc.balance = fromAcc.balance || new BN(0)
   fromAcc.balance = fromAcc.balance.sub(value)
   fromAcc.balance = fromAcc.balance.sub(transfer.tip)
-  fromAcc.status = { hates: 'ALICE', isTypeOf: 'Miserable' }
+  fromAcc.status = {
+    hates: 'ALICE',
+    loves: ['money', 'crypto'],
+    isTypeOf: 'Miserable',
+  }
 
   await store.save<Account>(fromAcc)
 

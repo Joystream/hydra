@@ -1,5 +1,6 @@
 import { fromStringSchema } from './model'
 import { expect } from 'chai'
+import { compact as c } from '../../src/generate/utils'
 import { VariantsRenderer } from '../../src/generate/VariantsRenderer'
 import * as fs from 'fs-extra'
 
@@ -119,6 +120,35 @@ describe('VariantsRenderer', () => {
   @StringField({ dbOnly: true })
   eventId!: string;`,
       'should generated additional field'
+    )
+  })
+
+  it('Should render array fields', () => {
+    const model = fromStringSchema(`
+    type Miserable @variant {
+      hates: String
+      x: Boolean!
+      y: Int
+      z: BigInt!
+      u: DateTime! 
+      loves: [String]!
+      maybeLoves: [String]
+    }`)
+    const gen = new VariantsRenderer(model)
+    const rendered = c(gen.render(variantsTemplate))
+    expect(rendered).to.include(
+      c(`@Field(() => String, { nullable: true, }) hates?: string`),
+      'should render nullable fields'
+    )
+
+    expect(rendered).to.include(
+      c(`@Field(() => [String]!, {}) loves!: string[]`),
+      'should render array fields'
+    )
+
+    expect(rendered).to.include(
+      c(`@Field(() => [String], { nullable: true, }) maybeLoves?: string[]`),
+      'should render nullable array fields'
     )
   })
 })
