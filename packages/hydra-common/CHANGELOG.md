@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.3 (2021-06-21)
+
+
+### Bug Fixes
+
+* **hydra-processor:** set createdAt, updatedAt to the block timestamp by default ([#426](https://github.com/Joystream/hydra/issues/426)) ([18ee4c2](https://github.com/Joystream/hydra/commit/18ee4c2c1dca7822f68c6db3864799a451e9a8bd)), closes [#400](https://github.com/Joystream/hydra/issues/400)
+
+
+
 ## 3.1.0-alpha.2 (2021-06-17)
 
 **Note:** Version bump only for package @joystream/hydra-common
