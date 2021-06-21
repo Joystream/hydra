@@ -14,7 +14,17 @@
     ]
   },
   "scripts": {
-    "e2e-test": "yarn workspace hydra-e2e-tests run e2e-test",
+    "build": "yarn build:common && yarn build:utils && yarn build:bn-typeorm && yarn build:typegen && yarn build:processor && yarn build:indexer && yarn build:indexer-gateway && yarn build:cli && yarn build:e2e-test",
+    "build:common": "yarn workspace @joystream/hydra-common build",
+    "build:utils": "yarn workspace @joystream/hydra-db-utils build",
+    "build:bn-typeorm": "yarn workspace @joystream/bn-typeorm build",
+    "build:typegen": "yarn workspace @joystream/hydra-typegen build",
+    "build:processor": "yarn workspace @joystream/hydra-processor build",
+    "build:indexer": "yarn workspace @joystream/hydra-indexer build",
+    "build:indexer-gateway": "yarn workspace @joystream/hydra-indexer-gateway build",
+    "build:cli": "yarn workspace @joystream/hydra-cli build",
+    "build:e2e-test": "yarn workspace @joystream/hydra-e2e-tests build",
+    "e2e-test": "yarn workspace @joystream/hydra-e2e-tests run e2e-test",
     "lint": "yarn workspaces run lint",
     "postinstall": "is-ci || husky install"
   },
