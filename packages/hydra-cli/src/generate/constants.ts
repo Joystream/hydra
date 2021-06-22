@@ -21,22 +21,27 @@ export const TYPE_FIELDS: { [key: string]: { [key: string]: string } } = {
   bool: {
     decorator: 'BooleanField',
     tsType: 'boolean',
+    gqlType: 'Boolean',
   },
   date: {
     decorator: 'DateTimeField',
     tsType: 'Date',
+    gqlType: 'GraphQLISODateTime',
   },
   int: {
     decorator: 'IntField',
     tsType: 'number',
+    gqlType: 'Int',
   },
   float: {
     decorator: 'FloatField',
     tsType: 'number',
+    gqlType: 'Float',
   },
   json: {
     decorator: 'JSONField',
     tsType: 'JsonObject',
+    gqlType: 'GraphQLJSONObject',
   },
   otm: {
     decorator: 'OneToMany',
@@ -53,25 +58,31 @@ export const TYPE_FIELDS: { [key: string]: { [key: string]: string } } = {
   string: {
     decorator: 'StringField',
     tsType: 'string',
+    gqlType: 'String',
   },
   numeric: {
     decorator: 'NumericField',
     tsType: 'BN',
+    gqlType: 'Float',
   },
   decimal: {
     decorator: 'NumericField',
     tsType: 'BN',
+    gqlType: 'Float',
   },
   oto: {
     decorator: 'OneToOne',
     tsType: '---',
+    gqlType: '',
   },
   array: {
     decorator: 'ArrayField',
     tsType: '', // will be updated with the correct type
+    gqlType: '',
   },
   bytes: {
     decorator: 'BytesField',
     tsType: 'Buffer',
+    gqlType: 'Buffer',
   },
 }

@@ -10,6 +10,10 @@ on:
         description: 'Graduate from prerelease'     
         required: false
         default: 'false'
+      releaseTag:
+        description: 'Tag the release (next, latest)'
+        required: false
+        default: 'next'
       
       
 
@@ -41,12 +45,12 @@ jobs:
         run: |
           (cd ./packages/hydra-indexer && yarn docker:publish)
         env:
-          RELEASE_TAG: ${{ github.event.inputs.graduate == 'true' && 'latest' || 'next' }}
+          RELEASE_TAG: ${{ github.event.inputs.releaseTag }}
         
       - name: Publish hydra-indexer-gateway image
         if: "contains(github.event.inputs.packages, 'hydra-indexer-gateway') || github.event.inputs.packages == '*'"
         run: |
           (cd ./packages/hydra-indexer-gateway && yarn docker:publish)
         env:
-          RELEASE_TAG: ${{ github.event.inputs.graduate == 'true' && 'latest' || 'next' }}
+          RELEASE_TAG: ${{ github.event.inputs.releaseTag }}
         
