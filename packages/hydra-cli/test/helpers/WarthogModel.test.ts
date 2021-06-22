@@ -256,4 +256,22 @@ describe('WarthogModel', () => {
       'Should have a single field of union type'
     )
   })
+
+  it('Should add array field to variants', () => {
+    const model = fromStringSchema(`
+    type Miserable @variant {
+      hates: String!
+      loves: [String]!
+    }`)
+
+    expect(model.lookupVariant('Miserable').fields.length).eq(
+      2,
+      'Should have both fields'
+    )
+
+    expect(model.lookupVariant('Miserable').fields[1].isList).eq(
+      true,
+      'Should be a list'
+    )
+  })
 })

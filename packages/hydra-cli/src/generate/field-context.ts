@@ -50,8 +50,10 @@ export function withFieldTypeGuardProps(f: Field): GeneratorContext {
 export function withTsTypeAndDecorator(f: Field): GeneratorContext {
   const fieldType = f.columnType()
   if (TYPE_FIELDS[fieldType]) {
+    const t = TYPE_FIELDS[fieldType]
     return {
-      ...TYPE_FIELDS[fieldType],
+      ...t,
+      gqlType: f.isArray() ? `[${t.gqlType}]` : t.gqlType,
     }
   }
 
