@@ -2,7 +2,7 @@
 
 import * as util from 'util';
 
-import { getBindingError } from '@metmirr/warthog';
+import { getBindingError } from '@joystream/warthog';
 
 export class Logger {
   static info(...args: any[]) {

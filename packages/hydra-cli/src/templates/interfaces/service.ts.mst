@@ -1,6 +1,6 @@
 import { Service, Inject } from 'typedi';
 import { getManager, SelectQueryBuilder, ObjectLiteral } from 'typeorm';
-import { BaseModel, WhereInput } from '@metmirr/warthog';
+import { BaseModel, WhereInput } from '@joystream/warthog';
 import { snakeCase, camelCase, uniq, orderBy } from 'lodash';
 import { GraphQLResolveInfo } from 'graphql';
 

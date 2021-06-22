@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
-import { run } from '@metmirr/warthog/dist/cli/cli'
+import { run } from '@joystream/warthog/dist/cli/cli'
 
 import { WarthogModelBuilder } from '../parse/WarthogModelBuilder'
 import {
@@ -286,7 +286,7 @@ export default class WarthogWrapper {
     envConfig.WARTHOG_APP_HOST =
       process.env.GRAPHQL_SERVER_HOST || envConfig.WARTHOG_APP_HOST
     envConfig.WARTHOG_MODULE_IMPORT_PATH =
-      process.env.MODULE_IMPORT_PATH || '@metmirr/warthog'
+      process.env.MODULE_IMPORT_PATH || '@joystream/warthog'
 
     const newEnvConfig = Object.keys(envConfig)
       .map((key) => `${key}=${envConfig[key]}`)

@@ -1,7 +1,7 @@
 import { Service, Inject } from 'typedi';
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { WhereInput } from '@metmirr/warthog';
+import { WhereInput } from '@joystream/warthog';
 import { WarthogBaseService } from '../../WarthogBaseService';
 
 import { {{className}} } from './{{kebabName}}.model';

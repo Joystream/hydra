@@ -122,7 +122,7 @@ export function parseWarthogCodegenStderr(stderr: string): void {
 
 export function getWarthogDependency(): string {
   /* eslint-disable */
-  const warthogPackageJson = require('@metmirr/warthog/package.json') as Record<
+  const warthogPackageJson = require('@joystream/warthog/package.json') as Record<
     string,
     unknown
   >
