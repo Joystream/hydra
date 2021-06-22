@@ -8,6 +8,7 @@ const typesSpec = {
   'node-template': {
     Address: 'AccountId',
     LookupSource: 'AccountId',
+    AccountInfo: 'AccountInfoWithRefCount',
   },
 }
 
