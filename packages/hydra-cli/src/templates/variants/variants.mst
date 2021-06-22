@@ -10,11 +10,21 @@ import {
   EnumField,
   StringField
 } from 'warthog';
+
+import {
+  Float,
+  Int,
+  GraphQLISODateTime,
+} from 'type-graphql';
 import BN from 'bn.js'
 
 {{#imports}} 
 {{{.}}};
 {{/imports}}
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { GraphQLJSONObject } = require('graphql-type-json');
+
 
 {{#variants}}
   {{#fields}}
@@ -34,26 +44,18 @@ export class {{name}} {
 	public isTypeOf: string = '{{name}}';
 
   {{#fields}}
+
     {{#is.entity}}
       @Field(() => {{^array}}{{tsType}}{{/array}} {{#array}}[{{tsType}}]{{/array}}, {
         nullable: true,
         {{#description}}description: `{{{description}}}`{{/description}}
       })
       {{camelName}}?:{{tsType}}{{#array}}[]{{/array}};
-
+      
       // `id` of the related entity, it is required to make the relationship possible.
       @StringField({ dbOnly: true {{#array}},array: true{{/array}} })
       {{camelName}}Id{{#array}}s{{/array}}!: string{{#array}}[]{{/array}};
     {{/is.entity}}
-
-    {{#is.scalar}}
-      @{{decorator}}({
-        {{^required}}nullable: true,{{/required}}
-        {{#description}}description: `{{{description}}}`,{{/description}}
-        {{#unique}}unique: true,{{/unique}}
-      })
-      {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: {{tsType}};
-    {{/is.scalar}}
 
     {{#is.enum}}
       @EnumField('{{tsType}}', {{tsType}}, { 
@@ -69,6 +71,14 @@ export class {{name}} {
         {{#description}}description: `{{{description}}}`{{/description}} })
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: typeof {{tsType}};
     {{/is.union}}
+
+    {{#is.scalar}}
+    @Field(() => {{gqlType}}{{#required}}!{{/required}}, {
+        {{^required}}nullable: true,{{/required}}
+        {{#description}}description: `{{{description}}}`{{/description}}
+    })
+    {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}}{{#array}}[]{{/array}};
+    {{/is.scalar}}
 
   {{/fields}}
 

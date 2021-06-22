@@ -42,6 +42,7 @@ type Account @entity {
 
 type Miserable @variant {
   hates: String!
+  loves: [String]!
 }
 
 type HappyPoor @variant {
