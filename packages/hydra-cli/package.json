@@ -1,7 +1,7 @@
 {
   "name": "@joystream/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "3.1.0-alpha.4",
+  "version": "3.1.0-alpha.5",
   "author": "metmirr @metmirr joystream @dzhelezov",
   "license": "MIT",
   "bin": {

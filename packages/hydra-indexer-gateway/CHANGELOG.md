@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.5 (2021-06-22)
+
+
+### Bug Fixes
+
+* **hydra-indexer:** bump polkadot version to 4.15.1 ([52c215e](https://github.com/Joystream/hydra/commit/52c215eb796f01e06914d55ae819f17456f85205))
+
+
+
 ## 3.1.0-alpha.4 (2021-06-22)
 
 
