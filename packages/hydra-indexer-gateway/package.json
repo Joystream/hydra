@@ -8,7 +8,7 @@
     "docker:build": "docker build . -t hydra-indexer-gateway:latest",
     "docker:tag": "docker tag hydra-indexer-gateway:latest joystream/hydra-indexer-gateway:${VERSION_TAG} && docker tag hydra-indexer-gateway:latest joystream/hydra-indexer-gateway:${RELEASE_TAG:-next} && docker tag hydra-indexer-gateway:latest joystream/hydra-indexer-gateway:${MAJOR_VERSION_TAG}",
     "docker:push": "docker push joystream/hydra-indexer-gateway --all-tags",
-    "docker:publish": "export VERSION_TAG=$(node -p 'require(\"./package.json\").version') && && export MAJOR_VERSION_TAG=$(echo $VERSION_TAG|cut -d'.' -f1) && yarn docker:build && yarn docker:tag && yarn docker:push",
+    "docker:publish": "export VERSION_TAG=$(node -p 'require(\"./package.json\").version') && export MAJOR_VERSION_TAG=$(echo $VERSION_TAG|cut -d'.' -f1) && yarn docker:build && yarn docker:tag && yarn docker:push",
     "bootstrap": "yarn bootstrap:dev",
     "bootstrap:dev": "yarn && yarn build:dev && yarn db:drop && yarn db:create && yarn db:migrate && yarn db:seed",
     "bootstrap:prod": "yarn && yarn build:prod && yarn start:prod",
