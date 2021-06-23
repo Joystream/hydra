@@ -10,7 +10,7 @@ import {
   EnumField,
   StringField,
   ObjectType
-} from 'warthog';
+} from '@joystream/warthog';
 import BN from 'bn.js'
 import { InputType, Field } from 'type-graphql';
 

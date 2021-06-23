@@ -9,7 +9,7 @@ import {
   BytesField,
   EnumField,
   StringField
-} from 'warthog';
+} from '@joystream/warthog';
 
 import {
   Float,

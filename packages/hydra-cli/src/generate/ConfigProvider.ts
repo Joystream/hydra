@@ -1,4 +1,4 @@
-import { Config } from 'warthog'
+import { Config } from '@joystream/warthog'
 import * as path from 'path'
 import * as util from './utils'
 import { GeneratorContext } from './SourcesGenerator'

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { SnakeNamingStrategy } from 'warthog';
+import { SnakeNamingStrategy } from '@joystream/warthog';
 import { snakeCase } from 'typeorm/util/StringUtils';
 
 import { loadConfig } from '../src/config';
