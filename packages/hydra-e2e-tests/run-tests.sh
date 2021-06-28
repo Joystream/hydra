@@ -26,7 +26,7 @@ docker-compose up -d
 
 # wait for the processor to start grinding 
 attempt_counter=0
-max_attempts=25
+max_attempts=30
 
 until $(curl -s --head  --request GET http://localhost:3000/metrics/hydra_processor_last_scanned_block | grep "200" > /dev/null);  do
     if [ ${attempt_counter} -eq ${max_attempts} ];then
