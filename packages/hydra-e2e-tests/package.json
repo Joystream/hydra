@@ -1,6 +1,6 @@
 {
   "name": "hydra-e2e-tests",
-  "version": "3.1.0-alpha.1",
+  "version": "3.1.0-alpha.2",
   "private": "true",
   "description": "End-to-end tests for Hydra services",
   "main": "index.js",
@@ -32,7 +32,7 @@
     "typedi": "^0.8.0"
   },
   "devDependencies": {
-    "@subsquid/hydra-cli": "^3.1.0-alpha.1",
+    "@subsquid/hydra-cli": "^3.1.0-alpha.2",
     "@types/chai": "^4.2.13",
     "@types/mocha": "^8.0.3",
     "chai": "^4.2.0",
