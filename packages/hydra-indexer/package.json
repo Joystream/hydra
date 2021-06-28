@@ -6,9 +6,9 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
-  "repository": "git@github.com:Joystream/hydra.git",
-  "bugs": "https://github.com/Joystream/hydra/issues",
-  "homepage": "https://www.joystream.org/hydra/",
+  "repository": "git@github.com:subsquid/hydra.git",
+  "bugs": "https://github.com/subsquid/hydra/issues",
+  "homepage": "https://www.subsquid.io",
   "files": [
     "lib",
     "README.md"
@@ -16,8 +16,8 @@
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
     "docker:build": "docker build . -t hydra-indexer:latest",
-    "docker:tag": "docker tag hydra-indexer:latest joystream/hydra-indexer:v${VERSION_TAG} && docker tag hydra-indexer:latest joystream/hydra-indexer:${MAJOR_VERSION_TAG} && docker tag hydra-indexer:latest joystream/hydra-indexer:${RELEASE_TAG:-next}",
-    "docker:publish": "export VERSION_TAG=$(node -p 'require(\"./package.json\").version') && export MAJOR_VERSION_TAG=$(echo $VERSION_TAG|cut -d'.' -f1) && yarn docker:build && yarn docker:tag && docker push joystream/hydra-indexer --all-tags",
+    "docker:tag": "docker tag hydra-indexer:latest subsquid/hydra-indexer:v${VERSION_TAG} && docker tag hydra-indexer:latest subsquid/hydra-indexer:${MAJOR_VERSION_TAG} && docker tag hydra-indexer:latest subsquid/hydra-indexer:${RELEASE_TAG:-next}",
+    "docker:publish": "export VERSION_TAG=$(node -p 'require(\"./package.json\").version') && export MAJOR_VERSION_TAG=$(echo $VERSION_TAG|cut -d'.' -f1) && yarn docker:build && yarn docker:tag && docker push subsquid/hydra-indexer --all-tags",
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "lint": "eslint . --cache --ext .ts",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",

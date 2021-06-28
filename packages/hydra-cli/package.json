@@ -31,9 +31,9 @@
       "@oclif/plugin-plugins"
     ]
   },
-  "repository": "git@github.com:Joystream/hydra.git",
-  "bugs": "https://github.com/Joystream/hydra/issues",
-  "homepage": "https://www.joystream.org/hydra/",
+  "repository": "git@github.com:subsquid/hydra.git",
+  "bugs": "https://github.com/subsquid/hydra/issues",
+  "homepage": "https://www.subsquid.io/",
   "keywords": [
     "oclif"
   ],
