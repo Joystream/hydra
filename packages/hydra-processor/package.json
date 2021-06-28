@@ -1,6 +1,6 @@
 {
   "name": "@joystream/hydra-processor",
-  "version": "3.1.0-alpha.6",
+  "version": "3.1.0-alpha.7",
   "description": "Hydra Processor CLI",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -36,8 +36,8 @@
     "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
   },
   "dependencies": {
-    "@joystream/hydra-common": "^3.1.0-alpha.6",
-    "@joystream/hydra-db-utils": "^3.1.0-alpha.6",
+    "@joystream/hydra-common": "^3.1.0-alpha.7",
+    "@joystream/hydra-db-utils": "^3.1.0-alpha.7",
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.3.3",
