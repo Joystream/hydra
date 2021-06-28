@@ -16,7 +16,7 @@
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
     "docker:build": "docker build . -t hydra-indexer:latest",
-    "docker:tag": "docker tag hydra-indexer:latest subsquid/hydra-indexer:v${VERSION_TAG} && docker tag hydra-indexer:latest subsquid/hydra-indexer:${MAJOR_VERSION_TAG} && docker tag hydra-indexer:latest subsquid/hydra-indexer:${RELEASE_TAG:-next}",
+    "docker:tag": "docker tag hydra-indexer:latest subsquid/hydra-indexer:${VERSION_TAG} && docker tag hydra-indexer:latest subsquid/hydra-indexer:${MAJOR_VERSION_TAG} && docker tag hydra-indexer:latest subsquid/hydra-indexer:${RELEASE_TAG:-next}",
     "docker:publish": "export VERSION_TAG=$(node -p 'require(\"./package.json\").version') && export MAJOR_VERSION_TAG=$(echo $VERSION_TAG|cut -d'.' -f1) && yarn docker:build && yarn docker:tag && docker push subsquid/hydra-indexer --all-tags",
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "lint": "eslint . --cache --ext .ts",
