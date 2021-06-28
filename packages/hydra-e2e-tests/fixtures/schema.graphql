@@ -125,4 +125,5 @@ type EventParam @jsonField {
 type SystemEvent @entity {
   id: ID!
   params: EventParam!
+  arrayField: [String!]
 }

@@ -61,7 +61,7 @@ export class Field {
   }
 
   isScalar(): boolean {
-    return this.isBuildinType
+    return this.isBuildinType && !this.isList
   }
 
   isRelationType(): boolean {

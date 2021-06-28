@@ -34,6 +34,7 @@ export function withFieldTypeGuardProps(f: Field): GeneratorContext {
   const is: GeneratorContext = {}
   is.array = f.isArray()
   is.scalar = f.isScalar()
+  is.primitive = f.isBuildinType
   is.enum = f.isEnum()
   is.union = f.isUnion()
   is.entity = f.isEntity()
@@ -43,7 +44,7 @@ export function withFieldTypeGuardProps(f: Field): GeneratorContext {
   )
 
   return {
-    is: is,
+    is,
   }
 }
 

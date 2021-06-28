@@ -72,13 +72,13 @@ export class {{name}} {
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: typeof {{tsType}};
     {{/is.union}}
 
-    {{#is.scalar}}
+    {{#is.primitive}}
     @Field(() => {{gqlType}}{{#required}}!{{/required}}, {
         {{^required}}nullable: true,{{/required}}
         {{#description}}description: `{{{description}}}`{{/description}}
     })
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}}{{#array}}[]{{/array}};
-    {{/is.scalar}}
+    {{/is.primitive}}
 
   {{/fields}}
 

@@ -199,3 +199,11 @@ export const TYPED_JSONFIELD_FILTERING = gql`
     }
   }
 `
+
+export const ARRAY_FIELD_QUERY_ANY = gql`
+  query {
+    systemEvents(where: { arrayField_containsAny: ["aaa"] }) {
+      id
+    }
+  }
+`
