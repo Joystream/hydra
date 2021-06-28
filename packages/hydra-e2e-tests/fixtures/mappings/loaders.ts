@@ -71,6 +71,7 @@ export async function jsonFieldLoader({ store }: BlockContext & StoreContext) {
 
   params.additionalData = [additionalData]
   e.params = params
+  e.arrayField = ['aaa', 'bbb', 'ccc']
 
   await store.save<SystemEvent>(e)
 }
