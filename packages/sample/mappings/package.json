@@ -1,7 +1,7 @@
 {
   "name": "sample-mappings",
   "private": true,
-  "version": "3.1.0-alpha.2",
+  "version": "3.1.0-alpha.3",
   "description": "Mappings for hydra-processor",
   "main": "lib/mappings/index.js",
   "license": "MIT",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@polkadot/types": "4.2.1",
-    "@subsquid/hydra-common": "^3.1.0-alpha.2"
+    "@subsquid/hydra-common": "^3.1.0-alpha.3"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",

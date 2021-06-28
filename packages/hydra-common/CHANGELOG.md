@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.3 (2021-06-28)
+
+
+### Bug Fixes
+
+* **hydra-cli:** fix array fields ([bd69623](https://github.com/subsquid/hydra/commit/bd696234387bd49e2b334360206967997e90475d))
+
+
+
 ## 3.1.0-alpha.2 (2021-06-28)
 
 
