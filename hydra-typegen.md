@@ -142,7 +142,7 @@ is correctly resolved.
 ...
 customTypes: 
     lib: 'my/types/library',
-    typedefs: my-types-json,
+    typedefsLoc: my-types-json,
 ```
 
 Note, that when used in the mappings, the library with custom types \(here `my/types/library`\) must be added as a dependency for the mappings module in `mappings/package.json`
