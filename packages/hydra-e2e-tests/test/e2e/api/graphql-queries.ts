@@ -151,6 +151,29 @@ export const VARIANT_FILTER_MISREABLE_ACCOUNTS = gql`
   }
 `
 
+export const EVENT_SUBCLASSES_QUERY = gql`
+  query {
+    events(
+      where: {
+        eventA: { field1_eq: "field1" }
+        eventB: { field2_eq: "field2" }
+        eventC: { field3_eq: "field3" }
+      }
+      orderBy: [indexInBlock_DESC, network_DESC]
+    ) {
+      ... on EventA {
+        field1
+      }
+      ... on EventB {
+        field2
+      }
+      ... on EventC {
+        field3
+      }
+    }
+  }
+`
+
 export const EVENT_INTERFACE_QUERY = gql`
   query {
     events(
