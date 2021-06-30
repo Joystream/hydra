@@ -10,6 +10,10 @@ interface WhereFilterAttributes {
   [key: string]: string | number | null;
 }
 
+/**
+ *  This code is by and large taken from the Warthog sources 
+ *  and should be incorporated into warthog fork
+ */
 export class WarthogBaseService<E extends BaseModel> extends BaseService<E> {
   buildFindQueryWithParams<W extends WhereInput>(
     where: WhereExpression = {},
@@ -160,6 +164,13 @@ export class WarthogBaseService<E extends BaseModel> extends BaseService<E> {
   }
 }
 
+/**
+ * 
+ * @param orderBy clause(s) formatted as <attr1>_DESC 
+ * @param qb query builder
+ * @param attrToDBColumn a function that maps the attribute to the db column name
+ * @returns query builder with the order by clause
+ */
 export function addOrderBy<T>(
   orderBy: string | string[] | undefined,
   qb: SelectQueryBuilder<T>,
@@ -177,6 +188,11 @@ export function addOrderBy<T>(
   return qb;
 }
 
+/**
+ * 
+ * @param orderBy list of orderby's or a single orderby, formatted as <field1>_ASC or <field2>_DESC
+ * @returns an array of order by clauses suitable for typeorm: [[field1, field2], ['asc', 'desc']]
+ */
 export function parseOrderBy(
   orderBy: string | string[] | undefined
 ): [string[], ('asc' | 'desc')[]] {
@@ -200,6 +216,11 @@ export function parseOrderBy(
   return [attrs, directions];
 }
 
+/**
+ * 
+ * @param orderBy list of orderBy clauses
+ * @returns list of fields used for the ordering
+ */
 export function orderByFields(orderBy: string | string[] | undefined): string[] {
   if (orderBy === undefined) {
     return [];
@@ -209,3 +230,4 @@ export function orderByFields(orderBy: string | string[] | undefined): string[] 
   }
   return orderBy.map((o) => o.toString().split('_')[0]);
 }
+

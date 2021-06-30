@@ -1,4 +1,4 @@
-import { Arg, Args, Mutation, Query, Resolver, Info } from 'type-graphql';
+import { Arg, Args, ArgsType, InputType, Mutation, Query, Resolver, Info, Field } from 'type-graphql';
 import { Inject } from 'typedi';
 import { Fields, StandardDeleteResponse, UserId } from '@joystream/warthog';
 import { GraphQLResolveInfo } from 'graphql';
@@ -9,11 +9,29 @@ import {
   {{className}}UpdateArgs,
   {{className}}WhereArgs,
   {{className}}WhereInput,
-  {{className}}WhereUniqueInput
+  {{className}}WhereUniqueInput,
+  {{#subclasses}}  
+  {{className}}WhereInput,
+  {{/subclasses}}
 } from '{{{generatedFolderRelPath}}}';
 
 import { {{className}} } from './{{kebabName}}.model';
 import { {{className}}Service } from './{{kebabName}}.service';
+
+@InputType()
+export class {{className}}WithSubclassesWhereInput extends {{className}}WhereInput {
+  {{#subclasses}}  
+    @Field(() => {{className}}WhereInput, { nullable: true })
+    {{camelName}}?: {{className}}WhereInput;
+  {{/subclasses}}
+}
+
+@ArgsType()
+export class {{className}}WithSubclassesWhereArgs extends {{className}}WhereArgs {
+  @Field(() => {{className}}WithSubclassesWhereInput, { nullable: true })
+  where?: {{className}}WithSubclassesWhereInput;
+}
+
 
 @Resolver()
 export class {{className}}Resolver {
@@ -21,7 +39,7 @@ export class {{className}}Resolver {
 
   @Query(() => [{{className}}])
   async {{camelNamePlural}}(
-    @Args() { where, orderBy, limit, offset }: {{className}}WhereArgs,
+    @Args() { where, orderBy, limit, offset }: {{className}}WithSubclassesWhereArgs,
     @Fields() fields: string[],
     @Info() info?: GraphQLResolveInfo | string
   ): Promise<{{className}}[]> {

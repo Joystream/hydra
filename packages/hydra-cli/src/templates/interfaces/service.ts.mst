@@ -1,7 +1,7 @@
 import { Service, Inject } from 'typedi';
 import { getManager, SelectQueryBuilder, ObjectLiteral } from 'typeorm';
 import { BaseModel, WhereInput } from '@joystream/warthog';
-import { snakeCase, camelCase, uniq, orderBy } from 'lodash';
+import { snakeCase, camelCase, uniq, orderBy, pickBy } from 'lodash';
 import { GraphQLResolveInfo } from 'graphql';
 
 {{#subclasses}}
@@ -53,12 +53,13 @@ export class {{className}}Service {
     const { type_in, type_eq } = where;
     const types: string[] = (type_eq
       ? [type_eq]
-      : type_in || [ {{#subclasses}}  {{className}}, {{/subclasses}} ]
+      : type_in || [ {{#subclasses}}  '{{className}}', {{/subclasses}} ]
     ).map((t: EventTypeOptions) => t.toString());
 
     delete where.type_in;
     delete where.type_eq;
     // take fields that are present in all implemetations
+    console.log(`Types: ${JSON.stringify(types)}`)
     const commonFields = fields.filter((f) =>
       types.reduce(
         (hasField: boolean, t) => this.typeToService[t].columnMap[f] !== undefined && hasField,
@@ -66,11 +67,22 @@ export class {{className}}Service {
       )
     );
 
+    const getWhereForSubclass = (subclass: string) => {
+      const colMap = this.typeToService[subclass].columnMap 
+      // TODO: is this filtering good enough?
+      const commonWhere = pickBy(where, (v, k) =>  k.includes('_') && colMap[k.split('_')[0]] !== undefined)
+      const subclassWhere = where[camelCase(subclass)] || {}
+      return { 
+        ...commonWhere,
+        ...subclassWhere
+      }
+    }
+
     const queries: SelectQueryBuilder<unknown>[] = types.map(
       (t) =>
         (this.typeToService[t]
           .buildFindQueryWithParams(
-            <any>where,
+            <any>getWhereForSubclass(t),
             undefined,
             undefined,
             commonFields,

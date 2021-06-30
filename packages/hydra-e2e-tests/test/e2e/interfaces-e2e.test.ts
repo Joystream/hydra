@@ -5,7 +5,10 @@ import {
   getProcessorStatus,
   queryInterfacesByEnum,
 } from './api/processor-api'
-import { EVENT_INTERFACE_QUERY } from './api/graphql-queries'
+import {
+  EVENT_INTERFACE_QUERY,
+  EVENT_SUBCLASSES_QUERY,
+} from './api/graphql-queries'
 
 describe('end-to-end interfaces tests', () => {
   before(async () => {
@@ -51,5 +54,12 @@ describe('end-to-end interfaces tests', () => {
   it('perform filtering on interfaces by implementers enum types', async () => {
     const { events } = await queryInterfacesByEnum()
     expect(events.length).to.be.equal(1, 'shoud find an interface by type')
+  })
+
+  it('executes a flat interface query with fragments', async () => {
+    const result = await getGQLClient().request<{
+      events: any[]
+    }>(EVENT_SUBCLASSES_QUERY)
+    expect(result.events.length).to.be.equal(3, 'should find three events')
   })
 })
