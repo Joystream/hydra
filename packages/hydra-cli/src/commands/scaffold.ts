@@ -113,13 +113,14 @@ export default class Scaffold extends Command {
 
     debug(`Flags: ${JSON.stringify(flags, null, 2)}`)
 
-    let ctx = {}
+    let ctx = {} as Record<string, unknown>
 
     if (flags.silent) {
       ctx = { ...flags, dbName: flags.name }
     } else {
       ctx = await this.promptDotEnv()
     }
+    ctx.name = ctx.name || "hydra-scaffold" // ensure project has some name
 
     ctx = withDependenciesResolutions(ctx)
 
@@ -235,8 +236,8 @@ export default class Scaffold extends Command {
 }
 
 export function withDependenciesResolutions(
-  ctx: Record<string, string>
-): Record<string, string> {
+  ctx: Record<string, unknown>
+): Record<string, unknown> {
   return {
     ...ctx,
     hydraVersion:

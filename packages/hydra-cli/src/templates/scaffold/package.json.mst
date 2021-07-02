@@ -1,8 +1,10 @@
 {
   "name": "{{{name}}}",
   "private": "true",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "GraphQL server and Substrate indexer. Generated with \u2665 by Hydra-CLI",
+  "main": "dist/model/index.js",
+  "types": "dist/model/index.d.ts",
   "workspaces": [
     "./generated/*",
     "./mappings"
