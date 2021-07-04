@@ -1007,10 +1007,10 @@
   resolved "https://registry.yarnpkg.com/@joystream/prettier-config/-/prettier-config-1.0.0.tgz#d87c6370244f39281d9052c619977ca60f6e21cd"
   integrity sha512-ZY2H1PH05Yhn22B7G8ilLyIT9LxQ9b/PyErkPx8OOW+znary5QgExMhgBl1Gmv3k9m/QX1qIxKHZveO4R2yfeA==
 
-"@joystream/warthog@^2.35.0":
-  version "2.35.0"
-  resolved "https://registry.yarnpkg.com/@joystream/warthog/-/warthog-2.35.0.tgz#da6d735a81ac64eb1dc9fb7ce6ea103b24f236c3"
-  integrity sha512-rxhPjtbN+V2cnFR4kSkn98B2qrL6jWwQzlHqd18S3Am6izotvdVcXInPTqTCRGsdVvmgrrHOduUqzLLiKjed3A==
+"@joystream/warthog@^2.36.0":
+  version "2.36.0"
+  resolved "https://registry.yarnpkg.com/@joystream/warthog/-/warthog-2.36.0.tgz#f470d00a71424a98467c2802ca391038f72a007d"
+  integrity sha512-uHlvaMrDW31NofNXRgbNXA54aF2+EOsW1ZJnOwFHkrsnGeXUrLEnMhJTdPLKpHMHNtpdSXaj+bp6YgBvopHf8g==
   dependencies:
     "@types/app-root-path" "^1.2.4"
     "@types/bn.js" "^4.11.6"
