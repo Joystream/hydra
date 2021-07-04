@@ -26,20 +26,32 @@ export class RelationshipGenerator {
     this.visited = new Set()
   }
 
-  traversed(field: Field, relatedField: Field): boolean {
+  traversed(
+    field: Field,
+    relatedField: Field,
+    entity: ObjectType,
+    relatedEntity: ObjectType
+  ): boolean {
     return (
-      this.visited.has(`${field.name}:${relatedField.name}`) ||
-      this.visited.has(`${relatedField.name}:${field.name}`)
+      this.visited.has(
+        `${entity.name}-${relatedEntity.name}:${field.name}-${relatedField.name}`
+      ) ||
+      this.visited.has(
+        `${relatedEntity.name}-${entity.name}:${relatedField.name}-${field.name}`
+      )
     )
   }
 
   createRelationship(rel: EntityRelationship): void {
     this.relationships.push(rel)
-
-    const { field, relatedField } = rel
-    this.visited.add(`${field.name}:${relatedField.name}`)
+    const { field, relatedField, entity, relatedEntity } = rel
+    this.visited.add(
+      `${entity.name}-${relatedEntity.name}:${field.name}-${relatedField.name}`
+    )
     // reversed
-    this.visited.add(`${relatedField.name}:${field.name}`)
+    this.visited.add(
+      `${relatedEntity.name}-${entity.name}:${relatedField.name}-${field.name}`
+    )
   }
 
   listFieldWithDerivedFromDirective(props: EntityRelatedEntityField): void {
@@ -52,7 +64,7 @@ export class RelationshipGenerator {
         `Incorrect relationship detected. A field like 'someField: [${entity.name}]' must exists on ${relatedEntity.name}`
       )
     }
-    if (this.traversed(field, relatedField)) {
+    if (this.traversed(field, relatedField, entity, relatedEntity)) {
       return
     }
     const rel = {
@@ -82,7 +94,7 @@ export class RelationshipGenerator {
         `Incorrect relationship detected A field like 'someField: [${entity.name}] @derivedFrom(${field.name})' must exists on ${relatedEntity.name}`
       )
     }
-    if (this.traversed(field, relatedField)) {
+    if (this.traversed(field, relatedField, entity, relatedEntity)) {
       return
     }
     this.createRelationship({
@@ -106,7 +118,7 @@ export class RelationshipGenerator {
         `Incorrect relationship! A field like 'someField: ${entity.name} @derivedFrom("${field.derivedFrom?.argument}")' should exists on ${relatedEntity.name}`
       )
     }
-    if (this.traversed(field, relatedField)) {
+    if (this.traversed(field, relatedField, entity, relatedEntity)) {
       return
     }
     this.createRelationship({ ...props, relatedField, type: RelationType.OTO })
@@ -121,7 +133,7 @@ export class RelationshipGenerator {
     // No fields found build OneToMany relationship
     if (!relatedFields.length) {
       const relatedField = relations.createAdditionalField(entity, field)
-      if (this.traversed(field, relatedField)) {
+      if (this.traversed(field, relatedField, entity, relatedEntity)) {
         return
       }
       this.createRelationship({
@@ -138,7 +150,7 @@ export class RelationshipGenerator {
 
     if (!relatedField) {
       const relatedField = relations.createAdditionalField(entity, field)
-      if (this.traversed(field, relatedField)) {
+      if (this.traversed(field, relatedField, entity, relatedEntity)) {
         return
       }
       this.createRelationship({
@@ -149,7 +161,7 @@ export class RelationshipGenerator {
       return
     }
 
-    if (this.traversed(field, relatedField)) {
+    if (this.traversed(field, relatedField, entity, relatedEntity)) {
       return
     }
 
