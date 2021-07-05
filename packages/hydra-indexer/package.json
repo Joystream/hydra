@@ -29,14 +29,14 @@
     "db:migrate": "node ./lib/run.js migrate",
     "db:bootstrap": "yarn db:create ; yarn db:migrate",
     "db:bootstrap:dev": "dotenv -e ${ENV} yarn db:bootstrap",
-    "db:drop:test": "dotenv -e ${ENV} yarn db:bootstrap",
+    "db:drop:dev": "dotenv -e ${ENV} yarn db:drop",
     "start:test": "NODE_ENV=development dotenv -e test/.env --  ts-node src/run.ts index",
-    "start:dev": "NODE_ENV=development ts-node src/run.ts index",
+    "start:dev": "NODE_ENV=development dotenv -e ${ENV} ts-node src/run.ts index",
     "start:prod": "DEBUG=${DEBUG} node ./lib/run.js index",
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only --exclude \"test/integration/**/*.test.ts\"  \"test/**/*.test.ts\" \"src/**/*.test.ts\""
   },
   "dependencies": {
-    "@polkadot/api": "4.16.2",
+    "@polkadot/api": "4.17.1",
     "@subsquid/bn-typeorm": "^3.1.0-alpha.3",
     "@subsquid/hydra-common": "^3.1.0-alpha.3",
     "@subsquid/hydra-db-utils": "^3.1.0-alpha.3",

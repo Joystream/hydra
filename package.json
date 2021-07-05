@@ -37,7 +37,7 @@
     "prettier": "2.0.2"
   },
   "resolutions": {
-    "@polkadot/types": "4.16.2"
+    "@polkadot/types": "4.17.1"
   },
   "lint-staged": {
     "*.ts": "yarn lint --fix"
