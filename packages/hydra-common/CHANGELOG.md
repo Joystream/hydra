@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.4 (2021-07-05)
+
+
+### Features
+
+* **hydra-indexer:** bump polkadot/api indexer version to 4.17.1 ([51ea406](https://github.com/subsquid/hydra/commit/51ea406dbfcb4256e88dba2fb77b0d5d47d67b72))
+
+
+
 ## 3.1.0-alpha.3 (2021-06-28)
 
 
