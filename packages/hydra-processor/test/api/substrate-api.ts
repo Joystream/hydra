@@ -6,7 +6,7 @@ import pWaitFor from 'p-wait-for'
 import * as fs from 'fs'
 
 const typesSpec = {
-  'node-template': JSON.parse(fs.readFileSync(__dirname + '/../../../fixtures/typedefs.json', 'utf8')),
+  'node-template': JSON.parse(fs.readFileSync(__dirname + '/../fixtures/typedefs.json', 'utf8')),
 }
 
 export async function transfer(

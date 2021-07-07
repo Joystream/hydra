@@ -6,8 +6,8 @@ export const manifest = parseManifest('./test/fixtures/manifest.yml')
 describe('manifest', () => {
   it('parses manifest', () => {
     expect(Object.keys(manifest.mappings.eventHandlers).length).to.be.equal(
-      1,
-      'Has 1 event handler'
+      2,
+      'Has 2 event handlers'
     )
     expect(Object.keys(manifest.mappings.extrinsicHandlers).length).to.be.equal(
       1,
