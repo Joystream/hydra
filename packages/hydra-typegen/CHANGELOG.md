@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.5 (2021-07-08)
+
+
+### Bug Fixes
+
+* **hydra-cli:** update hydra-cli scaffold template ([#39](https://github.com/Joystream/hydra/issues/39)) ([7a1c52b](https://github.com/Joystream/hydra/commit/7a1c52b55f705d31e3f16a605c491bb5ce4d2aed))
+
+
+
 ## 3.1.0-alpha.4 (2021-07-05)
 
 
