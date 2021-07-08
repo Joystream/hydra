@@ -44,6 +44,11 @@ export DB_USER=postgres
 export DB_PASS=postgres
 export INDEXER_ENDPOINT_URL=http://localhost:4002/graphql
 
+# ensure docker depencency images exist
+docker build ../../ -t hydra-builder:latest
+yarn workspace @joystream/hydra-indexer docker:build
+yarn workspace @joystream/hydra-indexer-gateway docker:build
+
 # start preparation
 startupDocker
 buildProcessor
