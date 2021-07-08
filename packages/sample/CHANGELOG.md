@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.6 (2021-07-08)
+
+
+### Bug Fixes
+
+* **hydra-cli:** fix scaffold indexer url property ([db0b721](https://github.com/subsquid/hydra/commit/db0b721a365d1fba4b8101ecdedd3543d3eaaf31))
+
+
+
 ## 3.1.0-alpha.5 (2021-07-08)
 
 
