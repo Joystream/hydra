@@ -17,7 +17,7 @@ import input = require('@inquirer/input')
 import password = require('@inquirer/password')
 import glob = require('glob')
 
-const debug = Debug('qnode-cli:scaffold')
+const debug = Debug('hydra-cli:scaffold')
 
 // TODO: fetch from a well-known source?
 const INDEXERS = [
@@ -197,7 +197,8 @@ export default class Scaffold extends Command {
     })) as string
     ctx = { ...ctx, projectName }
 
-    ctx = { ...ctx, ...(await this.promptIndexerURL(ctx)) }
+    const iCtx = await this.promptIndexerURL(ctx)
+    ctx = { ...ctx, ...iCtx }
 
     const dbName = (await input({
       message: 'Database name',
@@ -230,6 +231,7 @@ export default class Scaffold extends Command {
     })) as string
     ctx = { ...ctx, dbPassword }
 
+    debug(`Ctx: ${JSON.stringify(ctx)}`)
     return ctx
   }
 
@@ -241,7 +243,12 @@ export default class Scaffold extends Command {
       choices: INDEXERS,
     })
 
-    ctx = { ...ctx, indexerUrl: answer.url }
+    debug(`Answer: ${JSON.stringify(answer)}`)
+    ctx = {
+      ...ctx,
+      indexerUrl: INDEXERS.find((c) => c.value === answer)?.url || '',
+    }
+    debug(`Indexer url: ${JSON.stringify(ctx)}`)
     return ctx
   }
 }
