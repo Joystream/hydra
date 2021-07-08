@@ -190,7 +190,7 @@ export default class WarthogWrapper {
     }
 
     // Ensure version is greater than '0.0.0'
-    pkgFile.version = pkgFile.version == '0.0.0' ? '0.0.1' : pkgFile.version
+    pkgFile.version = pkgFile.version === '0.0.0' ? '0.0.1' : pkgFile.version
 
     pkgFile.scripts['db:sync'] =
       'SYNC=true WARTHOG_DB_SYNCHRONIZE=true ts-node --type-check src/index.ts'

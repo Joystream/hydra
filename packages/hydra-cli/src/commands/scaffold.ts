@@ -120,7 +120,7 @@ export default class Scaffold extends Command {
     } else {
       ctx = await this.promptDotEnv()
     }
-    ctx.name = ctx.name || "hydra-scaffold" // ensure project has some name
+    ctx.name = ctx.name || 'hydra-scaffold' // ensure project has some name
 
     ctx = withDependenciesResolutions(ctx)
 
