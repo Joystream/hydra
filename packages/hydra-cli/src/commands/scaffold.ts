@@ -28,14 +28,26 @@ const INDEXERS = [
     url: 'http://localhost:4001/graphql',
   },
   {
-    name: 'subsocial',
-    value: 'subsocial',
-    description: 'Ready-to use indexer of Subsocial, hosted by Joystream',
-    url: 'https://subsocial-indexer.joystream.app/graphql',
+    name: 'Polkadot',
+    value: 'polkadot',
+    description: 'Ready-to use indexer for Polkadot, hosted by Subsquid',
+    url: 'https://polkadot.indexer.gc.subsquid.io/graphql',
   },
   {
-    name: 'other',
-    value: 'other',
+    name: 'Kusama',
+    value: 'kusama',
+    description: 'Ready-to use indexer for Kusama, hosted by Subsquid',
+    url: 'https://kusama.indexer.gc.subsquid.io/graphql',
+  },
+  {
+    name: 'Karura',
+    value: 'karura',
+    description: 'Ready-to use indexer for Karura, hosted by Subsquid',
+    url: 'https://karura.indexer.gc.subsquid.io/graphql',
+  },
+  {
+    name: 'manual',
+    value: 'manual',
     description:
       'Skip for now, I will manually set INDEXER_ENDPOINT_URL later on',
     url: '',

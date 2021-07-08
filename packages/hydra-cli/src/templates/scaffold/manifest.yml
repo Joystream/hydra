@@ -24,9 +24,7 @@ mappings:
     - event: balances.Transfer 
       handler: balancesTransfer
   extrinsicHandlers:
-    # infer defaults
-    - extrinsic: timestamp.set 
-      handler: timestampCall
+    # put extrinsic handlers here
   preBlockHooks:
   postBlockHooks:
   
