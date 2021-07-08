@@ -4,14 +4,12 @@ import { transfer, createApi } from './api/substrate-api'
 import * as dotenv from 'dotenv'
 import Container from 'typedi'
 import pWaitFor from 'p-wait-for'
-import { GraphQLClient } from 'graphql-request'
-import { SubscriptionClient } from 'graphql-subscriptions-client'
-import dbConfig from '../src/db/ormconfig'
-import { Connection, EntityManager, getConnection } from 'typeorm'
+import { Connection, EntityManager } from 'typeorm'
 import { parseManifest } from '../src/start/manifest'
 import { createDBConnection } from '../src/db'
 import { TestEntity } from './fixtures/test-entities'
 import { ProcessedEventsLogEntity } from '../src/entities/ProcessedEventsLogEntity'
+import * as path from 'path'
 
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
@@ -34,7 +32,9 @@ describe('MappingsProcessor', () => {
     await waitForProcessorToCatchUp(db, blockHeight)
 
     // retrieve db record created by event mapping
-    const testEntity = await db.findOne(TestEntity, { order: { primaryKey: 'DESC' } })
+    const testEntity = await db.findOne(TestEntity, {
+      order: { primaryKey: 'DESC' },
+    })
 
     // ensure entity was sucessfully saved in mapping
     assert.isOk(testEntity)
@@ -56,13 +56,13 @@ function setupEnvironment() {
   // ensure WebSocket is available globally (facilitates outside connection)
   globalThis.WebSocket = require('ws')
 
-  const environment: {db: Connection} = {
-    db: null as any
+  const environment: { db: Connection } = {
+    db: null as any,
   }
 
   before(async () => {
     // load configuration and create api
-    dotenv.config({ path: __dirname + '/.env' })
+    dotenv.config({ path: path.join(__dirname, '/.env') })
     await createApi(process.env.WS_PROVIDER_URI || '')
 
     // synchronize db
@@ -88,7 +88,7 @@ function setupEnvironment() {
 */
 async function synchronizeDb() {
   // read test manifest
-  const manifest = parseManifest(__dirname + '/fixtures/manifest.yml')
+  const manifest = parseManifest(path.join(__dirname, '/fixtures/manifest.yml'))
 
   // connect to db
   const connection = await createDBConnection(manifest.entities)
@@ -102,16 +102,24 @@ async function synchronizeDb() {
 /*
   Periodically checks processor block information from the database and waits until the given block is processed.
 */
-async function waitForProcessorToCatchUp(db: EntityManager, blockHeight: number) {
+async function waitForProcessorToCatchUp(
+  db: EntityManager,
+  blockHeight: number
+) {
   // wait until the indexer indexes the block and the processor picks it up
-  await pWaitFor(async () => {
-    try {
-      const record = await db.findOne(ProcessedEventsLogEntity, { where: { lastScannedBlock: blockHeight } })
+  await pWaitFor(
+    async () => {
+      try {
+        const record = await db.findOne(ProcessedEventsLogEntity, {
+          where: { lastScannedBlock: blockHeight },
+        })
 
-      return !!record
-    } catch (error) {
-      // catch error thrown if db has not been initialized yet
-      return false
-    }
-  }, { interval: 50 })
+        return !!record
+      } catch (error) {
+        // catch error thrown if db has not been initialized yet
+        return false
+      }
+    },
+    { interval: 50 }
+  )
 }

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, PrimaryColumn, Column, BaseEntity } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm'
 import { IDType } from 'warthog'
 
 import 'reflect-metadata'
@@ -8,23 +8,22 @@ import 'reflect-metadata'
 */
 @Entity()
 export class TestEntity extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  primaryKey!: IDType
 
-    @PrimaryGeneratedColumn()
-    primaryKey!: IDType;
+  @Column()
+  id!: string
 
-    @Column()
-    id!: string;
+  @Column()
+  description!: string
 
-    @Column()
-    description!: string
+  @Column({
+    nullable: true,
+  })
+  alternativeDescription?: string
 
-    @Column({
-        nullable: true,
-    })
-    alternativeDescription?: string
-
-    constructor(init?: Partial<TestEntity>) {
-        super()
-        Object.assign(this, init)
-    }
+  constructor(init?: Partial<TestEntity>) {
+    super()
+    Object.assign(this, init)
+  }
 }

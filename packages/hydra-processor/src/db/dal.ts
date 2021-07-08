@@ -14,10 +14,7 @@ export async function createDBConnection(
   const tmpConfig = config()
   const _config = {
     ...tmpConfig,
-    subscribers: [
-      ...(tmpConfig.subscribers || []),
-      SanitizationSubscriber,
-    ]
+    subscribers: [...(tmpConfig.subscribers || []), SanitizationSubscriber],
   }
 
   entities.map((e) => _config.entities?.push(e))

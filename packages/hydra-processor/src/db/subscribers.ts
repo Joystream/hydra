@@ -1,4 +1,10 @@
-import { EntitySubscriberInterface, EntityMetadata, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm'
+import {
+  EntitySubscriberInterface,
+  EntityMetadata,
+  EventSubscriber,
+  InsertEvent,
+  UpdateEvent,
+} from 'typeorm'
 
 type Entity = Record<string, unknown>
 
@@ -24,7 +30,7 @@ function sanitizeEntity(entity: Entity, entityMetadata: EntityMetadata) {
   const stringFields = getEntityStringFields(entityMetadata)
 
   // sanitize all fields that can possibly need it
-  for (let field of stringFields) {
+  for (const field of stringFields) {
     // prevents error when saving to UTF-8 null character(s) to PostgreSQL
     sanitizeNullCharacter(entity as Record<string, string>, field)
   }
@@ -53,7 +59,10 @@ function getEntityStringFields(entityMetadata: EntityMetadata): string[] {
   }
 
   const fields = entityMetadata.columns.reduce((acc, item) => {
-    if (item.type == String || (typeof item.type === 'string' && item.type.includes('string'))) {
+    if (
+      item.type === String ||
+      (typeof item.type === 'string' && item.type.includes('string'))
+    ) {
       acc.push(item.propertyName)
     }
 

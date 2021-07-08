@@ -4,9 +4,12 @@ import { Hash } from '@polkadot/types/interfaces'
 import Container from 'typedi'
 import pWaitFor from 'p-wait-for'
 import * as fs from 'fs'
+import * as path from 'path'
 
 const typesSpec = {
-  'node-template': JSON.parse(fs.readFileSync(__dirname + '/../fixtures/typedefs.json', 'utf8')),
+  'node-template': JSON.parse(
+    fs.readFileSync(path.join(__dirname, '/../fixtures/typedefs.json'), 'utf8')
+  ),
 }
 
 export async function transfer(
