@@ -115,4 +115,35 @@ describe('ReletionshipGenerator', () => {
     extrinsic!: Extrinsic`)
     )
   })
+
+  it('should preserve all the relations', () => {
+    model = fromStringSchema(`
+    type ForumThread @entity {
+      id: ID!
+      title: String!
+      posts: [ForumPost!] @derivedFrom(field: "thread")
+    }
+
+    type ForumPost @entity {
+      id: ID!
+      thread: ForumThread!
+    }
+
+    type ProposalDiscussionThread @entity {
+      id: ID!
+      test: String!
+      posts: [ProposalDiscussionPost!] @derivedFrom(field: "thread")
+    }
+
+    type ProposalDiscussionPost @entity {
+      id: ID!
+      thread: ProposalDiscussionThread!
+      text: String!
+    }`)
+
+    const relGenerator = new RelationshipGenerator(model)
+    relGenerator.generate()
+    expect(relGenerator.relationships.length).to.be.equal(2)
+    console.log(relGenerator.relationships)
+  })
 })
