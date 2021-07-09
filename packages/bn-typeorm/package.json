@@ -1,6 +1,6 @@
 {
   "name": "@subsquid/bn-typeorm",
-  "version": "3.1.0-alpha.6",
+  "version": "3.1.0-alpha.7",
   "description": "TypeORM transformer for BigNumber",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

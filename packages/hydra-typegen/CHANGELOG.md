@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.7 (2021-07-09)
+
+
+### Bug Fixes
+
+* **hydra-cli:** fix kusama v3 examples and subsquid docker images ([025e9c7](https://github.com/Joystream/hydra/commit/025e9c76db3241b084184751cc48a7fea2a62a8a))
+
+
+
 ## 3.1.0-alpha.6 (2021-07-08)
 
 
