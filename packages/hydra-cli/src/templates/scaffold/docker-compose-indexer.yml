@@ -14,7 +14,7 @@ services:
       POSTGRES_DB: indexer-db
       
   indexer:
-    image: joystream/hydra-indexer:latest
+    image: subsquid/hydra-indexer:3
     restart: unless-stopped
     environment:
       - INDEXER_WORKERS=5
@@ -37,7 +37,7 @@ services:
       sh -c "yarn db:bootstrap && yarn start:prod" 
   
   indexer-api-gateway:
-    image: joystream/hydra-indexer-gateway:latest
+    image: subsquid/hydra-indexer-gateway:3
     restart: unless-stopped
     environment:
       - WARTHOG_STARTER_DB_DATABASE=indexer-db

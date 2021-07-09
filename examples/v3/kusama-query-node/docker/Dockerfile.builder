@@ -1,4 +1,4 @@
-FROM node:12-alpine 
+FROM node:14-alpine 
 
 RUN mkdir -p /home/hydra-builder && chown -R node:node /home/hydra-builder
 
@@ -13,7 +13,6 @@ COPY ./.env ./
 RUN yarn 
 RUN yarn codegen 
 RUN yarn typegen 
-RUN yarn workspace sample-mappings install
 RUN yarn mappings:build
 
 RUN yarn workspace query-node install

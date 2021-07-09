@@ -38,7 +38,6 @@ services:
     env_file:
       - .env
     environment:
-      - INDEXER_ENDPOINT_URL=https://sumer-indexer.joystream.app/graphql
       - DB_HOST=db
       - POLL_INTERVAL_MS=300
       - TYPEORM_HOST=db

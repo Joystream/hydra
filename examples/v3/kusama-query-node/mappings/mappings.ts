@@ -2,8 +2,8 @@ import { Transfer, Account } from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
-import { Balances as BalancesV1 } from './generated/types-v1'
-import { Balances as BalancesV2 } from './generated/types-v2'
+import { Balances as BalancesV1 } from './generated/types-V1'
+import { Balances as BalancesV2 } from './generated/types-V2'
 
 import { AccountId, Balance } from '@polkadot/types/interfaces'
 
