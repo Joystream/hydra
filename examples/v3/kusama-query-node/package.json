@@ -49,9 +49,9 @@
     "bn.js": "^5.1.2"
   },
   "devDependencies": {
-    "@joystream/hydra-cli": "^3.1.0-alpha",
-    "@joystream/hydra-processor": "^3.1.0-alpha",
-    "@joystream/hydra-typegen": "^3.1.0-alpha",
+    "@subsquid/hydra-cli": "^3.1.0-alpha",
+    "@subsquid/hydra-processor": "^3.1.0-alpha",
+    "@subsquid/hydra-typegen": "^3.1.0-alpha",
     "envsub": "^4.0.7"
   }
 }
