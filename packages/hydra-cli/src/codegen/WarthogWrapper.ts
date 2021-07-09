@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
-import { run } from '@joystream/warthog/dist/cli/cli'
+import { run as warthogCliRun } from '@joystream/warthog/dist/cli/cli'
 
 import { WarthogModelBuilder } from '../parse/WarthogModelBuilder'
 import {
@@ -147,7 +147,7 @@ export default class WarthogWrapper {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     console.log = () => {}
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await run(['new', `${projectName}`])
+    await warthogCliRun(['new', `${projectName}`])
     console.log = consoleFn
 
     this.copySourceFiles()
@@ -183,10 +183,14 @@ export default class WarthogWrapper {
     }
 
     const pkgFile = JSON.parse(fs.readFileSync('package.json', 'utf8')) as {
+      version: string
       scripts: Record<string, string>
       dependencies: Record<string, string>
       devDependencies: Record<string, string>
     }
+
+    // Ensure version is greater than '0.0.0'
+    pkgFile.version = pkgFile.version === '0.0.0' ? '0.0.1' : pkgFile.version
 
     pkgFile.scripts['db:sync'] =
       'SYNC=true WARTHOG_DB_SYNCHRONIZE=true ts-node --type-check src/index.ts'
@@ -232,7 +236,7 @@ export default class WarthogWrapper {
 
   async createDB(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await run(['db:create'])
+    await warthogCliRun(['db:create'])
   }
 
   /**
