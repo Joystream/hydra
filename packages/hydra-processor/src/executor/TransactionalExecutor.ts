@@ -18,6 +18,9 @@ const debug = Debug('hydra-processor:mappings-executor')
 export class TransactionalExecutor implements IMappingExecutor {
   private mappingsLookup!: IMappingsLookup
 
+  // "expose" transaction EntityManager to tests (is meant to be read despite being private)
+  private entityManager: EntityManager | null = null
+
   async init(): Promise<void> {
     info('Initializing mappings executor')
     this.mappingsLookup = await getMappingsLookup()
@@ -28,6 +31,8 @@ export class TransactionalExecutor implements IMappingExecutor {
     onSuccess: (data: BlockData) => Promise<void>
   ): Promise<void> {
     await getConnection().transaction(async (entityManager: EntityManager) => {
+      this.entityManager = entityManager
+
       const allMappings = this.mappingsLookup.lookupHandlers(blockData)
       if (conf().VERBOSE)
         debug(
@@ -74,6 +79,8 @@ export class TransactionalExecutor implements IMappingExecutor {
       }
 
       await onSuccess({ ...blockData, entityManager } as TxAwareBlockContext)
+
+      this.entityManager = null
     })
   }
 }

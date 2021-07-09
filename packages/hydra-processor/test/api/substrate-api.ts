@@ -8,10 +8,7 @@ import * as path from 'path'
 
 const typesSpec = {
   'node-template': JSON.parse(
-    fs.readFileSync(
-      path.join(__dirname, '/../../../fixtures/typedefs.json'),
-      'utf8'
-    )
+    fs.readFileSync(path.join(__dirname, '/../fixtures/typedefs.json'), 'utf8')
   ),
 }
 

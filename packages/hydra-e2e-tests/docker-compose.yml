@@ -41,6 +41,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
+      - hydra-indexer # feel free to comment this during dev/debugging
       - hydra-indexer-gateway
     command: >
       sh -c "yarn query-node:configure && \

@@ -22,7 +22,8 @@ docker build . -t hydra-test:latest
 (cd ../ && yarn workspace @joystream/hydra-indexer docker:build)
 (cd ../ && yarn workspace @joystream/hydra-indexer-gateway docker:build)
 
-docker-compose up -d
+# start processor and it's dependencies first
+docker-compose up -d hydra-processor
 
 # wait for the processor to start grinding 
 attempt_counter=0
@@ -37,7 +38,10 @@ until $(curl -s --head  --request GET http://localhost:3000/metrics/hydra_proces
     printf '.'
     attempt_counter=$(($attempt_counter+1))
     sleep 5
-done 
+done
+
+# start rest of services (query-node most importantly)
+docker-compose up -d
 
 # run the actual tests
 yarn e2e-test-local

@@ -3,6 +3,7 @@ import { getRepository, Connection, createConnection } from 'typeorm'
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 import Debug from 'debug'
 import config from './ormconfig'
+import { SanitizationSubscriber } from './subscribers'
 
 const debug = Debug('hydra-processor:dal')
 
@@ -10,8 +11,14 @@ export async function createDBConnection(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entities: any[] = []
 ): Promise<Connection> {
-  const _config = config()
+  const tmpConfig = config()
+  const _config = {
+    ...tmpConfig,
+    subscribers: [...(tmpConfig.subscribers || []), SanitizationSubscriber],
+  }
+
   entities.map((e) => _config.entities?.push(e))
+
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
   return createConnection(_config)
 }

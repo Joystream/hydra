@@ -5,6 +5,7 @@ import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 const config: () => ConnectionOptions = () => {
   // ugly, but we need to set the warthog envs, otherwise it fails
   setWarthogEnvs()
+
   return {
     type: 'postgres',
     host: process.env.TYPEORM_HOST || process.env.DB_HOST,
