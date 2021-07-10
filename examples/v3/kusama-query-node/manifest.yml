@@ -12,8 +12,8 @@ entities:
 mappings:
   mappingsModule: mappings/lib/mappings
   imports:
-    - mappings/lib/mappings/generated/types-v1
-    - mappings/lib/mappings/generated/types-v2
+    - mappings/lib/mappings/generated/types-V1
+    - mappings/lib/mappings/generated/types-V2
   range: '[0, )' # process all blocks from genesis
   eventHandlers:
     - event: balances.Transfer 

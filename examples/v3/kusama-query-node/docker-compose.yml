@@ -40,6 +40,5 @@ services:
       - .env
     environment:
       - POLL_INTERVAL_MS=300
-      - DEBUG=hydra-processor:*
     command: ["yarn", "processor:start"]
 

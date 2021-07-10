@@ -43,30 +43,8 @@ the `specVersion` filter the processor will pick up the right one. The former is
 
 Another mapping, `genesisLoader` is a pre-block hook, which means it runs before any other mapping in the block. By setting it's filter range to `[0, 0]` it is restricted only to the genesis block and is convenient place to seed some data if needed.
 
-## 4. Run local Hydra Indexer
 
-A stack of Hydra Indexer services is configured in `docker-compose-indexer.yml`. 
-Run
-
-```
-$ docker-compose -f docker-compose-indexer.yml up -d
-```
-
-and check the status at `localhost:4001` by quering
-
-```gql
-query {
-  indexerStatus {
-    chainHeight
-    head
-    hydraVersion
-  }
-}
-```
-
-Make sure that the last indexer block (head) and the last known finalized block (chainHeight) are both positive and `hydraVersion` is `3.x`.
-
-## 5. Run the processor and the GraphQL server
+## 4. Run the processor and the GraphQL server
 
 Then run the processor:
 
@@ -92,8 +70,8 @@ Images for the GraphQL query node and the processor depend on the `builder` imag
 Build with
 
 ```bash
-$ docker build . -f docker/Dockerfile.query-node -t query-node:latest
-$ docker build . -f docker/Dockerfile.processor -t processor:latest
+$ docker build . -f docker/Dockerfile.query-node -t query-node:latest 
+$ docker build . -f docker/Dockerfile.processor -t hydra-processor:latest 
 ```
 
 In order to run the docker-compose stack, we need to create the schema and run the database migrations. 

@@ -11,9 +11,7 @@ COPY ./*.graphql ./
 COPY ./.env ./
 
 RUN yarn 
-RUN yarn codegen 
-RUN yarn typegen 
-RUN yarn mappings:build
+RUN yarn codegen
 
 RUN yarn workspace query-node install
 RUN yarn workspace query-node compile
