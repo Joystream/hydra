@@ -19,6 +19,7 @@ let conf: {
   // the query tries to events from the current block to block + BLOCK_WINDOW
   BLOCK_WINDOW: number
   PROCESSOR_NAME: string
+  // TODO: remove
   // Interval at which the processor pulls new blocks from the database
   // The interval is reasonably large by default. The trade-off is the latency
   // between the updates and the load to the database

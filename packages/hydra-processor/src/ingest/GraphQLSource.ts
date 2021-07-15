@@ -13,6 +13,10 @@ import { GraphQLQuery, IndexerQuery } from './IProcessorSource'
 import { IndexerStatus } from '../state'
 import { collectNamedQueries } from './graphql-query-builder'
 import { compact } from 'lodash'
+//import { WebSocketLink } from 'apollo-link-ws' // yarn add apollo-link-ws
+import { SubscriptionClient, Observable, Observer } from 'subscriptions-transport-ws'
+import ws from 'ws'
+import { ExecutionResult } from 'graphql/execution/execute'
 
 const debug = Debug('hydra-processor:graphql-source')
 
@@ -56,8 +60,70 @@ export class GraphQLSource implements IProcessorSource {
 
   // TODO: implement
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  subscribe(events: string[]): Promise<void> {
-    throw new Error('Method not implemented.')
+  async subscribe(events: string[]): Promise<void> {
+
+    //throw new Error('Method not implemented.')
+
+    // http://localhost:4002/graphql // indexer url
+
+    /*
+    const wsLink = new WebSocketLink({
+      //uri: 'ws://localhost:4000/subscriptions',
+      uri: 'ws://localhost:4002/graphql',
+      options: {
+        reconnect: true
+      }
+    });
+    */
+    //const uri = 'wss://localhost:4002/graphql'
+    //const uri = 'ws://localhost:4002/graphql'
+    //const uri = 'ws://localhost:4100/graphql'
+    const uri = 'ws://localhost:4002/mytestsubscription'
+    
+
+    const subscriptionOptions = {
+      lazy: false,
+      reconnect: true,
+    }
+    const client = new SubscriptionClient(uri, subscriptionOptions, ws)
+    console.log(client.status)
+    client.onConnected(() => {console.log('connected', client.status)})
+
+    /*
+    const subscriptionQuery = `
+      subscription OnCommentAdded($postID: ID!) {
+        commentAdded(postID: $postID) {
+          id
+          content
+        }
+      }
+    `
+    */
+    // inspired by https://www.apollographql.com/docs/apollo-server/data/subscriptions/
+    const subscriptionQuery = `
+      subscription StatusSubscription {
+        indexerStatus {
+          chainHeight
+        }
+      }
+    `
+
+    const request = {
+      query: subscriptionQuery
+    }
+
+    //client.request(request).subscribe((observer: Observer<ExecutionResult>) => {})
+    client.request(request).subscribe({
+      next: (value) => {console.log('neeeext', value)},
+      error: (error) => {
+        console.log('eeeeerror', error)
+        console.trace()
+      },
+      complete: () => {console.log('coooomplete')},
+    })
+console.log('qqqqqqqqa')
+    //throw new Error('Good throw :)')
+    //throw new Error('Method not implemented.')
   }
 
   async getIndexerStatus(): Promise<IndexerStatus> {
