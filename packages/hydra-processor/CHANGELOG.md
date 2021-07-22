@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0](https://github.com/dzhelezov/hydra/compare/v3.1.0-alpha.1...v4.0.0) (2021-07-22)
+
+
+### Bug Fixes
+
+* **hydra-processor:** set createdAt, updatedAt to the block timestamp by default ([#426](https://github.com/dzhelezov/hydra/issues/426)) ([1046de9](https://github.com/dzhelezov/hydra/commit/1046de96ff10b39d09b306adcebd71443d4c4c4a)), closes [#400](https://github.com/dzhelezov/hydra/issues/400)
+
+
+
 ## 3.1.0-alpha.7 (2021-07-09)
 
 

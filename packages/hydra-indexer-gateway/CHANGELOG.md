@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0](https://github.com/dzhelezov/hydra/compare/v3.1.0-alpha.1...v4.0.0) (2021-07-22)
+
+
+### Bug Fixes
+
+* **hydra-indexer:** bump polkadot version to 4.15.1 ([7a9ac48](https://github.com/dzhelezov/hydra/commit/7a9ac484f2475ceab4b9672dea446631c5756b2a))
+
+
+
 ## 3.1.0-alpha.7 (2021-07-09)
 
 

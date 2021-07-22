@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0](https://github.com/dzhelezov/hydra/compare/v3.1.0-alpha.1...v4.0.0) (2021-07-22)
+
+
+### Features
+
+* **hydra-cli:** Introduce [@json](https://github.com/json)Field directive, refactoring ([#417](https://github.com/dzhelezov/hydra/issues/417)) ([f6e32d7](https://github.com/dzhelezov/hydra/commit/f6e32d7bc1d5ee3389a4533cdbeece996f3df958)), closes [#418](https://github.com/dzhelezov/hydra/issues/418) [#418](https://github.com/dzhelezov/hydra/issues/418)
+* **hydra-indexer:** bump polkadot/api indexer version to 4.17.1 ([51ea406](https://github.com/dzhelezov/hydra/commit/51ea406dbfcb4256e88dba2fb77b0d5d47d67b72))
+
+
+### Bug Fixes
+
+* **hydra-cli:** fix array fields ([bd69623](https://github.com/dzhelezov/hydra/commit/bd696234387bd49e2b334360206967997e90475d))
+* **hydra-cli:** fix array fields ([#35](https://github.com/dzhelezov/hydra/issues/35)) ([dc58f98](https://github.com/dzhelezov/hydra/commit/dc58f98923e73a2722a777ad1c05712ae204df9e))
+* **hydra-cli:** fix kusama v3 examples and subsquid docker images ([025e9c7](https://github.com/dzhelezov/hydra/commit/025e9c76db3241b084184751cc48a7fea2a62a8a))
+* **hydra-cli:** fix scaffold indexer url property ([db0b721](https://github.com/dzhelezov/hydra/commit/db0b721a365d1fba4b8101ecdedd3543d3eaaf31))
+* **hydra-cli:** render variant fields of array type ([#429](https://github.com/dzhelezov/hydra/issues/429)) ([cc42906](https://github.com/dzhelezov/hydra/commit/cc42906293ffb35fe6ae313428d58688a9a4f2b3))
+* **hydra-cli:** update hydra-cli scaffold template ([#39](https://github.com/dzhelezov/hydra/issues/39)) ([7a1c52b](https://github.com/dzhelezov/hydra/commit/7a1c52b55f705d31e3f16a605c491bb5ce4d2aed))
+* **hydra-indexer:** bump polkadot version to 4.15.1 ([7a9ac48](https://github.com/dzhelezov/hydra/commit/7a9ac484f2475ceab4b9672dea446631c5756b2a))
+* **hydra-indexer:** bump polkadot-api to 4.16.2 ([31d404d](https://github.com/dzhelezov/hydra/commit/31d404da09127b1739d1f35f5a79a3c6aa4893f9))
+* **hydra-processor:** set createdAt, updatedAt to the block timestamp by default ([#426](https://github.com/dzhelezov/hydra/issues/426)) ([1046de9](https://github.com/dzhelezov/hydra/commit/1046de96ff10b39d09b306adcebd71443d4c4c4a)), closes [#400](https://github.com/dzhelezov/hydra/issues/400)
+
+
+
 ## 3.1.0-alpha.7 (2021-07-09)
 
 

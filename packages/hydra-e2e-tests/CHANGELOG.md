@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0](https://github.com/dzhelezov/hydra/compare/v3.1.0-alpha.1...v4.0.0) (2021-07-22)
+
+
+### Features
+
+* **hydra-cli:** Introduce [@json](https://github.com/json)Field directive, refactoring ([#417](https://github.com/dzhelezov/hydra/issues/417)) ([f6e32d7](https://github.com/dzhelezov/hydra/commit/f6e32d7bc1d5ee3389a4533cdbeece996f3df958)), closes [#418](https://github.com/dzhelezov/hydra/issues/418) [#418](https://github.com/dzhelezov/hydra/issues/418)
+* **hydra-indexer:** bump polkadot/api indexer version to 4.17.1 ([51ea406](https://github.com/dzhelezov/hydra/commit/51ea406dbfcb4256e88dba2fb77b0d5d47d67b72))
+
+
+### Bug Fixes
+
+* **hydra-cli:** fix array fields ([bd69623](https://github.com/dzhelezov/hydra/commit/bd696234387bd49e2b334360206967997e90475d))
+* **hydra-cli:** render variant fields of array type ([#429](https://github.com/dzhelezov/hydra/issues/429)) ([cc42906](https://github.com/dzhelezov/hydra/commit/cc42906293ffb35fe6ae313428d58688a9a4f2b3))
+* **hydra-indexer:** bump polkadot version to 4.15.1 ([7a9ac48](https://github.com/dzhelezov/hydra/commit/7a9ac484f2475ceab4b9672dea446631c5756b2a))
+* **hydra-indexer:** bump polkadot-api to 4.16.2 ([31d404d](https://github.com/dzhelezov/hydra/commit/31d404da09127b1739d1f35f5a79a3c6aa4893f9))
+* **hydra-processor:** set createdAt, updatedAt to the block timestamp by default ([#426](https://github.com/dzhelezov/hydra/issues/426)) ([1046de9](https://github.com/dzhelezov/hydra/commit/1046de96ff10b39d09b306adcebd71443d4c4c4a)), closes [#400](https://github.com/dzhelezov/hydra/issues/400)
+
+
+
 ## 3.1.0-alpha.7 (2021-07-09)
 
 

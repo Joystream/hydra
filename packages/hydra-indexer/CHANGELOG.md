@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0](https://github.com/subsquid/hydra/compare/v3.1.0-alpha.1...v4.0.0) (2021-07-22)
+
+
+### Features
+
+* **hydra-indexer:** bump polkadot/api indexer version to 4.17.1 ([51ea406](https://github.com/subsquid/hydra/commit/51ea406dbfcb4256e88dba2fb77b0d5d47d67b72))
+
+
+### Bug Fixes
+
+* **hydra-indexer:** bump polkadot version to 4.15.1 ([7a9ac48](https://github.com/subsquid/hydra/commit/7a9ac484f2475ceab4b9672dea446631c5756b2a))
+* **hydra-indexer:** bump polkadot-api to 4.16.2 ([31d404d](https://github.com/subsquid/hydra/commit/31d404da09127b1739d1f35f5a79a3c6aa4893f9))
+
+
+
 ## 3.1.0-alpha.7 (2021-07-09)
 
 
