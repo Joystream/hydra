@@ -1,31 +1,29 @@
-FROM node:14-alpine 
-
-RUN mkdir -p /home/hydra && chown -R node:node /home/hydra
-
-WORKDIR /home/hydra
-
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/bn-typeorm/lib ./packages/bn-typeorm/lib
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/bn-typeorm/*.json ./packages/bn-typeorm/
-
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/hydra-common/lib ./packages/hydra-common/lib
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/hydra-common/*.json ./packages/hydra-common/
-
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/hydra-db-utils/lib ./packages/hydra-db-utils/lib
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/packages/hydra-db-utils/*.json ./packages/hydra-db-utils/
-
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/package.json .
-COPY --from=hydra-builder:latest --chown=node:node /home/hydra/yarn.lock .
-
-COPY --chown=node:node src /home/hydra/packages/hydra-indexer-gateway/src
-COPY --chown=node:node generated /home/hydra/packages/hydra-indexer-gateway/generated
-COPY --chown=node:node env.yml /home/hydra/packages/hydra-indexer-gateway
-COPY --chown=node:node *.json /home/hydra/packages/hydra-indexer-gateway/
-COPY --chown=node:node *.js /home/hydra/packages/hydra-indexer-gateway/
+FROM hasura/graphql-engine:v2.0.3.cli-migrations-v3
 
 
-RUN yarn --frozen-lockfile --non-interactive 
-RUN yarn workspace @subsquid/hydra-indexer-gateway build
+RUN apt-get -y update \
+    && apt-get install -y curl ca-certificates gnupg lsb-release \
+    && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get -y update \
+    && apt-get install -y postgresql-12 postgresql-client-12 \
+    && apt-get purge -y curl lsb-release gnupg \
+    && apt-get -y autoremove \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/share/doc/ \
+    && rm -rf /usr/share/man/ \
+    && rm -rf /usr/share/locale/
 
-WORKDIR /home/hydra/packages/hydra-indexer-gateway
 
-CMD ["yarn", "start:prod"]
+RUN mv /bin/docker-entrypoint.sh /bin/hasura-entrypoint.sh
+
+
+ADD metadata /hasura-metadata/
+
+
+ADD docker-entrypoint.sh .
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+
+
+EXPOSE 8080

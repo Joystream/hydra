@@ -126,11 +126,12 @@ export interface IProcessorSource {
     }
   ): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }>
 
-  executeQueries<T>(
-    queries: {
-      [K in keyof T]: GraphQLQuery<T[K]>
-    }
-  ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>
+  // Commenting out for now, as it is not essential
+  // executeQueries<T>(
+  //   queries: {
+  //     [K in keyof T]: GraphQLQuery<T[K]>
+  //   }
+  // ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>
 
   getIndexerStatus(): Promise<IndexerStatus>
 

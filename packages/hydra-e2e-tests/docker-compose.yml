@@ -7,7 +7,7 @@ services:
     environment:
       - DB_NAME=processor-db
       - DB_HOST=db
-      - DB_USER=postgres 
+      - DB_USER=postgres
       - DB_PASS=postgres
       - DB_PORT=5432
       - GRAPHQL_SERVER_HOST=localhost
@@ -30,13 +30,13 @@ services:
       - TYPEORM_DATABASE=processor-db
       - TYPEORM_USERNAME=postgres
       - TYPEORM_PASSWORD=postgres
-      - GRAPHQL_SERVER_HOST=localhost 
-      - GRAPHQL_SERVER_PORT=4000  
+      - GRAPHQL_SERVER_HOST=localhost
+      - GRAPHQL_SERVER_PORT=4000
       - TYPEORM_HOST=db
       - TYPEORM_PORT=5432
-      - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:4000/graphql
+      - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:8080/v1/graphql
       - NODE_URL=ws://node-template:9944
-      - POLL_INTERVAL_MS=500 # refresh every second 
+      - POLL_INTERVAL_MS=500 # refresh every second
       - DEBUG=hydra-processor:*
     ports:
       - "3000:3000"
@@ -48,7 +48,7 @@ services:
              yarn typegen && \
              yarn mappings:build && \
              yarn processor:start"
-  
+
   hydra-indexer:
     image: hydra-indexer:latest
     restart: unless-stopped
@@ -65,32 +65,39 @@ services:
       - TYPES_JSON=typedefs.json
     volumes:
       - ./fixtures/typedefs.json:/home/hydra/packages/hydra-indexer/typedefs.json
-    command: > 
-      sh -c "yarn db:bootstrap && yarn start:prod" 
+    command: >
+      sh -c "yarn db:bootstrap && yarn start:prod"
     depends_on:
       - node-template
       - redis
       - db
-    
+
   hydra-indexer-gateway:
     image: hydra-indexer-gateway:latest
     restart: unless-stopped
-    environment:
-      - WARTHOG_STARTER_DB_DATABASE=indexer-db
-      - WARTHOG_STARTER_DB_HOST=db 
-      - WARTHOG_STARTER_DB_PASSWORD=postgres
-      - WARTHOG_STARTER_DB_PORT=5432 
-      - WARTHOG_STARTER_DB_USERNAME=postgres 
-      - WARTHOG_STARTER_REDIS_URI=redis://redis:6379/0 
-      - PORT=4000
-      - DEBUG=index-server:*
-    ports:
-      - "4001:4000"
     depends_on:
       - redis
       - db
-    
-    
+      - hydra-indexer-status-service
+      - hydra-indexer
+    ports:
+      - "8080:8080"
+    environment:
+      # DEV_MODE: "true"
+      HYDRA_INDEXER_DB: postgres://postgres:postgres@db:5432/indexer-db
+      HYDRA_INDEXER_STATUS_SERVICE: http://hydra-indexer-status-service:8081/status
+
+  hydra-indexer-status-service:
+    image: hydra-indexer-status-service:latest
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "8081:8081"
+    environment:
+      REDIS_URI: redis://redis:6379/0
+      PORT: 8081
+
   node-template:
     image: paritytech/substrate-playground-template-node-template:sha-7212614
     restart: unless-stopped
@@ -108,7 +115,6 @@ services:
     image: postgres:12
     restart: always
     ports:
-      - "5432"
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: postgres
-    
