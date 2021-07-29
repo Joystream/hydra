@@ -6,6 +6,12 @@ It showcase the two main features of Hydra v3:
 - Dealing with runtime upgrades via spec filters
 - Using ad-hoc data loaders via block hooks
 
+## Prerequisites
+
+```
+- NodeJs v14+
+```
+
 ## 1. Bootstrap
 
 Run

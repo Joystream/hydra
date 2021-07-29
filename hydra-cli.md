@@ -2,6 +2,12 @@
 
 A cli tool for running a [Hydra](https://joystream.org/hydra) query node
 
+## Prerequisites
+
+```text
+- NodeJs v14+
+```
+
 ## Install
 
 Using `npx`:
