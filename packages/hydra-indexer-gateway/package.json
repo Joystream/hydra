@@ -6,10 +6,7 @@
   "license": "MIT",
   "scripts": {
     "apply-metadata": "hasura metadata apply",
-    "lint": "echo skip",
-    "docker:build": "docker build . -t hydra-indexer-gateway:latest",
-    "docker:tag": "docker tag hydra-indexer-gateway:latest subsquid/hydra-indexer-gateway:${VERSION_TAG} && docker tag hydra-indexer-gateway:latest subsquid/hydra-indexer-gateway:${MAJOR_VERSION_TAG} && docker tag hydra-indexer-gateway:latest subsquid/hydra-indexer-gateway:${RELEASE_TAG:-next}",
-    "docker:publish": "export VERSION_TAG=$(node -p 'require(\"./package.json\").version') && export MAJOR_VERSION_TAG=$(echo $VERSION_TAG|cut -d'.' -f1) && yarn docker:build && yarn docker:tag && docker push subsquid/hydra-indexer-gateway --all-tags"
+    "lint": "echo skip"
   },
   "dependencies": {
     "hasura-cli": "^2.0.2"

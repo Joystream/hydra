@@ -7,19 +7,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
-    "build": "tsc --build tsconfig.json",
-    "docker:build": "docker build ./schema -t hydra:${CLITAG:-latest} --no-cache",
-    "db:migrate": "bash ./scripts/db.sh --db-name indexer-db --db-host db up  && bash ./scripts/db.sh --db-name processor-db --db-host db up",
-    "db:drop": "bash ./scripts/db.sh --db-name indexer-db drop && bash ./scripts/db.sh --db-name processor-db drop",
-    "db:up": "docker-compose up -d db",
-    "db:setup": "CLITAG=${CLITAG:-latest} yarn db:up && CLITAG=${CLITAG:-latest} yarn db:migrate",
-    "redis:reset": "docker-compose up -d redis && docker-compose exec redis redis-cli FLUSHALL",
-    "db:reset": "yarn db:up && yarn db:drop && yarn db:setup",
-    "reset": "yarn db:reset && yarn redis:reset",
-    "pre-e2e-test": "CLITAG=${CLITAG:-latest} yarn db:setup && CLITAG=${CLITAG:-latest} docker-compose up -d",
-    "post-e2e-test": "CLITAG=${CLITAG:-latest} docker-compose down",
-    "e2e-test-local": "nyc --extension .ts mocha --timeout 70000 --require ts-node/register --exit --file ./test/e2e/setup-e2e.ts \"test/e2e/**/*.test.ts\"",
-    "e2e-test": "bash run-tests.sh"
+    "test": "nyc --extension .ts mocha --timeout 70000 --require dotenv/config --require ts-node/register --exit --file ./test/e2e/setup-e2e.ts \"test/e2e/**/*.test.ts\""
   },
   "dependencies": {
     "@polkadot/api": "4.17.1",
@@ -32,7 +20,6 @@
     "typedi": "^0.8.0"
   },
   "devDependencies": {
-    "@subsquid/hydra-cli": "^4.0.0",
     "@types/chai": "^4.2.13",
     "@types/mocha": "^8.0.3",
     "chai": "^4.2.0",

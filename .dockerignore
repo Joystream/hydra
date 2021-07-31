@@ -1,8 +1,12 @@
+/.git
 **/node_modules
 **/dist
 **/lib
 **/.nyc_output
-./docs
-./gitbook
-./github
-./vscode
+/.gitbook
+/.github
+/.vscode
+/.idea
+/docs
+/examples
+/packages/sample

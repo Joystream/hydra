@@ -14,7 +14,6 @@
     ]
   },
   "scripts": {
-    "e2e-test": "yarn workspace hydra-e2e-tests run e2e-test",
     "lint": "yarn workspaces run lint",
     "postinstall": "is-ci || husky install"
   },
@@ -37,7 +36,8 @@
     "prettier": "2.0.2"
   },
   "resolutions": {
-    "@polkadot/types": "4.17.1"
+    "@polkadot/types": "4.17.1",
+    "typeorm": "0.2.32"
   },
   "lint-staged": {
     "*.ts": "yarn lint --fix"

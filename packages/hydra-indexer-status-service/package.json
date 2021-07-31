@@ -7,9 +7,6 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
-    "docker:build": "docker build . -t hydra-indexer-status-service:latest",
-    "docker:tag": "docker tag hydra-indexer-status-service:latest subsquid/hydra-indexer-status-service:${VERSION_TAG} && docker tag hydra-indexer-status-service:latest subsquid/hydra-indexer-status-service:${MAJOR_VERSION_TAG} && docker tag hydra-indexer-status-service:latest subsquid/hydra-indexer-status-service:${RELEASE_TAG:-next}",
-    "docker:publish": "export VERSION_TAG=$(node -p 'require(\"./package.json\").version') && export MAJOR_VERSION_TAG=$(echo $VERSION_TAG|cut -d'.' -f1) && yarn docker:build && yarn docker:tag && docker push subsquid/hydra-indexer-status-service --all-tags",
     "lint": "eslint './+(src|test|tools)/**/*.{js,ts}'"
   },
   "dependencies": {

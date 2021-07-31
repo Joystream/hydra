@@ -2,7 +2,9 @@ version: "3"
 
 services:
   query-node:
-    image: hydra-test:latest
+    build:
+      context: ../..
+      target: test
     restart: unless-stopped
     environment:
       - DB_NAME=processor-db
@@ -19,7 +21,9 @@ services:
     command: ["yarn", "query-node:start:prod"]
 
   hydra-processor:
-    image: hydra-test:latest
+    build:
+      context: ../..
+      target: test
     restart: unless-stopped
     environment:
       - DB_NAME=processor-db
@@ -50,7 +54,9 @@ services:
              yarn processor:start"
 
   hydra-indexer:
-    image: hydra-indexer:latest
+    build:
+      context: ../..
+      target: indexer
     restart: unless-stopped
     environment:
       - DB_NAME=indexer-db
@@ -64,7 +70,7 @@ services:
       - DEBUG=index-builder:*
       - TYPES_JSON=typedefs.json
     volumes:
-      - ./fixtures/typedefs.json:/home/hydra/packages/hydra-indexer/typedefs.json
+      - ./fixtures/typedefs.json:/hydra/packages/hydra-indexer/typedefs.json
     command: >
       sh -c "yarn db:bootstrap && yarn start:prod"
     depends_on:
@@ -73,7 +79,9 @@ services:
       - db
 
   hydra-indexer-gateway:
-    image: hydra-indexer-gateway:latest
+    build:
+      context: ../..
+      target: indexer-gateway
     restart: unless-stopped
     depends_on:
       - redis
@@ -88,7 +96,9 @@ services:
       HYDRA_INDEXER_STATUS_SERVICE: http://hydra-indexer-status-service:8081/status
 
   hydra-indexer-status-service:
-    image: hydra-indexer-status-service:latest
+    build:
+      context: ../..
+      target: indexer-status-service
     restart: unless-stopped
     depends_on:
       - redis

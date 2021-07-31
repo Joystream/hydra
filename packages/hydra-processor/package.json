@@ -67,6 +67,7 @@
     "@types/figlet": "^1.2.1",
     "@types/graphql": "^14.5.0",
     "@types/node": "^12",
+    "@types/semver": "^7.3.8",
     "chai-spies": "^1.0.0",
     "eslint": "^7.12.1",
     "ts-auto-mock": "^3.1.2",

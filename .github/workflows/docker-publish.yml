@@ -16,9 +16,9 @@ on:
         default: 'next'
 
 
-
 env:
   CI: true
+
 
 jobs:
   publish:
@@ -35,27 +35,20 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Docker build
-        if: "contains(github.event.inputs.packages, 'hydra-indexer') || github.event.inputs.packages == '*'"
-        run: |
-          docker build . -t hydra-builder:latest
-
       - name: Publish hydra-indexer image
         if: "contains(github.event.inputs.packages, 'hydra-indexer') || github.event.inputs.packages == '*'"
-        run: |
-          (cd ./packages/hydra-indexer && yarn docker:publish)
+        run: ./scripts/docker-publish.sh hydra-indexer
         env:
           RELEASE_TAG: ${{ github.event.inputs.releaseTag }}
 
       - name: "Publish hydra-indexer-status-service image"
-        run: |
-          (cd ./packages/hydra-indexer-status-service && yarn docker:publish)
+        if: "contains(github.event.inputs.packages, 'hydra-indexer-status-service') || github.event.inputs.packages == '*'"
+        run: ./scripts/docker-publish.sh hydra-indexer-status-service
         env:
           RELEASE_TAG: ${{ github.event.inputs.releaseTag }}
 
       - name: Publish hydra-indexer-gateway image
         if: "contains(github.event.inputs.packages, 'hydra-indexer-gateway') || github.event.inputs.packages == '*'"
-        run: |
-          (cd ./packages/hydra-indexer-gateway && yarn docker:publish)
+        run: ./scripts/docker-publish.sh hydra-indexer-gateway
         env:
           RELEASE_TAG: ${{ github.event.inputs.releaseTag }}
