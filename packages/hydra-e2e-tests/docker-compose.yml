@@ -92,7 +92,11 @@ services:
       - "8080:8080"
     environment:
       # DEV_MODE: "true"
-      HYDRA_INDEXER_DB: postgres://postgres:postgres@db:5432/indexer-db
+      DB_NAME: indexer-db
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_HOST: db
+      DB_PORT: 5432
       HYDRA_INDEXER_STATUS_SERVICE: http://hydra-indexer-status-service:8081/status
 
   hydra-indexer-status-service:

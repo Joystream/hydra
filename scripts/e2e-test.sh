@@ -25,10 +25,10 @@ docker-compose -f packages/hydra-e2e-tests/docker-compose.yml up -d --build || e
 RUNNER="$(docker build . --target e2e-test-runner -q)" || exit 1
 
 
-function wait-until {
+wait-until() {
     local attempt_counter=0
     local max_attempts=50
-    until $(eval "$1"); do
+    until eval "$1"; do
         if [ ${attempt_counter} -eq ${max_attempts} ];then
             echo "Max attempts reached"
             exit 1

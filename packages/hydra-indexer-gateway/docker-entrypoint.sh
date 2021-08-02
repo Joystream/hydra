@@ -1,9 +1,9 @@
 #!/bin/bash
 
-function wait-until {
+wait-until() {
     local attempt_counter=0
-    local max_attempts=30
-    until $(eval "$1"); do
+    local max_attempts=${2:-30}
+    until eval "$1"; do
         if [ ${attempt_counter} -eq ${max_attempts} ];then
             echo "Max attempts reached"
             exit 1
@@ -14,25 +14,31 @@ function wait-until {
 }
 
 
-echo "Waiting until indexer db is ready"
-wait-until 'psql "$HYDRA_INDEXER_DB" -q -c "select count(*) from substrate_block" > /dev/null 2>&1'
+METADATA_HASH=($(tar fc - -C / hasura-metadata | md5sum))
+MDB="gateway_metadata_$METADATA_HASH"
+echo "metadata hash: $METADATA_HASH"
+echo "metadata db: $MDB"
 
 
-# initialize metadata db
-rm -rf /var/lib/postgresql/data
-su -l postgres -c "/usr/lib/postgresql/12/bin/initdb -D /var/lib/postgresql/data" || exit 1
+export PGHOST=$DB_HOST
+export PGPORT=$DB_PORT
+export PGUSER=$DB_USER
+export PGPASSWORD=$DB_PASS
 
 
-function terminate {
-    trap '' INT TERM
-    kill -TERM `jobs -pr` 2>/dev/null
+echo "waiting until indexer db is ready"
+wait-until 'psql --dbname="$DB_NAME" -c "select id from substrate_block limit 1" > /dev/null 2>&1'
+
+
+create-database() {
+    if [ "$( psql -tAc "SELECT 1 FROM pg_database WHERE datname='"$MDB"'" )" = '1' ]
+    then
+        echo "found metadata database"
+    else
+        createdb "$MDB" && echo "created metadata database"
+    fi
 }
-
-
-trap terminate TERM INT
-
-
-su -l postgres -c "/usr/lib/postgresql/12/bin/postgres -D /var/lib/postgresql/data" &
+wait-until 'create-database' 5
 
 
 if [ "$DEV_MODE" == "true" ]; then
@@ -41,16 +47,11 @@ else
     export HASURA_GRAPHQL_ADMIN_SECRET="$(openssl rand -hex 12)"
     export HASURA_GRAPHQL_UNAUTHORIZED_ROLE=user
 fi
-HASURA_GRAPHQL_STRINGIFY_NUMERIC_TYPES=true \
-HASURA_GRAPHQL_ENABLE_TELEMETRY=false \
-HASURA_GRAPHQL_METADATA_DATABASE_URL="postgres://postgres@localhost:5432/" \
-/bin/hasura-entrypoint.sh graphql-engine serve &
+export HASURA_GRAPHQL_STRINGIFY_NUMERIC_TYPES=true
+export HASURA_GRAPHQL_STRINGIFY_NUMERIC_TYPES=true
+export HASURA_GRAPHQL_ENABLE_TELEMETRY=false
+export HASURA_GRAPHQL_METADATA_DATABASE_URL="postgres://$DB_USER:$DB_PASS@$DB_HOST:$DB_PORT/$MDB"
+export HYDRA_INDEXER_DB="postgres://$DB_USER:$DB_PASS@$DB_HOST:$DB_PORT/$DB_NAME"
 
 
-#TODO: check metadata consistency
-
-
-wait -n
-terminate
-wait
-exit 1
+exec /bin/hasura-entrypoint.sh graphql-engine serve
