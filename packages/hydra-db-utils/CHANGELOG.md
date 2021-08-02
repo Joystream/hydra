@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.0.0-alpha.0](https://github.com/dzhelezov/hydra/compare/v4.0.0...v4.0.0-alpha.0) (2021-08-02)
+
+**Note:** Version bump only for package @subsquid/hydra-db-utils
+
+
+
+
+
 ## [4.0.0](https://github.com/dzhelezov/hydra/compare/v3.1.0-alpha.1...v4.0.0) (2021-07-22)
 
 **Note:** Version bump only for package @subsquid/hydra-db-utils
