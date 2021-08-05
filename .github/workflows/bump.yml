@@ -1,13 +1,5 @@
 name: bump
-on:
-  push:
-    branches:
-      - master
-      - dev
-      - ci-test
-      - ci-lerna
-      - ci-lerna-test
-      - hydra-v3
+on: push
 
 env:
   CI: true
@@ -42,10 +34,5 @@ jobs:
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
       - name: Lerna update prerelease version
-        if: steps.extract_branch.outputs.branch != 'master'
-        run: |
-          yarn lerna version --conventional-commits --conventional-prerelease --preid ${{ steps.extract_branch.outputs.branch }} --yes
-      - name: Lerna update prerelease version master
-        if: steps.extract_branch.outputs.branch == 'master'
         run: |
           yarn lerna version --conventional-commits --conventional-prerelease --yes
