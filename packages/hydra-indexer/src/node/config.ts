@@ -10,6 +10,7 @@ let conf: {
   VERBOSE: boolean
   DEBUG: string
   TYPES_JSON: Record<string, unknown>
+  TYPES_ALIAS: Record<string, unknown>
   SPEC_TYPES: Record<string, unknown>
   CHAIN_TYPES: Record<string, unknown>
   BUNDLE_TYPES: Record<string, unknown>
@@ -130,6 +131,10 @@ export function configure(): void {
         default: {},
         desc: `path to JSON with custom substrate type definitions`,
       }), // optional
+      TYPES_ALIAS: jsonPath({
+        default: {},
+        desc: `path to JSON with custom type aliases`
+      }),
       SPEC_TYPES: jsonPath({
         default: {},
         desc: `path to JSON with spec-level type definitions`,

@@ -1,5 +1,5 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
-import { RegistryTypes, OverrideBundleType } from '@polkadot/types/types'
+import { RegistryTypes, OverrideBundleType, OverrideModuleType } from '@polkadot/types/types'
 import pRetry from 'p-retry'
 import Debug from 'debug'
 import { getConfig } from '../node/config'
@@ -44,6 +44,7 @@ export async function getApiPromise(): Promise<ApiPromise> {
       new ApiPromise({
         provider,
         types: conf.TYPES_JSON as RegistryTypes,
+        typesAlias: conf.TYPES_ALIAS as Record<string, OverrideModuleType>,
         typesBundle: conf.BUNDLE_TYPES as OverrideBundleType,
         typesSpec: conf.SPEC_TYPES as Record<string, RegistryTypes>,
         typesChain: conf.CHAIN_TYPES as Record<string, RegistryTypes>,
