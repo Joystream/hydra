@@ -133,7 +133,7 @@ export function configure(): void {
       }), // optional
       TYPES_ALIAS: jsonPath({
         default: {},
-        desc: `path to JSON with custom type aliases`
+        desc: `path to JSON with custom type aliases`,
       }),
       SPEC_TYPES: jsonPath({
         default: {},

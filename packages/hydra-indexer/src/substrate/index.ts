@@ -1,5 +1,9 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
-import { RegistryTypes, OverrideBundleType, OverrideModuleType } from '@polkadot/types/types'
+import {
+  RegistryTypes,
+  OverrideBundleType,
+  OverrideModuleType,
+} from '@polkadot/types/types'
 import pRetry from 'p-retry'
 import Debug from 'debug'
 import { getConfig } from '../node/config'
