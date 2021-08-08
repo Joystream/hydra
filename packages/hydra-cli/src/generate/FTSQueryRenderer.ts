@@ -101,6 +101,7 @@ export class FTSQueryRenderer {
     entities[entities.length - 1].last = true
 
     return {
+      ...this._context,
       entities,
       query: {
         viewName: `${prefix}_view`,

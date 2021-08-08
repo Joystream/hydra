@@ -18,7 +18,7 @@ import {
   addOrderBy,
   orderByFields,
   parseOrderBy,
-} from '../../WarthogBaseService';
+} from '../../server/WarthogBaseService';
 
 @Service('{{className}}Service')
 export class {{className}}Service {
@@ -29,7 +29,7 @@ export class {{className}}Service {
      @Inject('{{className}}Service') public readonly {{camelName}}Service: {{className}}Service,
     {{/subclasses}}
   ) {
-    {{#subclasses}}  
+    {{#subclasses}}
     this.typeToService['{{className}}'] = {{camelName}}Service;
     {{/subclasses}}
   }

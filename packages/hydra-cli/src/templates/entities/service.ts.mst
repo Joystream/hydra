@@ -2,11 +2,11 @@ import { Service, Inject } from 'typedi';
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { WhereInput } from 'warthog';
-import { WarthogBaseService } from '../../WarthogBaseService';
+import { WarthogBaseService } from '../../server/WarthogBaseService';
 
 import { {{className}} } from './{{kebabName}}.model';
 
-import { {{#variantNames}} {{.}}, {{/variantNames}} } from '../variants/variants.model'
+{{#has.enum}}import { {{#variantNames}} {{.}}, {{/variantNames}} } from '../variants/variants.model'{{/has.enum}}
 
 import {
   {{className}}WhereArgs,
@@ -20,10 +20,10 @@ import {
 @Service('{{className}}Service')
 export class {{className}}Service extends WarthogBaseService<{{className}}> {
  {{#fieldResolvers}}
-    @Inject('{{returnTypeFunc}}Service') 
+    @Inject('{{returnTypeFunc}}Service')
     public readonly {{fieldName}}Service!: {{returnTypeFunc}}Service
   {{/fieldResolvers}}
-  
+
   constructor(
     @InjectRepository({{className}}) protected readonly repository: Repository<{{className}}>,
   ) {
@@ -51,10 +51,10 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
       }
       return records;
     {{/has.union}}
-    
+
     {{^has.union}} return this.findWithRelations<W>(where, orderBy, limit, offset, fields); {{/has.union}}
   }
-  
+
 
   async findWithRelations<W extends WhereInput>(
 		_where?: any,
@@ -62,19 +62,19 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
 		limit?: number,
 		offset?: number,
 		fields?: string[]): Promise<{{className}}[]> {
-    
+
     const where = <{{className}}WhereInput>(_where || {})
 
     {{#fieldResolvers}}
-    // remove relation filters to enable warthog query builders 
+    // remove relation filters to enable warthog query builders
     {{#relationType.isTO}}
-        const { {{fieldName}} } = where 
+        const { {{fieldName}} } = where
         delete where.{{fieldName}};
     {{/relationType.isTO}}
-    
+
     {{#relationType.isTM}}
-        const { {{fieldName}}_some, {{fieldName}}_none, {{fieldName}}_every } = where 
-        
+        const { {{fieldName}}_some, {{fieldName}}_none, {{fieldName}}_every } = where
+
         if ((+!!{{fieldName}}_some) + (+!!{{fieldName}}_none) + (+!!{{fieldName}}_every) > 1) {
             throw new Error(`A query can have at most one of none, some, every clauses on a relation field`)
         }
@@ -82,7 +82,7 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
         delete where.{{fieldName}}_some;
         delete where.{{fieldName}}_none;
         delete where.{{fieldName}}_every;
-    {{/relationType.isTM}}    
+    {{/relationType.isTM}}
     {{/fieldResolvers}}
 
     let mainQuery = this.buildFindQueryWithParams(
@@ -96,10 +96,10 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
     let parameters = mainQuery.getParameters();
 
     {{#crossFilters}}
-    
+
     {{#fieldResolvers}}
         {{#relationType.isTO}}
-        
+
         if ({{fieldName}}) {
           // OTO or MTO
           const {{fieldName}}Query = this.{{fieldName}}Service.buildFindQueryWithParams(
@@ -108,19 +108,19 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
                 undefined,
                 ['id'],
                 '{{fieldName}}'
-            ).take(undefined); // remove the default LIMIT 
+            ).take(undefined); // remove the default LIMIT
 
 
           mainQuery = mainQuery
             .andWhere(`"{{typeormAliasName}}"."{{fieldNameColumnName}}_id" IN (${ {{fieldName}}Query.getQuery() })`);
 
           parameters = { ...parameters, ...{{fieldName}}Query.getParameters() };
-          
+
         }
         {{/relationType.isTO}}
 
         {{#relationType.isTM}}
-       
+
           const {{fieldName}}Filter = {{fieldName}}_some || {{fieldName}}_none || {{fieldName}}_every
 
           if ({{fieldName}}Filter) {
@@ -155,44 +155,44 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
                 .addSelect('{{typeormAliasName}}.id', '{{typeormAliasName}}_id');
 
             const subQuery = `
-                SELECT 
-                    f.{{typeormAliasName}}_id {{typeormAliasName}}_id, f.cnt_filtered cnt_filtered, t.cnt_total cnt_total 
-                FROM 
-                    (${subQueryTotal.getQuery()}) t, (${subQueryFiltered.getQuery()}) f 
-                WHERE 
+                SELECT
+                    f.{{typeormAliasName}}_id {{typeormAliasName}}_id, f.cnt_filtered cnt_filtered, t.cnt_total cnt_total
+                FROM
+                    (${subQueryTotal.getQuery()}) t, (${subQueryFiltered.getQuery()}) f
+                WHERE
                     t.{{typeormAliasName}}_id = f.{{typeormAliasName}}_id`;
 
 
             if ({{fieldName}}_none) {
-              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
-                (SELECT 
+              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN
+                (SELECT
                     {{fieldName}}_subq.{{typeormAliasName}}_id
-                FROM 
-                    (${subQuery}) {{fieldName}}_subq 
-                WHERE 
+                FROM
+                    (${subQuery}) {{fieldName}}_subq
+                WHERE
                     {{fieldName}}_subq.cnt_filtered = 0
                 )`)
             }
 
             if ({{fieldName}}_some) {
-              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
-                (SELECT 
+              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN
+                (SELECT
                     {{fieldName}}_subq.{{typeormAliasName}}_id
-                FROM 
-                    (${subQuery}) {{fieldName}}_subq 
-                WHERE 
+                FROM
+                    (${subQuery}) {{fieldName}}_subq
+                WHERE
                     {{fieldName}}_subq.cnt_filtered > 0
                 )`)
             }
 
             if ({{fieldName}}_every) {
-              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN 
-                (SELECT 
+              mainQuery = mainQuery.andWhere(`{{typeormAliasName}}.id IN
+                (SELECT
                     {{fieldName}}_subq.{{typeormAliasName}}_id
-                FROM 
-                    (${subQuery}) {{fieldName}}_subq 
-                WHERE 
-                    {{fieldName}}_subq.cnt_filtered > 0 
+                FROM
+                    (${subQuery}) {{fieldName}}_subq
+                WHERE
+                    {{fieldName}}_subq.cnt_filtered > 0
                     AND {{fieldName}}_subq.cnt_filtered = {{fieldName}}_subq.cnt_total
                 )`)
             }
@@ -200,13 +200,13 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
         {{/relationType.isTM}}
 
     {{/fieldResolvers}}
-    
+
     {{/crossFilters}}
 
     mainQuery = mainQuery.setParameters(parameters);
 
     return mainQuery.take(limit || 50).skip(offset || 0).getMany();
   }
-    
+
 
 }

@@ -8,7 +8,7 @@ import {
   SystemEvent,
   EventParam,
   AdditionalData,
-} from '../generated/graphql-server/model'
+} from '../generated/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent

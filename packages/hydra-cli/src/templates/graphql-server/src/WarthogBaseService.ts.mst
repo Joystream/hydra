@@ -11,7 +11,7 @@ interface WhereFilterAttributes {
 }
 
 export class WarthogBaseService<E extends BaseModel> extends BaseService<E> {
-  buildFindQueryWithParams<W extends WhereInput>(
+  buildFindQueryWithParams(
     where: WhereExpression = {},
     orderBy?: string | string[],
     pageOptions?: LimitOffset,
@@ -75,7 +75,7 @@ export class WarthogBaseService<E extends BaseModel> extends BaseService<E> {
         const paramKey = `${paramKeyPrefix}${paramKeyCounter.counter}`;
         // increment counter each time we add a new where clause so that TypeORM doesn't reuse our input variables
         paramKeyCounter.counter = paramKeyCounter.counter + 1;
-        const key = k as keyof W; // userName_contains
+        const key = k as keyof WhereInput; // userName_contains
         const parts = key.toString().split('_'); // ['userName', 'contains']
         const attr = parts[0]; // userName
         const operator = parts.length > 1 ? parts[1] : 'eq'; // contains

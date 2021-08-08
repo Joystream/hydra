@@ -1,14 +1,23 @@
-FROM node:14-alpine AS base
+FROM node:14-alpine AS node
+FROM hasura/graphql-engine:v2.0.3.cli-migrations-v3 AS hasura-with-migrations
+
+# use those for ARM64
+# FROM fedormelexin/graphql-engine-arm64:v2.0.3.cli-migrations-v3 AS hasura-with-migrations
+# FROM node:14 AS node
+
+
+FROM node AS base
 WORKDIR /hydra
 ADD package.json .
 ADD yarn.lock .
 RUN yarn --frozen-lockfile
 
 
-FROM base AS libs
+FROM base AS indexer
 ADD packages/bn-typeorm/package.json packages/bn-typeorm/
 ADD packages/hydra-common/package.json packages/hydra-common/
 ADD packages/hydra-db-utils/package.json packages/hydra-db-utils/
+ADD packages/hydra-indexer/package.json packages/hydra-indexer/
 RUN yarn --frozen-lockfile
 
 ADD packages/bn-typeorm/tsconfig.json packages/bn-typeorm/
@@ -24,26 +33,13 @@ ADD packages/hydra-db-utils/src packages/hydra-db-utils/src
 ADD packages/hydra-db-utils/test packages/hydra-db-utils/test
 RUN yarn workspace @subsquid/hydra-db-utils build
 
-
-FROM libs AS indexer
-ADD packages/hydra-indexer/package.json packages/hydra-indexer/
-RUN yarn --frozen-lockfile
 ADD packages/hydra-indexer/tsconfig.json packages/hydra-indexer/
 ADD packages/hydra-indexer/src packages/hydra-indexer/src
 ADD packages/hydra-indexer/test packages/hydra-indexer/test
 RUN yarn workspace @subsquid/hydra-indexer build
+
 WORKDIR /hydra/packages/hydra-indexer
 CMD ["yarn", "start:prod"]
-
-
-FROM libs AS processor
-ADD packages/hydra-processor/package.json packages/hydra-processor/
-RUN yarn --frozen-lockfile
-ADD packages/hydra-processor/tsconfig.json packages/hydra-processor/
-ADD packages/hydra-processor/src packages/hydra-processor/src
-ADD packages/hydra-processor/test packages/hydra-processor/test
-ADD packages/hydra-processor/bin packages/hydra-processor/bin
-RUN yarn workspace @subsquid/hydra-processor build
 
 
 FROM base AS indexer-status-service
@@ -61,40 +57,43 @@ ADD packages/bn-typeorm/package.json packages/bn-typeorm/
 ADD packages/hydra-common/package.json packages/hydra-common/
 ADD packages/hydra-db-utils/package.json packages/hydra-db-utils/
 ADD packages/hydra-processor/package.json packages/hydra-processor/
+ADD packages/hydra-processor/bin packages/hydra-processor/bin
 ADD packages/hydra-typegen/package.json packages/hydra-typegen/
+ADD packages/hydra-typegen/bin packages/hydra-typegen/bin
 ADD packages/hydra-cli/package.json packages/hydra-cli/
+ADD packages/hydra-cli/bin packages/hydra-cli/bin
 ADD packages/hydra-e2e-tests/package.json packages/hydra-e2e-tests/
 RUN yarn --frozen-lockfile
 
 
 FROM deps AS test
-ADD packages/hydra-typegen/tsconfig.json packages/hydra-typegen/
-ADD packages/hydra-typegen/src packages/hydra-typegen/src
-ADD packages/hydra-typegen/test packages/hydra-typegen/test
-ADD packages/hydra-typegen/bin packages/hydra-typegen/bin
-RUN yarn workspace @subsquid/hydra-typegen build
-RUN yarn workspace @subsquid/hydra-typegen link
-
 ADD packages/hydra-cli/tsconfig.json packages/hydra-cli/
 ADD packages/hydra-cli/src packages/hydra-cli/src
-ADD packages/hydra-cli/test packages/hydra-cli/test
 ADD packages/hydra-cli/bin packages/hydra-cli/bin
-RUN yarn workspace @subsquid/hydra-cli build
-RUN yarn workspace @subsquid/hydra-cli link
+RUN yarn workspace @subsquid/hydra-cli prepack
+RUN rm -r packages/hydra-cli/src
 
-RUN hydra-cli scaffold --dir packages/hydra-test --name hydra-test --silent
+RUN ./packages/hydra-cli/bin/run scaffold --dir packages/hydra-test --name hydra-test --silent
+RUN yarn
+
 ADD packages/hydra-e2e-tests/fixtures packages/hydra-test/
 RUN yarn workspace hydra-test codegen
 
-COPY --from=libs /hydra/packages/bn-typeorm/lib packages/bn-typeorm/lib
-COPY --from=libs /hydra/packages/hydra-common/lib packages/hydra-common/lib
-COPY --from=libs /hydra/packages/hydra-db-utils/lib packages/hydra-db-utils/lib
-COPY --from=processor /hydra/packages/hydra-processor/bin packages/hydra-processor/bin
-COPY --from=processor /hydra/packages/hydra-processor/lib packages/hydra-processor/lib
-RUN yarn --frozen-lockfile
+ADD packages/hydra-typegen/tsconfig.json packages/hydra-typegen/
+ADD packages/hydra-typegen/src packages/hydra-typegen/src
+RUN yarn workspace @subsquid/hydra-typegen prepack
+RUN rm -r packages/hydra-typegen/src
+
+COPY --from=indexer /hydra/packages/bn-typeorm/lib packages/bn-typeorm/lib
+COPY --from=indexer /hydra/packages/hydra-common/lib packages/hydra-common/lib
+COPY --from=indexer /hydra/packages/hydra-db-utils/lib packages/hydra-db-utils/lib
+
+ADD packages/hydra-processor/tsconfig.json packages/hydra-processor/
+ADD packages/hydra-processor/src packages/hydra-processor/src
+RUN yarn workspace @subsquid/hydra-processor prepack
+RUN rm -r packages/hydra-processor/src
 
 WORKDIR /hydra/packages/hydra-test
-RUN yarn workspace query-node compile
 
 
 FROM deps AS e2e-test-runner
@@ -106,7 +105,7 @@ RUN tsc
 CMD nyc mocha --timeout 70000 --exit --file ./lib/e2e/setup-e2e.js "lib/e2e/**/*.test.js"
 
 
-FROM hasura/graphql-engine:v2.0.3.cli-migrations-v3 AS indexer-gateway
+FROM hasura-with-migrations AS indexer-gateway
 RUN apt-get -y update \
     && apt-get install -y curl ca-certificates gnupg lsb-release \
     && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \

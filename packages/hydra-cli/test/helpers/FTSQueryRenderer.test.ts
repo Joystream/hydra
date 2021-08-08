@@ -16,7 +16,10 @@ describe('FTSQueryRenderer', () => {
 
   before(() => {
     // set timestamp in the context to make the output predictable
-    generator = new FTSQueryRenderer({ ts: 111111111 })
+    generator = new FTSQueryRenderer({
+      ts: 111111111,
+      generatedFolderRelPath: '../../warthog',
+    })
   })
 
   it('Should generate migration', function () {
@@ -55,7 +58,7 @@ describe('FTSQueryRenderer', () => {
     )
 
     expect(rendered).to.include(
-      `import {  PostWhereInput,  } from '../../../generated'`
+      `import {  PostWhereInput,  } from '../../warthog'`
     )
     expect(rendered).to.include(
       `@Arg('skip', () => Int, { defaultValue: 0 }) skip: number`

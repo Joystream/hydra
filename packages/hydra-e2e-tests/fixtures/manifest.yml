@@ -6,7 +6,7 @@ dataSource:
   kind: substrate
   chain: node-template
 entities:
-  - mappings/lib/generated/**/*.model.js
+  - generated/modules/**/*.model.ts
 typegen:
   metadata:
     source: ws://node-template:9944/
@@ -14,11 +14,11 @@ typegen:
     - balances.Transfer
   calls:
     - timestamp.set
-  outDir: ./mappings/generated/types
+  outDir: types
 mappings:
-  mappingsModule: mappings/lib/mappings
+  mappingsModule: mappings
   imports:
-    - mappings/lib/mappings/generated/types
+    - generated/server/config
   eventHandlers:
     - event: balances.Transfer
       handler: balancesTransfer

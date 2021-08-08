@@ -39,18 +39,18 @@ describe('model index render', () => {
   }
 `)
 
-    const rendered = new SourcesGenerator(model).generateModelIndex()
+    const rendered = new SourcesGenerator('.', model).generateModelIndex()
 
     expect(c(rendered)).to.include(
-      c(`import { MyUnion } from '../src/modules/variants/variants.model`),
+      c(`import { MyUnion } from '../modules/variants/variants.model`),
       'should import union types'
     )
     expect(c(rendered)).to.include(
-      c(`import { Var1 } from '../src/modules/variants/variants.model`),
+      c(`import { Var1 } from '../modules/variants/variants.model`),
       'should import variant'
     )
     expect(c(rendered)).to.include(
-      c(`import { Network } from '../src/modules/enums/enums`),
+      c(`import { Network } from '../modules/enums/enums`),
       'should import enums'
     )
     expect(c(rendered)).to.include(
@@ -58,7 +58,7 @@ describe('model index render', () => {
       'should export enums'
     )
     expect(c(rendered)).to.include(
-      c(`import { MyEntity } from '../src/modules/my-entity/my-entity.model`),
+      c(`import { MyEntity } from '../modules/my-entity/my-entity.model`),
       'should import entities'
     )
     expect(c(rendered)).to.include(
@@ -67,7 +67,7 @@ describe('model index render', () => {
     )
     expect(c(rendered)).to.include(
       c(
-        `import { MyInterface } from '../src/modules/my-interface/my-interface.model`
+        `import { MyInterface } from '../modules/my-interface/my-interface.model`
       ),
       'should import interfaces'
     )

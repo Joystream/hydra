@@ -109,7 +109,7 @@ export function parseWarthogCodegenStderr(stderr: string): void {
   // String to look if there is any graphql error
   const graphqlErrors = `GeneratingSchemaError: Generating schema error`
   // Pattern to search if any file under the generated/graphql-server/src/* has problems
-  const sourceCodeErrors = /src\/modules\/\S*.ts/g
+  const sourceCodeErrors = /modules\/\S*.ts/g
   const errorMsg = `Failed to generate Graphql API due to errors: \n`
 
   const m = stderr.match(sourceCodeErrors)
@@ -122,16 +122,8 @@ export function parseWarthogCodegenStderr(stderr: string): void {
 
 export function getWarthogDependency(): string {
   /* eslint-disable */
-  const warthogPackageJson = require('warthog/package.json') as Record<
-    string,
-    unknown
-  >
-  debug(`Warthog package json: ${JSON.stringify(warthogPackageJson, null, 2)}`)
-  // if there is a special 'hydra' property, use it as depenency, otherwise use hardcoded fallback
-  if (warthogPackageJson.hydra === undefined) {
-    throw new Error(`Cannot resolve warthog version`)
-  }
-  return warthogPackageJson.hydra as string
+  const packageJson = require('../../package.json')
+  return packageJson.dependencies.warthog
 }
 
 export const verifySchemaExt = (file: string) =>

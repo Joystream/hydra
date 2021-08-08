@@ -1,6 +1,6 @@
 name: hydra-unit-tests
-on: [pull_request]
-  
+on: [pull_request, workflow_dispatch]
+
 jobs:
   run_unit_tests:
     name: run Hydra unit tests
@@ -16,15 +16,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: lint
         run: |
-          yarn 
+          yarn
           yarn workspaces run lint
       - name: run unit tests
         run: |
-          yarn  
-          yarn workspace @subsquid/hydra-cli test 
+          yarn
+          yarn workspace @subsquid/hydra-cli test
           yarn workspace @subsquid/hydra-typegen test
           yarn workspace @subsquid/hydra-common build
           yarn workspace @subsquid/hydra-db-utils build
           yarn workspace @subsquid/hydra-processor install
           yarn workspace @subsquid/hydra-processor test
- 

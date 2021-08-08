@@ -9,6 +9,7 @@ export default class Migrate extends Command {
     env: flags.string({
       char: 'e',
       description: 'Path to a file with environment variables',
+      default: './.env',
     }),
   }
 
@@ -17,9 +18,13 @@ export default class Migrate extends Command {
     info('Running migrations for Hydra Processor')
 
     const { flags } = this.parse(Migrate)
-    if (flags.env) {
-      dotenv.config({ path: flags.env })
-    }
+
+    dotenv.config({ path: flags.env })
+    process.env.PGDATABASE = process.env.DB_NAME
+    process.env.PGUSER = process.env.DB_USER
+    process.env.PGPASSWORD = process.env.DB_PASS
+    process.env.PGPORT = process.env.DB_PORT
+    process.env.PGHOST = process.env.DB_HOST
 
     try {
       connection = await createDBConnection()
