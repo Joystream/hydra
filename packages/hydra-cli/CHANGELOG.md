@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### 4.0.1-alpha.1 (2021-08-08)
+
+**Note:** Version bump only for package @subsquid/hydra-cli
+
+
+
+
+
 ### 4.0.1-alpha.0 (2021-08-05)
 
 **Note:** Version bump only for package @subsquid/hydra-cli
