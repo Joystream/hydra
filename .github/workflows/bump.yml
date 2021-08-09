@@ -1,5 +1,6 @@
 name: bump
-on: push
+on:
+  workflow_dispatch:
 
 env:
   CI: true
@@ -12,6 +13,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Extract branch name
         shell: bash
         run: echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
@@ -28,11 +30,13 @@ jobs:
           npm whoami
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      - name: Install  
+
+      - name: Install
         run: |
           yarn install --frozen-lockfile
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
+
       - name: Lerna update prerelease version
         run: |
           yarn lerna version --conventional-commits --conventional-prerelease --yes
