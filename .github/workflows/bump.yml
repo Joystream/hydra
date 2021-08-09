@@ -8,6 +8,7 @@ on:
       - ci-lerna
       - ci-lerna-test
       - hydra-v3
+  workflow_dispatch:
 
 env:
   CI: true
