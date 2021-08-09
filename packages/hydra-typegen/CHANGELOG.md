@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.0-alpha.0 (2021-08-09)
+
+
+### Features
+
+* remove WARTHOG_* from env ([#66](https://github.com/Joystream/hydra/issues/66)) ([4ea6f23](https://github.com/Joystream/hydra/commit/4ea6f235db51596bafaa8ba24102915013dd423f))
+
+
+
 ### 4.0.1-alpha.2 (2021-08-08)
 
 **Note:** Version bump only for package @subsquid/hydra-typegen
