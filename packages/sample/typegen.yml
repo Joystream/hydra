@@ -1,8 +1,0 @@
-typegen:
-  metadata:
-    source: ws://localhost:9000
-  events:
-    - balances.Transfer
-  calls:
-    - timestamp.set
-  outDir: ./mappings/generated/types
