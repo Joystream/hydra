@@ -18,6 +18,7 @@ import {
   TRANSFER_IN_QUERY,
   VARIANT_FILTER_MISREABLE_ACCOUNTS,
 } from './api/graphql-queries'
+import { gql } from 'graphql-request'
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
@@ -68,6 +69,70 @@ describe('end-to-end transfer tests', () => {
     const highlihts: string[] = await findTransfersByComment('transfer')
     expect(highlihts).length.gte(1, 'Full text search should find comment')
     expect(highlihts[0]).contains('Transfer')
+  })
+
+  it('fetches one-to-many relations', async () => {
+    const result = await getGQLClient().request(
+      gql`
+        query account($id: ID!) {
+          account: accountByUniqueInput(where: { id: $id }) {
+            id
+            incomingTx {
+              value
+            }
+          }
+        }
+      `,
+      {
+        id: BOB,
+      }
+    )
+    expect(result).to.deep.equal({
+      account: {
+        id: BOB,
+        incomingTx: [
+          {
+            value: txAmount1.toString(),
+          },
+          {
+            value: txAmount2.toString(),
+          },
+        ],
+      },
+    })
+  })
+
+  it('fetches one-to-many relations when where condition is present', async () => {
+    const result = await getGQLClient().request(
+      gql`
+        query accounts($value: BigInt!) {
+          accounts(where: { incomingTx_some: { value_eq: $value } }) {
+            id
+            incomingTx {
+              value
+            }
+          }
+        }
+      `,
+      {
+        value: txAmount2.toString(),
+      }
+    )
+    expect(result).to.deep.equal({
+      accounts: [
+        {
+          id: BOB,
+          incomingTx: [
+            {
+              value: txAmount1.toString(),
+            },
+            {
+              value: txAmount2.toString(),
+            },
+          ],
+        },
+      ],
+    })
   })
 
   it('fetch block timestamp from substrate event', async () => {
