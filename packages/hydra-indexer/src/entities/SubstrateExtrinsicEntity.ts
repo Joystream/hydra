@@ -124,21 +124,22 @@ export function fromBlockExtrinsic(data: {
   extr.blockNumber = height
   extr.blockHash = hash
   extr.indexInBlock = indexInBlock
-  extr.signature = e.signature.toString()
-  extr.signer = e.signer.toString()
+  extr.signature = e.signature ? e.signature.toString() : ''
+  extr.signer = e.signer ? e.signer.toString() : ''
 
-  extr.method = e.method.method || 'NO_METHOD'
-  extr.section = e.method.section || 'NO_SECTION'
+  extr.method = (e.method && e.method.method) || 'NO_METHOD'
+  extr.section = (e.method && e.method.section) || 'NO_SECTION'
   extr.name = fullName(e.method)
 
-  extr.meta = (e.meta.toJSON() || {}) as AnyJson
-  extr.hash = e.hash.toString()
+  extr.meta =
+    e.meta && e.meta.toJSON ? ((e.meta.toJSON() || {}) as AnyJson) : {}
+  extr.hash = e.hash ? e.hash.toString() : ''
 
   extr.isSigned = e.isSigned
-  extr.tip = e.tip.toBigInt()
-  extr.versionInfo = e.version.toString()
-  extr.nonce = e.nonce.toNumber()
-  extr.era = (e.era.toJSON() || {}) as AnyJson
+  extr.tip = e.tip ? e.tip.toBigInt() : BigInt(0)
+  extr.versionInfo = e.version ? e.version.toString() : ''
+  extr.nonce = e.nonce ? e.nonce.toNumber() : 0
+  extr.era = e.era ? ((e.era.toJSON() || {}) as AnyJson) : {}
 
   extr.args = []
 
