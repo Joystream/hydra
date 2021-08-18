@@ -45,3 +45,10 @@ npm run query-node:start
 
 Project's configuration is driven by environment variables, defined in `.env`,
 and `manifest.yml`.
+
+## Self-hosted indexer
+
+It is recommeded to use already set up indexer if available, as new indexer typically
+requires some time to catch up with interesting events.
+
+Have a look at `./indexer/docker-compose.yml` for example of how you can set up a self-hosted version.

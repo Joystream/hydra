@@ -30,12 +30,7 @@ export async function copyFiles(from: string, to: string): Promise<void> {
 }
 
 export function getTemplatePath(template: string): string {
-  const templatePath = path.resolve(
-    __dirname,
-    '..',
-    'templates',
-    ...template.split('/')
-  )
+  const templatePath = path.resolve(__dirname, '..', 'templates', template)
   if (!fs.existsSync(templatePath)) {
     throw new Error(`Tempate ${template} does not exists!`)
   }

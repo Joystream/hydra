@@ -181,21 +181,17 @@ export class SourcesGenerator {
 
   generateServer() {
     this.mkdir('generated/server')
-    ;[
-      'index.ts',
-      'processor.resolver.ts',
-      'pubsub.ts',
-      'server.ts',
-      'utils.ts',
-      'logger.ts',
-      'config.ts',
-      'warthog-env.ts',
-      'WarthogBaseService.ts',
-    ].forEach((file) => {
-      fs.copyFileSync(
-        getTemplatePath(`graphql-server/src/${file}.mst`),
-        this.output(`generated/server/${file}`)
-      )
+
+    const templatesDir = getTemplatePath('graphql-server')
+
+    fs.readdirSync(templatesDir).forEach((file) => {
+      if (file.endsWith('.mst')) {
+        const src = path.join(templatesDir, file)
+        const target = this.output(
+          `generated/server/${path.basename(file, '.mst')}`
+        )
+        fs.copyFileSync(src, target)
+      }
     })
   }
 
