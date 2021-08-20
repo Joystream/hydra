@@ -2507,10 +2507,10 @@
   resolved "https://registry.yarnpkg.com/@sqltools/formatter/-/formatter-1.2.3.tgz#1185726610acc37317ddab11c3c7f9066966bd20"
   integrity sha512-O3uyB/JbkAEMZaP3YqyHH7TMnex7tWyCbCI4EfJdOCoN6HIhqdJBWTM6aCCiWQ/5f5wxjgU735QAIpJbjDvmzg==
 
-"@subsquid/warthog@2.39.1":
-  version "2.39.1"
-  resolved "https://registry.yarnpkg.com/@subsquid/warthog/-/warthog-2.39.1.tgz#b1c0bfe06d59fdce2796aa6d5ff2819e8e415049"
-  integrity sha512-nNTyoCxPBVcyKC/weGH2UhbL9toYZ1qcaUwRg8CdFtY+ssM8XkQWz00mCNye6ozGJQosHhN7/075YUWIbI0g1A==
+"@subsquid/warthog@2.40.0":
+  version "2.40.0"
+  resolved "https://registry.yarnpkg.com/@subsquid/warthog/-/warthog-2.40.0.tgz#a5252aaa3296e045164b9e032950cfda307b312f"
+  integrity sha512-2YL4JoDgxtITr32Y4d1osnlxdiITiGiqSyeAOMVfGObovAVcNvDvuSz/FXcV9jkP5Fgv5oqv2Nq5KWjMXApxVA==
   dependencies:
     "@apollographql/graphql-playground-react" "https://github.com/Joystream/graphql-playground/releases/download/query-templates%401.7.27/graphql-playground-react-v1.7.27.tgz"
     "@types/app-root-path" "^1.2.4"
