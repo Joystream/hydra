@@ -6,7 +6,7 @@ import { WarthogBaseService } from '../../server/WarthogBaseService';
 
 import { {{className}} } from './{{kebabName}}.model';
 
-{{#has.enum}}import { {{#variantNames}} {{.}}, {{/variantNames}} } from '../variants/variants.model'{{/has.enum}}
+{{#hasVariantNames}}import { {{#variantNames}} {{.}}, {{/variantNames}} } from '../variants/variants.model'{{/hasVariantNames}}
 
 import {
   {{className}}WhereArgs,
