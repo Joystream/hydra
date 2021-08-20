@@ -37,7 +37,7 @@
   },
   "resolutions": {
     "@polkadot/types": "4.17.1",
-    "typeorm": "0.2.32"
+    "typeorm": "0.2.37"
   },
   "lint-staged": {
     "*.ts": "yarn lint --fix"

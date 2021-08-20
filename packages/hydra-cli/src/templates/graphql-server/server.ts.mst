@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { GraphQLID } from 'graphql';
-import { BaseContext, DataLoaderMiddleware, Server, ServerOptions } from 'warthog';
+import { BaseContext, DataLoaderMiddleware, Server, ServerOptions } from '@subsquid/warthog';
 import { DateResolver } from 'graphql-scalars';
 import { buildSchema } from 'type-graphql';
 

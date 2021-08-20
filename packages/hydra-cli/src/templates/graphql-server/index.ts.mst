@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import './config';
-import { SnakeNamingStrategy } from 'warthog';
+import { SnakeNamingStrategy } from '@subsquid/warthog';
 import { snakeCase } from 'typeorm/util/StringUtils';
 import { Logger } from './logger';
 import { buildServerSchema, getServer } from './server';

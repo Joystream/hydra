@@ -15,13 +15,13 @@
     "query-node:start": "ts-node --type-check ./generated/server/index.ts"
   },
   "dependencies": {
+    "@subsquid/warthog": "{{{hydraWarthogVersion}}}",
     "@types/bn.js": "^4.11.6",
     "bn.js": "^5.1.2",
     "pg": "^8.3.2",
     "pg-listen": "^1.7.0",
     "ts-node": "^10.1.0",
-    "tslib": "^2.0.0",
-    "warthog": "{{{hydraWarthogVersion}}}"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@subsquid/hydra-cli": "{{{hydraVersion}}}",

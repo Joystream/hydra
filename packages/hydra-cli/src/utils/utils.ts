@@ -118,7 +118,7 @@ export function parseWarthogCodegenStderr(stderr: string): void {
 export function getWarthogDependency(): string {
   /* eslint-disable */
   const packageJson = require('../../package.json')
-  return packageJson.dependencies.warthog
+  return packageJson.dependencies['@subsquid/warthog']
 }
 
 export const verifySchemaExt = (file: string) =>

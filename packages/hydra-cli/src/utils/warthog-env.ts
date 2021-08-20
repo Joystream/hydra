@@ -1,6 +1,7 @@
 export function getWarthogEnv(): any {
   const env = process.env
   return {
+    WARTHOG_MODULE_IMPORT_PATH: '@subsquid/warthog',
     WARTHOG_GENERATED_FOLDER: 'generated/warthog',
     WARTHOG_DB_ENTITIES: 'generated/modules/**/*.model.ts',
     WARTHOG_RESOLVERS_PATH:

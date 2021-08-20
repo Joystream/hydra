@@ -1,6 +1,6 @@
 import { Arg, Args, Mutation, Query, Resolver, Info } from 'type-graphql';
 import { Inject } from 'typedi';
-import { Fields, StandardDeleteResponse, UserId } from 'warthog';
+import { Fields, StandardDeleteResponse, UserId } from '@subsquid/warthog';
 import { GraphQLResolveInfo } from 'graphql';
 
 import {
@@ -28,5 +28,5 @@ export class {{className}}Resolver {
     return this.service.find<{{className}}WhereInput>(where, orderBy, limit, offset, fields, info);
   }
 
-  
+
 }

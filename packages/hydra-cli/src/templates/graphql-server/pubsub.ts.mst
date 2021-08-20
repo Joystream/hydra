@@ -37,7 +37,7 @@ export async function startPgSubsribers() {
     })
   })
 
-  subscriber.events.on('error', (error) => {
+  subscriber.events.on('error', (error: any) => {
     Logger.error('Fatal database connection error:', error)
     process.exit(1)
   })

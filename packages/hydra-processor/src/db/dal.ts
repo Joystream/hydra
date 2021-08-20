@@ -48,7 +48,7 @@ export async function countProcessedEvents(
     .createQueryBuilder('events')
     .select('COUNT(DISTINCT(events.event_id))', 'cnt')
     .where({ processor: processorID })
-    .getRawOne()
+    .getRawOne()!
 
   debug(`Total events count ${String(cnt)}`)
 

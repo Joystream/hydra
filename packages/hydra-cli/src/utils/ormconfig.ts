@@ -1,5 +1,5 @@
 import { ConnectionOptions } from 'typeorm'
-import { SnakeNamingStrategy } from 'warthog'
+import { SnakeNamingStrategy } from '@subsquid/warthog'
 import { snakeCase } from 'typeorm/util/StringUtils'
 
 class CustomNamingStrategy extends SnakeNamingStrategy {

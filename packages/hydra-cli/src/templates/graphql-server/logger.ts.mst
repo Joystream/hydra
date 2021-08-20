@@ -2,7 +2,7 @@
 
 import * as util from 'util';
 
-import { getBindingError } from 'warthog';
+import { getBindingError } from '@subsquid/warthog';
 
 export class Logger {
   static info(...args: any[]) {
