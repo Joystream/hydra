@@ -1,0 +1,9 @@
+export declare type ColumnType = IntColumnType | StringColumnType | FloatColumnType | NumericColumnType | JSONColumnType | BooleanColumnType | ByteaColumnType | 'money' | 'citext' | 'hstore' | 'bit' | 'varbit' | 'bit varying' | 'timetz' | 'timestamptz' | 'timestamp' | 'timestamp without time zone' | 'timestamp with time zone' | 'date' | 'time' | 'time without time zone' | 'time with time zone' | 'interval' | 'enum' | 'point' | 'line' | 'lseg' | 'box' | 'path' | 'polygon' | 'circle' | 'cidr' | 'inet' | 'macaddr' | 'tsvector' | 'tsquery' | 'uuid' | 'xml' | 'int4range' | 'int8range' | 'numrange' | 'tsrange' | 'tstzrange' | 'daterange' | 'geometry' | 'geography';
+export declare type StringColumnType = 'varchar' | 'character varying' | 'character' | 'char' | 'text';
+export declare type IntColumnType = 'int' | 'int2' | 'int4' | 'int8' | 'smallint' | 'integer' | 'bigint';
+export declare type FloatColumnType = 'float' | 'float4' | 'float8' | 'real' | 'double precision';
+export declare type NumericColumnType = 'numeric' | 'decimal';
+export declare type MoneyColumnType = 'money';
+export declare type JSONColumnType = 'json' | 'jsonb';
+export declare type BooleanColumnType = 'bool' | 'boolean';
+export declare type ByteaColumnType = 'bytea';

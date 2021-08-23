@@ -12,27 +12,27 @@ describe('config', () => {
 
   it('should throw if no events or calls were defined', () => {
     expect(() =>
-      validate(({ events: [], calls: [] } as unknown) as IConfig)
+      validate({ events: [], calls: [] } as unknown as IConfig)
     ).to.throw('Nothing to generate')
   })
 
   it('should throw if it cannot locate typedef files', () => {
     expect(() =>
-      validate(({
+      validate({
         events: ['a'],
         calls: ['b'],
         customTypes: { typedefsLoc: 'non-existent' },
-      } as unknown) as IConfig)
+      } as unknown as IConfig)
     ).to.throw('Cannot find type definition')
   })
 
   it('should locate type defintions', () => {
     expect(() =>
-      validate(({
+      validate({
         events: ['a'],
         calls: ['b'],
         customTypes: { typedefsLoc: 'test/fixtures/typedefs.json' },
-      } as unknown) as IConfig)
+      } as unknown as IConfig)
     ).not.to.throw()
   })
 })

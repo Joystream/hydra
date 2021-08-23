@@ -33,7 +33,8 @@ module.exports = {
     "sonarjs/cognitive-complexity": "warn",
     "sonarjs/no-identical-functions": "warn",
     "sonarjs/no-duplicate-string": "warn",
-    "sonarjs/no-collapsible-if": "warn"
+    "sonarjs/no-collapsible-if": "warn",
+    "sonarjs/no-nested-template-literals": "off"
   },
   "overrides": [
     {

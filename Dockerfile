@@ -1,9 +1,7 @@
-FROM node:14-alpine AS node
-FROM hasura/graphql-engine:v2.0.3.cli-migrations-v3 AS hasura-with-migrations
-
-# use those for ARM64
-# FROM fedormelexin/graphql-engine-arm64:v2.0.3.cli-migrations-v3 AS hasura-with-migrations
-# FROM node:14 AS node
+ARG NODE=node:14-alpine
+ARG HASURA=hasura/graphql-engine:v2.0.3.cli-migrations-v3
+FROM ${NODE} AS node
+FROM ${HASURA} AS hasura-with-migrations
 
 
 FROM node AS base
@@ -30,12 +28,10 @@ RUN yarn workspace @subsquid/hydra-common build
 
 ADD packages/hydra-db-utils/tsconfig.json packages/hydra-db-utils/
 ADD packages/hydra-db-utils/src packages/hydra-db-utils/src
-ADD packages/hydra-db-utils/test packages/hydra-db-utils/test
 RUN yarn workspace @subsquid/hydra-db-utils build
 
 ADD packages/hydra-indexer/tsconfig.json packages/hydra-indexer/
 ADD packages/hydra-indexer/src packages/hydra-indexer/src
-ADD packages/hydra-indexer/test packages/hydra-indexer/test
 RUN yarn workspace @subsquid/hydra-indexer build
 
 WORKDIR /hydra/packages/hydra-indexer
@@ -63,10 +59,18 @@ ADD packages/hydra-typegen/bin packages/hydra-typegen/bin
 ADD packages/hydra-cli/package.json packages/hydra-cli/
 ADD packages/hydra-cli/bin packages/hydra-cli/bin
 ADD packages/hydra-e2e-tests/package.json packages/hydra-e2e-tests/
+ADD packages/warthog/package.json packages/warthog/
+ADD packages/warthog/bin packages/warthog/bin
 RUN yarn --frozen-lockfile
 
 
 FROM deps AS test
+ADD packages/warthog/tsconfig.json packages/warthog/
+ADD packages/warthog/src packages/warthog/src
+ADD packages/warthog/typings packages/warthog/typings
+RUN yarn workspace @subsquid/warthog prepack
+RUN rm -r packages/warthog/src packages/warthog/typings
+
 ADD packages/hydra-cli/tsconfig.json packages/hydra-cli/
 ADD packages/hydra-cli/src packages/hydra-cli/src
 ADD packages/hydra-cli/bin packages/hydra-cli/bin
@@ -100,9 +104,8 @@ FROM deps AS e2e-test-runner
 WORKDIR /hydra/packages/hydra-e2e-tests
 ADD packages/hydra-e2e-tests/tsconfig.json .
 ADD packages/hydra-e2e-tests/test test
-ENV PATH ./node_modules/.bin:$PATH
-RUN tsc
-CMD nyc mocha --timeout 70000 --exit --file ./lib/e2e/setup-e2e.js "lib/e2e/**/*.test.js"
+RUN npx tsc
+CMD yarn test
 
 
 FROM hasura-with-migrations AS indexer-gateway

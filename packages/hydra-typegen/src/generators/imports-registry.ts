@@ -11,7 +11,7 @@ const KNOWN_LOCATIONS = {
   types: '@polkadot/types',
   typesTypes: '@polkadot/types/types',
   typesCreate: '@polkadot/types/create',
-  metadata: '@polkadot/metadata',
+  metadata: '@polkadot/types',
   local: '.',
   hydraCommon: '@subsquid/hydra-common',
 }

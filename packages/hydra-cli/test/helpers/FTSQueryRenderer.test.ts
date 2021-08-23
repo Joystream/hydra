@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createModel } from './model'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import { FTSQueryRenderer } from '../../src/generate/FTSQueryRenderer'
 import * as chai from 'chai'
 

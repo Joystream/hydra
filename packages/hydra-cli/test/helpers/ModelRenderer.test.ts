@@ -1,7 +1,7 @@
 import { ModelRenderer } from '../../src/generate/ModelRenderer'
 import { WarthogModel, Field, ObjectType } from '../../src/model'
 import { createModel, fromStringSchema } from './model'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import { expect } from 'chai'
 import Debug from 'debug'
 

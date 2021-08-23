@@ -141,9 +141,11 @@ export function subscribeToProcessorStatus(): void {
     .subscribe({
       next({ data }: unknown) {
         if (data) {
-          processorStatus = (data as {
-            stateSubscription: ProcessorStatus
-          }).stateSubscription
+          processorStatus = (
+            data as {
+              stateSubscription: ProcessorStatus
+            }
+          ).stateSubscription
         }
       },
     })

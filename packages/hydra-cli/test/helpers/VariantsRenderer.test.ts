@@ -2,7 +2,7 @@ import { fromStringSchema } from './model'
 import { expect } from 'chai'
 import { compact as c } from '../../src/generate/utils'
 import { VariantsRenderer } from '../../src/generate/VariantsRenderer'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 
 describe('VariantsRenderer', () => {
   let variantsTemplate: string
@@ -22,11 +22,11 @@ describe('VariantsRenderer', () => {
       father: Poor!
       mother: Poor!
     }
-    
+
     type Miserable @variant {
       hates: String!
     }
-    
+
     type MyEntity @entity {
       status: Poor!
     }`)
@@ -50,13 +50,13 @@ describe('VariantsRenderer', () => {
     enum GeN_ERa_TION {
       BOOMER, ZOOMER, GENEXER
     }
-    
-    union Status = MiddleClass | Rich 
-    
+
+    union Status = MiddleClass | Rich
+
     type Rich @variant {
       bank: String!
     }
-    
+
     type MiddleClass @variant {
       generation: GeN_ERa_TION
     }`)
@@ -130,7 +130,7 @@ describe('VariantsRenderer', () => {
       x: Boolean!
       y: Int
       z: BigInt!
-      u: DateTime! 
+      u: DateTime!
       loves: [String]!
       maybeLoves: [String]
     }`)

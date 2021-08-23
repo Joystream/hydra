@@ -1,8 +1,7 @@
 import { Service, Inject } from 'typedi';
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { WhereInput } from '@subsquid/warthog';
-import { WarthogBaseService } from '../../server/WarthogBaseService';
+import { WhereInput, HydraBaseService } from '@subsquid/warthog';
 
 import { {{className}} } from './{{kebabName}}.model';
 
@@ -18,7 +17,7 @@ import {
 {{/fieldResolverImports}}
 
 @Service('{{className}}Service')
-export class {{className}}Service extends WarthogBaseService<{{className}}> {
+export class {{className}}Service extends HydraBaseService<{{className}}> {
  {{#fieldResolvers}}
     @Inject('{{returnTypeFunc}}Service')
     public readonly {{fieldName}}Service!: {{returnTypeFunc}}Service

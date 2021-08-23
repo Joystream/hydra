@@ -1,5 +1,5 @@
 import { Command, flags } from '@oclif/command'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import * as path from 'path'
 import cli from 'cli-ux'
 import Mustache from 'mustache'
@@ -182,10 +182,19 @@ export default class Scaffold extends Command {
   async dotenvFromFlags(flags: {
     [key: string]: string | boolean | undefined
   }): Promise<string> {
-    const template = await fs.readFile(
-      getTemplatePath('scaffold/.env'),
-      'utf-8'
-    )
+    const template = await new Promise<string>((resolve, reject) => {
+      fs.readFile(
+        getTemplatePath('scaffold/.env'),
+        { encoding: 'utf-8' },
+        (err, content) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(content)
+          }
+        }
+      )
+    })
     return Mustache.render(template, { ...flags, dbName: flags.projectName })
   }
 

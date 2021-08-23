@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 trap 'on_exit $?' EXIT; on_exit() {
     if [ "$1" != "0" ]; then
         echo "## Processor Logs ##"
@@ -18,11 +17,15 @@ trap 'on_exit $?' EXIT; on_exit() {
     docker-compose -f packages/hydra-e2e-tests/docker-compose.yml down
 }
 
+. scripts/base-images.sh
 
-docker-compose -f packages/hydra-e2e-tests/docker-compose.yml up -d --build || exit 1
+docker-compose -f packages/hydra-e2e-tests/docker-compose.yml build \
+    --build-arg NODE="$HYDRA_NODE_BASE" \
+    --build-arg HASURA="$HYDRA_HASURA_BASE" || exit 1
 
+docker-compose -f packages/hydra-e2e-tests/docker-compose.yml up -d || exit 1
 
-RUNNER="$(docker build . --target e2e-test-runner -q)" || exit 1
+RUNNER="$(./scripts/docker-build.sh --target e2e-test-runner -q)" || exit 1
 
 
 wait-until() {

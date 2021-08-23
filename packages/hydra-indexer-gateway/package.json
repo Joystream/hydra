@@ -9,6 +9,6 @@
     "lint": "echo skip"
   },
   "dependencies": {
-    "hasura-cli": "^2.0.2"
+    "hasura-cli": "^2.0.7"
   }
 }

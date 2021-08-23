@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import * as path from 'path'
 import Debug from 'debug'
 import { FieldDefinitionNode } from 'graphql'
@@ -10,7 +10,7 @@ export function createDir(path: string, del = false, recursive = false): void {
     fs.mkdirSync(path, { recursive })
   }
   if (del) {
-    fs.removeSync(path)
+    fs.rmSync(path, { recursive: true })
     fs.mkdirSync(path)
   }
 }
@@ -18,14 +18,6 @@ export function createDir(path: string, del = false, recursive = false): void {
 export function createFile(path: string, content = '', replace = false): void {
   if (!fs.existsSync(path) || replace) {
     fs.writeFileSync(path, content)
-  }
-}
-
-export async function copyFiles(from: string, to: string): Promise<void> {
-  try {
-    await fs.copy(from, to)
-  } catch (err) {
-    console.error(err)
   }
 }
 
@@ -45,22 +37,6 @@ export function resolveHydraCliPkgJson(): Record<string, unknown> {
   const path = require.resolve('@subsquid/hydra-cli/package.json')
 
   return JSON.parse(fs.readFileSync(path, 'utf-8')) as Record<string, unknown>
-}
-
-/**
- * Copies the template to the current directory of the process under the <filename>
- *
- * @param template Template file int templates/<templateName>
- * @param fileName Filename of the file to be created
- */
-export async function copyTemplateToCWD(
-  templateName: string,
-  fileName: string
-): Promise<void> {
-  await fs.copyFile(
-    getTemplatePath(templateName),
-    path.join(process.cwd(), fileName)
-  )
 }
 
 /**

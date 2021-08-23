@@ -1,0 +1,13 @@
+import { ColumnMetadata, ModelMetadata } from '../metadata';
+export declare function getColumnsForModel(model: ModelMetadata): ColumnMetadata[];
+export declare function filenameToImportPath(filename: string): string;
+export declare function generateEnumMapImports(): string[];
+export declare function generateClassImports(): string[];
+export declare function entityToWhereUniqueInput(model: ModelMetadata): string;
+export declare function entityToCreateInput(model: ModelMetadata): string;
+export declare function entityToUpdateInput(model: ModelMetadata): string;
+export declare function entityToUpdateInputArgs(model: ModelMetadata): string;
+export declare function entityToWhereInput(model: ModelMetadata): string;
+export declare function entityToWhereArgs(model: ModelMetadata): string;
+export declare function entityToCreateManyArgs(model: ModelMetadata): string;
+export declare function entityToOrderByEnum(model: ModelMetadata): string;

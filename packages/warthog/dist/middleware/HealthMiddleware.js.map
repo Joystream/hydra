@@ -1,0 +1,1 @@
+{"version":3,"file":"HealthMiddleware.js","sourceRoot":"","sources":["../../src/middleware/HealthMiddleware.ts"],"names":[],"mappings":";;;AAEA,SAAgB,qBAAqB,CAAC,GAAY,EAAE,GAAa;IAC/D,GAAG,CAAC,IAAI,CAAC,EAAE,IAAI,EAAE,OAAO,EAAE,CAAC,CAAC;IAC5B,OAAO,OAAO,CAAC,OAAO,EAAE,CAAC;AAC3B,CAAC;AAHD,sDAGC"}

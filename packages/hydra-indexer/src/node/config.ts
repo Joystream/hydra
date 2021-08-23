@@ -171,8 +171,7 @@ export function configure(): void {
       // Number of time the worker tries to fetch a block
       BLOCK_PRODUCER_FETCH_RETRIES: num({
         default: 3,
-        desc:
-          'Number of times a worker retries to fetch a block before giving up',
+        desc: 'Number of times a worker retries to fetch a block before giving up',
       }),
 
       // Timeout (in milliseconds) for each API call
@@ -183,8 +182,7 @@ export function configure(): void {
       // Number of times an API call is retried before giving up and throwing and error
       SUBSTRATE_API_CALL_RETRIES: num({
         default: 5,
-        desc:
-          'Number of times an API call is retried before giving up and throwing and error',
+        desc: 'Number of times an API call is retried before giving up and throwing and error',
       }),
 
       // If the block producer does not recieve a new block within this time limit,

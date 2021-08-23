@@ -19,8 +19,10 @@ dotenv.config({ path: './test/.env' })
 const debug = Debug('index-builder:status-service-test')
 const FINAL_CHAIN_HEIGHT = 7
 
-class MockBlockProducer extends EventEmitter
-  implements IBlockProducer<QueryEventBlock> {
+class MockBlockProducer
+  extends EventEmitter
+  implements IBlockProducer<QueryEventBlock>
+{
   private height = 0
 
   async fetchBlock(height: number): Promise<QueryEventBlock> {
@@ -104,9 +106,8 @@ describe('IndexerStatusService', () => {
     )
     await sleep(300)
 
-    const redisClient = Container.get<RedisClientFactory>(
-      'RedisClientFactory'
-    ).getClient()
+    const redisClient =
+      Container.get<RedisClientFactory>('RedisClientFactory').getClient()
     const totalEventsVal = (await redisClient.hget(EVENT_TOTAL, 'ALL')) || '0'
     const totalEvents = Number.parseInt(totalEventsVal)
     // we start with heigh 0, so FINAL_CHAIN_HEIGHT + 1 blocks in total
