@@ -13,8 +13,7 @@
     "types": [ "node", "mocha" ]
   },
   "include": [
-    "src",
-    "test"
+    "src"
   ],
   "exclude": [
     "src/templates",
