@@ -1,6 +1,6 @@
 {
   "name": "@subsquid/hydra-db-utils",
-  "version": "4.1.0-alpha.1",
+  "version": "4.1.0-alpha.2",
   "description": "Hydra Database tools",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,7 +18,7 @@
     "prepack": "yarn build"
   },
   "dependencies": {
-    "@subsquid/hydra-common": "^4.1.0-alpha.1",
+    "@subsquid/hydra-common": "^4.1.0-alpha.2",
     "@types/ioredis": "^4.26.7",
     "bn.js": "^4.12.0",
     "ioredis": "^4.27.8",
