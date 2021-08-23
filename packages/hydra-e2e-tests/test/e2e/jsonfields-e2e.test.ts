@@ -1,20 +1,10 @@
-import pWaitFor from 'p-wait-for'
 import { expect } from 'chai'
-
 import { SystemEvent } from './api/types'
 import { TYPED_JSONFIELD_FILTERING } from './api/graphql-queries'
-import { getGQLClient, getProcessorStatus } from './api/processor-api'
+import { getGQLClient, waitForProcessing } from './api/processor-api'
 
 describe('end-to-end jsonfields tests', () => {
-  before(async () => {
-    // wait until the indexer indexes the block and the processor picks it up
-    await pWaitFor(
-      async () => {
-        return (await getProcessorStatus()).lastCompleteBlock > 0
-      },
-      { interval: 50 }
-    )
-  })
+  before(() => waitForProcessing())
 
   it('fetch typed json types', async () => {
     const { systemEvents } = await getGQLClient().request<{

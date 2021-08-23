@@ -8,6 +8,7 @@ import {
   getProcessorStatus,
   accountByOutgoingTxValue,
   getGQLClient,
+  waitForProcessing,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
 import pWaitFor from 'p-wait-for'
@@ -40,15 +41,8 @@ describe('end-to-end transfer tests', () => {
     console.log(
       `Transfer of ${txAmount2} schmeks done at height ${blockHeight}`
     )
-    // wait until the indexer indexes the block and the processor picks it up
-    await pWaitFor(
-      async () => {
-        return (
-          (await getProcessorStatus()).lastCompleteBlock > blockHeight.valueOf()
-        )
-      },
-      { interval: 50 }
-    )
+
+    await waitForProcessing(blockHeight.valueOf())
     console.log(`The processor processed block ${blockHeight}`)
   })
 

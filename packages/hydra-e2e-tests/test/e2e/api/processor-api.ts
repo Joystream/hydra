@@ -181,3 +181,14 @@ export async function fetchTypedJsonFields(
   }>(query)
   return systemEvents
 }
+
+/**
+ * Wait until the indexer indexes the block and the processor picks it up
+ */
+export function waitForProcessing(nBlocks = 0): Promise<void> {
+  return pWaitFor(
+    () =>
+      getProcessorStatus().then((status) => status.lastCompleteBlock > nBlocks),
+    { interval: 50 }
+  )
+}

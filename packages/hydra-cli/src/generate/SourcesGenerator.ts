@@ -25,7 +25,7 @@ export interface GeneratorContext {
 }
 
 export class SourcesGenerator {
-  dryRun = false
+  dryRun: boolean
 
   constructor(
     public readonly outDir: string,
@@ -35,6 +35,9 @@ export class SourcesGenerator {
   }
 
   generate(): void {
+    if (!this.dryRun) {
+      this.mkdir('generated', true)
+    }
     this.generateEnums()
     this.generateVariants()
     this.generateModels()

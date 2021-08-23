@@ -1,22 +1,13 @@
-import pWaitFor from 'p-wait-for'
 import { expect } from 'chai'
 import {
   getGQLClient,
-  getProcessorStatus,
   queryInterfacesByEnum,
+  waitForProcessing,
 } from './api/processor-api'
 import { EVENT_INTERFACE_QUERY } from './api/graphql-queries'
 
 describe('end-to-end interfaces tests', () => {
-  before(async () => {
-    // wait until the indexer indexes the block and the processor picks it up
-    await pWaitFor(
-      async () => {
-        return (await getProcessorStatus()).lastCompleteBlock > 0
-      },
-      { interval: 50 }
-    )
-  })
+  before(waitForProcessing)
 
   it('executes a flat interface query with fragments', async () => {
     const result = await getGQLClient().request<{

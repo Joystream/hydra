@@ -16,7 +16,10 @@ const options: ConnectionOptions = {
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   migrations: ['db/migrations/*.ts'],
-  entities: ['generated/modules/**/*.model.ts'],
+  entities: [
+    'generated/modules/**/*.model.ts',
+    'server-extension/**/*.model.ts',
+  ],
   namingStrategy: new CustomNamingStrategy(),
   cli: {
     migrationsDir: 'db/migrations',

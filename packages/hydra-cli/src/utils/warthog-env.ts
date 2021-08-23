@@ -3,9 +3,10 @@ export function getWarthogEnv(): any {
   return {
     WARTHOG_MODULE_IMPORT_PATH: '@subsquid/warthog',
     WARTHOG_GENERATED_FOLDER: 'generated/warthog',
-    WARTHOG_DB_ENTITIES: 'generated/modules/**/*.model.ts',
+    WARTHOG_DB_ENTITIES:
+      'generated/modules/**/*.model.ts,server-extension/**/*.model.ts',
     WARTHOG_RESOLVERS_PATH:
-      'generated/modules/**/*.resolver.ts,generated/server/**/*.resolver.ts',
+      'generated/modules/**/*.resolver.ts,generated/server/**/*.resolver.ts,server-extension/**/*.resolver.ts',
     WARTHOG_DB_MIGRATIONS: 'db/migrations/*.ts',
     WARTHOG_DB_MIGRATIONS_DIR: 'db/migrations',
     WARTHOG_DB_DATABASE: env.DB_NAME || 'none',
