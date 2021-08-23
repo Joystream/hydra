@@ -104,7 +104,6 @@ FROM deps AS e2e-test-runner
 WORKDIR /hydra/packages/hydra-e2e-tests
 ADD packages/hydra-e2e-tests/tsconfig.json .
 ADD packages/hydra-e2e-tests/test test
-RUN npx tsc
 CMD yarn test
 
 
