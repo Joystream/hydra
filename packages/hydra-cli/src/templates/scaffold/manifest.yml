@@ -3,13 +3,6 @@ description: Test manifest
 repository: https://github.com/
 hydraVersion: "4"
 
-dataSource:
-  kind: substrate
-  chain: node-template
-
-entities:
-  - generated/modules/**/*.model.ts
-
 typegen:
   metadata:
     source: wss://rpc.polkadot.io
@@ -19,8 +12,6 @@ typegen:
 
 mappings:
   mappingsModule: mappings
-  imports:
-    - generated/server/config # configure the processor environment (this is required)
   eventHandlers:
     - event: balances.Transfer
       handler: balancesTransfer

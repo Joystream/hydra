@@ -15,7 +15,12 @@ const config: () => ConnectionOptions = () => {
     username: process.env.TYPEORM_USERNAME || process.env.DB_USER,
     password: process.env.TYPEORM_PASSWORD || process.env.DB_PASS,
     database: process.env.TYPEORM_DATABASE || process.env.DB_NAME,
-    entities: [ProcessedEventsLogEntity, process.env.TYPEORM_ENTITIES],
+    entities: [
+      ProcessedEventsLogEntity,
+      process.env.TYPEORM_ENTITIES,
+      'generated/modules/**/*.model.ts',
+      'server-extension/**/*.model.ts',
+    ],
     migrations: [`${__dirname}/../**/migrations/*.{ts,js}`],
     cli: {
       migrationsDir: 'migrations',

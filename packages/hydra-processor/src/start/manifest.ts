@@ -23,11 +23,6 @@ const manifestValidatorOptions = {
     'repository?': 'string',
     hydraVersion: 'string',
     'indexerVersionRange?': 'string?',
-    dataSource: {
-      kind: 'string',
-      chain: 'string',
-    },
-    entities: ['string'],
     mappings: {
       mappingsModule: 'string',
       'imports?': ['string'],
@@ -78,12 +73,6 @@ const manifestValidatorOptions = {
   onWarning: function (error: unknown, filepath: unknown) {
     throw new Error(`${filepath} has error: ${JSON.stringify(error)}`)
   },
-}
-
-export interface DataSource {
-  kind: string
-  chain: string
-  indexerVersion: string
 }
 
 interface HandlerInput {
@@ -152,10 +141,8 @@ export interface ProcessorManifest {
   version: string
   hydraVersion: string
   indexerVersionRange: string
-  entities: string[]
   description?: string
   repository?: string
-  dataSource: DataSource
   mappings: MappingsDef
 }
 
@@ -172,16 +159,14 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
   }
   const parsed = YAML.parse(fs.readFileSync(manifestLoc, 'utf8')) as {
     version: string
-    entities: string[]
     hydraVersion: string
     indexerVersionRange?: string
     description?: string
     repository?: string
-    dataSource: DataSource
     mappings: MappingsDefInput
   }
 
-  const { mappings, entities, hydraVersion } = parsed
+  const { mappings, hydraVersion } = parsed
   const indexerVersionRange = parsed.indexerVersionRange || parsed.hydraVersion
   if (!semver.validRange(indexerVersionRange)) {
     throw new Error(
@@ -194,7 +179,6 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
   return {
     ...parsed,
     indexerVersionRange,
-    entities: entities.map((e) => path.resolve(e.trim())),
     mappings: buildMappingsDef(mappings),
   }
 }
