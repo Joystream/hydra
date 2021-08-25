@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.0-alpha.4 (2021-08-25)
+
+
+### Bug Fixes
+
+* support connection queries with where conditions on relations ([#83](https://github.com/subsquid/hydra/issues/83)) ([06fd25a](https://github.com/subsquid/hydra/commit/06fd25aafc8e09e926e19502877a0c283138a6fd))
+
+
+
 ## 4.1.0-alpha.3 (2021-08-23)
 
 **Note:** Version bump only for package @subsquid/hydra-processor
