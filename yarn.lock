@@ -2235,7 +2235,7 @@
   dependencies:
     graphql "^14.5.3"
 
-"@types/graphql-iso-date@3.3.3", "@types/graphql-iso-date@^3.3.3":
+"@types/graphql-iso-date@3.3.3":
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/@types/graphql-iso-date/-/graphql-iso-date-3.3.3.tgz#a368aa7370512a9cc87a5035c3701949ed7db9e2"
   integrity sha512-lchvlAox/yqk2Rcrgqh+uvwc1UC9i1hap+0tqQqyYYcAica6Uw2D4mUkCNcw+WeZ8dvSS5QdtIlJuDYUf4nLXQ==
@@ -2405,7 +2405,7 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.20.tgz#ce3d6c13c15c5e622a85efcd3a1cb2d9c7fa43a6"
   integrity sha512-kqmxiJg4AT7rsSPIhO6eoBIx9mNwwpeH42yjtgQh6X2ANSpLpvToMXv+LMFdfxpwG1FZXZ41OGZMiUAtbBLEvg==
 
-"@types/node@^14.14.31", "@types/node@^14.17.11":
+"@types/node@^14.17.11":
   version "14.17.11"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.17.11.tgz#82d266d657aec5ff01ca59f2ffaff1bb43f7bf0f"
   integrity sha512-n2OQ+0Bz6WEsUjrvcHD1xZ8K+Kgo4cn9/w94s1bJS690QMUWfJPW/m7CCb7gPkA1fcYwL2UpjXP/rq/Eo41m6w==
@@ -6709,11 +6709,6 @@ graphql-import@^0.7.1:
     lodash "^4.17.4"
     resolve-from "^4.0.0"
 
-graphql-iso-date@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.6.1.tgz#bd2d0dc886e0f954cbbbc496bbf1d480b57ffa96"
-  integrity sha512-AwFGIuYMJQXOEAgRlJlFL4H1ncFM8n8XmoVDTNypNOZyQ8LFDG2ppMFlsS862BSTCDcSUfHp8PD3/uJhv7t59Q==
-
 graphql-language-service-interface@^2.3.3, graphql-language-service-interface@^2.4.3:
   version "2.8.4"
   resolved "https://registry.yarnpkg.com/graphql-language-service-interface/-/graphql-language-service-interface-2.8.4.tgz#3ff31754e9b295b1abc26b97d286c00835aacff0"
@@ -10021,10 +10016,24 @@ pg-connection-string@^2.4.0, pg-connection-string@^2.5.0:
   resolved "https://registry.yarnpkg.com/pg-connection-string/-/pg-connection-string-2.5.0.tgz#538cadd0f7e603fc09a12590f3b8a452c2c0cf34"
   integrity sha512-r5o/V/ORTA6TmUnyWZR9nCj1klXCO2CEKNRlVuJptZe85QuhFayC7WeMic7ndayT5IRIR0S0xFxFi2ousartlQ==
 
+pg-format@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/pg-format/-/pg-format-1.0.4.tgz#27734236c2ad3f4e5064915a59334e20040a828e"
+  integrity sha1-J3NCNsKtP05QZJFaWTNOIAQKgo4=
+
 pg-int8@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/pg-int8/-/pg-int8-1.0.1.tgz#943bd463bf5b71b4170115f80f8efc9a0c0eb78c"
   integrity sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==
+
+pg-listen@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/pg-listen/-/pg-listen-1.7.0.tgz#5a5c68a1cabf88d2b78ed9cf133667f597d3b860"
+  integrity sha512-MKDwKLm4ryhy7iq1yw1K1MvUzBdTkaT16HZToddX9QaT8XSdt3Kins5mYH6DLECGFzFWG09VdXvWOIYogjXrsg==
+  dependencies:
+    debug "^4.1.1"
+    pg-format "^1.0.4"
+    typed-emitter "^0.1.0"
 
 pg-pool@^3.4.1:
   version "3.4.1"
@@ -12432,6 +12441,11 @@ type@^2.0.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/type/-/type-2.5.0.tgz#0a2e78c2e77907b252abe5f298c1b01c63f0db3d"
   integrity sha512-180WMDQaIMm3+7hGXWf12GtdniDEy7nYcyFMKJn/eZz/6tSLXrUN9V0wKSbMjej0I1WHWbpREDEKHtqPQa9NNw==
+
+typed-emitter@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/typed-emitter/-/typed-emitter-0.1.0.tgz#ca532f100ccbf850e3a73b8ebf43d43e4f1f3849"
+  integrity sha512-Tfay0l6gJMP5rkil8CzGbLthukn+9BN/VXWcABVFPjOoelJ+koW8BuPZYk+h/L+lEeIp1fSzVRiWRPIjKVjPdg==
 
 typedarray-to-buffer@^3.1.5:
   version "3.1.5"

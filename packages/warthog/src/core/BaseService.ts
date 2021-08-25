@@ -9,7 +9,6 @@ import {
   SelectQueryBuilder,
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
-import { isArray } from 'util';
 import { debug } from '../decorators';
 import { StandardDeleteResponse } from '../tgql';
 import { addQueryBuilderWhereItem } from '../torm';

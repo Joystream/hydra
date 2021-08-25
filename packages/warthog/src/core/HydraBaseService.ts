@@ -1,8 +1,16 @@
 import { Brackets, SelectQueryBuilder } from 'typeorm';
 import { BaseModel } from './BaseModel';
-import { BaseService, LimitOffset } from './BaseService';
+import { BaseOptions, BaseService, LimitOffset, PaginationOptions, RelayPageOptionsInput } from './BaseService';
 import { WhereInput } from './types';
 import { addQueryBuilderWhereItem } from '../torm';
+import {
+  ConnectionResult,
+  RelayFirstAfter,
+  RelayLastBefore,
+  RelayPageOptions,
+  RelayService,
+} from './RelayService';
+import { ConnectionInputFields } from './GraphQLInfoService';
 
 type WhereExpression = {
   AND?: WhereExpression[];
@@ -167,6 +175,93 @@ export class HydraBaseService<E extends BaseModel> extends BaseService<E> {
 
     return qb;
   }
+
+  buildFindWithRelationsQuery<W extends WhereInput>(
+		_where?: any,
+		orderBy?: string | string[],
+		limit?: number,
+		offset?: number,
+		fields?: string[]
+  ): SelectQueryBuilder<E> {
+    throw new Error('Not implemented')
+  }
+
+  async findConnection<W extends WhereInput>(
+    whereUserInput: any = {}, // V3: WhereExpression = {},
+    orderBy?: string | string[],
+    _pageOptions: RelayPageOptionsInput = {},
+    fields?: ConnectionInputFields,
+    options?: BaseOptions
+  ): Promise<ConnectionResult<E>> {
+    if (options) {
+      throw new Error('base options are not supported')
+    }
+
+    // TODO: if the orderby items aren't included in `fields`, should we automatically include?
+    // TODO: FEATURE - make the default limit configurable
+    const DEFAULT_LIMIT = 50;
+    const { first, after, last, before } = _pageOptions;
+
+    let relayPageOptions;
+    let limit;
+    let cursor;
+    if (isLastBefore(_pageOptions)) {
+      limit = last || DEFAULT_LIMIT;
+      cursor = before;
+      relayPageOptions = {
+        last: limit,
+        before,
+      } as RelayLastBefore;
+    } else {
+      limit = first || DEFAULT_LIMIT;
+      cursor = after;
+      relayPageOptions = {
+        first: limit,
+        after,
+      } as RelayFirstAfter;
+    }
+
+    const requestedFields = this.graphQLInfoService.connectionOptions(fields);
+    const sorts = this.relayService.normalizeSort(orderBy);
+    let whereFromCursor = {};
+    if (cursor) {
+      whereFromCursor = this.relayService.getFilters(orderBy, relayPageOptions);
+    }
+
+    const whereCombined: any = Object.keys(whereFromCursor).length > 0
+      ? { AND: [whereUserInput, whereFromCursor] }
+      : whereUserInput;
+
+    const qb = this.buildFindWithRelationsQuery<W>(
+      whereCombined,
+      this.relayService.effectiveOrderStrings(sorts, relayPageOptions),
+      limit + 1,
+      undefined,
+      requestedFields.selectFields,
+    );
+
+    let totalCountOption = {};
+    if (requestedFields.totalCount) {
+      // We need to get total count without applying limit. totalCount should return same result for the same where input
+      // no matter which relay option is applied (after, after)
+      totalCountOption = { totalCount: await this.buildFindWithRelationsQuery<W>(whereUserInput).getCount() };
+    }
+    const rawData = await qb.getMany();
+
+    // If we got the n+1 that we requested, pluck the last item off
+    const returnData = rawData.length > limit ? rawData.slice(0, limit) : rawData;
+
+    return {
+      ...totalCountOption,
+      edges: returnData.map((item: E) => {
+        return {
+          node: item,
+          cursor: this.relayService.encodeCursor(item, sorts),
+        };
+      }),
+      pageInfo: this.relayService.getPageInfo(rawData, sorts, relayPageOptions),
+    };
+  }
 }
 
 export function addOrderBy<T>(
@@ -217,4 +312,10 @@ export function orderByFields(orderBy: string | string[] | undefined): string[] 
     orderBy = [orderBy as unknown as string];
   }
   return orderBy.map((o) => o.toString().split('_')[0]);
+}
+
+function isLastBefore(
+  pageType: PaginationOptions | RelayPageOptionsInput
+): pageType is RelayLastBefore {
+  return (pageType as RelayLastBefore).last !== undefined;
 }

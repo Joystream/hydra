@@ -434,7 +434,7 @@ export function entityToWhereInput(model: ModelMetadata): string {
       }
 
       if (allowFilter('gt')) {
-        fieldTemplates += `   
+        fieldTemplates += `
           @TypeGraphQLField(() => ${graphQLDataType}, { nullable: true })
           ${column.propertyName}_gt?: ${tsType};
         `;
