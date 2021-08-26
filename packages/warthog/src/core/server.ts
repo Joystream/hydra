@@ -13,20 +13,16 @@ import { Server as HttpsServer } from 'https'; // eslint-disable-line @typescrip
 import { AuthChecker, buildSchema } from 'type-graphql'; // formatArgumentValidationError
 import { Container } from 'typedi';
 import { Connection, ConnectionOptions, useContainer as TypeORMUseContainer } from 'typeorm';
-// import { IQueryTemplate } from '@apollographql/graphql-playground-react';
-
 import { logger, Logger } from '../core/logger';
 import { getRemoteBinding } from '../gql';
 import { DataLoaderMiddleware, healthCheckMiddleware } from '../middleware';
 import { createDBConnection } from '../torm';
-
 import { CodeGenerator } from './code-generator';
 import { Config } from './config';
-
 import { BaseContext } from './Context';
-
 import * as Debug from 'debug';
 import * as path from 'path';
+import * as fs from 'fs';
 const open = require('open');
 
 const debug = Debug('warthog:server');
@@ -235,24 +231,6 @@ export class Server<C extends BaseContext> {
       });
 
     debug('start:ApolloServerAllocation:start');
-    // See all options here: https://github.com/apollographql/apollo-server/blob/9ffb4a847e1503ea2ab1f3fcd47837daacf40870/packages/apollo-server-core/src/types.ts#L69
-    const playgroundAssetsUrl = '/@apollographql/graphql-playground-react/build';
-    const playgroundOption =
-      this.config.get('PLAYGROUND') === 'true'
-        ? {
-            playground: {
-              // this makes playground files to be served locally
-              version: this.appOptions.playgroundConfig?.version || '',
-              cdnUrl: this.appOptions.playgroundConfig?.cdnUrl || '',
-
-              // pass custom query templates to playground
-              // queryTemplates: this.appOptions.playgroundConfig?.queryTemplates || []
-            },
-          }
-        : {};
-    const introspectionOption =
-      this.config.get('INTROSPECTION') === 'true' ? { introspection: true } : {};
-
     this.graphQLServer = new ApolloServer({
       context: async (options: { req: Request }) => {
         const consumerCtx = await contextGetter(options.req);
@@ -268,8 +246,8 @@ export class Server<C extends BaseContext> {
           ...consumerCtx,
         };
       },
-      ...playgroundOption,
-      ...introspectionOption,
+      introspection: this.config.get('INTROSPECTION') === 'true',
+      playground: false,
       schema: this.schema,
       ...this.apolloConfig,
     });
@@ -278,11 +256,7 @@ export class Server<C extends BaseContext> {
 
     this.expressApp.use('/health', healthCheckMiddleware);
 
-    // serve static files for GraphQL Playground
-    const pathToPlaygroundAssets =
-      path.dirname(require.resolve('@apollographql/graphql-playground-react/package.json')) +
-      '/build';
-    this.expressApp.use(playgroundAssetsUrl, express.static(pathToPlaygroundAssets));
+    this.useGraphiqlConsole()
 
     if (this.appOptions.onBeforeGraphQLMiddleware) {
       this.appOptions.onBeforeGraphQLMiddleware(this.expressApp);
@@ -317,6 +291,29 @@ export class Server<C extends BaseContext> {
 
     debug('start:end');
     return this;
+  }
+
+  private useGraphiqlConsole() {
+    const assets = path.join(
+      require.resolve('@subsquid/graphiql-console/package.json'),
+      '../build'
+    )
+
+    const indexHtml = fs.readFileSync(path.join(assets, 'index.html'), 'utf-8')
+      .replace(/\/static\//g, 'console/static/')
+      .replace('/manifest.json', 'console/manifest.json')
+      .replace('${GRAPHQL_API}', 'graphql')
+      .replace('${APP_TITLE}', 'Query node playground')
+
+    this.expressApp.use('/console', express.static(assets))
+
+    this.expressApp.use('/graphql', (req, res, next) => {
+      if (req.path != '/') return next()
+      if (req.method != 'GET' && req.method != 'HEAD') return next()
+      res.vary('Accept')
+      if (!req.accepts('html')) return next()
+      res.type('html').send(indexHtml)
+    })
   }
 
   async stop() {

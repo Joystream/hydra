@@ -18,7 +18,7 @@ trap 'on_exit $?' EXIT; on_exit() {
 }
 
 
-./scripts/e2e-setup.sh -d || exit 1
+./scripts/e2e-up.sh -d || exit 1
 RUNNER="$(./scripts/docker-build.sh --target e2e-test-runner -q)" || exit 1
 
 
