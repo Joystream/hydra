@@ -12,6 +12,7 @@ import { IndexerStatus } from '../state'
 import { quotedJoin } from '../util/utils'
 import { IProcessorSource } from './'
 import { IndexerQuery } from './IProcessorSource'
+import pRetry from 'p-retry'
 
 const debug = Debug('hydra-processor:graphql-source')
 
@@ -177,7 +178,16 @@ export class GraphQLSource implements IProcessorSource {
       }
     >
   ): Promise<T> {
-    const raw = await this.graphClient.request<T>(query)
+    const raw = await pRetry(() => this.graphClient.request<T>(query), {
+      retries: conf().INDEXER_CALL_RETRIES,
+      onFailedAttempt: (i) =>
+        debug(
+          `Failed to connect to the indexer endpoint "${
+            conf().INDEXER_ENDPOINT_URL
+          }" after ${i.attemptNumber} attempts. Retries left: ${i.retriesLeft}`
+        ),
+    })
+
     return JSON.parse(JSON.stringify(raw), (k, v) => {
       if (revive[k as keyof K] === 'BigInt' && typeof v === 'string') {
         return BigInt(v)

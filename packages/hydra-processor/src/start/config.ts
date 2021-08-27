@@ -44,6 +44,9 @@ let conf: {
   EVENT_QUEUE_MAX_CAPACITY: number
 
   BLOCK_CACHE_CAPACITY: number
+
+  // number of attempts to reconnect to the indexer before giving up
+  INDEXER_CALL_RETRIES: number
 }
 
 export function configure(): void {
@@ -64,6 +67,7 @@ export function configure(): void {
     QUEUE_FACTOR: num({ default: 2 }),
     QUEUE_MAX_CAP_FACTOR: num({ default: 5 }),
     BLOCK_CACHE_CAPACITY: num({ default: 10000 }),
+    INDEXER_CALL_RETRIES: num({ default: 10 }), // the default of the retry module
   })
   conf = {
     ...envConf,
