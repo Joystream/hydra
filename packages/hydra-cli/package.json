@@ -52,7 +52,6 @@
     "@oclif/plugin-help": "^2",
     "@oclif/plugin-plugins": "^1.10.1",
     "@subsquid/warthog": "^4.1.0-alpha.4",
-    "@types/chalk": "^2.2.0",
     "@types/copyfiles": "^2.4.1",
     "@types/fs-extra": "^8.1.2",
     "@types/graphql": "^14.5.0",
