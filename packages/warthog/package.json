@@ -30,8 +30,7 @@
     "README.md"
   ],
   "scripts": {
-    "check:code": "tsc --noEmit && yarn lint",
-    "lint": "echo skip",
+    "check:code": "tsc --noEmit",
     "prepack": "rm -rf ./dist && tsc && copyfiles -u 1 src/cli/**/*.ejs dist/"
   },
   "prettier": {

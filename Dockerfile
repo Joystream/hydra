@@ -96,7 +96,6 @@ ADD packages/hydra-processor/tsconfig.json packages/hydra-processor/
 ADD packages/hydra-processor/src packages/hydra-processor/src
 RUN yarn workspace @subsquid/hydra-processor prepack
 RUN rm -r packages/hydra-processor/src
-
 WORKDIR /hydra/packages/hydra-test
 
 

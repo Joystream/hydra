@@ -14,7 +14,6 @@
     ]
   },
   "scripts": {
-    "lint": "yarn workspaces run lint",
     "postinstall": "is-ci || husky install"
   },
   "devDependencies": {

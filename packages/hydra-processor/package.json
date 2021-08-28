@@ -32,7 +32,6 @@
     "postpack": "rm -f oclif.manifest.json",
     "test-build": "rm -rf test-lib && tsc --build ./test/tsconfig.json",
     "prepack": "yarn build && oclif-dev manifest",
-    "lint": "eslint . --cache --ext .ts",
     "test": "INDEXER_ENDPOINT_URL=http://fake/endpoint nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
   },
   "dependencies": {

@@ -1,13 +1,12 @@
 export function getWarthogEnv(): any {
   const env = process.env
+  const ext = env.HYDRA_NO_TS === 'true' ? 'js' : 'ts'
   return {
     WARTHOG_MODULE_IMPORT_PATH: '@subsquid/warthog',
     WARTHOG_GENERATED_FOLDER: 'generated/warthog',
-    WARTHOG_DB_ENTITIES:
-      'generated/modules/**/*.model.ts,server-extension/**/*.model.ts',
-    WARTHOG_RESOLVERS_PATH:
-      'generated/modules/**/*.resolver.ts,generated/server/**/*.resolver.ts,server-extension/**/*.resolver.ts',
-    WARTHOG_DB_MIGRATIONS: 'db/migrations/*.ts',
+    WARTHOG_DB_ENTITIES: `generated/modules/**/*.model.${ext},server-extension/**/*.model.${ext}`,
+    WARTHOG_RESOLVERS_PATH: `generated/modules/**/*.resolver.${ext},generated/server/**/*.resolver.${ext},server-extension/**/*.resolver.${ext}`,
+    WARTHOG_DB_MIGRATIONS: `db/migrations/*.${ext}`,
     WARTHOG_DB_MIGRATIONS_DIR: 'db/migrations',
     WARTHOG_DB_DATABASE: env.DB_NAME || 'none',
     WARTHOG_DB_USERNAME: env.DB_USER || 'none',

@@ -5,6 +5,7 @@ import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 const config: () => ConnectionOptions = () => {
   // ugly, but we need to set the warthog envs, otherwise it fails
   setWarthogEnvs()
+  const ext = process.env.HYDRA_NO_TS === 'true' ? 'js' : 'ts'
   return {
     type: 'postgres',
     host: process.env.TYPEORM_HOST || process.env.DB_HOST,
@@ -18,8 +19,8 @@ const config: () => ConnectionOptions = () => {
     entities: [
       ProcessedEventsLogEntity,
       process.env.TYPEORM_ENTITIES,
-      'generated/modules/**/*.model.ts',
-      'server-extension/**/*.model.ts',
+      `generated/modules/**/*.model.${ext}`,
+      `server-extension/**/*.model.${ext}`,
     ],
     migrations: [`${__dirname}/../**/migrations/*.{ts,js}`],
     cli: {

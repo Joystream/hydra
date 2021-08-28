@@ -38,7 +38,6 @@
   "scripts": {
     "build": "rm -rf lib && tsc --build tsconfig.json",
     "postpack": "rm -f oclif.manifest.json",
-    "lint": "eslint . --cache --ext .ts",
     "prepack": "rm -rf lib && tsc -b && cp -LR ./src/templates ./lib/templates && oclif-dev manifest",
     "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },

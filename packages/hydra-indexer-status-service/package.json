@@ -6,8 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/app.js",
-    "lint": "eslint './+(src|test|tools)/**/*.{js,ts}'"
+    "start": "node dist/app.js"
   },
   "dependencies": {
     "express": "^4.17.1",

@@ -8,6 +8,8 @@ class CustomNamingStrategy extends SnakeNamingStrategy {
   }
 }
 
+const ext = process.env.HYDRA_NO_TS === 'true' ? 'js' : 'ts'
+
 const options: ConnectionOptions = {
   type: 'postgres',
   host: process.env.DB_HOST,
@@ -15,10 +17,10 @@ const options: ConnectionOptions = {
   database: process.env.DB_NAME,
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
-  migrations: ['db/migrations/*.ts'],
+  migrations: [`db/migrations/*.${ext}`],
   entities: [
-    'generated/modules/**/*.model.ts',
-    'server-extension/**/*.model.ts',
+    `generated/modules/**/*.model.${ext}`,
+    `server-extension/**/*.model.${ext}`,
   ],
   namingStrategy: new CustomNamingStrategy(),
   cli: {

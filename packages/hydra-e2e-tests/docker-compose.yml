@@ -45,9 +45,10 @@ services:
       sh -c "yarn typegen && \
              yarn db:create && \
              npx hydra-cli db:create-migration Initial && \
-             yarn db:migrate && \
-             yarn processor:migrate && \
-             yarn processor:start"
+             /hydra/node_modules/.bin/tsc && \
+             HYDRA_NO_TS=true yarn db:migrate && \
+             HYDRA_NO_TS=true yarn processor:migrate && \
+             HYDRA_NO_TS=true yarn processor:start"
 
   hydra-indexer:
     build:

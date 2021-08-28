@@ -21,9 +21,6 @@ export async function warthogexec(cmd: string[]): Promise<boolean> {
     if (result.stderr) {
       console.error(result.stderr)
     }
-    // seems like sometimes there are nasty messages from typescript compiler,
-    // but every thing in fact is fine
-    // So we redirect no messages in case of 0 exit code
     return true
   }
 }

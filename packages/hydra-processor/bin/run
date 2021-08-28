@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-try {
+if (process.env.HYDRA_NO_TS != 'true') {
   require('ts-node/register')
-} catch(e) {
-  // ignore
 }
 
 require('@oclif/command').run()

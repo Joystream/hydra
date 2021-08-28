@@ -11,11 +11,13 @@ function getConfig(): string {
 }
 
 export async function ormexec(cmd: string[]): Promise<boolean> {
+  const tsOptions =
+    process.env.HYDRA_NO_TS === 'true' ? [] : ['--require', 'ts-node/register']
+
   const proc = execa(
     'node',
     [
-      '--require',
-      'ts-node/register',
+      ...tsOptions,
       require.resolve('typeorm/cli.js'),
       ...cmd,
       '--config',

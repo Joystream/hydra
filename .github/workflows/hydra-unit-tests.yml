@@ -19,7 +19,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: lint
-        run: yarn workspaces run lint
+        run: ./scripts/lint.sh
 
       - name: run unit tests
         run: ./scripts/test.sh

@@ -6,7 +6,6 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
     "test": "nyc --extension .ts mocha --timeout 70000 --require ts-node/register --exit --file ./test/e2e/setup-e2e.ts \"test/e2e/**/*.test.ts\""
   },
   "dependencies": {
