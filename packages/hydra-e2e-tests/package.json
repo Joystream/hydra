@@ -9,7 +9,7 @@
     "test": "nyc --extension .ts mocha --timeout 70000 --require ts-node/register --exit --file ./test/e2e/setup-e2e.ts \"test/e2e/**/*.test.ts\""
   },
   "dependencies": {
-    "@polkadot/api": "^5.5.2",
+    "@polkadot/api": "^5.6.1",
     "fetch": "^1.1.0",
     "graphql-request": "^3.5.0",
     "graphql-subscriptions-client": "^0.16.0",
