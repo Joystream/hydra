@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.0-alpha.5 (2021-08-28)
+
+
+### Features
+
+* bump polkadot ([#91](https://github.com/subsquid/hydra/issues/91)) ([1c5afe0](https://github.com/subsquid/hydra/commit/1c5afe02587f2224064bf4943602eb9cf3cbf217))
+
+
+
 ## 4.1.0-alpha.4 (2021-08-25)
 
 
