@@ -33,6 +33,7 @@ let conf: {
   NEW_BLOCK_TIMEOUT_MS: number
   HEADER_CACHE_CAPACITY: number
   FINALITY_THRESHOLD: number
+  EVENT_BATCH_SIZE: number
 }
 
 let dbConf: {
@@ -207,6 +208,11 @@ API is disconnected yet no error is thrown, with the block producer stuck in the
         desc: ` before resolving the block hash by the height, wait until it's behind the chain height
 by at least that many blocks`,
         default: 5,
+      }),
+
+      EVENT_BATCH_SIZE: num({
+        default: 100,
+        desc: 'maximal number of events from a block to be saved in an single db insert batch',
       }),
     }),
     ...getDBConfig(),

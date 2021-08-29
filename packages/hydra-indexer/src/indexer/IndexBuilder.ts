@@ -139,7 +139,10 @@ export class IndexBuilder {
 
       debug(`Saving event entities`)
       const queryEventsBlock = fromBlockData(blockData)
-      const batches = _.chunk(queryEventsBlock.blockEvents, 100)
+      const batches = _.chunk(
+        queryEventsBlock.blockEvents,
+        getConfig().EVENT_BATCH_SIZE
+      )
       debug(
         `Read ${queryEventsBlock.blockEvents.length} events; saving in ${batches.length} batches`
       )
