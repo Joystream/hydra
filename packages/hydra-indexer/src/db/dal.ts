@@ -1,49 +1,60 @@
-import {
-  EntityManager,
-  Connection,
-  createConnection,
-  getConnection,
-} from 'typeorm'
-import { EVENT_TABLE_NAME } from '../entities/SubstrateEventEntity'
+import { Connection, createConnection, getConnection } from 'typeorm'
+import assert from 'assert'
 import Debug from 'debug'
 import config from './dbconfig'
 import { getConfig as conf } from '../node'
 
 const debug = Debug('index-builder:helper')
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createDBConnection(
-  entities: any[] = []
-): Promise<Connection> {
-  // const connectionOptions = await getConnectionOptions();
+export async function createDBConnection(): Promise<Connection> {
   const _config = config()
-  entities.map((e) => _config.entities?.push(e))
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
   return createConnection(_config)
 }
 
-export async function getIndexerHead(): Promise<number> {
-  return await getConnection().transaction(async (em: EntityManager) => {
+export function getIndexerHead(): Promise<number> {
+  // serialization failures are possible, but let's assume they are rare
+  return getConnection().transaction('SERIALIZABLE', async (em) => {
     const raw = (await em.query(`
-      SELECT block_number 
-      FROM ${EVENT_TABLE_NAME} e1 
-      WHERE 
-        e1.block_number >= ${conf().BLOCK_HEIGHT}
-        AND
-        NOT EXISTS (
-          SELECT 
-            NULL FROM ${EVENT_TABLE_NAME} e2 
-          WHERE e2.block_number = e1.block_number + 1
-          AND e2.block_number > ${conf().BLOCK_HEIGHT}) 
-        ORDER BY block_number
-      LIMIT 1`)) as Array<any>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      SELECT height FROM status WHERE id = 0
+    `)) as { height: number }[]
 
-    if (raw === undefined || raw.length === 0) {
-      return conf().BLOCK_HEIGHT - 1
+    assert.strictEqual(raw.length, 1, 'There must be exactly one status record')
+
+    const height = raw[0].height
+
+    const higherBlocks = (await em.query(
+      'SELECT height FROM substrate_block WHERE height > $1 ORDER BY height ASC',
+      [height]
+    )) as { height: number }[]
+
+    let actualHeight = height
+    for (let i = 0; i < higherBlocks.length; i++) {
+      const bh = higherBlocks[i].height
+      if (bh === actualHeight + 1) {
+        actualHeight = bh
+      }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return Number(raw[0].block_number)
+    if (actualHeight > height) {
+      await em.query('UPDATE status SET height = $1 WHERE id = 0', [
+        actualHeight,
+      ])
+    }
+
+    if (actualHeight === -1) {
+      return conf().BLOCK_HEIGHT - 1
+    } else {
+      return Number(actualHeight)
+    }
+  })
+}
+
+export function setIndexerHeight(height: number): Promise<void> {
+  return getConnection().transaction(async (em) => {
+    await em.query(
+      'UPDATE status SET height = $1 WHERE id = 0 AND height < $1',
+      [height]
+    )
   })
 }

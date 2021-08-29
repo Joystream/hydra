@@ -50,9 +50,9 @@ export class IndexBuilder {
     if (lastHead >= 0 && !getConfig().FORCE_HEIGHT) {
       debug(
         `WARNING! The database contains indexed blocks.
-          The last indexed block height is ${lastHead}. The indexer 
-          will continue from block ${lastHead} ignoring the start 
-          block height hint. Set the environment variable FORCE_BLOCK_HEIGHT to true 
+          The last indexed block height is ${lastHead}. The indexer
+          will continue from block ${lastHead} ignoring the start
+          block height hint. Set the environment variable FORCE_BLOCK_HEIGHT to true
           if you want to start from ${atBlock} anyway.`
       )
     } else {

@@ -64,16 +64,16 @@ services:
       - NEW_BLOCK_TIMEOUT_SEC=150000
       - WS_PROVIDER_ENDPOINT_URI=ws://node-template:9944/
       - REDIS_URI=redis://redis:6379/0
-      - DEBUG=index-builder:*
+      - DEBUG=index-builder:*,hydra-indexer:*
       - TYPES_JSON=typedefs.json
     volumes:
       - ./fixtures/typedefs.json:/hydra/packages/hydra-indexer/typedefs.json
     command: >
       sh -c "yarn db:bootstrap && yarn start:prod"
     depends_on:
-      - node-template
-      - redis
       - db
+      - redis
+      - node-template
 
   hydra-indexer-gateway:
     build:
