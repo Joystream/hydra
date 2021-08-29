@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.0-alpha.6 (2021-08-29)
+
+
+### Features
+
+* save indexer BLOCK_HEIGHT in database ([#94](https://github.com/subsquid/hydra/issues/94)) ([8bc1e40](https://github.com/subsquid/hydra/commit/8bc1e40a8814267067cab28cf73ae2e5eb27e75e))
+
+
+
 ## 4.1.0-alpha.5 (2021-08-28)
 
 
