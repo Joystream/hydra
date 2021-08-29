@@ -28,10 +28,13 @@ export async function getIndexerHead(): Promise<number> {
       SELECT block_number 
       FROM ${EVENT_TABLE_NAME} e1 
       WHERE 
+        e1.block_number >= ${conf().BLOCK_HEIGHT}
+        AND
         NOT EXISTS (
           SELECT 
             NULL FROM ${EVENT_TABLE_NAME} e2 
-          WHERE e2.block_number = e1.block_number + 1) 
+          WHERE e2.block_number = e1.block_number + 1
+          AND e2.block_number > ${conf().BLOCK_HEIGHT}) 
         ORDER BY block_number
       LIMIT 1`)) as Array<any>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
