@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.0-alpha.7 (2021-08-30)
+
+
+### Features
+
+* update docs, remove unsupported options ([c78b6a2](https://github.com/subsquid/hydra/commit/c78b6a24d5f07191b3f595eab1082e93bbb8bb0c))
+
+
+
 ## 4.1.0-alpha.6 (2021-08-29)
 
 
