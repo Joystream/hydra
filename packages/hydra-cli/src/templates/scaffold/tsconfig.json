@@ -3,7 +3,7 @@
     "module": "commonjs",
     "target": "es5",
     "sourceMap": true,
-    "declaration": true,
+    "declaration": false,
     "esModuleInterop": true,
     "importHelpers": true,
     "strict": true,

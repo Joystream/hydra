@@ -10,7 +10,7 @@ import { warthogexec } from '../utils/warthog-exec'
 const debug = Debug('qnode-cli:codegen')
 
 export default class Codegen extends Command {
-  static description = 'Code generator'
+  static description = 'Analyze graphql schema and generate model/server files'
 
   static flags = {
     schema: flags.string({

@@ -3,7 +3,7 @@ import { Command } from '@oclif/command'
 import { ormexec } from '../../utils/orm'
 
 export default class Migrate extends Command {
-  static description = 'Run database migrations'
+  static description = 'Apply database migrations'
 
   async run(): Promise<void> {
     dotenv.config()

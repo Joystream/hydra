@@ -24,8 +24,8 @@ const INDEXERS = [
   {
     name: 'local',
     value: 'localhost',
-    description: 'Self-hosted indexer at localhost:4001',
-    url: 'http://localhost:4001/graphql',
+    description: 'Self-hosted indexer at localhost:4010',
+    url: 'http://localhost:4010/v1/graphql',
   },
   {
     name: 'Polkadot',
@@ -81,13 +81,6 @@ export default class Scaffold extends Command {
       description:
         'If present, the scaffolder is non-interactive and uses only provided CLI flags',
     }),
-    // pass --no-mappings to skip default mappings and schema
-    mappings: flags.boolean({
-      char: 'm',
-      allowNo: true,
-      description: 'Create schema and mappings',
-      default: true,
-    }),
     blockHeight: flags.string({
       char: 'b',
       description: 'Start block height',
@@ -138,6 +131,13 @@ export default class Scaffold extends Command {
     cli.action.start('Scaffolding')
 
     const destRoot = path.resolve(flags.dir)
+    if (destRoot === process.cwd() && flags.rewrite) {
+      flags.rewrite = false
+      console.warn(
+        "WARN: can't delete current working dir, ignoring --rewrite flag"
+      )
+    }
+
     createDir(destRoot, flags.rewrite, true)
 
     debug(`Writing files to ${destRoot}`)

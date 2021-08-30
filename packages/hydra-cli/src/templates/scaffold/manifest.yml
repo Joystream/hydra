@@ -8,7 +8,7 @@ typegen:
     source: wss://rpc.polkadot.io
   events:
     - balances.Transfer
-  outDir: types
+  outDir: chain
 
 mappings:
   mappingsModule: mappings

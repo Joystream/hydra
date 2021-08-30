@@ -1,5 +1,5 @@
 import { Transfer } from '../generated/model'
-import { Balances } from '../types'
+import { Balances } from '../chain'
 import BN from 'bn.js'
 import {
   ExtrinsicContext,

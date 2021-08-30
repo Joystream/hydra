@@ -21,7 +21,7 @@ services:
       - DB_PASS=postgres
       - DB_PORT=5432
       - REDIS_URI=redis://redis:6379/0
-      - BLOCK_HEIGHT=0 # starting block height
+      - BLOCK_HEIGHT={{blockHeight}} # starting block height
       - WS_PROVIDER_ENDPOINT_URI=wss://rpc.polkadot.io
 
     # # If your chain uses custom types you need to provide those
