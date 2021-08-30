@@ -154,7 +154,7 @@ export class Server<C extends BaseContext> {
         ...options,
       });
       return binding;
-    } catch (error) {
+    } catch (error: any) {
       if (error.result && error.result.errors) {
         const messages = error.result.errors.map((item: any) => item.message);
         throw new Error(JSON.stringify(messages));

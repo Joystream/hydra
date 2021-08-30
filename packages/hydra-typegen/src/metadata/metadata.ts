@@ -99,7 +99,7 @@ async function fromChain(
         }
         websocket.close()
       }
-    } catch (e) {
+    } catch (e: any) {
       reject(
         new Error(
           `Cannot fetch metadata: ${e.message}, ${JSON.stringify(e, null, 2)}`

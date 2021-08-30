@@ -70,7 +70,7 @@ export class MappingsProcessor {
         const eventBlock = next.value
 
         await this.processBlock(eventBlock)
-      } catch (e) {
+      } catch (e: any) {
         error(`Stopping the proccessor due to errors: ${logError(e)}`)
         this.stop()
         throw new Error(e)

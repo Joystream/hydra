@@ -21,7 +21,7 @@ export default {
         validateResolvers: config.get('VALIDATE_RESOLVERS') === 'true',
         warthogImportPath: config.get('MODULE_IMPORT_PATH'),
       }).generate();
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error);
       if (error.name.indexOf('Cannot determine GraphQL input type') > -1) {
         logger.error('This often means you have multiple versions of TypeGraphQL installed.');

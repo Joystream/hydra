@@ -28,7 +28,7 @@ module.exports = (toolbox: GluegunToolbox) => {
 
       try {
         await createDb(getPgConfig(config), database);
-      } catch (e) {
+      } catch (e: any) {
         if (e.message.indexOf('duplicate') > -1) {
           info(`Database '${database}' already exists`);
           return true;
@@ -46,7 +46,7 @@ module.exports = (toolbox: GluegunToolbox) => {
 
       try {
         await dropDb(getPgConfig(config), database);
-      } catch (e) {
+      } catch (e: any) {
         if (e.name.indexOf('invalid_catalog_name') > -1) {
           info(`Database '${database}' does not exist`);
           return true;
