@@ -1,6 +1,6 @@
 {
   "name": "@subsquid/warthog",
-  "version": "4.1.0-alpha.7",
+  "version": "4.1.0-alpha.8",
   "description": "Opinionated set of tools for setting up GraphQL backed by TypeORM",
   "keywords": [
     "graphql",

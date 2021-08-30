@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.0-alpha.8 (2021-08-30)
+
+
+### Features
+
+* bump typescript version ([aba2721](https://github.com/Joystream/hydra/commit/aba2721fa6a32c6f64082b8d4373c7d6948c20b5))
+
+
+
 ## 4.1.0-alpha.7 (2021-08-30)
 
 
