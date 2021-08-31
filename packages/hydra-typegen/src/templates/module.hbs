@@ -7,9 +7,9 @@ import { typeRegistry } from ".";
 
 export namespace {{module.name}} {
 {{#each events}}
-    {{#if documentation}}
+    {{#if docs }}
     /**
-    {{#each documentation}}
+    {{#each docs }}
      * {{{this}}}
     {{/each}}
      *
@@ -22,7 +22,7 @@ export namespace {{module.name}} {
         constructor(public readonly ctx: SubstrateEvent) {}
 
         get params(): {{{paramsReturnType}}} {
-            
+
             {{#if @root.validateArgs}}
             if (!this.validateParams()) {
                 throw new Error(`Expected event parameters of types [${this.expectedParamTypes.join(',')}] but received [${this.ctx.params.map((p) => p.type).join(',')}]`)
@@ -45,9 +45,9 @@ export namespace {{module.name}} {
             return valid
         }
 
-    }     
+    }
 
-    
+
 {{/each}}
 
 {{#each calls}}
@@ -93,11 +93,11 @@ export namespace {{module.name}} {
     }
 
     class {{pascalCase name}}_Args {
-    
+
         constructor(public readonly extrinsic: SubstrateExtrinsic) {}
 
         {{{namedGetters}}}
-        
+
     }
 {{/each}}
 
