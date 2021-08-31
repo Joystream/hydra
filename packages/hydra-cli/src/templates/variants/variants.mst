@@ -9,7 +9,7 @@ import {
   BytesField,
   EnumField,
   StringField
-} from 'warthog';
+} from '@subsquid/warthog';
 
 import {
   Float,
@@ -18,7 +18,7 @@ import {
 } from 'type-graphql';
 import BN from 'bn.js'
 
-{{#imports}} 
+{{#imports}}
 {{{.}}};
 {{/imports}}
 
@@ -51,23 +51,23 @@ export class {{name}} {
         {{#description}}description: `{{{description}}}`{{/description}}
       })
       {{camelName}}?:{{tsType}}{{#array}}[]{{/array}};
-      
+
       // `id` of the related entity, it is required to make the relationship possible.
       @StringField({ dbOnly: true {{#array}},array: true{{/array}} })
       {{camelName}}Id{{#array}}s{{/array}}!: string{{#array}}[]{{/array}};
     {{/is.entity}}
 
     {{#is.enum}}
-      @EnumField('{{tsType}}', {{tsType}}, { 
-        {{^required}}nullable: true,{{/required}} 
+      @EnumField('{{tsType}}', {{tsType}}, {
+        {{^required}}nullable: true,{{/required}}
         {{#description}}description: `{{{description}}}`{{/description}} })
-      {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}} 
+      {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}}
     {{/is.enum}}
 
 
     {{#is.union}}
-    @Field(type => {{tsType}}, { 
-        {{^required}}nullable: true,{{/required}} 
+    @Field(type => {{tsType}}, {
+        {{^required}}nullable: true,{{/required}}
         {{#description}}description: `{{{description}}}`{{/description}} })
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: typeof {{tsType}};
     {{/is.union}}
@@ -99,7 +99,7 @@ export class {{name}} {
           relationData.map((r: any) => data[r.id] = r);
 
           for (const record of records) {
-            
+
             for (const id of (record[unionFieldName] as {{name}}).{{camelName}}Ids) {
               const m = data[id]
               if (m) {

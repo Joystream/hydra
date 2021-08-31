@@ -1,4 +1,4 @@
-import { getIndexerHead as slowIndexerHead } from '../db/dal'
+import * as dal from '../db/dal'
 import Debug from 'debug'
 import * as IORedis from 'ioredis'
 import { BlockPayload, logError } from '@subsquid/hydra-common'
@@ -98,8 +98,8 @@ export class IndexerStatusService implements IStatusService {
   /**
    * Simply re-delegate to simplify mocking purpose
    * */
-  async slowIndexerHead(): Promise<number> {
-    return await slowIndexerHead()
+  slowIndexerHead(): Promise<number> {
+    return dal.getIndexerHead()
   }
 
   private async updateHeadKey(height: number): Promise<void> {
@@ -172,6 +172,7 @@ export class IndexerStatusService implements IStatusService {
     const currentHead = await this.getIndexerHead()
     if (head > currentHead) {
       debug(`Updating the indexer head from ${currentHead} to ${head}`)
+      await dal.setIndexerHeight(head)
       await this.updateHeadKey(head)
     }
   }

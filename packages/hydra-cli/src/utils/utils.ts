@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import * as path from 'path'
 import Debug from 'debug'
 import { FieldDefinitionNode } from 'graphql'
@@ -10,7 +10,7 @@ export function createDir(path: string, del = false, recursive = false): void {
     fs.mkdirSync(path, { recursive })
   }
   if (del) {
-    fs.removeSync(path)
+    fs.rmSync(path, { recursive: true })
     fs.mkdirSync(path)
   }
 }
@@ -21,21 +21,8 @@ export function createFile(path: string, content = '', replace = false): void {
   }
 }
 
-export async function copyFiles(from: string, to: string): Promise<void> {
-  try {
-    await fs.copy(from, to)
-  } catch (err) {
-    console.error(err)
-  }
-}
-
 export function getTemplatePath(template: string): string {
-  const templatePath = path.resolve(
-    __dirname,
-    '..',
-    'templates',
-    ...template.split('/')
-  )
+  const templatePath = path.resolve(__dirname, '..', 'templates', template)
   if (!fs.existsSync(templatePath)) {
     throw new Error(`Tempate ${template} does not exists!`)
   }
@@ -50,22 +37,6 @@ export function resolveHydraCliPkgJson(): Record<string, unknown> {
   const path = require.resolve('@subsquid/hydra-cli/package.json')
 
   return JSON.parse(fs.readFileSync(path, 'utf-8')) as Record<string, unknown>
-}
-
-/**
- * Copies the template to the current directory of the process under the <filename>
- *
- * @param template Template file int templates/<templateName>
- * @param fileName Filename of the file to be created
- */
-export async function copyTemplateToCWD(
-  templateName: string,
-  fileName: string
-): Promise<void> {
-  await fs.copyFile(
-    getTemplatePath(templateName),
-    path.join(process.cwd(), fileName)
-  )
 }
 
 /**
@@ -109,7 +80,7 @@ export function parseWarthogCodegenStderr(stderr: string): void {
   // String to look if there is any graphql error
   const graphqlErrors = `GeneratingSchemaError: Generating schema error`
   // Pattern to search if any file under the generated/graphql-server/src/* has problems
-  const sourceCodeErrors = /src\/modules\/\S*.ts/g
+  const sourceCodeErrors = /modules\/\S*.ts/g
   const errorMsg = `Failed to generate Graphql API due to errors: \n`
 
   const m = stderr.match(sourceCodeErrors)
@@ -122,16 +93,8 @@ export function parseWarthogCodegenStderr(stderr: string): void {
 
 export function getWarthogDependency(): string {
   /* eslint-disable */
-  const warthogPackageJson = require('warthog/package.json') as Record<
-    string,
-    unknown
-  >
-  debug(`Warthog package json: ${JSON.stringify(warthogPackageJson, null, 2)}`)
-  // if there is a special 'hydra' property, use it as depenency, otherwise use hardcoded fallback
-  if (warthogPackageJson.hydra === undefined) {
-    throw new Error(`Cannot resolve warthog version`)
-  }
-  return warthogPackageJson.hydra as string
+  const packageJson = require('../../package.json')
+  return packageJson.dependencies['@subsquid/warthog']
 }
 
 export const verifySchemaExt = (file: string) =>

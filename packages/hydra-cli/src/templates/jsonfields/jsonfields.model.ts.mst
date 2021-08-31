@@ -10,7 +10,7 @@ import {
   EnumField,
   StringField,
   ObjectType
-} from 'warthog';
+} from '@subsquid/warthog';
 import BN from 'bn.js'
 import { InputType, Field } from 'type-graphql';
 
@@ -39,17 +39,17 @@ export class {{name}} {
     {{/is.scalar}}
 
     {{#is.enum}}
-      @EnumField('{{tsType}}', {{tsType}}, { 
-        {{^required}}nullable: true,{{/required}} 
+      @EnumField('{{tsType}}', {{tsType}}, {
+        {{^required}}nullable: true,{{/required}}
         {{#description}}description: `{{{description}}}`{{/description}} })
-      {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}} 
+      {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}}
     {{/is.enum}}
-    
+
     {{#is.json}}
     @Field(() => {{#array}}[{{/array}}{{tsType}}{{#array}}]{{/array}}, {{^required}}{ nullable: true }{{/required}})
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}: {{tsType}}{{#array}}[]{{/array}}
     {{/is.json}}
-    
+
   {{/fields}}
 }
 

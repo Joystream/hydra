@@ -8,6 +8,7 @@ import {
   getProcessorStatus,
   accountByOutgoingTxValue,
   getGQLClient,
+  waitForProcessing,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
 import pWaitFor from 'p-wait-for'
@@ -18,6 +19,7 @@ import {
   TRANSFER_IN_QUERY,
   VARIANT_FILTER_MISREABLE_ACCOUNTS,
 } from './api/graphql-queries'
+import { gql } from 'graphql-request'
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
@@ -39,15 +41,8 @@ describe('end-to-end transfer tests', () => {
     console.log(
       `Transfer of ${txAmount2} schmeks done at height ${blockHeight}`
     )
-    // wait until the indexer indexes the block and the processor picks it up
-    await pWaitFor(
-      async () => {
-        return (
-          (await getProcessorStatus()).lastCompleteBlock > blockHeight.valueOf()
-        )
-      },
-      { interval: 50 }
-    )
+
+    await waitForProcessing(blockHeight.valueOf())
     console.log(`The processor processed block ${blockHeight}`)
   })
 
@@ -70,6 +65,70 @@ describe('end-to-end transfer tests', () => {
     expect(highlihts[0]).contains('Transfer')
   })
 
+  it('fetches one-to-many relations', async () => {
+    const result = await getGQLClient().request(
+      gql`
+        query account($id: ID!) {
+          account: accountByUniqueInput(where: { id: $id }) {
+            id
+            incomingTx {
+              value
+            }
+          }
+        }
+      `,
+      {
+        id: BOB,
+      }
+    )
+    expect(result).to.deep.equal({
+      account: {
+        id: BOB,
+        incomingTx: [
+          {
+            value: txAmount1.toString(),
+          },
+          {
+            value: txAmount2.toString(),
+          },
+        ],
+      },
+    })
+  })
+
+  it('fetches one-to-many relations when where condition is present', async () => {
+    const result = await getGQLClient().request(
+      gql`
+        query accounts($value: BigInt!) {
+          accounts(where: { incomingTx_some: { value_eq: $value } }) {
+            id
+            incomingTx {
+              value
+            }
+          }
+        }
+      `,
+      {
+        value: txAmount2.toString(),
+      }
+    )
+    expect(result).to.deep.equal({
+      accounts: [
+        {
+          id: BOB,
+          incomingTx: [
+            {
+              value: txAmount1.toString(),
+            },
+            {
+              value: txAmount2.toString(),
+            },
+          ],
+        },
+      ],
+    })
+  })
+
   it('fetch block timestamp from substrate event', async () => {
     const tm = await blockTimestamp()
     expect(tm).not.equal(0, 'Timestamp should not be equal to zero (0)')
@@ -80,12 +139,8 @@ describe('end-to-end transfer tests', () => {
   })
 
   it('fetch datetime field from transfer', async () => {
-    const {
-      insertedAt,
-      createdAt,
-      updatedAt,
-      timestamp,
-    } = await fetchDateTimeFieldFromTransfer()
+    const { insertedAt, createdAt, updatedAt, timestamp } =
+      await fetchDateTimeFieldFromTransfer()
     const ts = Number.parseInt(timestamp)
 
     console.log(`Timestamp: ${timestamp}, ts: ${ts}`)

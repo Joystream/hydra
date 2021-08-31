@@ -1,7 +1,7 @@
 import { ModelRenderer } from '../../src/generate/ModelRenderer'
 import { WarthogModel, Field, ObjectType } from '../../src/model'
 import { createModel, fromStringSchema } from './model'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import { expect } from 'chai'
 import Debug from 'debug'
 
@@ -12,6 +12,7 @@ describe('ModelRenderer', () => {
   let warthogModel: WarthogModel
   let modelTemplate: string
   let resolverTemplate: string
+  let serviceTemplate: string
 
   before(() => {
     // set timestamp in the context to make the output predictable
@@ -21,6 +22,10 @@ describe('ModelRenderer', () => {
     )
     resolverTemplate = fs.readFileSync(
       './src/templates/entities/resolver.ts.mst',
+      'utf-8'
+    )
+    serviceTemplate = fs.readFileSync(
+      './src/templates/entities/service.ts.mst',
       'utf-8'
     )
   })
@@ -110,7 +115,7 @@ describe('ModelRenderer', () => {
     type Author @entity {
       posts: [Post!] @derivedFrom(field: "author")
     }
-    
+
     type Post @entity {
       title: String
       author: Author!
@@ -140,10 +145,10 @@ describe('ModelRenderer', () => {
     type Author @entity {
       name: String!
     }
-    
+
     type Post @entity {
       title: String
-      author: Author! 
+      author: Author!
     }`)
 
     generator = new ModelRenderer(model, model.lookupEntity('Post'))
@@ -170,7 +175,7 @@ describe('ModelRenderer', () => {
       handle: String!
       language: Language
     }
-    
+
     type Language @entity {
       code: String!
       name: String!
@@ -221,7 +226,7 @@ describe('ModelRenderer', () => {
         EMPIRE
         JEDI
       }
-        
+
       type Movie @entity {
         episode: Episode
       }`)
@@ -250,7 +255,7 @@ describe('ModelRenderer', () => {
         EMPIRE
         JEDI
       }
-        
+
       type Movie @entity {
         episode: episode_Camel_Case
       }`)
@@ -297,7 +302,7 @@ describe('ModelRenderer', () => {
         EMPIRE
         JEDI
       }
-        
+
       type Movie @entity {
         field1: enum1,
         field2: enum2
@@ -324,7 +329,7 @@ describe('ModelRenderer', () => {
         EMPIRE
         JEDI
       }
-      
+
       type B @entity {
         field1: enum1,
       }
@@ -387,22 +392,22 @@ describe('ModelRenderer', () => {
         }
         union unionOne = variantOneUnionOne | variantTwoUnionOne
         union unionTwo =  variantOneUnionTwo | variantTwoUnionTwo
-        
+
         type variantOneUnionOne @variant {
             id: ID!
             propertah: String!
         }
-        
+
         type variantTwoUnionOne @variant {
             id: ID!
             propertah: String!
         }
-        
+
         type variantOneUnionTwo @variant {
             id: ID!
             propertah: String!
         }
-        
+
         type variantTwoUnionTwo @variant {
             id: ID!
             propertah: String!
@@ -478,11 +483,11 @@ describe('ModelRenderer', () => {
       father: Poor!
       mother: Poor!
     }
-    
+
     type Miserable @variant {
       hates: String!
     }
-    
+
     type MyEntity @entity {
       status: Poor!
     }`)
@@ -501,6 +506,23 @@ describe('ModelRenderer', () => {
       'status!: typeof Poor',
       'Should render the correct union type'
     )
+  })
+
+  it('should not include variant import if there are no variants', () => {
+    const model = fromStringSchema(`
+      enum Option {
+        ONE
+        TWO
+      }
+      type Foo @entity {
+        id: ID!
+        name: String!
+        option: Option!
+      }
+    `)
+    const gen = new ModelRenderer(model, model.lookupEntity('Foo'))
+    const serviceCode = gen.render(serviceTemplate)
+    expect(serviceCode).to.not.include('variants/variants.model')
   })
 
   it('Should add transformer for BigInt fields', () => {
@@ -590,11 +612,11 @@ describe('ModelRenderer', () => {
       father: Poor!
       mother: Poor!
     }
-    
+
     type Miserable @variant {
       hates: String!
     }
-    
+
     type MyEntity @entity {
       status: Poor!
       anotherStatus: Poor!

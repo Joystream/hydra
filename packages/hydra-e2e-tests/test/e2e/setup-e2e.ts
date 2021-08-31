@@ -1,6 +1,5 @@
 import { ApiPromise } from '@polkadot/api'
 import { createApi } from './api/substrate-api'
-import * as dotenv from 'dotenv'
 import Container from 'typedi'
 import { GraphQLClient } from 'graphql-request'
 import { SubscriptionClient } from 'graphql-subscriptions-client'
@@ -16,7 +15,6 @@ globalThis.WebSocket = require('ws')
 /* eslint-enable */
 
 before(async () => {
-  dotenv.config({ path: './test/e2e/.env' })
   // creates and registers the necessary services
   await createApi(process.env.WS_PROVIDER_URI || '')
 

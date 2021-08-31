@@ -82,7 +82,7 @@ export function convertTuples(type: string): string {
 
 export const helper: Handlebars.HelperDeclareSpec = {
   imports() {
-    const { imports } = (this as unknown) as { imports: ImportsDef }
+    const { imports } = this as unknown as { imports: ImportsDef }
     return renderImports(imports)
   },
 
@@ -107,12 +107,12 @@ export const helper: Handlebars.HelperDeclareSpec = {
   },
 
   paramsReturnType() {
-    const { args } = (this as unknown) as { args: string[] }
+    const { args } = this as unknown as { args: string[] }
     return `[${args.map((a) => convertTuples(a)).join(',')}]`
   },
 
   paramsReturnStmt() {
-    const { args } = (this as unknown) as { args: string[] }
+    const { args } = this as unknown as { args: string[] }
     const returnObjects = args.map((argType, index) =>
       renderCreateTypeStmt(argType, eventParamValueGetter(index))
     )
@@ -120,12 +120,12 @@ export const helper: Handlebars.HelperDeclareSpec = {
   },
 
   paramGetter() {
-    const { args } = (this as unknown) as { args: string[] }
+    const { args } = this as unknown as { args: string[] }
     return renderTypedParams(args)
   },
 
   namedGetters() {
-    const { args } = (this as unknown) as { args: Arg[] }
+    const { args } = this as unknown as { args: Arg[] }
     return renderNamedArgs(args, callArgValueGetter)
   },
 }

@@ -1,5 +1,5 @@
 import { MetadataLatest } from '@polkadot/types/interfaces'
-import { Metadata } from '@polkadot/metadata'
+import { Metadata } from '@polkadot/types'
 import { TypeRegistry } from '@polkadot/types/create'
 import { WebSocket } from '@polkadot/x-ws'
 import BN from 'bn.js'
@@ -99,7 +99,7 @@ async function fromChain(
         }
         websocket.close()
       }
-    } catch (e) {
+    } catch (e: any) {
       reject(
         new Error(
           `Cannot fetch metadata: ${e.message}, ${JSON.stringify(e, null, 2)}`

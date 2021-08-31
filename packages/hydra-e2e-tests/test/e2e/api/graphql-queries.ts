@@ -11,7 +11,7 @@ export const GET_INDEXER_HEAD = gql`
 
 export const SUBSTRATE_EVENTS_LIMIT_BY_ONE = gql`
   query {
-    substrateEvents(limit: 1) {
+    substrate_event(limit: 1) {
       blockTimestamp
     }
   }

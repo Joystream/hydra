@@ -1,6 +1,0 @@
-" All transfers "
-type Post @entity {
-  content: String!
-  author: String!
-} 
-

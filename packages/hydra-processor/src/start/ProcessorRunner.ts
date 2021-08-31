@@ -5,7 +5,6 @@ import { logError } from '@subsquid/hydra-common'
 import { log } from 'console'
 import { createDBConnection } from '../db/dal'
 import { ProcessorPromClient, startPromEndpoint } from '../prometheus'
-import { getManifest } from './config'
 import { error, info } from '../util/log'
 import pWaitFor from 'p-wait-for'
 import { Server } from 'http'
@@ -41,9 +40,8 @@ export class ProcessorRunner {
    * @param options options passed to create the mappings
    */
   async process(): Promise<void> {
-    const manifest = getManifest()
     info('Establishing a database connection')
-    this.connection = await createDBConnection(manifest.entities)
+    this.connection = await createDBConnection()
 
     this.processor = new MappingsProcessor()
 

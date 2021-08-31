@@ -70,9 +70,8 @@ export interface QueryFilter<T> {
 }
 
 // extract T from type of Array<T>
-export type ArrayElement<
-  ArrayType extends readonly unknown[]
-> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never
 
 export type QueryField<T> =
   | keyof T
@@ -126,11 +125,12 @@ export interface IProcessorSource {
     }
   ): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }>
 
-  executeQueries<T>(
-    queries: {
-      [K in keyof T]: GraphQLQuery<T[K]>
-    }
-  ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>
+  // Commenting out for now, as it is not essential
+  // executeQueries<T>(
+  //   queries: {
+  //     [K in keyof T]: GraphQLQuery<T[K]>
+  //   }
+  // ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>
 
   getIndexerStatus(): Promise<IndexerStatus>
 

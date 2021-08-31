@@ -50,9 +50,9 @@ export class IndexBuilder {
     if (lastHead >= 0 && !getConfig().FORCE_HEIGHT) {
       debug(
         `WARNING! The database contains indexed blocks.
-          The last indexed block height is ${lastHead}. The indexer 
-          will continue from block ${lastHead} ignoring the start 
-          block height hint. Set the environment variable FORCE_BLOCK_HEIGHT to true 
+          The last indexed block height is ${lastHead}. The indexer
+          will continue from block ${lastHead} ignoring the start
+          block height hint. Set the environment variable FORCE_BLOCK_HEIGHT to true
           if you want to start from ${atBlock} anyway.`
       )
     } else {
@@ -126,20 +126,23 @@ export class IndexBuilder {
         signedBlock: { block },
       } = blockData
 
-      const extrinsicEntities: SubstrateExtrinsicEntity[] = block.extrinsics.map(
-        (e, index) =>
+      const extrinsicEntities: SubstrateExtrinsicEntity[] =
+        block.extrinsics.map((e, index) =>
           fromBlockExtrinsic({
             e,
             blockEntity,
             indexInBlock: index,
           })
-      )
+        )
       await em.save(extrinsicEntities)
       debug(`Saved ${extrinsicEntities.length} extrinsics`)
 
       debug(`Saving event entities`)
       const queryEventsBlock = fromBlockData(blockData)
-      const batches = _.chunk(queryEventsBlock.blockEvents, 100)
+      const batches = _.chunk(
+        queryEventsBlock.blockEvents,
+        getConfig().EVENT_BATCH_SIZE
+      )
       debug(
         `Read ${queryEventsBlock.blockEvents.length} events; saving in ${batches.length} batches`
       )

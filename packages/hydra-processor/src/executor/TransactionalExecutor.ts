@@ -9,6 +9,7 @@ import { IMappingsLookup } from './IMappingsLookup'
 import {
   DeepPartial,
   FindOneOptions,
+  FindManyOptions,
   DatabaseManager,
 } from '@subsquid/hydra-common'
 import { TxAwareBlockContext } from './tx-aware'
@@ -94,21 +95,21 @@ export function makeDatabaseManager(
     remove: async <T>(entity: DeepPartial<T>): Promise<void> => {
       await entityManager.remove(entity)
     },
-    get: async <T>(
+    get: <T>(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       entity: { new (...args: any[]): T },
       options: FindOneOptions<T>
     ): Promise<T | undefined> => {
-      return await entityManager.findOne(entity, options)
+      return entityManager.findOne(entity, options)
     },
-    getMany: async <T>(
+    getMany: <T>(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       entity: { new (...args: any[]): T },
-      options: FindOneOptions<T>
+      options: FindManyOptions<T>
     ): Promise<T[]> => {
-      return await entityManager.find(entity, options)
+      return entityManager.find(entity, options)
     },
-  } as DatabaseManager
+  }
 }
 
 /**

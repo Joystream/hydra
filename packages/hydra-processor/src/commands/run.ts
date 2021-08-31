@@ -16,6 +16,7 @@ export default class Run extends Command {
     env: flags.string({
       char: 'e',
       description: 'Path to a file with environment variables',
+      default: './.env',
     }),
     id: flags.string({
       description: 'ID of the processor (useful for multi-processor setups)',
@@ -27,9 +28,7 @@ export default class Run extends Command {
 
     const { flags } = this.parse(Run)
 
-    if (flags.env) {
-      dotenv.config({ path: flags.env })
-    }
+    dotenv.config({ path: flags.env })
 
     if (flags.indexer) {
       process.env.INDEXER_ENDPOINT_URL = flags.indexer
