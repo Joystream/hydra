@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.1.0 (2021-08-31)
+
+
+### Bug Fixes
+
+* fix inline docs for typegen artifacts ([1395ac1](https://github.com/subsquid/hydra/commit/1395ac126d56c8ddd3abdc42e1e4cb430070ecd9))
+
+
+
 ## 4.1.0-alpha.8 (2021-08-30)
 
 
