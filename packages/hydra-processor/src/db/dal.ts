@@ -6,12 +6,8 @@ import config from './ormconfig'
 
 const debug = Debug('hydra-processor:dal')
 
-export async function createDBConnection(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  entities: any[] = []
-): Promise<Connection> {
+export async function createDBConnection(): Promise<Connection> {
   const _config = config()
-  entities.map((e) => _config.entities?.push(e))
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
   return createConnection(_config)
 }
@@ -48,7 +44,7 @@ export async function countProcessedEvents(
     .createQueryBuilder('events')
     .select('COUNT(DISTINCT(events.event_id))', 'cnt')
     .where({ processor: processorID })
-    .getRawOne()
+    .getRawOne()!
 
   debug(`Total events count ${String(cnt)}`)
 

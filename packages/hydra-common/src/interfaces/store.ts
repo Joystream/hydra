@@ -1,4 +1,4 @@
-import { DeepPartial, FindOneOptions } from './typeorm'
+import { DeepPartial, FindManyOptions, FindOneOptions } from './typeorm'
 
 export interface DatabaseManager {
   /**
@@ -30,6 +30,6 @@ export interface DatabaseManager {
    */
   getMany<T>(
     entity: { new (...args: any[]): T },
-    options: FindOneOptions<T>
+    options: FindManyOptions<T>
   ): Promise<T[]>
 }

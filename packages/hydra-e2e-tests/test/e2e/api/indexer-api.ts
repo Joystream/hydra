@@ -17,7 +17,7 @@ export async function indexerHead(): Promise<number> {
 export async function blockTimestamp(): Promise<number> {
   const indexerClient = Container.get<GraphQLClient>('IndexerClient')
   const event = await indexerClient.request<{
-    substrateEvents: [{ blockTimestamp: string }]
+    substrate_event: [{ blockTimestamp: string }]
   }>(SUBSTRATE_EVENTS_LIMIT_BY_ONE)
-  return Number.parseInt(event.substrateEvents[0].blockTimestamp)
+  return Number.parseInt(event.substrate_event[0].blockTimestamp)
 }

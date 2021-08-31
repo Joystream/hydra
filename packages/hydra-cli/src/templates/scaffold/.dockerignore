@@ -1,4 +1,2 @@
-**/node_modules
-**/dist
-**/lib 
-**/generated
+.git
+node_modules

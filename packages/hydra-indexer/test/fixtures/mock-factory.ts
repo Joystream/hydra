@@ -4,9 +4,9 @@ import { BlockPayload } from '../../src/model'
 import { withTs } from '@subsquid/hydra-common'
 
 export function blockPayload(height: number): BlockPayload {
-  return (withTs({
+  return withTs({
     height,
-  }) as unknown) as BlockPayload
+  }) as unknown as BlockPayload
 }
 
 export function queryEventBlock(block = 0): QueryEventBlock {
@@ -28,18 +28,18 @@ export function* queryEvent(
   let i = 0
   do {
     yield {
-      eventRecord: ({
-        phase: ({
+      eventRecord: {
+        phase: {
           toJSON: () => {
             return {}
           },
-        } as unknown) as Phase,
-        event: ({
+        } as unknown as Phase,
+        event: {
           method: 'fake.method',
           section: 'fake.section',
           data: [],
-        } as unknown) as Event,
-      } as unknown) as EventRecord,
+        } as unknown as Event,
+      } as unknown as EventRecord,
       blockNumber: block,
       blockTimestamp: 11111111111,
       indexInBlock: i,

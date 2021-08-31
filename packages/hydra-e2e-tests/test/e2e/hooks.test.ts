@@ -1,21 +1,13 @@
-import pWaitFor from 'p-wait-for'
 import { expect } from 'chai'
 import { HOOKS } from './api/graphql-queries'
-import { getGQLClient, getProcessorStatus } from './api/processor-api'
-
-const hooksTo = 4
+import { getGQLClient, waitForProcessing } from './api/processor-api'
 
 describe('end-to-end hook tests', () => {
   let hooks: { type: string; blockNumber: number }[]
 
   before(async () => {
-    // wait until the indexer indexes the block and the processor picks it up
-    await pWaitFor(
-      async () => {
-        return (await getProcessorStatus()).lastCompleteBlock > hooksTo
-      },
-      { interval: 50 }
-    )
+    await waitForProcessing(4)
+
     hooks = (
       await getGQLClient().request<{
         blockHooks: { type: string; blockNumber: number }[]

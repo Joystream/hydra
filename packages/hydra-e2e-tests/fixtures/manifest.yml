@@ -1,12 +1,7 @@
 version: '3.0'
 description: Test manifest
 repository: https://github.com/
-hydraVersion: "3"
-dataSource:
-  kind: substrate 
-  chain: node-template
-entities:
-  - mappings/lib/generated/**/*.model.js
+hydraVersion: "4"
 typegen:
   metadata:
     source: ws://node-template:9944/
@@ -14,16 +9,14 @@ typegen:
     - balances.Transfer
   calls:
     - timestamp.set
-  outDir: ./mappings/generated/types
+  outDir: types
 mappings:
-  mappingsModule: mappings/lib/mappings
-  imports:
-    - mappings/lib/mappings/generated/types
+  mappingsModule: mappings
   eventHandlers:
-    - event: balances.Transfer 
+    - event: balances.Transfer
       handler: balancesTransfer
   extrinsicHandlers:
-    - extrinsic: timestamp.set 
+    - extrinsic: timestamp.set
       handler: timestampCall
   preBlockHooks:
     - handler: preHook
@@ -33,10 +26,9 @@ mappings:
       filter:
         height: '[0,0]'
     - handler: preHook
-      filter: 
+      filter:
         height: '[1, 2]'
   postBlockHooks:
     - handler: postHook
-      filter:  
+      filter:
         height: '[2, 4)'
-  

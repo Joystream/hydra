@@ -141,9 +141,11 @@ export function subscribeToProcessorStatus(): void {
     .subscribe({
       next({ data }: unknown) {
         if (data) {
-          processorStatus = (data as {
-            stateSubscription: ProcessorStatus
-          }).stateSubscription
+          processorStatus = (
+            data as {
+              stateSubscription: ProcessorStatus
+            }
+          ).stateSubscription
         }
       },
     })
@@ -178,4 +180,15 @@ export async function fetchTypedJsonFields(
     systemEvents: SystemEvent[]
   }>(query)
   return systemEvents
+}
+
+/**
+ * Wait until the indexer indexes the block and the processor picks it up
+ */
+export function waitForProcessing(nBlocks = 0): Promise<void> {
+  return pWaitFor(
+    () =>
+      getProcessorStatus().then((status) => status.lastCompleteBlock > nBlocks),
+    { interval: 50 }
+  )
 }

@@ -1,0 +1,19 @@
+{
+  "name": "@subsquid/hydra-indexer-status-service",
+  "private": "true",
+  "version": "4.1.0-alpha.8",
+  "description": "Indexer status service",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "ioredis": "^4.27.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/ioredis": "^4.26.7"
+  }
+}

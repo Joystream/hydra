@@ -1,9 +1,0 @@
-typegen:
-  metadata:
-    source: wss://kusama-rpc.polkadot.io
-    blockHash: '${HASH}'
-  events:
-    - balances.Transfer
-  outDir: ./mappings/generated/types-${PREFIX}
-  customTypes: 
-    typedefsLoc: typedefs.json # it's empty for Kusama, type overrides can be places there

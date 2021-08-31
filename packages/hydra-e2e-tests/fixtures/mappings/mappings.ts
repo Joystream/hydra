@@ -4,11 +4,11 @@ import {
   BlockHook,
   HookType,
   Account,
-} from '../generated/graphql-server/model'
+} from '../generated/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
-import { Balances, Timestamp } from './generated/types'
+import { Balances, Timestamp } from '../types'
 import BN from 'bn.js'
 import {
   ExtrinsicContext,

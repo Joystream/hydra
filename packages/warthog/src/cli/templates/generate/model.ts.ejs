@@ -1,0 +1,107 @@
+import {
+  BaseModel,
+  <%= props.fields.some((field) => { return field.type === 'bool' }) ? "BooleanField," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'date' }) ? "DateField," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'float' }) ? "FloatField," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'int' }) ? "IntField," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'numeric' || 'decimal' }) ? "NumericField," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'json' }) ? "JSONField," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'bytes' }) ? "BytesField," : "" -%>
+  Model,
+  <%= props.fields.some((field) => { return field.type === 'mto' }) ? "ManyToOne," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'otm' }) ? "OneToMany," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'oto' }) ? "OneToOne, JoinColumn," : "" -%>
+  <%= props.fields.some((field) => { return field.type === 'array' }) ? "CustomField," : "" -%>
+  StringField
+} from '<%= props.warthogPathInSourceFiles %>';
+
+
+<% props.fields.forEach(function(field){ %>
+
+  <%
+    // Special case for OneToMany
+    if(field.type === 'otm') {
+      locals.relClassName = props.pascalCase(field.name).slice(0, -1)
+      locals.relCamelName = props.camelCase(field.name).slice(0, -1)
+  %>
+    import { <%= locals.relClassName %> } from '<%= props.getRelativePathForModel(relCamelName) %>'
+  <% return; } %>
+  
+  <%
+  // Special case for OneToMany
+  if(field.type === 'mto') {
+    locals.relClassName = props.pascalCase(field.name)
+    locals.relCamelName = props.camelCase(field.name)
+  %>
+    import { <%= locals.relClassName %> } from '<%= props.getRelativePathForModel(locals.relCamelName) %>'
+  <% return; } %>
+
+  <%
+  // Special case for OneToOne
+  if(field.type === 'oto') {
+    locals.relClassName = props.pascalCase(field.name)
+    locals.relCamelName = props.camelCase(field.name)
+  %>
+    import { <%= locals.relClassName %> } from '<%= props.getRelativePathForModel(locals.relCamelName) %>'
+  <% return; } %>
+
+<% }) %>
+
+@Model()
+export class <%= props.className %> extends BaseModel {
+<% props.fields.forEach(function(field){ %>
+  <% locals.tmp = !field.required %>
+  <% locals.tmp = field.type === 'decimal' ? true : locals.tmp %>
+
+  <%
+    // Special case for OneToMany
+    if(field.type === 'otm') {
+      locals.relClassName = props.pascalCase(field.name).slice(0, -1)
+      locals.relCamelName = props.camelCase(field.name).slice(0, -1)
+  %>
+    @OneToMany(() => <%= locals.relClassName %>, (<%= locals.relCamelName %>: <%= locals.relClassName %>) => <%= locals.relCamelName %>.<%= props.camelName %>)
+    <%= props.camelCase(field.name) %>?: <%= locals.relClassName %>[];
+  <% return; } %>
+
+  <%
+    // Special case for ManyToOne
+    if(field.type === 'mto') {
+      locals.relClassName = props.pascalCase(field.name)
+      locals.relCamelName = props.camelCase(field.name)
+  %>
+    @ManyToOne(() => <%= locals.relClassName %>, (<%= locals.relCamelName %>: <%= locals.relClassName %>) => <%= locals.relCamelName %>.<%= props.camelNamePlural %>, {
+      skipGraphQLField: true,
+      nullable: true
+    })
+    <%= locals.relCamelName %>?: <%= locals.relClassName %>;
+  <% return; } %>
+
+  <%
+  // Special case for OneToOne
+  if(field.type === 'oto') {
+    locals.relClassName = props.pascalCase(field.name)
+    locals.relCamelName = props.camelCase(field.name)
+  %>
+    @OneToOne(() => <%= locals.relClassName %>)
+    @JoinColumn()
+    <%= props.camelCase(field.name) %>?: <%= locals.relClassName %>;
+  <% return; } %>
+
+  <%
+  // Special case for ArrayField
+  if(field.type === 'array') {
+    locals.relClassName = props.pascalCase(field.name)
+    locals.relCamelName = props.camelCase(field.name)
+    locals.nullable = field.required ? "" : "nullable: true"
+  %>
+    @CustomField({ db: { type: '<%= field.dbType %>', array: true, <%= locals.nullable -%> }, api: { type: '<%= field.apiType %>', <%= locals.nullable -%> } })
+    <%= props.camelCase(field.name) %><%= field.required ? "!" : "?" %>: <%= field.tsType %>[];
+  <% return; } %>
+
+  @<%= field.decorator %>(<%= locals.tmp ? "{" : "" -%>
+    <%_ _%><%= field.required ? "" : "nullable: true," -%>
+    <%_ _%><%- field.type === 'decimal' ? "dataType: 'decimal'" : "" %>
+    <%_ _%><%= locals.tmp ? "}" : "" -%>)
+  <%= field.name %><%= field.required ? "!" : "?" %>: <%= field.tsType %>;
+<% }) %>
+}

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 
 import { WarthogModel } from '../../src/model'
 import { ModelRenderer } from '../../src/generate/ModelRenderer'

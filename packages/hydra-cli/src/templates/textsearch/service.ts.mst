@@ -1,11 +1,11 @@
 import { Service, Inject } from 'typedi';
-{{#entities}}  
+{{#entities}}
 import { {{type}} } from '../{{model}}/{{model}}.model';
 import { {{type}}Service } from '../{{model}}/{{model}}.service';
-{{/entities}}  
+{{/entities}}
 
 {{#whereInputs}}
-import { {{#entities}} {{type}}WhereInput, {{/entities}} } from '../../../generated';
+import { {{#entities}} {{type}}WhereInput, {{/entities}} } from '{{{generatedFolderRelPath}}}';
 {{/whereInputs}}
 
 import { InjectRepository } from 'typeorm-typedi-extensions';
@@ -22,15 +22,15 @@ interface RawSQLResult {
 
 @Service('{{query.typePrefix}}FTSService')
 export class {{query.typePrefix}}FTSService {
-    {{#entities}}  
+    {{#entities}}
     readonly {{fieldName}}Repository: Repository<{{type}}>;
-    {{/entities}} 
+    {{/entities}}
 
     constructor(
       {{#entities}}@InjectRepository({{type}}) {{fieldName}}Repository: Repository<{{type}}>{{^last}},{{/last}}{{/entities}}
       {{#entities}},@Inject('{{type}}Service') public readonly {{fieldName}}Service: {{type}}Service {{/entities}}
     ) {
-      {{#entities}} this.{{fieldName}}Repository = {{fieldName}}Repository; {{/entities}} 
+      {{#entities}} this.{{fieldName}}Repository = {{fieldName}}Repository; {{/entities}}
     }
 
     /**
@@ -130,7 +130,7 @@ export class {{query.typePrefix}}FTSService {
           async (em: EntityManager) => {
             const query = `
               ${queries}
-              SELECT origin_table, id, 
+              SELECT origin_table, id,
                   ts_rank(tsv, phraseto_tsquery('english', $${parameterCounter + 1})) as rank,
                   ts_headline(document, phraseto_tsquery('english', $${parameterCounter +
                     1})) as highlight
@@ -140,7 +140,7 @@ export class {{query.typePrefix}}FTSService {
                 queries !== ``
                   ? `AND unique_id IN (SELECT unique_id FROM selected_ids)`
                   : ``
-              } 
+              }
               ORDER BY rank DESC
               LIMIT $${parameterCounter + 2}
               OFFSET $${parameterCounter + 3}`;
@@ -153,15 +153,15 @@ export class {{query.typePrefix}}FTSService {
             const idMap:{ [id:string]: RawSQLResult } = {};
             results.forEach(item => idMap[item.id] = item);
             const ids: string[] = results.map(item => item.id);
-            
+
             {{#entities}}
             const {{arrayName}}: {{type}}[] = await em.createQueryBuilder<{{type}}>({{type}}, '{{type}}')
                         .where("id IN (:...ids)", { ids }).getMany();
             {{/entities}}
 
             const enhancedEntities = [{{#entities}}...{{arrayName}} {{^last}},{{/last}}{{/entities}}].map((e) => {
-                return { item: e, 
-                    rank: idMap[e.id].rank, 
+                return { item: e,
+                    rank: idMap[e.id].rank,
                     highlight: idMap[e.id].highlight,
                     isTypeOf: idMap[e.id].origin_table } as {{query.typePrefix}}FTSOutput;
             });

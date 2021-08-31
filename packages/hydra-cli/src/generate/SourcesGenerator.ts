@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import * as path from 'path'
 import { getTemplatePath, createFile, createDir } from '../utils/utils'
 
@@ -8,17 +8,11 @@ import { FTSQueryRenderer } from './FTSQueryRenderer'
 import { ModelRenderer } from './ModelRenderer'
 import { EnumRenderer } from './EnumRenderer'
 import { kebabCase } from './utils'
-import { ConfigProvider } from './ConfigProvider'
 import { VariantsRenderer } from './VariantsRenderer'
 import { render } from './AbstractRenderer'
 import { indexContext } from './model-index-context'
 import { JsonFieldRenderer } from './JsonFieldRenderer'
-import {
-  ENUMS_FOLDER,
-  VARIANTS_FOLDER,
-  JSONFIELDS_FOLDER,
-  QUERIES_FOLDER,
-} from './constants'
+import { JSONFIELDS_FOLDER } from './constants'
 
 const debug = Debug('qnode-cli:sources-generator')
 
@@ -31,27 +25,30 @@ export interface GeneratorContext {
 }
 
 export class SourcesGenerator {
-  readonly config: ConfigProvider
-  readonly model: WarthogModel
-  dryRun = false
+  dryRun: boolean
 
-  constructor(model: WarthogModel) {
-    this.config = new ConfigProvider()
-    this.model = model
+  constructor(
+    public readonly outDir: string,
+    public readonly model: WarthogModel
+  ) {
     this.dryRun = process.env.DRY_RUN === 'true'
   }
 
   generate(): void {
+    if (!this.dryRun) {
+      this.mkdir('generated', true)
+    }
     this.generateEnums()
     this.generateVariants()
     this.generateModels()
     this.generateQueries()
     this.generateModelIndex()
     this.generateJsonFields()
+    this.generateServer()
   }
 
   generateModels(): void {
-    createDir(path.resolve(process.cwd(), 'src/modules'), false, true)
+    this.mkdir('generated/modules')
 
     const typesAndInterfaces: ObjectType[] = [
       ...this.model.interfaces,
@@ -59,10 +56,12 @@ export class SourcesGenerator {
     ]
 
     typesAndInterfaces.map((objType) => {
-      const context = this.config.withGeneratedFolderRelPath(objType.name)
-      const modelRenderer = new ModelRenderer(this.model, objType, context)
-      const destFolder = this.config.getDestFolder(objType.name)
-      createDir(path.resolve(process.cwd(), destFolder), false, true)
+      const modelRenderer = new ModelRenderer(this.model, objType, {
+        generatedFolderRelPath: '../../warthog',
+      })
+
+      const destFolder = `generated/modules/${kebabCase(objType.name)}`
+      this.mkdir(destFolder)
 
       const tempateFile: { [key: string]: string } = {
         model: 'entities/model.ts.mst',
@@ -88,23 +87,24 @@ export class SourcesGenerator {
   }
 
   generateQueries(): void {
-    if (!this.model) {
-      throw new Error('Warthog model is undefined')
-    }
-
     // create migrations dir if not exists
-    const migrationsDir = this.config.getMigrationsFolder()
-    fs.ensureDirSync(path.resolve(process.cwd(), migrationsDir))
+    const migrationsDir = 'db/migrations'
+    this.mkdir(migrationsDir)
 
     // create dir if the textsearch module
-    const ftsDir = this.config.getDestFolder(QUERIES_FOLDER)
-    fs.ensureDirSync(path.resolve(process.cwd(), ftsDir))
+    const ftsDir = 'generated/modules/queries'
+    this.mkdir(ftsDir)
 
-    const queryRenderer = new FTSQueryRenderer()
+    const queryRenderer = new FTSQueryRenderer({
+      generatedFolderRelPath: '../../warthog',
+      // add large enough offset, so that search migrations are always applyied after everything else
+      ts: Date.now() + 64060578000000,
+    })
 
     this.model.ftsQueries.map((query) => {
       const tempateFile = (name: string) =>
         this.readTemplate(`textsearch/${name}.ts.mst`)
+
       const destPath = {
         migration: path.join(migrationsDir, `${query.name}.migration.ts`),
         resolver: path.join(ftsDir, `${query.name}.resolver.ts`),
@@ -120,40 +120,43 @@ export class SourcesGenerator {
   }
 
   generateVariants(): void {
-    if (!this.model.unions) {
+    if (!this.model.unions?.length) {
       return
     }
 
-    const unionDir = this.config.getDestFolder(VARIANTS_FOLDER)
-    createDir(path.resolve(process.cwd(), unionDir), false, true)
+    const dir = 'generated/modules/variants'
+    this.mkdir(dir)
+
     const renderer = new VariantsRenderer(this.model)
     const template = this.readTemplate('variants/variants.mst')
+
     this.writeFile(
-      path.join(unionDir, 'variants.model.ts'),
+      path.join(dir, 'variants.model.ts'),
       renderer.render(template)
     )
   }
 
   generateEnums(): void {
-    if (!this.model.enums) {
+    if (!this.model.enums?.length) {
       return
     }
 
-    const enumsDir = this.config.getDestFolder(ENUMS_FOLDER)
-    createDir(path.resolve(process.cwd(), enumsDir), false, true)
+    const enumsDir = 'generated/modules/enums'
+    this.mkdir(enumsDir)
 
     const enumRenderer = new EnumRenderer(this.model)
     const rendered = enumRenderer.render(
       this.readTemplate('entities/enums.ts.mst')
     )
-    this.writeFile(path.join(enumsDir, `enums.ts`), rendered)
+    this.writeFile(path.join(enumsDir, 'enums.ts'), rendered)
   }
 
   generateJsonFields(): void {
     const [dir, tmplName] = JSONFIELDS_FOLDER
 
-    const jsonFieldsDir = this.config.getDestFolder(dir)
-    createDir(path.resolve(process.cwd(), jsonFieldsDir), false, true)
+    const jsonFieldsDir = 'generated/modules/jsonfields'
+
+    this.mkdir(jsonFieldsDir)
 
     this.writeFile(
       path.join(jsonFieldsDir, tmplName.slice(0, -4)),
@@ -170,25 +173,40 @@ export class SourcesGenerator {
     )
     if (!this.dryRun) {
       // create top-level /model folder
-      const modelDir = path.join(this.config.config.get('ROOT_FOLDER'), 'model')
-      createDir(modelDir, false, true)
+      this.mkdir('generated/model')
 
-      // write to /modul/index.ts
-      this.writeFile(path.join(modelDir, 'index.ts'), rendered)
+      // write to /model/index.ts
+      this.writeFile(this.output('generated/model/index.ts'), rendered)
     }
-    // return the result to simply testing
+    // return the result to simplify testing
     return rendered
+  }
+
+  generateServer() {
+    this.mkdir('generated/server')
+
+    const templatesDir = getTemplatePath('graphql-server')
+
+    fs.readdirSync(templatesDir).forEach((file) => {
+      if (file.endsWith('.mst')) {
+        const src = path.join(templatesDir, file)
+        const target = this.output(
+          `generated/server/${path.basename(file, '.mst')}`
+        )
+        fs.copyFileSync(src, target)
+      }
+    })
   }
 
   /**
    *
    * @param template - relative path to a template from the templates folder, e.g. 'db-helper.mst'
-   * @param destPath - relative path to the `generated/graphql-server` folder, e.g. 'src/index.ts'
+   * @param dest - target file relative to the `this.outDir`
    * @param render - function which transforms the template contents
    */
   private renderAndWrite(
     template: string,
-    destPath: string,
+    dest: string,
     render: (data: string) => string
   ) {
     const templateData: string = fs.readFileSync(
@@ -199,7 +217,7 @@ export class SourcesGenerator {
     const rendered: string = render(templateData)
 
     debug(`Transformed: ${rendered}`)
-    const destFullPath = path.resolve(process.cwd(), destPath)
+    const destFullPath = this.output(dest)
 
     debug(`Writing to: ${destFullPath}`)
     createFile(destFullPath, rendered, true)
@@ -210,10 +228,18 @@ export class SourcesGenerator {
     return fs.readFileSync(getTemplatePath(relPath), 'utf-8')
   }
 
-  private writeFile(destPath: string, data: string) {
-    const destFullPath = path.resolve(process.cwd(), destPath)
+  private writeFile(dest: string, data: string) {
+    const destFullPath = this.output(dest)
 
     debug(`Writing to: ${destFullPath}`)
     createFile(destFullPath, data, true)
+  }
+
+  private output(dest): string {
+    return path.resolve(this.outDir, dest)
+  }
+
+  private mkdir(name: string, del?: boolean) {
+    createDir(this.output(name), del, true)
   }
 }

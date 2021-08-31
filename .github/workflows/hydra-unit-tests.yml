@@ -1,6 +1,6 @@
 name: hydra-unit-tests
-on: [pull_request]
-  
+on: [pull_request, workflow_dispatch]
+
 jobs:
   run_unit_tests:
     name: run Hydra unit tests
@@ -14,17 +14,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: install dependencies
+        run: yarn --frozen-lockfile
+
       - name: lint
-        run: |
-          yarn 
-          yarn workspaces run lint
+        run: ./scripts/lint.sh
+
       - name: run unit tests
-        run: |
-          yarn  
-          yarn workspace @subsquid/hydra-cli test 
-          yarn workspace @subsquid/hydra-typegen test
-          yarn workspace @subsquid/hydra-common build
-          yarn workspace @subsquid/hydra-db-utils build
-          yarn workspace @subsquid/hydra-processor install
-          yarn workspace @subsquid/hydra-processor test
- 
+        run: ./scripts/test.sh

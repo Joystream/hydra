@@ -4,7 +4,6 @@
     "importHelpers": true,
     "module": "commonjs",
     "outDir": "lib",
-    "rootDir": ".",
     "strict": true,
     "target": "es2017",
     "noImplicitAny": false,
@@ -13,6 +12,11 @@
     "emitDecoratorMetadata": true,
     "types": [ "node", "mocha" ]
   },
-  "include": ["./src/**/*.ts", "./test/**/*.ts"],
-  "exclude": ["./src/templates/scaffold/mappings/*.ts"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/templates",
+    "node_modules"
+  ]
 }

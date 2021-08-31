@@ -2,7 +2,7 @@ import { EnumRenderer } from '../../src/generate/EnumRenderer'
 import { fromStringSchema } from './model'
 import { expect } from 'chai'
 import Debug from 'debug'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 
 const debug = Debug('cli-test:enum-renderer')
 

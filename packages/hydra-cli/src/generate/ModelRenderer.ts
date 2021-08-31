@@ -206,7 +206,7 @@ export class ModelRenderer extends AbstractRenderer {
   }
 
   transform(): GeneratorContext {
-    return {
+    const ctx = {
       ...this.context, // this.getGeneratedFolderRelativePath(objType.name),
       ...this.withFields(),
       ...this.withEnums(),
@@ -221,5 +221,7 @@ export class ModelRenderer extends AbstractRenderer {
       ...this.withVariantNames(),
       ...this.withInterfaceRelationOptions(),
     }
+    ctx.hasVariantNames = (ctx as any).variantNames.length > 0
+    return ctx
   }
 }

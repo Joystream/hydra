@@ -34,7 +34,9 @@ It is also possible to run `hydra-typegen` against a YAML config file
 hydra-typegen typegen typegen.yml --debug
 ```
 
-## Typegen config 
+A full sample Hydra project can be found [here](https://github.com/subsquid/hydra-template)
+
+## Typegen config
 
 Typegen config file has the following structure:
 
@@ -88,7 +90,7 @@ Typegen config file has the following structure:
       </td>
       <td style="text-align:left">boolean</td>
       <td style="text-align:left">
-        <p>Default: <code>false</code> 
+        <p>Default: <code>false</code>
         </p>
         <p>If true, the event/extrinsic constructor throws an error if the raw data
           does not match the format in metadata (e.g. due to a runtime upgrade).</p>
@@ -116,7 +118,7 @@ The config file `typegen.yml` can look like this:
 ```text
 # Typegen will pull the metadata from Kusama at block with the given hash
 metadata:
-  source: wss://kusama-rpc.polkadot.io 
+  source: wss://kusama-rpc.polkadot.io
   blockHash: '0x45eb7ddd324361adadd4f8cfafadbfb7e0a26393a70a70e5bee6204fc46af62e'
 # events and calls for which the typescript types will be generated
 events:
@@ -140,7 +142,7 @@ is correctly resolved.
 
 ```text
 ...
-customTypes: 
+customTypes:
     lib: 'my/types/library',
     typedefs: my-types-json,
 ```
@@ -149,14 +151,15 @@ Note, that when used in the mappings, the library with custom types \(here `my/t
 
 ## Commands
 
-* [`hydra-typegen help [COMMAND]`](hydra-typegen.md#hydra-typegen-help-command)
-* [`hydra-typegen typegen [CONFIG]`](hydra-typegen.md#hydra-typegen-typegen-config)
+<!-- commands -->
+* [`hydra-typegen help [COMMAND]`](#hydra-typegen-help-command)
+* [`hydra-typegen typegen [CONFIG]`](#hydra-typegen-typegen-config)
 
 ## `hydra-typegen help [COMMAND]`
 
 display help for hydra-typegen
 
-```text
+```
 USAGE
   $ hydra-typegen help [COMMAND]
 
@@ -167,13 +170,12 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code:_ [_@oclif/plugin-help_](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)
 
 ## `hydra-typegen typegen [CONFIG]`
 
 Generate Typescript classes for the Substrate events
 
-```text
+```
 USAGE
   $ hydra-typegen typegen [CONFIG]
 
@@ -204,11 +206,4 @@ OPTIONS
   -t, --typedefs=typedefs    A relative path to a file with JSON definitions for custom types used by the chain
 ```
 
-_See code:_ [_src/commands/typegen/index.ts_](https://github.com/Joystream/hydra/blob/v3.0.0-beta.8/src/commands/typegen/index.ts) 
-
-A full sample Hydra project can be found [here](https://github.com/Joystream/hydra/tree/master/packages/sample)
-
-
-
-
-
+<!-- commandsstop -->

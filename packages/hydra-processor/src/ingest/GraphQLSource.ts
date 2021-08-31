@@ -1,18 +1,18 @@
-import { IProcessorSource, AsJson } from './'
 import {
   FIFOCache,
   SubstrateBlock,
   SubstrateEvent,
   SubstrateExtrinsic,
 } from '@subsquid/hydra-common'
-import { GraphQLClient } from 'graphql-request'
 import Debug from 'debug'
-import { getConfig as conf } from '../start/config'
-import { quotedJoin } from '../util/utils'
-import { GraphQLQuery, IndexerQuery } from './IProcessorSource'
-import { IndexerStatus } from '../state'
-import { collectNamedQueries } from './graphql-query-builder'
+import { GraphQLClient } from 'graphql-request'
 import { compact } from 'lodash'
+import { getConfig as conf } from '../start/config'
+import { IndexerStatus } from '../state'
+import { quotedJoin } from '../util/utils'
+import { IProcessorSource } from './'
+import { IndexerQuery } from './IProcessorSource'
+import pRetry from 'p-retry'
 
 const debug = Debug('hydra-processor:graphql-source')
 
@@ -97,19 +97,20 @@ export class GraphQLSource implements IProcessorSource {
     }
   }
 
-  executeQueries<T>(
-    queries: {
-      [K in keyof T]: GraphQLQuery<T[K]>
-    }
-  ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }> {
-    const bigNamedQuery = collectNamedQueries(queries)
-    // return this.graphClient.request<
-    //   { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
-    // >(bigNamedQuery)
-    return this.requestSubstrateData<
-      { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
-    >(bigNamedQuery)
-  }
+  // Commenting out for now, as it is not essential
+  // executeQueries<T>(
+  //   queries: {
+  //     [K in keyof T]: GraphQLQuery<T[K]>
+  //   }
+  // ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }> {
+  //   const bigNamedQuery = collectNamedQueries(queries)
+  //   // return this.graphClient.request<
+  //   //   { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
+  //   // >(bigNamedQuery)
+  //   return this.requestSubstrateData<
+  //     { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
+  //   >(bigNamedQuery)
+  // }
 
   async getBlock(blockNumber: number): Promise<SubstrateBlock> {
     const block = this.blockCache.get(blockNumber)
@@ -134,31 +135,24 @@ export class GraphQLSource implements IProcessorSource {
       return cached
     }
 
-    const query: GraphQLQuery<SubstrateBlock> = {
-      name: 'substrateBlocks',
-      fields: [
-        'id',
-        'hash',
-        'parentHash',
-        'height',
-        'timestamp',
-        'runtimeVersion',
-        'lastRuntimeUpgrade',
-        { 'events': ['id', 'name', 'extrinsic'] },
-        { 'extrinsics': ['id', 'name'] },
-      ],
-      query: {
-        where: {
-          height: { in: toFetch },
-        },
-        orderBy: { asc: 'height' },
-        limit: Math.min(toFetch.length, conf().BLOCK_CACHE_CAPACITY),
-      },
-    }
+    const limit = Math.min(toFetch.length, conf().BLOCK_CACHE_CAPACITY)
 
-    const result = await this.executeQueries({
-      blocks: query,
-    })
+    const result = await this.requestSubstrateData<{
+      blocks: SubstrateBlock[]
+    }>(`{
+      blocks: substrate_block(where: {height: {_in: [${toFetch.join(
+        ','
+      )}]}}, order_by: {height: asc}, limit: ${limit}) {
+        id
+        hash
+        parentHash
+        height
+        timestamp
+        runtimeVersion
+        lastRuntimeUpgrade
+        events
+        extrinsics
+    }}`)
 
     for (const b of result.blocks) {
       this.blockCache.put(b.height, b)
@@ -184,7 +178,16 @@ export class GraphQLSource implements IProcessorSource {
       }
     >
   ): Promise<T> {
-    const raw = await this.graphClient.request<T>(query)
+    const raw = await pRetry(() => this.graphClient.request<T>(query), {
+      retries: conf().INDEXER_CALL_RETRIES,
+      onFailedAttempt: (i) =>
+        debug(
+          `Failed to connect to the indexer endpoint "${
+            conf().INDEXER_ENDPOINT_URL
+          }" after ${i.attemptNumber} attempts. Retries left: ${i.retriesLeft}`
+        ),
+    })
+
     return JSON.parse(JSON.stringify(raw), (k, v) => {
       if (revive[k as keyof K] === 'BigInt' && typeof v === 'string') {
         return BigInt(v)
@@ -218,31 +221,29 @@ export function getEventsGraphQLQuery({
 }: IndexerQuery): string {
   const event_in = event.in || []
   const eventsFilter =
-    event_in.length > 0 ? `name_in: [${quotedJoin(event_in as string[])}],` : ''
+    event_in.length > 0
+      ? `name: {_in: [${quotedJoin(event_in as string[])}]},`
+      : ''
 
   const extrinsic_in = extrinsic ? extrinsic.in || [] : []
   const extrinsicsFilter =
     extrinsic_in.length > 0
-      ? `extrinsicName_in: [${quotedJoin(extrinsic_in as string[])}],`
+      ? `extrinsic: {name: {_in: [${quotedJoin(extrinsic_in as string[])}]}},`
       : ''
 
-  const idFilter = id.gt ? `afterID: "${id.gt}",` : ''
+  const idFilter = id.gt ? `id: {_gt: "${id.gt}"},` : ''
 
   // FIXME: very rough...
   const block_gt = block.gt || 0
   const block_lte = block.lte || Number.MIN_SAFE_INTEGER
 
   return `
-  substrateEventsAfter(where: { ${eventsFilter}${extrinsicsFilter} blockNumber_gt: ${block_gt}, blockNumber_lte: ${block_lte} }, ${idFilter} limit: ${limit}) {
+  substrate_event(where: {${eventsFilter}${extrinsicsFilter}${idFilter} blockNumber: {_gt: ${block_gt}, _lte: ${block_lte}}}, limit: ${limit}, order_by: {id: asc}) {
     id
-    name 
-    method 
-    params {
-      name
-      type
-      value
-    }
-    indexInBlock 
+    name
+    method
+    params
+    indexInBlock
     blockNumber
     blockTimestamp
     extrinsic {
