@@ -90,7 +90,6 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
       orderBy,
       undefined,
       fields,
-      'main'
     ).take(undefined); // remove LIMIT
 
     let parameters = mainQuery.getParameters();
@@ -107,7 +106,6 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
                 undefined,
                 undefined,
                 ['id'],
-                '{{fieldName}}'
             ).take(undefined); // remove the default LIMIT 
 
 
@@ -129,7 +127,6 @@ export class {{className}}Service extends WarthogBaseService<{{className}}> {
                 undefined,
                 undefined,
                 ['id'],
-                '{{fieldName}}'
             ).take(undefined); //remove the default LIMIT
 
             parameters = { ...parameters, ...{{fieldName}}Query.getParameters() }
