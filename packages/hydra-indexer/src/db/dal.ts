@@ -42,7 +42,7 @@ export function getIndexerHead(): Promise<number> {
       ])
     }
 
-    if (actualHeight === -1) {
+    if (actualHeight === -1 || actualHeight < conf().BLOCK_HEIGHT) {
       return conf().BLOCK_HEIGHT - 1
     } else {
       return Number(actualHeight)
