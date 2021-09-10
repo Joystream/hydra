@@ -45,6 +45,6 @@ The monorepo contains the following sub-packages:
 * [Hydra Indexer Gateway](./packages/hydra-indexer-gateway): GraphQL interface for the Indexer
 * [Hydra Processor](./packages/hydra-processor): Processing part of the pipeline for transforming events into rich business-level objects
 * [Hydra Typegen](./packages/hydra-typegen): A tool for generating typesafe typescript classes for events and extrinsics from the runtime metadata. No more manual deserialization of the event data.
-* [Sample Project](https://github.com/subsquid/hydra-template): A quickstart Hydra project set up against a publicly available Kusama indexer. Good starting point.
+* [Template Project](https://github.com/subsquid/hydra-template): A template project, ready for cloning and hacking. It's a nice starting point for building your own Hydra project and deploying to Subsquid! 
 * [Docs](https://docs.subsquid.io): In-depth documentation covering the Hydra pipeline and API features, such as full-text search, pagination, extensive filtering and a rich GraphQL dialect defining your schema!
 
