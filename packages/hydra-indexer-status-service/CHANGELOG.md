@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.2.0-alpha.0 (2021-09-10)
+
+
+### Features
+
+* **hydra-cli:** hydra-cli deploy features ([#109](https://github.com/subsquid/hydra/issues/109)) ([3446596](https://github.com/subsquid/hydra/commit/34465964f47dacd56cf0aedd28444d547464e668))
+
+
+
 ## 4.1.0 (2021-08-31)
 
 
