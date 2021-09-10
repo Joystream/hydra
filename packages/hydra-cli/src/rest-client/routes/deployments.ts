@@ -1,6 +1,6 @@
 import { baseUrl } from '../baseUrl'
 import { getCreds } from '../../creds'
-import fetch from 'node-fetch'
+import { request } from '../request'
 
 export type ResponseBody = {
   id: string
@@ -10,9 +10,9 @@ export type ResponseBody = {
   version: number
 }
 
-export async function deploymentList(): Promise<ResponseBody[]> {
+export async function deploymentList(): Promise<ResponseBody[] | undefined> {
   const apiUrl = `${baseUrl}/client/deployment`
-  const response = await fetch(apiUrl, {
+  const response = await request(apiUrl, {
     method: 'get',
     headers: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -23,9 +23,5 @@ export async function deploymentList(): Promise<ResponseBody[]> {
   const responseBody = await response.json()
   if (response.status === 200) {
     return responseBody
-  } else {
-    throw new Error(
-      `Failed, status ${response.status}, message: ${responseBody.message}`
-    )
   }
 }

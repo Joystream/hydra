@@ -7,16 +7,19 @@ export default class Ls extends Command {
 
   async run(): Promise<void> {
     const deployments = await deploymentList()
-    cli.table(
-      deployments,
-      {
-        id: {},
-        status: {},
-        name: {},
-        artifactUrl: {},
-        version: {},
-      },
-      {}
-    )
+    if (deployments) {
+      cli.table(
+        deployments,
+        {
+          id: {},
+          status: {},
+          name: {},
+          artifactUrl: {},
+          version: {},
+          deploymentUrl: {},
+        },
+        {}
+      )
+    }
   }
 }

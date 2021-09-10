@@ -57,7 +57,9 @@ describe('deploy command', () => {
     .do(() => creds.setCreds('test_creds')) // perhaps we got an expired or broken creds
     .command(['deploy', '-n', successResponseFixture.name])
     .catch((err) =>
-      expect(err.message.indexOf('status 401')).to.satisfy((index) => index > 0)
+      expect(err.message.indexOf('Run hydra-cli login')).to.satisfy(
+        (index) => index > 0
+      )
     )
     .it('show error message when broken creds')
 })

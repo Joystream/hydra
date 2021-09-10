@@ -1,6 +1,6 @@
 import { baseUrl } from '../baseUrl'
 import { getCreds } from '../../creds'
-import fetch from 'node-fetch'
+import { request } from '../request'
 
 export type ResponseBody = {
   id: string
@@ -13,9 +13,9 @@ export type ResponseBody = {
 export async function deploy(
   deploymentName: string,
   artifactUrl: string
-): Promise<string> {
+): Promise<string | undefined> {
   const apiUrl = `${baseUrl}/client/deployment`
-  const response = await fetch(apiUrl, {
+  const response = await request(apiUrl, {
     method: 'post',
     body: JSON.stringify({
       name: deploymentName,
@@ -30,9 +30,5 @@ export async function deploy(
   const responseBody = await response.json()
   if (response.status === 200) {
     return `Created deployment with name ${responseBody.name}`
-  } else {
-    throw new Error(
-      `Failed, status ${response.status}, message: ${responseBody.message}`
-    )
   }
 }
