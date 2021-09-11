@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/hydra-indexer-status-service",
   "private": "true",
-  "version": "4.2.0-alpha.0",
+  "version": "4.2.0-alpha.1",
   "description": "Indexer status service",
   "license": "MIT",
   "scripts": {
