@@ -305,3 +305,24 @@ export declare type EntityFieldsNames<Entity = any> = {
   // eslint-disable-next-line @typescript-eslint/ban-types
   [P in keyof Entity]: Entity[P] extends Function ? never : P
 }[keyof Entity]
+
+/**
+ * Entity target.
+ */
+export declare type EntityTarget<Entity> =
+  | ObjectType<Entity>
+  | string
+  | {
+      type: Entity
+      name: string
+    }
+
+/**
+ * Represents some Type of the Object.
+ */
+export declare type ObjectType<T> =
+  | {
+      new (): T
+    }
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  | Function

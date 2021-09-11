@@ -6,12 +6,8 @@ import { info } from '../util/log'
 import { BlockData } from '../queue'
 import { getMappingsLookup, IMappingExecutor } from '.'
 import { IMappingsLookup } from './IMappingsLookup'
-import {
-  DeepPartial,
-  FindOneOptions,
-  FindManyOptions,
-  DatabaseManager,
-} from '@subsquid/hydra-common'
+import { DeepPartial, DatabaseManager } from '@subsquid/hydra-common'
+import { makeDatabaseManager } from '../db'
 import { TxAwareBlockContext } from './tx-aware'
 
 const debug = Debug('hydra-processor:mappings-executor')
@@ -41,7 +37,7 @@ export class TransactionalExecutor implements IMappingExecutor {
 
       const { pre, post, mappings } = allMappings
 
-      const store = makeDatabaseManager(entityManager, blockData)
+      const store = getStore(entityManager, blockData)
 
       for (const hook of pre) {
         await this.mappingsLookup.call(hook, {
@@ -83,31 +79,17 @@ export class TransactionalExecutor implements IMappingExecutor {
  * Create database manager.
  * @param entityManager EntityManager
  */
-export function makeDatabaseManager(
+export function getStore(
   entityManager: EntityManager,
   blockData: BlockData
 ): DatabaseManager {
+  const store = makeDatabaseManager(entityManager)
+
   return {
+    ...store,
     save: async <T>(entity: DeepPartial<T>): Promise<void> => {
       entity = fillRequiredWarthogFields(entity, blockData)
-      await entityManager.save(entity)
-    },
-    remove: async <T>(entity: DeepPartial<T>): Promise<void> => {
-      await entityManager.remove(entity)
-    },
-    get: <T>(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      entity: { new (...args: any[]): T },
-      options: FindOneOptions<T>
-    ): Promise<T | undefined> => {
-      return entityManager.findOne(entity, options)
-    },
-    getMany: <T>(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      entity: { new (...args: any[]): T },
-      options: FindManyOptions<T>
-    ): Promise<T[]> => {
-      return entityManager.find(entity, options)
+      await store.save(entity)
     },
   }
 }
