@@ -96,14 +96,39 @@ export class BlockQueue implements IBlockQueue {
 
     info('Starting the event queue')
 
-    await Promise.all([this.pollIndexer(), this.fill()])
+    //await Promise.all([this.pollIndexer(), this.fill()])
+
+
+    this.subscribeToIndexer()
+
+    await this.fill()
   }
 
   stop(): void {
     this._started = false
   }
 
+  async subscribeToIndexer(): Promise<void> {
+    info('Subscribing to indexer')
+
+    this.dataSource.subscribe([]) // TODO: enumerate events
+
+    eventEmitter.on(ProcessorEvents.NEW_INDEXER_HEAD, (h: number) => {
+      debug(`New Indexer Head: ${h}`)
+      console.log('NIIIIICE', h)
+      //this.indexerHead = h
+    })
+  }
+
+
+/*
   async pollIndexer(): Promise<void> {
+
+    eventEmitter.on(ProcessorEvents.NEW_INDEXER_HEAD, (h: number) => {
+      debug(`New Indexer Head: ${h}`)
+      this.indexerHead = h
+    });
+
     // TODO: uncomment this block when eventSource will emit
     // this.eventsSource.on('NewIndexerHead', (h: number) => {
     //   debug(`New Indexer Head: ${h}`)
@@ -119,6 +144,7 @@ export class BlockQueue implements IBlockQueue {
       await delay(conf().POLL_INTERVAL_MS)
     }
   }
+  */
 
   hasNext(): boolean {
     return this._hasNext
@@ -231,7 +257,7 @@ export class BlockQueue implements IBlockQueue {
       debug(
         `Event queue state:
           \tIndexer head: ${this.indexerStatus.head}
-          \tChain head: ${this.indexerStatus.chainHeight} 
+          \tChain head: ${this.indexerStatus.chainHeight}
           \tQueue size: ${this.eventQueue.length}
           \tLast fetched event: ${this.rangeFilter.id.gt}
           \tBlock range: ${JSON.stringify(this.rangeFilter.block)}`

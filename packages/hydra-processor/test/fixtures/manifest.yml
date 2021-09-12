@@ -10,7 +10,7 @@ entities:
   - test/fixtures/test-entities.ts
 mappings:
   mappingsModule: test/fixtures/test-mappings.ts
-  range: '[, 345]'
+  range: '[, 34500]'
   imports:
     - test/fixtures/test-types.ts
   eventHandlers:

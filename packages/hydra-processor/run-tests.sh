@@ -8,7 +8,7 @@ cleanup() {
   yarn pm2 stop processorProcess > /dev/null
 
   # turn off docker containers
-  docker-compose -f docker-compose-test.yml down
+  #docker-compose -f docker-compose-test.yml down
 }
 
 startupDocker() {
@@ -17,6 +17,7 @@ startupDocker() {
   echo "starting db, please wait"
   sleep 2 # wait for db to startup
   docker-compose -f docker-compose-test.yml up -d
+  #docker-compose -f docker-compose-test.yml up -d hydra-indexer
 }
 
 buildProcessor() {
@@ -45,15 +46,15 @@ export DB_PASS=postgres
 export INDEXER_ENDPOINT_URL=http://localhost:4002/graphql
 
 # ensure docker depencency images exist
-docker build ../../ -t hydra-builder:latest
-yarn workspace @joystream/hydra-indexer docker:build
-yarn workspace @joystream/hydra-indexer-gateway docker:build
+#docker build ../../ -t hydra-builder:latest
+#yarn workspace @joystream/hydra-indexer docker:build
+#yarn workspace @joystream/hydra-indexer-gateway docker:build
 
 # start preparation
 startupDocker
 buildProcessor
 
-#exit 1 # uncomment during debugging and run rest of commands manually as you need
+exit 1 # uncomment during debugging and run rest of commands manually as you need
 
 startProcessor
 
