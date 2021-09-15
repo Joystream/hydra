@@ -310,6 +310,7 @@ export class Server<C extends BaseContext> {
     this.expressApp.use('/graphql', (req, res, next) => {
       if (req.path != '/') return next()
       if (req.method != 'GET' && req.method != 'HEAD') return next()
+      if (req.query['query']) return next()
       res.vary('Accept')
       if (!req.accepts('html')) return next()
       res.type('html').send(indexHtml)
