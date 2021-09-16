@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.2.0-alpha.2 (2021-09-16)
+
+
+### Bug Fixes
+
+* do not return console on gql endpoint when query param is present ([d5bf8fb](https://github.com/subsquid/hydra/commit/d5bf8fbb7aef8eb95855be30e73c56bf59458a33))
+
+
+
 ## 4.2.0-alpha.1 (2021-09-11)
 
 
