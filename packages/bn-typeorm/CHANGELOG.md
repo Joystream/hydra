@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.11 (2021-09-17)
+
+
+### Bug Fixes
+
+* missing websocket dependency fix ([6b23a3d](https://github.com/Joystream/hydra/commit/6b23a3dca5b7009020031fff7642f80c898e5255))
+
+
+
 ## 3.1.0-alpha.10 (2021-09-09)
 
 **Note:** Version bump only for package @joystream/bn-typeorm
