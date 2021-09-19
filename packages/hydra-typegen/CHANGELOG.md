@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.2.0-alpha.3 (2021-09-19)
+
+
+### Features
+
+* **hydra-indexer:** bump polkadot.api to 6.0.2 ([ca45a62](https://github.com/Joystream/hydra/commit/ca45a622bd790ebac0382ac63b2ae0982c860b9a))
+
+
+
 ## 4.2.0-alpha.2 (2021-09-16)
 
 
