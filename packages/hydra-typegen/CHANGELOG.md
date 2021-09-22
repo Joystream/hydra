@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.2.0-alpha.4 (2021-09-22)
+
+
+### Bug Fixes
+
+* **hydra-indexer:** always use paramX name for event params ([132a916](https://github.com/Joystream/hydra/commit/132a9166e6adf70911ccbc06ca173d8dc0e83b43))
+
+
+
 ## 4.2.0-alpha.3 (2021-09-19)
 
 
