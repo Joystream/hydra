@@ -137,10 +137,7 @@ export class SubstrateEventEntity
     if (event.data.length) {
       q.eventRecord.event.data.forEach((data, index) => {
         const type = event.typeDef[index].type
-        const name =
-          event.typeDef[index].name ||
-          event.typeDef[index].displayName ||
-          `param${index}`
+        const name = `param${index}`
         const value = data ? data.toJSON() : {}
 
         _entity.data[name] = { type, value } as AnyJson
