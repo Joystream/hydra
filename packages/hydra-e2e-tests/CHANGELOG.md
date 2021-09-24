@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.12 (2021-09-24)
+
+
+### Bug Fixes
+
+* loadManyToMany undefined fix ([c758740](https://github.com/Joystream/hydra/commit/c7587402e0d1a2b775fc7fc6a19ceb0f6b32d525))
+
+
+
 ## 3.1.0-alpha.11 (2021-09-17)
 
 
