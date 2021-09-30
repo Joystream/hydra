@@ -1,6 +1,7 @@
 import {
   Hash,
   Header,
+  AccountId,
   BlockNumber,
   EventRecord,
   SignedBlock,
@@ -156,6 +157,7 @@ export class SubstrateService implements ISubstrateService {
       signedBlock: this.getSignedBlock(hash),
       lastUpgrade: this.lastRuntimeUpgrade(hash),
       runtimeVersion: this.runtimeVersion(hash),
+      validatorId: this.validatorId(hash),
     }
     const out = (await pProps(data)) as Partial<BlockData>
     if (getConfig().VERBOSE) debug(`Out: ${JSON.stringify(out, null, 2)}`)
@@ -184,6 +186,13 @@ export class SubstrateService implements ISubstrateService {
 
   async timestamp(hash: Hash): Promise<BN> {
     return this.apiCall((api) => api.query.timestamp.now.at(hash))
+  }
+
+  async validatorId(hash: Hash): Promise<AccountId | undefined> {
+    const headerExtended = await this.apiCall((api) =>
+      api.derive.chain.getHeader(hash)
+    )
+    return headerExtended?.author
   }
 
   async lastRuntimeUpgrade(

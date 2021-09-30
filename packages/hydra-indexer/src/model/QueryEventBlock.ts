@@ -7,6 +7,7 @@ import {
   RuntimeVersion,
   LastRuntimeUpgradeInfo,
   Extrinsic,
+  AccountId,
 } from '@polkadot/types/interfaces'
 
 import { u32 } from '@polkadot/types'
@@ -22,6 +23,7 @@ export interface BlockData {
   timestamp: number
   lastRuntimeUpgrade: LastRuntimeUpgradeInfo
   runtimeVersion: RuntimeVersion
+  validatorId: AccountId
 }
 
 export function fromBlockData({

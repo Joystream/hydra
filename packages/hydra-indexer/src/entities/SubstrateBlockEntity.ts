@@ -43,6 +43,9 @@ export class SubstrateBlockEntity
   @Column()
   extrinsicsRoot!: string
 
+  @Column()
+  validatorId!: string
+
   @Column({ type: 'jsonb' })
   runtimeVersion!: AnyJson
 
@@ -61,6 +64,7 @@ export class SubstrateBlockEntity
     events,
     signedBlock: { block },
     timestamp,
+    validatorId,
   }: BlockData): SubstrateBlockEntity {
     const entity = new SubstrateBlockEntity()
 
@@ -77,6 +81,7 @@ export class SubstrateBlockEntity
     entity.stateRoot = header.stateRoot.toHex()
     entity.height = header.number.toNumber()
     entity.extrinsicsRoot = header.extrinsicsRoot.toHex()
+    entity.validatorId = validatorId?.toHuman()
     entity.timestamp = timestamp
     entity.id = formatId({ height: entity.height, hash: entity.hash })
 
