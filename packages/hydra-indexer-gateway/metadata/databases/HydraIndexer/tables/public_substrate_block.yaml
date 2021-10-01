@@ -8,6 +8,7 @@ configuration:
     parent_hash: parentHash
     runtime_version: runtimeVersion
     state_root: stateRoot
+    validator_id: validatorId
   custom_root_fields: {}
 array_relationships:
 - name: substrate_events
@@ -41,6 +42,7 @@ select_permissions:
     - version
     - events
     - extrinsics
+    - validator_id
     - last_runtime_upgrade
     - runtime_version
     - created_at
