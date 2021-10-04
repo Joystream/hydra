@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.2.0-alpha.5 (2021-10-04)
+
+
+### Features
+
+* **hydra-indexer-gateway:** expose validator_id ([541ff6d](https://github.com/Joystream/hydra/commit/541ff6d1bc7c4ea731743bd9320e8d5a3bb56be9))
+
+
+
 ## 4.2.0-alpha.4 (2021-09-22)
 
 
