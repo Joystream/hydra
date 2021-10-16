@@ -1,279 +1,40 @@
 import { Command, flags } from '@oclif/command'
-import * as fs from 'fs'
-import * as path from 'path'
-import cli from 'cli-ux'
-import Mustache from 'mustache'
-import Debug from 'debug'
-
-import {
-  getTemplatePath,
-  createDir,
-  resolvePackageVersion,
-  getWarthogDependency,
-} from '../utils/utils'
-
-import select = require('@inquirer/select')
-import input = require('@inquirer/input')
-import password = require('@inquirer/password')
-import glob = require('glob')
-
-const debug = Debug('hydra-cli:scaffold')
-
-// TODO: fetch from a well-known source?
-const INDEXERS = [
-  {
-    name: 'local',
-    value: 'localhost',
-    description: 'Self-hosted indexer at localhost:4010',
-    url: 'http://localhost:4010/v1/graphql',
-  },
-  {
-    name: 'Polkadot',
-    value: 'polkadot',
-    description: 'Ready-to use indexer for Polkadot, hosted by Subsquid',
-    url: 'https://polkadot.indexer.gc.subsquid.io/graphql',
-  },
-  {
-    name: 'Kusama',
-    value: 'kusama',
-    description: 'Ready-to use indexer for Kusama, hosted by Subsquid',
-    url: 'https://kusama.indexer.gc.subsquid.io/graphql',
-  },
-  {
-    name: 'Karura',
-    value: 'karura',
-    description: 'Ready-to use indexer for Karura, hosted by Subsquid',
-    url: 'https://karura.indexer.gc.subsquid.io/graphql',
-  },
-  {
-    name: 'manual',
-    value: 'manual',
-    description:
-      'Skip for now, I will manually set INDEXER_ENDPOINT_URL later on',
-    url: '',
-  },
-]
+import { scaffold } from '../scaffold'
 
 export default class Scaffold extends Command {
-  static description = `Starter kit: generates a directory layout and a sample schema file`
+  static description = `Starter kit: creates initial project layout`
 
   static flags = {
-    name: flags.string({
-      char: 'n',
-      description: 'Project name',
-      default: 'hydra-scaffold',
-    }),
-
-    indexerUrl: flags.string({
-      char: 'i',
-      description: 'Hydra Indexer endpoint',
-      default: INDEXERS.find((e) => e.name === 'polkadot')?.url,
-    }),
     dir: flags.string({
       char: 'd',
-      description: 'Project folder',
+      description: 'Project directory',
       default: process.cwd(),
     }),
-    rewrite: flags.boolean({
-      description: 'Clear the folder before scaffolding',
+
+    server: flags.boolean({
+      description: 'Include GraphQL server',
+      allowNo: true,
+      default: true,
     }),
+
+    'server-extension': flags.boolean({
+      description: 'Include support for GraphQL server extension',
+      default: false,
+    }),
+
     silent: flags.boolean({
       description:
         'If present, the scaffolder is non-interactive and uses only provided CLI flags',
-    }),
-    blockHeight: flags.string({
-      char: 'b',
-      description: 'Start block height',
-      default: '0',
-    }),
-    dbHost: flags.string({
-      char: 'h',
-      description: 'Database host',
-      default: 'localhost',
-    }),
-    dbPort: flags.string({
-      char: 'p',
-      description: 'Database port',
-      default: '5432',
-    }),
-    dbUser: flags.string({
-      char: 'u',
-      description: 'Database user',
-      default: 'postgres',
-    }),
-    dbPassword: flags.string({
-      char: 'x',
-      description: 'Database user password',
-      default: 'postgres',
-    }),
-    appPort: flags.string({
-      char: 'a',
-      description: 'GraphQL server port',
-      default: '4000',
     }),
   }
 
   async run(): Promise<void> {
     const { flags } = this.parse(Scaffold)
 
-    debug(`Flags: ${JSON.stringify(flags, null, 2)}`)
-
-    let ctx = {}
-
-    if (flags.silent) {
-      ctx = { ...flags, dbName: flags.name }
-    } else {
-      ctx = await this.promptDotEnv()
-    }
-
-    ctx = withDependenciesResolutions(ctx)
-
-    cli.action.start('Scaffolding')
-
-    const destRoot = path.resolve(flags.dir)
-    if (destRoot === process.cwd() && flags.rewrite) {
-      flags.rewrite = false
-      console.warn(
-        "WARN: can't delete current working dir, ignoring --rewrite flag"
-      )
-    }
-
-    createDir(destRoot, flags.rewrite, true)
-
-    debug(`Writing files to ${destRoot}`)
-
-    const templatesRoot: string = path.resolve(
-      __dirname,
-      '..',
-      'templates',
-      'scaffold'
-    )
-
-    glob('**/*', { cwd: templatesRoot, dot: true }, (error, files) => {
-      if (error) {
-        throw new Error(`An error occured during scaffolding: ${error.message}`)
-      }
-      files.forEach((sourceFile) => {
-        let destPath = path.join(destRoot, sourceFile)
-        const sourcePath = path.join(templatesRoot, sourceFile)
-
-        if (fs.lstatSync(sourcePath).isDirectory()) {
-          createDir(destPath)
-          return
-        }
-
-        debug(`Writing ${destPath}`)
-
-        const source = fs.readFileSync(sourcePath, 'utf-8')
-
-        if (sourcePath.endsWith('.mst')) {
-          // if it's a template, use the context
-          destPath = destPath.slice(0, -4)
-          fs.writeFileSync(destPath, Mustache.render(source, ctx))
-        } else {
-          fs.writeFileSync(destPath, source)
-        }
-      })
+    scaffold({
+      targetDir: flags.dir,
+      withServer: flags.server,
+      withServerExtension: flags['server-extension'],
     })
-
-    cli.action.stop()
-  }
-
-  async dotenvFromFlags(flags: {
-    [key: string]: string | boolean | undefined
-  }): Promise<string> {
-    const template = await new Promise<string>((resolve, reject) => {
-      fs.readFile(
-        getTemplatePath('scaffold/.env'),
-        { encoding: 'utf-8' },
-        (err, content) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(content)
-          }
-        }
-      )
-    })
-    return Mustache.render(template, { ...flags, dbName: flags.projectName })
-  }
-
-  async promptDotEnv(): Promise<Record<string, string>> {
-    let ctx: Record<string, string> = {}
-
-    const projectName = (await input({
-      message: 'Enter your project name',
-    })) as string
-    ctx = { ...ctx, projectName }
-
-    const iCtx = await this.promptIndexerURL(ctx)
-    ctx = { ...ctx, ...iCtx }
-
-    const dbName = (await input({
-      message: 'Database name',
-      default: projectName,
-    })) as string
-    ctx = { ...ctx, dbName }
-
-    const dbHost = (await input({
-      message: 'Database host',
-      default: 'localhost',
-    })) as string
-    ctx = { ...ctx, dbHost }
-
-    const dbPort = (await input({
-      message: 'Database port',
-      default: '5432',
-    })) as string
-    ctx = { ...ctx, dbPort }
-
-    const dbUser = (await input({
-      message: 'Database user',
-      default: 'postgres',
-    })) as string
-    ctx = { ...ctx, dbUser }
-
-    const dbPassword = (await password({
-      message: 'Database user password',
-      type: 'mask',
-      default: 'postgres',
-    })) as string
-    ctx = { ...ctx, dbPassword }
-
-    debug(`Ctx: ${JSON.stringify(ctx)}`)
-    return ctx
-  }
-
-  async promptIndexerURL(
-    ctx: Record<string, string>
-  ): Promise<Record<string, string>> {
-    const answer = await select({
-      message: 'Select a Hydra Indexer to be used by the mappings processor',
-      choices: INDEXERS,
-    })
-
-    debug(`Answer: ${JSON.stringify(answer)}`)
-    ctx = {
-      ...ctx,
-      indexerUrl: INDEXERS.find((c) => c.value === answer)?.url || '',
-    }
-    debug(`Indexer url: ${JSON.stringify(ctx)}`)
-    return ctx
-  }
-}
-
-export function withDependenciesResolutions(
-  ctx: Record<string, string>
-): Record<string, string> {
-  return {
-    ...ctx,
-    hydraVersion:
-      process.env.HYDRA_CLI_VERSION ||
-      resolvePackageVersion('@subsquid/hydra-cli'),
-    hydraCommonVersion: resolvePackageVersion('@subsquid/hydra-common'),
-    hydraDbUtilsVersion: resolvePackageVersion('@subsquid/hydra-db-utils'),
-    hydraProcessorVersion: resolvePackageVersion('@subsquid/hydra-processor'),
-    hydraTypegenVersion: resolvePackageVersion('@subsquid/hydra-typegen'),
-    hydraWarthogVersion: getWarthogDependency(),
   }
 }

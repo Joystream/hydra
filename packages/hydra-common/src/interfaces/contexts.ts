@@ -1,4 +1,8 @@
-import { SubstrateBlock, SubstrateEvent, SubstrateExtrinsic } from '.'
+import {
+  SubstrateBlock,
+  SubstrateEvent,
+  SubstrateExtrinsic,
+} from './substrate-interfaces'
 import { DatabaseManager } from './store'
 
 export interface StoreContext {

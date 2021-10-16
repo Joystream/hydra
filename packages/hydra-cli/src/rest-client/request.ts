@@ -1,4 +1,5 @@
 import * as fetch from 'node-fetch'
+
 export async function request(
   apiUrl: string,
   fetchContext: fetch.RequestInit | undefined

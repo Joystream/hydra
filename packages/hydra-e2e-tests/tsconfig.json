@@ -1,20 +1,15 @@
 {
 	"compilerOptions": {
-		"declaration": true,
-		"importHelpers": true,
+    "target": "es2020",
 		"module": "commonjs",
 		"outDir": "lib",
 		"rootDir": "test",
 		"strict": true,
-		"target": "es2017",
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"inlineSources": false,
-		"typeRoots": ["./node_modules/@types"],
-		"types": [ "node", "mocha" ]
+    "esModuleInterop": true,
+    "skipLibCheck": true,
 	},
 	"include": ["test/**/*"],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules", "fixtures"]
 }

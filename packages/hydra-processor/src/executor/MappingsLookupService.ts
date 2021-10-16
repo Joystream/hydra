@@ -223,13 +223,11 @@ export function matches<T extends { filter?: Filter }>(
     return false
   }
 
+  const runtimeVersion: any = blockData.block.runtimeVersion
   if (
     mapping.filter.specVersion &&
-    blockData.block.runtimeVersion.specVersion &&
-    !isInRange(
-      blockData.block.runtimeVersion.specVersion as number,
-      mapping.filter.specVersion
-    )
+    typeof runtimeVersion?.specVersion === 'number' &&
+    !isInRange(runtimeVersion.specVersion, mapping.filter.specVersion)
   ) {
     return false
   }

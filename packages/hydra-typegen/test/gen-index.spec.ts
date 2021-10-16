@@ -12,6 +12,6 @@ describe('gen-index', () => {
       customTypes: { typedefsLoc: 'test/fixtures/typedefs.json' },
       dest,
     } as unknown as GeneratorConfig)
-    expect(fs.existsSync(path.join(dest, 'typedefs.json'))).equal(true)
+    expect(fs.existsSync(path.join(dest, 'types-json.ts'))).equal(true)
   })
 })

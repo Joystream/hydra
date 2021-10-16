@@ -1,6 +1,5 @@
 import path from 'path'
 import fs from 'fs'
-import Prettier from 'prettier'
 
 const log = require('debug')('hydra-typegen:util')
 
@@ -32,26 +31,8 @@ export function writeFile(dest: string, generator: () => string): void {
   fs.writeFileSync(dest, generated)
 }
 
-const prettierOptions: Prettier.Options = {
-  parser: 'typescript',
-  endOfLine: 'auto',
-}
-
-export function formatWithPrettier(
-  text: string,
-  options: Prettier.Options = prettierOptions
-): string {
-  let formatted = ''
-  try {
-    formatted = Prettier.format(text, options)
-  } catch (error) {
-    console.error(
-      'There were some errors while formatting with Prettier',
-      error
-    )
-    formatted = text
-  }
-  return formatted
+export function formatWithPrettier(text: string): string {
+  return text
 }
 
 export type Key = string | number

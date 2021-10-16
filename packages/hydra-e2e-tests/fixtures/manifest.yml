@@ -1,17 +1,17 @@
-version: '3.0'
+version: '4.0'
 description: Test manifest
-repository: https://github.com/
-hydraVersion: "4"
+
 typegen:
   metadata:
-    source: ws://node-template:9944/
+    source: metadata.json
   events:
     - balances.Transfer
   calls:
     - timestamp.set
-  outDir: types
+  outDir: src/types
+
 mappings:
-  mappingsModule: mappings
+  mappingsModule: lib/mappings
   eventHandlers:
     - event: balances.Transfer
       handler: balancesTransfer

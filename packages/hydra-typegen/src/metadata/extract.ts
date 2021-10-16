@@ -1,6 +1,7 @@
 import { IConfig } from '../commands/typegen'
-import { getMetadata, registry } from './metadata'
+import { getMetadata, registry, MetadataSource } from './metadata'
 import { uniq, compact } from 'lodash'
+import assert from 'assert'
 import { Vec } from '@polkadot/types/codec'
 import { Text } from '@polkadot/types/primitive'
 import {
@@ -26,7 +27,8 @@ export async function extractMeta({
   const moduleCalls: Record<string, Call[]> = {}
   const moduleTypes: Record<string, string[]> = {}
 
-  const metadata = await getMetadata(metadataSource)
+  assert(metadataSource != null && typeof metadataSource.source === 'string')
+  const metadata = await getMetadata(metadataSource as MetadataSource)
 
   for (const e of events) {
     const [module, event] = findEvent(metadata, e)

@@ -1,15 +1,12 @@
-// @ts-check
+import _ from 'lodash'
+import Debug from 'debug'
 import {
   BlockData,
   fromBlockData,
   getExtrinsicIndex,
   getOrUndefined,
 } from '../model'
-import _ from 'lodash'
-
 import { toPayload } from '@subsquid/hydra-common'
-
-import Debug from 'debug'
 import { PooledExecutor } from './PooledExecutor'
 import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { IStatusService } from '../status-service/IStatusService'

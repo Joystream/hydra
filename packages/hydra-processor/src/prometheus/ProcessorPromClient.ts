@@ -14,6 +14,11 @@ export class ProcessorPromClient {
     help: 'Last block the processor has scanned for events',
   })
 
+  protected lastProcessedBlock = new Gauge({
+    name: 'hydra_processor_last_processed_block',
+    help: 'Last processed block',
+  })
+
   protected chainHeight = new Gauge({
     name: 'hydra_processor_chain_height',
     help: 'Current substrate chain height as reported by the indexer',
@@ -50,6 +55,7 @@ export class ProcessorPromClient {
         eventEmitter.on(
           ProcessorEvents.PROCESSED_EVENT,
           (event: SubstrateEvent) => {
+            this.lastProcessedBlock.set(event.blockNumber)
             this.processedEvents.inc()
             this.processedEvents.inc({ name: event.name })
           }

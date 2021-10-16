@@ -1,14 +1,11 @@
 import { TypeRegistry } from '@polkadot/types'
 {{#if hasTypeDefs}}
-import path from 'path'
-import fs from 'fs'
+import { typesJson } from './types-json'
 {{/if}}
 const typeRegistry = new TypeRegistry()
 
 {{#if hasTypeDefs}}
-typeRegistry.register(
-  JSON.parse(fs.readFileSync(path.join(__dirname, 'typedefs.json'), 'utf-8'))
-)
+typeRegistry.register(typesJson)
 {{/if}}
 
 export {

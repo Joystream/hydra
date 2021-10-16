@@ -63,7 +63,7 @@ type Extrinsic @entity {
   hash: String!
 }
 
-interface Event @entity {
+interface Event {
   indexInBlock: Int!
   inExtrinsic: String
   inBlock: Int!
@@ -118,7 +118,6 @@ type EventParam @jsonField {
   name: String
   type: String
   value: String
-
   additionalData: [AdditionalData!]
 }
 

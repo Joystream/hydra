@@ -8,8 +8,6 @@ import {
   PrimaryColumn,
 } from 'typeorm'
 import {
-  AnyJson,
-  AnyJsonField,
   ExtrinsicArg,
   SubstrateExtrinsic,
   formatId,
@@ -38,7 +36,7 @@ export class SubstrateExtrinsicEntity
   @Column({
     type: 'numeric',
   })
-  tip!: BigInt
+  tip!: bigint
 
   @Column('bigint')
   @Index()
@@ -54,7 +52,7 @@ export class SubstrateExtrinsicEntity
   @Column({
     type: 'jsonb',
   })
-  meta!: AnyJson
+  meta!: unknown
 
   @Column()
   @Index()
@@ -88,7 +86,7 @@ export class SubstrateExtrinsicEntity
   @Column({
     type: 'jsonb',
   })
-  era!: AnyJson
+  era!: unknown
 
   @Column()
   hash!: string
@@ -133,21 +131,20 @@ export function fromBlockExtrinsic(data: {
   extr.section = (e.method && e.method.section) || 'NO_SECTION'
   extr.name = fullName(e.method)
 
-  extr.meta =
-    e.meta && e.meta.toJSON ? ((e.meta.toJSON() || {}) as AnyJson) : {}
-  extr.hash = e.hash ? e.hash.toString() : ''
+  extr.meta = e.meta?.toJSON() || {}
+  extr.hash = e.hash?.toString() || ''
 
   extr.isSigned = e.isSigned
   extr.tip = e.tip ? e.tip.toBigInt() : BigInt(0)
   extr.versionInfo = e.version ? e.version.toString() : ''
   extr.nonce = e.nonce ? e.nonce.toNumber() : 0
-  extr.era = e.era ? ((e.era.toJSON() || {}) as AnyJson) : {}
+  extr.era = e.era?.toJSON() || {}
 
   extr.args = []
 
   e.method.args.forEach((data, index) => {
     const name = e.meta.args[index].name.toString()
-    const value = data.toJSON() as AnyJsonField
+    const value = data.toJSON()
     const type = data.toRawType()
 
     extr.args.push({

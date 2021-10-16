@@ -34,7 +34,10 @@ module.exports = {
     "sonarjs/no-identical-functions": "warn",
     "sonarjs/no-duplicate-string": "warn",
     "sonarjs/no-collapsible-if": "warn",
-    "sonarjs/no-nested-template-literals": "off"
+    "sonarjs/no-nested-template-literals": "off",
+    "sonarjs/no-small-switch": "off",
+    "sonarjs/no-nested-switch": "off",
+    "promise/param-names": "warn"
   },
   "overrides": [
     {

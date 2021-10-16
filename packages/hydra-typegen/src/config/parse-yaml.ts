@@ -8,8 +8,8 @@ import { IConfig } from '../commands/typegen'
 const options = {
   structure: {
     typegen: {
-      metadata: {
-        source: 'string',
+      'metadata?': {
+        'source?': 'string',
         'blockHash?': 'string',
       },
       'customTypes?': {

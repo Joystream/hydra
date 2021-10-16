@@ -1,7 +1,7 @@
 import { Command } from '@oclif/command'
 import cli from 'cli-ux'
 import { createOAuthDeviceAuth } from '@octokit/auth-oauth-device'
-import { Verification } from '@octokit/auth-oauth-device/dist-src'
+import type { Verification } from '@octokit/auth-oauth-device/dist-types/types'
 import { setCreds } from '../creds'
 import { me as identifyMe } from '../rest-client'
 

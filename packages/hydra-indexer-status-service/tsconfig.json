@@ -4,7 +4,7 @@
       "lib": ["ES2018"],
       "module": "commonjs",
       "moduleResolution": "node",
-      "outDir": "./dist",
+      "outDir": "./lib",
       "sourceMap": true,
 
       "allowSyntheticDefaultImports": true,

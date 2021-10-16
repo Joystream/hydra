@@ -2,7 +2,6 @@ import { MetadataLatest } from '@polkadot/types/interfaces'
 import { Metadata } from '@polkadot/types'
 import { TypeRegistry } from '@polkadot/types/create'
 import { WebSocket } from '@polkadot/x-ws'
-import BN from 'bn.js'
 import path from 'path'
 import { TypeDefs } from './types'
 import { readJson } from '../util'
@@ -20,7 +19,7 @@ export interface MetadataSource {
 interface ChainSpec {
   chain: string
   name: string
-  version: BN
+  version: BigInt
 }
 
 export async function getMetadata({

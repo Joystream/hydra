@@ -1,1 +1,0 @@
-export { SnakeNamingStrategy } from './SnakeNamingStrategy'

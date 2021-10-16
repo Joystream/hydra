@@ -27,7 +27,7 @@ export class ProcessedEventsLogEntity {
   lastScannedBlock!: number
 
   // When the event is added to the database
-  @Column('timestamp without time zone', {
+  @Column('timestamp with time zone', {
     default: () => 'now()',
   })
   updatedAt!: Date

@@ -1,9 +1,5 @@
 #!/usr/bin/env node
 
-if (process.env.HYDRA_NO_TS != 'true') {
-  require('ts-node/register')
-}
-
 require('@oclif/command').run()
 .then(require('@oclif/command/flush'))
 .catch(require('@oclif/errors/handle'))

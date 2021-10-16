@@ -2,9 +2,12 @@ import { Command, flags } from '@oclif/command'
 import fs from 'fs'
 import path from 'path'
 import Debug from 'debug'
-
-import { MetadataSource, registerCustomTypes } from '../../metadata/metadata'
-import { extractMeta } from '../../metadata'
+import * as dotenv from 'dotenv'
+import {
+  MetadataSource,
+  extractMeta,
+  registerCustomTypes,
+} from '../../metadata'
 import {
   generateModuleTypes,
   GeneratorConfig,
@@ -20,7 +23,7 @@ export type CustomTypes = {
 }
 
 export interface IConfig {
-  metadata: MetadataSource
+  metadata?: Omit<MetadataSource, 'source'> & { source?: string }
   events: string[]
   calls: string[]
   customTypes?: CustomTypes
@@ -87,7 +90,7 @@ Otherwise a relative path to a json file matching the RPC call response is expec
       char: 'o',
       description:
         'A relative path the root folder where the generated files will be generated',
-      default: 'generated/types',
+      default: 'src/types',
     }),
     strict: flags.boolean({
       char: 's',
@@ -104,8 +107,9 @@ types don't much the metadata definiton`,
   }
 
   async run(): Promise<void> {
-    const { flags, args } = this.parse(Typegen)
+    dotenv.config()
 
+    const { flags, args } = this.parse(Typegen)
     if (flags.debug) {
       Debug.enable('hydra-typegen:*')
     }
@@ -116,6 +120,16 @@ types don't much the metadata definiton`,
       config = parseConfigFile(path.resolve(args.config))
     } else {
       config = this.parseFlags(flags)
+    }
+
+    if (!config.metadata?.source) {
+      config.metadata = config.metadata || {}
+      config.metadata.source = process.env.CHAIN_NODE
+      if (!config.metadata.source) {
+        throw new Error(
+          'Metadata source must me defined either via typegen config or CHAIN_NODE environment variable'
+        )
+      }
     }
 
     validate(config)

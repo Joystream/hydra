@@ -8,50 +8,9 @@ FROM node AS base
 WORKDIR /hydra
 ADD package.json .
 ADD yarn.lock .
-RUN yarn --frozen-lockfile
-
-
-FROM base AS indexer
-ADD packages/bn-typeorm/package.json packages/bn-typeorm/
 ADD packages/hydra-common/package.json packages/hydra-common/
-ADD packages/hydra-db-utils/package.json packages/hydra-db-utils/
 ADD packages/hydra-indexer/package.json packages/hydra-indexer/
-RUN yarn --frozen-lockfile
-
-ADD packages/bn-typeorm/tsconfig.json packages/bn-typeorm/
-ADD packages/bn-typeorm/src packages/bn-typeorm/src
-RUN yarn workspace @subsquid/bn-typeorm build
-
-ADD packages/hydra-common/tsconfig.json packages/hydra-common/
-ADD packages/hydra-common/src packages/hydra-common/src
-RUN yarn workspace @subsquid/hydra-common build
-
-ADD packages/hydra-db-utils/tsconfig.json packages/hydra-db-utils/
-ADD packages/hydra-db-utils/src packages/hydra-db-utils/src
-RUN yarn workspace @subsquid/hydra-db-utils build
-
-ADD packages/hydra-indexer/tsconfig.json packages/hydra-indexer/
-ADD packages/hydra-indexer/src packages/hydra-indexer/src
-RUN yarn workspace @subsquid/hydra-indexer build
-
-WORKDIR /hydra/packages/hydra-indexer
-CMD ["yarn", "start:prod"]
-
-
-FROM base AS indexer-status-service
 ADD packages/hydra-indexer-status-service/package.json packages/hydra-indexer-status-service/
-RUN yarn --frozen-lockfile
-ADD packages/hydra-indexer-status-service/tsconfig.json packages/hydra-indexer-status-service/
-ADD packages/hydra-indexer-status-service/src packages/hydra-indexer-status-service/src
-RUN yarn workspace @subsquid/hydra-indexer-status-service build
-WORKDIR /hydra/packages/hydra-indexer-status-service
-CMD ["yarn", "start"]
-
-
-FROM base AS deps
-ADD packages/bn-typeorm/package.json packages/bn-typeorm/
-ADD packages/hydra-common/package.json packages/hydra-common/
-ADD packages/hydra-db-utils/package.json packages/hydra-db-utils/
 ADD packages/hydra-processor/package.json packages/hydra-processor/
 ADD packages/hydra-processor/bin packages/hydra-processor/bin
 ADD packages/hydra-typegen/package.json packages/hydra-typegen/
@@ -59,47 +18,96 @@ ADD packages/hydra-typegen/bin packages/hydra-typegen/bin
 ADD packages/hydra-cli/package.json packages/hydra-cli/
 ADD packages/hydra-cli/bin packages/hydra-cli/bin
 ADD packages/hydra-e2e-tests/package.json packages/hydra-e2e-tests/
-ADD packages/warthog/package.json packages/warthog/
-ADD packages/warthog/bin packages/warthog/bin
 RUN yarn --frozen-lockfile
 
 
-FROM deps AS test
-ADD packages/warthog/tsconfig.json packages/warthog/
-ADD packages/warthog/src packages/warthog/src
-ADD packages/warthog/typings packages/warthog/typings
-RUN yarn workspace @subsquid/warthog prepack
-RUN rm -r packages/warthog/src packages/warthog/typings
-
-ADD packages/hydra-cli/tsconfig.json packages/hydra-cli/
-ADD packages/hydra-cli/src packages/hydra-cli/src
-ADD packages/hydra-cli/bin packages/hydra-cli/bin
-RUN yarn workspace @subsquid/hydra-cli prepack
-RUN rm -r packages/hydra-cli/src
-
-RUN ./packages/hydra-cli/bin/run scaffold --dir packages/hydra-test --name hydra-test --silent
-RUN yarn
-
-ADD packages/hydra-e2e-tests/fixtures packages/hydra-test/
-RUN yarn workspace hydra-test codegen
-
-ADD packages/hydra-typegen/tsconfig.json packages/hydra-typegen/
-ADD packages/hydra-typegen/src packages/hydra-typegen/src
-RUN yarn workspace @subsquid/hydra-typegen prepack
-RUN rm -r packages/hydra-typegen/src
-
-COPY --from=indexer /hydra/packages/bn-typeorm/lib packages/bn-typeorm/lib
-COPY --from=indexer /hydra/packages/hydra-common/lib packages/hydra-common/lib
-COPY --from=indexer /hydra/packages/hydra-db-utils/lib packages/hydra-db-utils/lib
-
-ADD packages/hydra-processor/tsconfig.json packages/hydra-processor/
-ADD packages/hydra-processor/src packages/hydra-processor/src
-RUN yarn workspace @subsquid/hydra-processor prepack
-RUN rm -r packages/hydra-processor/src
-WORKDIR /hydra/packages/hydra-test
+FROM base AS common-build
+WORKDIR /hydra/packages/hydra-common
+ADD packages/hydra-common/tsconfig.json .
+ADD packages/hydra-common/src src/
+# can't do just `yarn pack` because it ignores `.files` field
+RUN yarn prepack
+RUN mv "$(npm pack --ignore-scripts)" package.tgz
 
 
-FROM deps AS e2e-test-runner
+FROM common-build AS indexer-build
+WORKDIR /hydra/packages/hydra-indexer
+ADD packages/hydra-indexer/tsconfig.json .
+ADD packages/hydra-indexer/src src/
+RUN yarn build
+
+
+FROM node AS indexer
+WORKDIR /hydra-indexer
+COPY --from=common-build  /hydra/packages/hydra-common/package.tgz /hydra-common.tgz
+COPY --from=indexer-build /hydra/packages/hydra-indexer/package.json .
+ADD scripts/patch-deps.js /patch-deps.js
+RUN node /patch-deps.js
+ENV NODE_ENV production
+RUN npm install --production
+COPY --from=indexer-build /hydra/packages/hydra-indexer/lib lib/
+CMD ["node", "./lib/run.js", "index"]
+
+
+FROM base AS indexer-status-service-builder
+WORKDIR /hydra/packages/hydra-indexer-status-service
+ADD packages/hydra-indexer-status-service/tsconfig.json .
+ADD packages/hydra-indexer-status-service/src src/
+RUN yarn build
+
+
+FROM node AS indexer-status-service
+WORKDIR /hydra-indexer-status-service
+COPY --from=indexer-status-service-builder /hydra/packages/hydra-indexer-status-service/package.json .
+ENV NODE_ENV production
+RUN npm install --production
+COPY --from=indexer-status-service-builder /hydra/packages/hydra-indexer-status-service/lib lib/
+CMD ["node", "./lib/app.js"]
+
+
+FROM base AS cli-build
+WORKDIR /hydra/packages/hydra-cli
+ADD packages/hydra-cli/tsconfig.json .
+ADD packages/hydra-cli/src src/
+ADD packages/hydra-cli/resource resource/
+RUN yarn prepack
+RUN mv "$(npm pack --ignore-scripts)" package.tgz
+
+
+FROM common-build AS processor-build
+WORKDIR /hydra/packages/hydra-processor
+ADD packages/hydra-processor/tsconfig.json .
+ADD packages/hydra-processor/src src/
+RUN yarn prepack
+RUN mv "$(npm pack --ignore-scripts)" package.tgz
+
+
+FROM base AS typegen-build
+WORKDIR /hydra/packages/hydra-typegen
+ADD packages/hydra-typegen/tsconfig.json .
+ADD packages/hydra-typegen/src src/
+RUN yarn prepack
+RUN mv "$(npm pack --ignore-scripts)" package.tgz
+
+
+FROM node AS test-project
+COPY --from=cli-build /hydra/packages/hydra-cli/package.tgz /hydra-cli.tgz
+RUN npm install -g --production /hydra-cli.tgz
+COPY --from=common-build /hydra/packages/hydra-common/package.tgz /hydra-common.tgz
+COPY --from=processor-build /hydra/packages/hydra-processor/package.tgz /hydra-processor.tgz
+COPY --from=typegen-build /hydra/packages/hydra-typegen/package.tgz /hydra-typegen.tgz
+RUN hydra-cli scaffold -d /hydra-test --server-extension --silent
+WORKDIR /hydra-test
+ADD scripts/patch-deps.js /patch-deps.js
+RUN node /patch-deps.js
+RUN npm install
+ADD packages/hydra-e2e-tests/fixtures .
+RUN npm run typegen
+RUN npm run codegen
+RUN npm run build
+
+
+FROM base AS e2e-test-runner
 WORKDIR /hydra/packages/hydra-e2e-tests
 ADD packages/hydra-e2e-tests/tsconfig.json .
 ADD packages/hydra-e2e-tests/test test

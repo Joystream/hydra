@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { AnyJson, SubstrateBlock, SubstrateEvent } from '@subsquid/hydra-common'
+import { SubstrateBlock, SubstrateEvent } from '@subsquid/hydra-common'
 import { IndexerStatus } from '../state'
 
 export interface Filter {
@@ -82,20 +82,6 @@ export type QueryField<T> =
         >
       }
     >
-
-export type AsJson<T> = T extends
-  | string
-  | number
-  | BigInt
-  | AnyJson
-  | boolean
-  | null
-  ? T // eslint-disable-next-line @typescript-eslint/ban-types
-  : T extends Function
-  ? never // eslint-disable-next-line @typescript-eslint/ban-types
-  : T extends object
-  ? { [K in keyof T]: AsJson<T[K]> }
-  : never
 
 export type QueryFields<T> = Array<QueryField<T>>
 /**

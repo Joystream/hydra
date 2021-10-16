@@ -1,13 +1,11 @@
+import { Command, flags } from '@oclif/command'
+import { loadModel } from '@subsquid/openreader/dist/tools'
+import * as dotenv from 'dotenv'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as dotenv from 'dotenv'
-import { Command, flags } from '@oclif/command'
-import Debug from 'debug'
-import { SourcesGenerator } from '../generate/SourcesGenerator'
-import { WarthogModelBuilder } from '../parse/WarthogModelBuilder'
-import { warthogexec } from '../utils/warthog-exec'
-
-const debug = Debug('qnode-cli:codegen')
+import { codegen, CodegenOptions } from '../codegen'
+import { generateFtsMigrations } from '../fts'
+import { OutDir } from '../utils/outDir'
 
 export default class Codegen extends Command {
   static description = 'Analyze graphql schema and generate model/server files'
@@ -22,26 +20,36 @@ export default class Codegen extends Command {
 
   async run(): Promise<void> {
     dotenv.config()
-
     const { flags } = this.parse(Codegen)
-    debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}`)
-
-    // Create warthog graphql server
-    const schemaFile = path.resolve(flags.schema)
-    if (!fs.existsSync(schemaFile)) {
-      console.error(
-        `Cannot open the schema file or folder: ${schemaFile}. Check if it exists.`
-      )
+    const model = loadModel(path.normalize(flags.schema))
+    const pkg = readPackageJson()
+    const options: CodegenOptions = {
+      model,
+      outDir: new OutDir('src/generated'),
+    }
+    if (pkg == null && pkg.dependencies?.['@subsquid/openreader'] == null) {
+      options.withServer = false
+    } else {
+      options.withServer = true
+    }
+    if (pkg?.dependencies?.['type-graphql']) {
+      options.withServerExtension = true
+    }
+    try {
+      codegen(options)
+      generateFtsMigrations(model, new OutDir('db/migrations'))
+    } catch (e: any) {
+      console.error(e.stack)
       process.exit(1)
     }
+  }
+}
 
-    const modelBuilder = new WarthogModelBuilder(schemaFile)
-    const model = modelBuilder.buildWarthogModel()
-
-    const sourcesGenerator = new SourcesGenerator('.', model)
-    sourcesGenerator.generate()
-
-    const ok = await warthogexec(['codegen'])
-    process.exit(ok ? 0 : 1)
+function readPackageJson(): any | undefined {
+  try {
+    const content = fs.readFileSync('package.json', 'utf-8')
+    return JSON.parse(content)
+  } catch (e: any) {
+    return undefined
   }
 }

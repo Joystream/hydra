@@ -1,22 +1,18 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "importHelpers": true,
     "module": "commonjs",
+    "target": "es2020",
     "outDir": "lib",
     "strict": true,
-    "target": "es2017",
-    "noImplicitAny": false,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "types": [ "node", "mocha" ]
+    "importHelpers": true
   },
   "include": [
     "src"
   ],
   "exclude": [
-    "src/templates",
+    "resource",
     "node_modules"
   ]
 }

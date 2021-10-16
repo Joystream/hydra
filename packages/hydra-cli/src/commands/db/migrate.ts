@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 import { Command } from '@oclif/command'
-import { ormexec } from '../../utils/orm'
+import { ormexec } from '../../db'
 
 export default class Migrate extends Command {
   static description = 'Apply database migrations'

@@ -1,6 +1,7 @@
-import { RedisClientFactory } from '@subsquid/hydra-db-utils'
 import { getConfig } from '..'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
+import Redis from 'ioredis'
+import { logError } from '@subsquid/hydra-common/lib'
 import Debug from 'debug'
 const debug = Debug('index-builder:redis-factory')
 
@@ -21,3 +22,42 @@ eventEmitter.on(IndexerEvents.INDEXER_STOP, () => {
     clientFactory.stop()
   }
 })
+
+export class RedisClientFactory {
+  private clients: Redis.Redis[] = []
+  private factoryMetod: () => Redis.Redis
+
+  public constructor(redisURI?: string, options?: Redis.RedisOptions) {
+    if (options) {
+      this.factoryMetod = () => new Redis(options)
+      debug(`Using RedisOptions`)
+      return
+    }
+
+    const uri = redisURI || process.env.REDIS_URI
+    if (uri) {
+      this.factoryMetod = () => new Redis(uri)
+      debug(`Using ${uri} for Redis clients`)
+    } else {
+      throw new Error(`Redis URL is not provided`)
+    }
+  }
+
+  getClient(): Redis.Redis {
+    const client = this.factoryMetod()
+    this.clients.push(client)
+    return client
+  }
+
+  stop(): void {
+    for (const client of this.clients) {
+      if (client) {
+        try {
+          client.disconnect()
+        } catch (e) {
+          debug(`Failed to disconnect redis client: ${logError(e)}`)
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,4 @@
 import {
-  AnyJson,
   EventInfo,
   ExtrinsicInfo,
   formatId,
@@ -47,10 +46,10 @@ export class SubstrateBlockEntity
   validatorId!: string
 
   @Column({ type: 'jsonb' })
-  runtimeVersion!: AnyJson
+  runtimeVersion!: unknown
 
   @Column({ type: 'jsonb' })
-  lastRuntimeUpgrade!: AnyJson
+  lastRuntimeUpgrade!: unknown
 
   @Column({ type: 'jsonb' })
   events!: EventInfo[]
@@ -66,15 +65,14 @@ export class SubstrateBlockEntity
     timestamp,
     validatorId,
   }: BlockData): SubstrateBlockEntity {
+    const { header } = block
     const entity = new SubstrateBlockEntity()
 
     entity.lastRuntimeUpgrade = lastRuntimeUpgrade
-      ? (lastRuntimeUpgrade.toJSON() as AnyJson)
+      ? lastRuntimeUpgrade.toJSON()
       : {}
-    entity.runtimeVersion = runtimeVersion
-      ? (runtimeVersion.toJSON() as AnyJson)
-      : {}
-    const { header } = block
+
+    entity.runtimeVersion = runtimeVersion ? runtimeVersion.toJSON() : {}
 
     entity.hash = header.hash.toHex()
     entity.parentHash = header.parentHash.toHex()

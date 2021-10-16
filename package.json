@@ -2,14 +2,10 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "packages/*",
-      "packages/sample/generated/*",
-      "packages/sample/mappings"
+      "packages/*"
     ],
     "nohoist": [
       "**/hydra-typegen",
-      "**/sample/generated/graphql-server",
-      "**/sample/generated/graphql-server/**",
       "**/hydra-typegen/**"
     ]
   },
@@ -43,12 +39,7 @@
     "typescript": "~4.4.2"
   },
   "resolutions": {
-    "typeorm": "0.2.37",
-    "graphql": "14.7.0",
-    "@types/graphql-iso-date": "3.3.3",
-    "@types/graphql-fields": "1.3.2",
-    "//": "Fixes security vulnerability",
-    "set-value": "2.0.1"
+    "typeorm": "0.2.38"
   },
   "lint-staged": {
     "*.ts": "yarn lint --fix"

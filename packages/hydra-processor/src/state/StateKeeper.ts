@@ -103,12 +103,17 @@ export class StateKeeper implements IStateKeeper {
 
     info(`Hydra Indexer version: ${this.indexerStatus.hydraVersion}`)
 
-    validateIndexerVersion(
-      this.indexerStatus.hydraVersion,
-      getManifest().indexerVersionRange
-    )
+    const manifest = getManifest()
 
-    const range = getManifest().mappings.range
+    if (manifest.indexerVersionRange) {
+      validateIndexerVersion(
+        this.indexerStatus.hydraVersion,
+        manifest.indexerVersionRange
+      )
+    }
+    validateIndexerVersion(this.indexerStatus.hydraVersion, '>=4 <5')
+
+    const range = manifest.mappings.range
 
     this.processorState = initState(range, lastState)
     eventEmitter.emit(ProcessorEvents.STATE_CHANGE, this.processorState)

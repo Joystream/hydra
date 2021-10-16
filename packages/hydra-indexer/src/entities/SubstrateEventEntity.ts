@@ -7,7 +7,6 @@ import {
   Index,
 } from 'typeorm'
 import {
-  AnyJson,
   EventParam,
   SubstrateEvent,
   formatId,
@@ -49,7 +48,7 @@ export class SubstrateEventEntity
   @Column({
     type: 'jsonb',
   })
-  extrinsicArgs!: AnyJson
+  extrinsicArgs!: unknown
 
   @Column({ nullable: true })
   extrinsicHash?: string
@@ -63,7 +62,7 @@ export class SubstrateEventEntity
   @Column({
     type: 'jsonb',
   })
-  phase!: AnyJson
+  phase!: unknown
 
   @Column()
   @Index()
@@ -88,7 +87,7 @@ export class SubstrateEventEntity
   @Column({
     type: 'jsonb',
   })
-  data!: AnyJson
+  data!: unknown
 
   @ManyToOne(
     () => SubstrateExtrinsicEntity,
@@ -127,10 +126,10 @@ export class SubstrateEventEntity
     _entity.method = q.eventRecord.event.method || 'NO_METHOD'
     _entity.section = q.eventRecord.event.section || 'NO_SECTION'
     _entity.name = `${_entity.section}.${_entity.method}`
-    _entity.phase = (q.eventRecord.phase.toJSON() || {}) as AnyJson
+    _entity.phase = q.eventRecord.phase.toJSON() || {}
 
     _entity.params = []
-    _entity.data = {} as AnyJson
+    _entity.data = {}
 
     const { event } = q.eventRecord
 
@@ -140,7 +139,7 @@ export class SubstrateEventEntity
         const name = `param${index}`
         const value = data ? data.toJSON() : {}
 
-        _entity.data[name] = { type, value } as AnyJson
+        ;(_entity.data as any)[name] = { type, value }
         _entity.params.push({
           type,
           name,
@@ -149,7 +148,7 @@ export class SubstrateEventEntity
       })
     }
 
-    const extrinsicArgs: AnyJson = {}
+    const extrinsicArgs: any = {}
 
     if (q.extrinsicEntity) {
       _entity.extrinsic = q.extrinsicEntity
@@ -162,8 +161,6 @@ export class SubstrateEventEntity
     }
 
     _entity.extrinsicArgs = extrinsicArgs
-
-    // debug(`Event entity: ${JSON.stringify(_entity, null, 2)}`);
 
     return _entity
   }

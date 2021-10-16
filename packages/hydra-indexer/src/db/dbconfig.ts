@@ -1,13 +1,13 @@
 import path from 'path'
-import { ConnectionOptions } from 'typeorm'
-import { SnakeNamingStrategy } from '@subsquid/hydra-db-utils'
+import { ConnectionOptions, DefaultNamingStrategy } from 'typeorm'
+import { snakeCase } from 'typeorm/util/StringUtils'
 import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { getDBConfig } from '../node'
 import { SubstrateBlockEntity } from '../entities/SubstrateBlockEntity'
 
 const migrationsDir = path.resolve(__dirname, '../migrations')
 
-const config: (name?: string) => ConnectionOptions = (name) => {
+export default function config(name?: string): ConnectionOptions {
   const conf = getDBConfig()
   return {
     name,
@@ -26,9 +26,50 @@ const config: (name?: string) => ConnectionOptions = (name) => {
     cli: {
       migrationsDir: 'src/migrations/v3',
     },
-    logging: conf.DB_LOGGING,
     namingStrategy: new SnakeNamingStrategy(),
-  } as ConnectionOptions
+  }
 }
 
-export default config
+class SnakeNamingStrategy extends DefaultNamingStrategy {
+  tableName(className: string, customName?: string): string {
+    return customName || `${snakeCase(className)}` // `${snakeCase(className)}s`;
+  }
+
+  columnName(
+    propertyName: string,
+    customName?: string,
+    embeddedPrefixes: string[] = []
+  ): string {
+    return (
+      snakeCase(embeddedPrefixes.join('_')) +
+      (customName || snakeCase(propertyName))
+    )
+  }
+
+  relationName(propertyName: string): string {
+    return snakeCase(propertyName)
+  }
+
+  joinColumnName(relationName: string, referencedColumnName: string): string {
+    return snakeCase(`${relationName}_${referencedColumnName}`)
+  }
+
+  joinTableName(firstTableName: string, secondTableName: string): string {
+    return snakeCase(`${firstTableName}_${secondTableName}`)
+  }
+
+  joinTableColumnName(
+    tableName: string,
+    propertyName: string,
+    columnName?: string
+  ): string {
+    return snakeCase(`${tableName}_${columnName || propertyName}`)
+  }
+
+  classTableInheritanceParentColumnName(
+    parentTableName: string,
+    parentTableIdPropertyName: string
+  ): string {
+    return snakeCase(`${parentTableName}_${parentTableIdPropertyName}`)
+  }
+}

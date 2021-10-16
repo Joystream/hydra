@@ -15,7 +15,13 @@ export function generateIndex({
 }: GeneratorConfig): void {
   if (customTypes) {
     const typedefsPath = path.resolve(customTypes.typedefsLoc)
-    fs.copyFileSync(typedefsPath, path.join(dest, `typedefs.json`))
+    const json = fs.readFileSync(typedefsPath, 'utf-8')
+    const code = `export const typesJson = ${JSON.stringify(
+      JSON.parse(json),
+      null,
+      2
+    )}\n`
+    fs.writeFileSync(path.join(dest, `types-json.ts`), code)
   }
 
   writeFile(path.join(dest, `index.ts`), () =>

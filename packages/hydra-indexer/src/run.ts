@@ -2,12 +2,11 @@ import dotenv from 'dotenv'
 import chalk from 'chalk'
 import figlet from 'figlet'
 import commander from 'commander'
-
-import { getLogger } from 'log4js'
-
 import { configure, IndexerStarter, cleanUp } from './node'
 
-const logger = getLogger()
+function info(msg: string): void {
+  console.log(`${chalk.green('INFO')}: ${msg}`)
+}
 
 const withErrors = (command: (...args: any[]) => Promise<void>) => {
   return async (...args: any[]) => {
@@ -73,28 +72,26 @@ function setUp(opts: Record<string, string>) {
 
   process.env.WS_PROVIDER_ENDPOINT_URI =
     opts.provider || process.env.WS_PROVIDER_ENDPOINT_URI
-  //  TODO: use logger everywhere
-  getLogger().level = 'debug'
 }
 
 async function runIndexer() {
   configure()
-  logger.info(`Starting the indexer`)
+  info('Starting indexer')
   await IndexerStarter.index()
 }
 
 async function runMigrations() {
-  logger.info(`Running migrations`)
+  info(`Running migrations`)
   await IndexerStarter.migrate()
 }
 
 process.on('SIGINT', async () => {
-  logger.info(`SIGINT: terminating`)
+  info(`SIGINT: terminating`)
   await cleanUp()
 })
 
 process.on('SIGTERM', async () => {
-  logger.info(`SIGTERM: terminating`)
+  info(`SIGTERM: terminating`)
   await cleanUp()
 })
 

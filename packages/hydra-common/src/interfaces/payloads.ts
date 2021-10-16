@@ -1,5 +1,4 @@
 import { SubstrateBlock } from './substrate-interfaces'
-import { pick } from 'lodash'
 
 /**
  * General block information. Typically used as a payload for lightweight subscription messages.
@@ -15,15 +14,18 @@ export interface BlockPayload {
 }
 
 export function toPayload(sb: SubstrateBlock): BlockPayload {
-  return <BlockPayload>{
-    ...pick(sb, [
-      'events',
-      'extrinsics',
-      'hash',
-      'parentHash',
-      'height',
-      'runtimeVersion.specVersion',
-    ]),
+  const runtimeVersion: BlockPayload['runtimeVersion'] = {}
+  const spec = (sb.runtimeVersion as any)?.specVersion
+  if (spec) {
+    runtimeVersion.specVersion = '' + spec
+  }
+  return {
+    height: sb.height,
+    hash: sb.hash,
+    parentHash: sb.parentHash,
     ts: sb.timestamp,
+    events: sb.events,
+    extrinsics: sb.extrinsics,
+    runtimeVersion,
   }
 }

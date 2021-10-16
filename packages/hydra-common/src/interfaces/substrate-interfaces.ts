@@ -1,15 +1,13 @@
-import { AnyJson, AnyJsonField } from './json-types'
-
 export interface EventParam {
   type: string
   name: string
-  value: AnyJsonField
+  value: unknown
 }
 
 export interface ExtrinsicArg {
   type: string
   name: string
-  value: AnyJsonField
+  value: unknown
 }
 
 export interface EventInfo {
@@ -62,12 +60,12 @@ export interface SubstrateBlock {
   /**
    * Raw JSON with substrate runtime version
    */
-  runtimeVersion: AnyJson
+  runtimeVersion: unknown
 
   /**
    * Raw JSON with last runtime upgrade information
    */
-  lastRuntimeUpgrade: AnyJson
+  lastRuntimeUpgrade: unknown
 
   /**
    * An array with basic event information
@@ -149,12 +147,12 @@ export interface SubstrateExtrinsic {
   /**
    * Raw JSON with extrinsic metadata information
    */
-  meta?: AnyJson
+  meta?: unknown
 
   /**
    * Raw JSON with extrinsic era
    */
-  era?: AnyJson
+  era?: unknown
 
   /**
    * Hex string representing the extrinsic signer
@@ -179,7 +177,7 @@ export interface SubstrateExtrinsic {
   /**
    * Extrinsic tip
    */
-  tip: BigInt
+  tip: bigint
 
   /**
    * Ordinal index in the event array of the current block

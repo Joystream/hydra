@@ -4,7 +4,7 @@ services:
   query-node:
     build:
       context: ../..
-      target: test
+      target: test-project
     restart: unless-stopped
     environment:
       - DB_NAME=processor-db
@@ -12,10 +12,7 @@ services:
       - DB_USER=postgres
       - DB_PASS=postgres
       - DB_PORT=5432
-      - GRAPHQL_SERVER_HOST=localhost
       - GRAPHQL_SERVER_PORT=4000
-    ports:
-      - "4000:4000"
     depends_on:
       - hydra-processor
     command: yarn query-node:start
@@ -23,38 +20,32 @@ services:
   hydra-processor:
     build:
       context: ../..
-      target: test
-    restart: unless-stopped
+      target: test-project
     environment:
       - DB_NAME=processor-db
       - DB_USER=postgres
       - DB_PASS=postgres
       - DB_HOST=db
       - DB_PORT=5432
-      - GRAPHQL_SERVER_HOST=localhost
-      - GRAPHQL_SERVER_PORT=4000
       - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:8080/v1/graphql
-      - NODE_URL=ws://node-template:9944
+      - CHAIN_NODE=ws://node-template:9944
       - POLL_INTERVAL_MS=500 # refresh every second
       - DEBUG=hydra*
-    ports:
-      - "3000:3000"
     depends_on:
       - hydra-indexer-gateway
     command: >
-      sh -c "yarn typegen && \
-             yarn db:create && \
+      sh -c "npm run typegen && \
+             npm run build && \
+             npm run db:create && \
              npx hydra-cli db:create-migration Initial && \
-             /hydra/node_modules/.bin/tsc && \
-             HYDRA_NO_TS=true yarn db:migrate && \
-             HYDRA_NO_TS=true yarn processor:migrate && \
-             HYDRA_NO_TS=true yarn processor:start"
+             npm run db:reset && \
+             npm run processor:start"
 
   hydra-indexer:
     build:
       context: ../..
       target: indexer
-    restart: unless-stopped
+    restart: always
     environment:
       - DB_NAME=indexer-db
       - DB_USER=postgres
@@ -67,7 +58,7 @@ services:
       - DEBUG=index-builder:*,hydra-indexer:*
       - TYPES_JSON=typedefs.json
     volumes:
-      - ./fixtures/typedefs.json:/hydra/packages/hydra-indexer/typedefs.json
+      - ./fixtures/typedefs.json:/hydra-indexer/typedefs.json
     command: >
       sh -c "yarn db:bootstrap && yarn start:prod"
     depends_on:
@@ -79,16 +70,13 @@ services:
     build:
       context: ../..
       target: indexer-gateway
-    restart: unless-stopped
     depends_on:
       - redis
       - db
       - hydra-indexer-status-service
       - hydra-indexer
-    ports:
-      - "8080:8080"
     environment:
-      # DEV_MODE: "true"
+#      DEV_MODE: "true"
       DB_NAME: indexer-db
       DB_USER: postgres
       DB_PASS: postgres
@@ -100,33 +88,22 @@ services:
     build:
       context: ../..
       target: indexer-status-service
-    restart: unless-stopped
     depends_on:
       - redis
-    ports:
-      - "8081:8081"
     environment:
       REDIS_URI: redis://redis:6379/0
       PORT: 8081
 
   node-template:
     image: paritytech/substrate-playground-template-node-template:sha-7212614
-    restart: unless-stopped
-    ports:
-      - "9944:9944"
     command: ["./target/release/node-template", "--dev", "--tmp", "--ws-external"]
 
   redis:
     image: redis:6.0-alpine
     restart: always
-    ports:
-      - "6379"
 
   db:
     image: postgres:12
-    restart: always
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: postgres
     # command: ["postgres", "-c", "log_statement=all"]

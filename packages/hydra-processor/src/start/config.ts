@@ -2,7 +2,6 @@
 import { cleanEnv, str, num, bool } from 'envalid'
 import { parseManifest, ProcessorManifest } from './manifest'
 import Debug from 'debug'
-import { setWarthogEnvs } from '../db/ormconfig'
 
 let conf: {
   // manifest file location
@@ -75,7 +74,6 @@ export function configure(): void {
     QUEUE_BATCH_SIZE: envConf.BATCH_SIZE * envConf.QUEUE_FACTOR,
     EVENT_QUEUE_MAX_CAPACITY: envConf.BATCH_SIZE * envConf.QUEUE_MAX_CAP_FACTOR,
   }
-  setWarthogEnvs()
   Debug.enable(conf.DEBUG)
 }
 

@@ -1,18 +1,14 @@
 {
 	"compilerOptions": {
-		"declaration": true,
-		"importHelpers": true,
-		"module": "commonjs",
+        "module": "commonjs",
+        "target": "es2020",
 		"outDir": "lib",
-		"rootDir": "src",
-		"strict": true,
-		"target": "es2017",
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true,
+        "declaration": true,
+        "strict": true,
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"inlineSources": false
 	},
-	"include": ["src/**/*"],
+	"include": ["src"],
 	"exclude": ["node_modules"]
 }

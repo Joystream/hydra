@@ -3,11 +3,10 @@ import YamlValidator from 'yaml-validator'
 import fs from 'fs'
 import path from 'path'
 import semver from 'semver'
-import { camelCase, upperFirst, compact } from 'lodash'
 import Debug from 'debug'
+import { camelCase, upperFirst, compact } from 'lodash'
 import { HandlerFunc } from './QueryEventProcessingPack'
 import { Range, parseRange } from '../util'
-import { validateHydraVersion } from '../state/version'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
 export const CONTEXT_CLASS_NAME = 'SubstrateEvent'
@@ -21,15 +20,11 @@ const manifestValidatorOptions = {
     version: 'string',
     'description?': 'string',
     'repository?': 'string',
-    hydraVersion: 'string',
-    'indexerVersionRange?': 'string?',
+    'indexerVersionRange?': 'string',
     mappings: {
       mappingsModule: 'string',
       'imports?': ['string'],
-      'range?': {
-        'from?': 'number',
-        'to?': 'number',
-      },
+      'range?': 'string',
       'eventHandlers?': [
         {
           event: 'string',
@@ -139,10 +134,9 @@ export function hasEvent(handler: unknown): handler is { event: string } {
 
 export interface ProcessorManifest {
   version: string
-  hydraVersion: string
-  indexerVersionRange: string
   description?: string
   repository?: string
+  indexerVersionRange?: string
   mappings: MappingsDef
 }
 
@@ -157,6 +151,7 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
       )}`
     )
   }
+
   const parsed = YAML.parse(fs.readFileSync(manifestLoc, 'utf8')) as {
     version: string
     hydraVersion: string
@@ -166,20 +161,20 @@ export function parseManifest(manifestLoc: string): ProcessorManifest {
     mappings: MappingsDefInput
   }
 
-  const { mappings, hydraVersion } = parsed
-  const indexerVersionRange = parsed.indexerVersionRange || parsed.hydraVersion
-  if (!semver.validRange(indexerVersionRange)) {
+  if (
+    parsed.indexerVersionRange &&
+    !semver.validRange(parsed.indexerVersionRange)
+  ) {
     throw new Error(
-      `Invalid indexer version range format: ${indexerVersionRange}. Make sure it satisfies the semver format`
+      `Invalid indexer version range format: ${parsed.indexerVersionRange}. Make sure it satisfies the semver format`
     )
   }
-  validateHydraVersion(hydraVersion)
-  validate(mappings)
+
+  validate(parsed.mappings)
 
   return {
     ...parsed,
-    indexerVersionRange,
-    mappings: buildMappingsDef(mappings),
+    mappings: buildMappingsDef(parsed.mappings),
   }
 }
 

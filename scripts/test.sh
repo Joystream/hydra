@@ -3,14 +3,8 @@
 set -e
 
 # Ensure, that everything builds correctly
-echo "BUILDING warthog"
-yarn workspace @subsquid/warthog prepack
-echo "BUILDING bn-typeorm"
-yarn workspace @subsquid/bn-typeorm prepack
 echo "BUILDING common"
 yarn workspace @subsquid/hydra-common prepack
-echo "BUILDING db-utils"
-yarn workspace @subsquid/hydra-db-utils prepack
 echo "BUILDING cli"
 yarn workspace @subsquid/hydra-cli prepack
 echo "BUILDING typegen"

@@ -1,0 +1,13 @@
+version: '4.0'
+description: Test manifest
+
+typegen:
+  outDir: src/types
+  events:
+
+mappings:
+  mappingsModule: lib/mappings
+  eventHandlers:
+  extrinsicHandlers:
+  preBlockHooks:
+  postBlockHooks:
