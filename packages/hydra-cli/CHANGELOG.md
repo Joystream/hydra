@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.0-alpha.0](https://github.com/subsquid/hydra/compare/v4.2.0-alpha.5...v5.0.0-alpha.0) (2021-10-16)
+
+
+### Features
+
+* introduce v5 ([#121](https://github.com/subsquid/hydra/issues/121)) ([ed5967b](https://github.com/subsquid/hydra/commit/ed5967bc53a795d1b36390472d073cad83d6eed4))
+
+
+
 ## 4.2.0-alpha.5 (2021-10-04)
 
 

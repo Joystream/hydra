@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/hydra-cli",
   "description": "CLI tool for building a Hydra query node",
-  "version": "4.2.0-alpha.5",
+  "version": "5.0.0-alpha.0",
   "author": "metmirr @metmirr subsquid @dzhelezov",
   "license": "MIT",
   "bin": {
@@ -55,8 +55,8 @@
     "cli-ux": "^5.6.3",
     "dotenv": "^10.0.0",
     "execa": "^4.1.0",
-    "pgtools": "^0.3.2",
     "node-fetch": "^2.6.1",
+    "pgtools": "^0.3.2",
     "simple-git": "^2.44.0",
     "tslib": "^2.3.1"
   },

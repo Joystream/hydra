@@ -1,6 +1,6 @@
 {
   "name": "@subsquid/hydra-typegen",
-  "version": "4.2.0-alpha.5",
+  "version": "5.0.0-alpha.0",
   "description": "\"Hydra-cli pluging for generating typed events\"",
   "main": "lib/index.js",
   "repository": "https://github.com/Joystream/hydra",
