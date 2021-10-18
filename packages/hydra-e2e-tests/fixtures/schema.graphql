@@ -86,6 +86,7 @@ type EventB implements Event @entity {
   network: Network!
   indexInBlock: Int!
   field2: String!
+  statusList: [Status!]
 }
 
 type EventC implements Event @entity {

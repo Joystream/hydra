@@ -8,6 +8,7 @@ import {
   EventParam,
   Network,
   SystemEvent,
+  HappyPoor,
 } from '../generated/model'
 
 export async function loader(ctx: BlockContext & StoreContext) {
@@ -33,6 +34,7 @@ export async function eventLoader({ store }: BlockContext & StoreContext) {
     network: Network.BABYLON,
     indexInBlock: 1,
     field2: 'field2',
+    statusList: [new HappyPoor({ isMale: true })],
   })
 
   const ce = new ComplexEntity()

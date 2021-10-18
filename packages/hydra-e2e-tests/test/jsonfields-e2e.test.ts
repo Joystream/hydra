@@ -32,4 +32,27 @@ describe('end-to-end json fields tests', () => {
       }
     )
   })
+
+  it('fetch json list', () => {
+    return queryNode.test(
+      `
+      query {
+        eventBs {
+          statusList {
+            ... on HappyPoor {
+              isMale
+            }
+          }
+        }
+      }
+    `,
+      {
+        eventBs: [
+          {
+            statusList: [{ isMale: true }],
+          },
+        ],
+      }
+    )
+  })
 })
