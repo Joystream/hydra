@@ -111,7 +111,7 @@ export class StateKeeper implements IStateKeeper {
         manifest.indexerVersionRange
       )
     }
-    validateIndexerVersion(this.indexerStatus.hydraVersion, '>=4 <5')
+    validateIndexerVersion(this.indexerStatus.hydraVersion, '>=4')
 
     const range = manifest.mappings.range
 

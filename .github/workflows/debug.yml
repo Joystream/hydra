@@ -1,0 +1,11 @@
+name: debug
+on: [workflow_dispatch]
+
+jobs:
+  debug:
+    name: Debug actions environment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3

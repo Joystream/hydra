@@ -27,7 +27,7 @@ services:
       - DB_PASS=postgres
       - DB_HOST=db
       - DB_PORT=5432
-      - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:8080/v1/graphql
+      - INDEXER_ENDPOINT_URL=http://hydra-indexer-gateway:8087/v1/graphql
       - CHAIN_NODE=ws://node-template:9944
       - POLL_INTERVAL_MS=500 # refresh every second
       - DEBUG=hydra*
@@ -70,6 +70,7 @@ services:
     build:
       context: ../..
       target: indexer-gateway
+    restart: always
     depends_on:
       - redis
       - db
@@ -83,6 +84,7 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       HYDRA_INDEXER_STATUS_SERVICE: http://hydra-indexer-status-service:8081/status
+      HASURA_GRAPHQL_SERVER_PORT: 8087
 
   hydra-indexer-status-service:
     build:

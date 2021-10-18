@@ -37,7 +37,6 @@ export function codegen(options: CodegenOptions): void {
 function generateOrmModels(model: Model, dir: OutDir): void {
   const variants = collectVariants(model)
   const index = dir.file('model.ts')
-  let usesMarshaling = false
 
   for (const name in model) {
     const item = model[name]
@@ -47,7 +46,6 @@ function generateOrmModels(model: Model, dir: OutDir): void {
         break
       case 'object':
         generateObject(name, item)
-        usesMarshaling = true
         break
       case 'union':
         generateUnion(name, item)
@@ -59,9 +57,7 @@ function generateOrmModels(model: Model, dir: OutDir): void {
   }
 
   index.write()
-  if (usesMarshaling) {
-    dir.addResource('codegen/marshal.ts', 'marshal.ts')
-  }
+  dir.addResource('codegen/marshal.ts', 'marshal.ts')
 
   function generateEntity(name: string, entity: Entity): void {
     index.line(`export * from "./model/${lowerCaseFirst(name)}.model"`)

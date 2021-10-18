@@ -30,7 +30,7 @@ export function scaffold(options: ScaffoldOptions): void {
       build: 'tsc',
       'db:create': 'hydra-cli db:create',
       'db:drop': 'hydra-cli db:drop',
-      'db:create-migration': 'hydra-clo db:create-migration',
+      'db:create-migration': 'hydra-cli db:create-migration',
       'db:migrate': 'hydra-cli db:migrate',
       'db:revert': 'hydra-cli db:revert',
       'db:reset':
