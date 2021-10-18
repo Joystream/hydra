@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.2 (2021-10-18)
+
+
+### Bug Fixes
+
+* json list codegen issues ([#125](https://github.com/subsquid/hydra/issues/125)) ([9989361](https://github.com/subsquid/hydra/commit/9989361b2327c486192338ee87644f1cfdb7fb09))
+
+
+
 ## 5.0.0-alpha.1 (2021-10-18)
 
 **Note:** Version bump only for package @subsquid/hydra-cli
