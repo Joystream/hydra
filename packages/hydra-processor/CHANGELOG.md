@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.5 (2021-10-25)
+
+
+### Features
+
+* remove all typegen validations ([#131](https://github.com/subsquid/hydra/issues/131)) ([d86ba8b](https://github.com/subsquid/hydra/commit/d86ba8b79a30221175726203725f97a88a5a8ee1))
+
+
+
 ## 5.0.0-alpha.4 (2021-10-25)
 
 
