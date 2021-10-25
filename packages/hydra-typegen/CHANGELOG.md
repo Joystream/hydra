@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.4 (2021-10-25)
+
+
+### Features
+
+* relax typegen validation rules ([#130](https://github.com/Joystream/hydra/issues/130)) ([14e5eb3](https://github.com/Joystream/hydra/commit/14e5eb36ce938dadaa0d3bb6c904e926ea57f79c))
+
+
+
 ## 5.0.0-alpha.3 (2021-10-25)
 
 
