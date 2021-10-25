@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.3 (2021-10-25)
+
+
+### Features
+
+* adopt new features from OpenReader ([#129](https://github.com/Joystream/hydra/issues/129)) ([039fa7a](https://github.com/Joystream/hydra/commit/039fa7ae40774a1339c5c8cb7e8c3fb107692c15))
+
+
+
 ## 5.0.0-alpha.2 (2021-10-18)
 
 
