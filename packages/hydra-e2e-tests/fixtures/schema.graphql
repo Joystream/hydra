@@ -10,6 +10,7 @@ type Transfer @entity {
   tip: BigInt!
   timestamp: BigInt!
   insertedAt: DateTime!
+  extrinsicId: String
 }
 
 " Tracks block timestamps "

@@ -61,6 +61,21 @@ describe('end-to-end transfer tests', () => {
     )
   })
 
+  it('extrinsic.id is exposed and mapped', function () {
+    return queryNode.test(
+      `
+      query {
+        transfers(limit: 1) {
+          extrinsicId
+        }
+      }
+    `,
+      {
+        transfers: [{ extrinsicId: expect.stringMatching(/\d/) }],
+      }
+    )
+  })
+
   it('performs full-text-search', () => {
     return queryNode.test(
       `

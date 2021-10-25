@@ -130,6 +130,11 @@ export interface SubstrateEvent {
  */
 export interface SubstrateExtrinsic {
   /**
+   * extrinsic id
+   */
+  id: string
+
+  /**
    * extrinsic method
    */
   method: string
