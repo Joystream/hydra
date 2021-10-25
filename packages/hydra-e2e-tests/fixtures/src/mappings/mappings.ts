@@ -80,11 +80,11 @@ export async function balancesTransfer({
 
 export async function timestampCall({
   store,
-  event,
+  extrinsic,
   block: { height, hash, timestamp },
 }: ExtrinsicContext & StoreContext) {
-  const call = new Timestamp.SetCall(event)
-  const ts = call.args.now.toBigInt()
+  const call = new Timestamp.SetCall(extrinsic)
+  const ts = call.now.toBigInt()
 
   const blockTs = new BlockTimestamp()
   blockTs.blockNumber = height

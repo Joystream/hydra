@@ -44,3 +44,17 @@ export function format(s: string): string {
 export function compact(s: string): string {
   return s.replace(/\s/g, '')
 }
+
+export function stringify(obj: any): string {
+  return JSON.stringify(
+    obj,
+    (k, v) => {
+      if (typeof v === 'bigint') {
+        return v.toString()
+      } else {
+        return v
+      }
+    },
+    2
+  )
+}

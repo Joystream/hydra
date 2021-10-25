@@ -1,7 +1,7 @@
 import { GqlClient } from './gql-client'
 
 export const indexer = new GqlClient(
-  'http://hydra-indexer-gateway:8087/v1/graphql'
+  'http://hydra-indexer-gateway:8080/v1/graphql'
 )
 
 export async function indexerHead(): Promise<number> {

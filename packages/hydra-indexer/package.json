@@ -32,7 +32,7 @@
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only --exclude \"test/integration/**/*.test.ts\"  \"test/**/*.test.ts\" \"src/**/*.test.ts\""
   },
   "dependencies": {
-    "@polkadot/api": "^5.6.1",
+    "@polkadot/api": "^6.4.2",
     "@subsquid/hydra-common": "^5.0.0-alpha.2",
     "commander": "^8.1.0",
     "debug": "^4.3.2",

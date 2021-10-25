@@ -1,6 +1,6 @@
 import { compact } from 'lodash'
 import { GraphQLQuery, QueryFields, ObjectFilter } from '.'
-import { format, stripSpaces } from '../util/utils'
+import { stringify, format, stripSpaces } from '../util'
 
 export type FilterValue<T> =
   | undefined
@@ -143,7 +143,7 @@ export function formatOrderBy(
 
   if (field === undefined) {
     throw new Error(
-      `OrderBy should have at least one field: ${JSON.stringify(orderBy)}`
+      `OrderBy should have at least one field: ${stringify(orderBy)}`
     )
   }
 

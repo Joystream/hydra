@@ -1,26 +1,30 @@
-import { getProcessorSource } from '../ingest'
-import { getConfig as conf, getManifest } from '../start/config'
-import { info } from '../util/log'
-import { uniq, last, first, union, mapValues, chunk } from 'lodash'
-import pWaitFor from 'p-wait-for'
-import delay from 'delay'
+import { SubstrateEvent } from '@subsquid/hydra-common'
 import Debug from 'debug'
-
-import { IndexerStatus, IStateKeeper, getStateKeeper } from '../state'
+import delay from 'delay'
+import { chunk, first, last, mapValues, union, uniq } from 'lodash'
+import pWaitFor from 'p-wait-for'
+import { getProcessorSource, IndexerQuery, IProcessorSource } from '../ingest'
+import { getConfig as conf, getManifest } from '../start/config'
+import { MappingsDef } from '../start/manifest'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
+import { getStateKeeper, IndexerStatus, IStateKeeper } from '../state'
+import {
+  info,
+  intersectWith,
+  numbersIn,
+  parseEventId,
+  Range,
+  stringify,
+  unionAll,
+} from '../util'
 import {
   BlockData,
-  IBlockQueue,
-  MappingFilter,
-  Kind,
-  RangeFilter,
   EventData,
+  IBlockQueue,
+  Kind,
+  MappingFilter,
+  RangeFilter,
 } from './IBlockQueue'
-import { MappingsDef } from '../start/manifest'
-import { SubstrateEvent } from '@subsquid/hydra-common'
-import { IndexerQuery, IProcessorSource } from '../ingest/IProcessorSource'
-import { parseEventId } from '../util/utils'
-import { unionAll, Range, numbersIn, intersectWith } from '../util'
 
 const debug = Debug('hydra-processor:event-queue')
 
@@ -172,8 +176,7 @@ export class BlockQueue implements IBlockQueue {
 
       // the event is from a new block, yield the current
       debug(`Yielding block ${block.id}`)
-      if (conf().VERBOSE)
-        debug(`Block contents: ${JSON.stringify(block, null, 2)}`)
+      if (conf().VERBOSE) debug(`Block contents: ${stringify(block)}`)
 
       yield {
         block,
@@ -234,7 +237,7 @@ export class BlockQueue implements IBlockQueue {
           \tChain head: ${this.indexerStatus.chainHeight} 
           \tQueue size: ${this.eventQueue.length}
           \tLast fetched event: ${this.rangeFilter.id.gt}
-          \tBlock range: ${JSON.stringify(this.rangeFilter.block)}`
+          \tBlock range: ${stringify(this.rangeFilter.block)}`
       )
     }
   }
@@ -272,7 +275,7 @@ export class BlockQueue implements IBlockQueue {
   async *blocksWithHooks(range: Range): AsyncGenerator<BlockData, void, void> {
     const ranges = intersectWith(range, this.heightsWithHooks)
 
-    debug(`Fetching hooks in ranges: ${JSON.stringify(ranges)}`)
+    debug(`Fetching hooks in ranges: ${stringify(ranges)}`)
 
     const heights = ranges
       .reduce((acc: number[], r) => [...acc, ...numbersIn(r)], [])
@@ -301,9 +304,7 @@ export class BlockQueue implements IBlockQueue {
     // collect the events object into an array with types
     const trimmed = sortAndTrim(events)
     if (conf().VERBOSE) {
-      debug(
-        `Enqueuing events: ${JSON.stringify(trimmed.map((e) => e.event.id))}`
-      )
+      debug(`Enqueuing events: ${stringify(trimmed.map((e) => e.event.id))}`)
     }
 
     const blockHeights = uniq(
@@ -370,6 +371,6 @@ export function prepareIndexerQueries(
 
   // TODO: block queries here
 
-  debug(`Queries: ${JSON.stringify(queries, null, 2)}`)
+  debug(`Queries: ${stringify(queries)}`)
   return queries
 }

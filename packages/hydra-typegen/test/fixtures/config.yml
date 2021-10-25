@@ -3,10 +3,10 @@ typegen:
     source: wss://kusama-rpc.polkadot.io
     blockHash: '0x45eb7ddd324361adadd4f8cfafadbfb7e0a26393a70a70e5bee6204fc46af62e'
   events:
-    - Balances.Transfer
+    - balances.Transfer
   calls:
-    - Balances.transfer
+    - balances.transfer
   customTypes:
     lib: 'testing'
-    typedefsLoc: test-typedefs.json
+    typedefsLoc: test/fixtures/typedefs.json
   outDir: ./generated

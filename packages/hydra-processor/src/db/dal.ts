@@ -1,14 +1,14 @@
 import { getRepository, Connection, createConnection } from 'typeorm'
-
-import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
+import { ProcessedEventsLogEntity } from '../entities'
 import Debug from 'debug'
+import { stringify } from '../util'
 import config from './ormconfig'
 
 const debug = Debug('hydra-processor:dal')
 
 export async function createDBConnection(): Promise<Connection> {
   const _config = config()
-  debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
+  debug(`DB config: ${stringify(_config)}`)
   return createConnection(_config)
 }
 

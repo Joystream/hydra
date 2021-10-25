@@ -11,7 +11,7 @@ import {
 
 import { BlockData, EventData, Kind } from '../queue'
 import { getConfig as conf } from '../start/config'
-import { isInRange } from '../util'
+import { isInRange, stringify } from '../util'
 import {
   MappingContext,
   EventContext,
@@ -52,10 +52,8 @@ export class MappingsLookupService implements IMappingsLookup {
     })
 
     debug(
-      `The following events will be processed: ${JSON.stringify(
-        Object.keys(this.events),
-        null,
-        2
+      `The following events will be processed: ${stringify(
+        Object.keys(this.events)
       )}`
     )
 
@@ -67,22 +65,18 @@ export class MappingsLookupService implements IMappingsLookup {
     })
 
     debug(
-      `The following extrinsics will be processed: ${JSON.stringify(
-        Object.keys(this.extrinsics),
-        null,
-        2
+      `The following extrinsics will be processed: ${stringify(
+        Object.keys(this.extrinsics)
       )}`
     )
 
-    debug(`Pre-hooks: ${JSON.stringify(this.mappings.preBlockHooks)}`)
-    debug(`Post-hooks: ${JSON.stringify(this.mappings.postBlockHooks)}`)
+    debug(`Pre-hooks: ${stringify(this.mappings.preBlockHooks)}`)
+    debug(`Post-hooks: ${stringify(this.mappings.postBlockHooks)}`)
   }
 
   lookupHandlers(blockData: BlockData): BlockMappings {
     if (conf().VERBOSE)
-      debug(
-        `Lookup handlers, block context: ${JSON.stringify(blockData, null, 2)}`
-      )
+      debug(`Lookup handlers, block context: ${stringify(blockData)}`)
 
     const filtered = {
       pre: filter(this.mappings.preBlockHooks || [], blockData),
@@ -94,8 +88,7 @@ export class MappingsLookupService implements IMappingsLookup {
       ),
     }
 
-    if (conf().VERBOSE)
-      debug(`Mappings for the block: ${JSON.stringify(filtered, null, 2)}`)
+    if (conf().VERBOSE) debug(`Mappings for the block: ${stringify(filtered)}`)
 
     return filtered
   }
@@ -120,7 +113,7 @@ export class MappingsLookupService implements IMappingsLookup {
 
     debug(`Cannot find a handler for ${name} and block ${blockData.block.id}`)
 
-    if (conf().VERBOSE) debug(`Context: ${JSON.stringify(blockData, null, 2)}`)
+    if (conf().VERBOSE) debug(`Context: ${stringify(blockData)}`)
   }
 
   async call(handler: MappingHandler, ctx: ExecContext): Promise<void> {
@@ -154,11 +147,7 @@ export function resolveType(
   if (type === 'SubstrateEvent') {
     if (!isEventOrExtrinsicContext(ctx)) {
       throw new Error(
-        `Cannot extract SubstrateEvent from the context ${JSON.stringify(
-          ctx,
-          null,
-          2
-        )}`
+        `Cannot extract SubstrateEvent from the context ${stringify(ctx)}`
       )
     }
     return ctx.event
@@ -170,10 +159,8 @@ export function resolveType(
 
   if (!isEventOrExtrinsicContext(ctx)) {
     throw new Error(
-      `Cannot construct an argument of type ${type} from the context ${JSON.stringify(
-        ctx,
-        null,
-        2
+      `Cannot construct an argument of type ${type} from the context ${stringify(
+        ctx
       )}`
     )
   }
@@ -192,9 +179,7 @@ export function extractName(ctx: EventData): string {
   if (ctx.kind === Kind.EXTRINSIC) {
     const extrinsic = ctx.event.extrinsic
     if (extrinsic === undefined) {
-      throw new Error(
-        `No extrinsics found in the context ${JSON.stringify(ctx, null, 2)}`
-      )
+      throw new Error(`No extrinsics found in the context ${stringify(ctx)}`)
     }
     return `${extrinsic.section}.${extrinsic.method}`
   }

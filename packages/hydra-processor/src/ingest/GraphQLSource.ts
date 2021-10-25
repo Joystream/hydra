@@ -9,7 +9,7 @@ import { GraphQLClient } from 'graphql-request'
 import { compact } from 'lodash'
 import { getConfig as conf } from '../start/config'
 import { IndexerStatus } from '../state'
-import { quotedJoin } from '../util/utils'
+import { stringify, quotedJoin } from '../util'
 import { IProcessorSource } from './'
 import { IndexerQuery } from './IProcessorSource'
 import pRetry from 'p-retry'
@@ -90,7 +90,7 @@ export class GraphQLSource implements IProcessorSource {
       )} events`
     )
 
-    if (conf().VERBOSE) debug(`Results: ${JSON.stringify(raw, null, 2)}`)
+    if (conf().VERBOSE) debug(`Results: ${stringify(raw)}`)
 
     return raw as {
       [K in keyof typeof queries]: SubstrateEvent[]
@@ -123,11 +123,11 @@ export class GraphQLSource implements IProcessorSource {
   }
 
   async fetchBlocks(heights: number[]): Promise<SubstrateBlock[]> {
-    if (conf().VERBOSE) debug(`Fetching blocks: ${JSON.stringify(heights)}`)
+    if (conf().VERBOSE) debug(`Fetching blocks: ${stringify(heights)}`)
 
     const cached = compact(heights.map((h) => this.blockCache.get(h)))
 
-    if (conf().VERBOSE) debug(`Cached blocks: ${JSON.stringify(cached)}`)
+    if (conf().VERBOSE) debug(`Cached blocks: ${stringify(cached)}`)
 
     const toFetch = heights.filter((h) => this.blockCache.get(h) === undefined)
     if (toFetch.length === 0) {
@@ -160,7 +160,7 @@ export class GraphQLSource implements IProcessorSource {
 
     debug(`Fetched and cached ${result.blocks.length} blocks`)
 
-    return [...cached, ...result.blocks].sort()
+    return [...cached, ...result.blocks].sort((a, b) => a.height - b.height)
   }
 
   private requestSubstrateData<T>(query: string): Promise<T> {
@@ -180,12 +180,14 @@ export class GraphQLSource implements IProcessorSource {
   ): Promise<T> {
     const raw = await pRetry(() => this.graphClient.request<T>(query), {
       retries: conf().INDEXER_CALL_RETRIES,
-      onFailedAttempt: (i) =>
+      onFailedAttempt: (i) => {
+        debug(`Failed to connect to the indexer endpoint: ${i.toString()}`)
         debug(
           `Failed to connect to the indexer endpoint "${
             conf().INDEXER_ENDPOINT_URL
           }" after ${i.attemptNumber} attempts. Retries left: ${i.retriesLeft}`
-        ),
+        )
+      },
     })
 
     return JSON.parse(JSON.stringify(raw), (k, v) => {
@@ -235,7 +237,7 @@ export function getEventsGraphQLQuery({
 
   // FIXME: very rough...
   const block_gt = block.gt || 0
-  const block_lte = block.lte || Number.MIN_SAFE_INTEGER
+  const block_lte = block.lte
 
   return `
   substrate_event(where: {${eventsFilter}${extrinsicsFilter}${idFilter} blockNumber: {_gt: ${block_gt}, _lte: ${block_lte}}}, limit: ${limit}, order_by: {id: asc}) {

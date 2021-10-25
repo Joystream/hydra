@@ -14,7 +14,7 @@ export interface IQueryEvent {
 }
 
 export interface EventParameters {
-  // TODO how do we reprsent it?
+  // TODO how do we represent it?
   [key: string]: Codec
 }
 

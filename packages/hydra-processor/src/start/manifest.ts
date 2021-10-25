@@ -6,7 +6,7 @@ import semver from 'semver'
 import Debug from 'debug'
 import { camelCase, upperFirst, compact } from 'lodash'
 import { HandlerFunc } from './QueryEventProcessingPack'
-import { Range, parseRange } from '../util'
+import { Range, parseRange, stringify } from '../util'
 
 export const STORE_CLASS_NAME = 'DatabaseManager'
 export const CONTEXT_CLASS_NAME = 'SubstrateEvent'
@@ -66,7 +66,7 @@ const manifestValidatorOptions = {
   },
 
   onWarning: function (error: unknown, filepath: unknown) {
-    throw new Error(`${filepath} has error: ${JSON.stringify(error)}`)
+    throw new Error(`${filepath} has error: ${stringify(error)}`)
   },
 }
 
@@ -188,7 +188,7 @@ function validate(parsed: MappingsDefInput): void {
 }
 
 function buildMappingsDef(parsed: MappingsDefInput): MappingsDef {
-  debug(`Parsed mappings def: ${JSON.stringify(parsed, null, 2)}`)
+  debug(`Parsed mappings def: ${stringify(parsed)}`)
   const {
     mappingsModule,
     range,

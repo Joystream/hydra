@@ -148,7 +148,7 @@ export function isInRange(height: number, range: Range | undefined): boolean {
   return from <= height && height <= to
 }
 
-export function stringify({ from, to }: Range): string {
+export function stringifyRange({ from, to }: Range): string {
   return `[${from}, ${to}]`
 }
 

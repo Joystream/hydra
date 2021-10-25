@@ -2,7 +2,7 @@ import { getConnection, EntityManager } from 'typeorm'
 import * as shortid from 'shortid'
 import { getConfig as conf } from '../start/config'
 import Debug from 'debug'
-import { info } from '../util/log'
+import { stringify, info } from '../util'
 import { BlockData } from '../queue'
 import { getMappingsLookup, IMappingExecutor } from '.'
 import { IMappingsLookup } from './IMappingsLookup'
@@ -28,11 +28,7 @@ export class TransactionalExecutor implements IMappingExecutor {
       const allMappings = this.mappingsLookup.lookupHandlers(blockData)
       if (conf().VERBOSE)
         debug(
-          `Mappings for block ${blockData.block.id}: ${JSON.stringify(
-            allMappings,
-            null,
-            2
-          )}`
+          `Mappings for block ${blockData.block.id}: ${stringify(allMappings)}`
         )
 
       const { pre, post, mappings } = allMappings
@@ -51,7 +47,7 @@ export class TransactionalExecutor implements IMappingExecutor {
         const { event } = blockData.events[i]
         debug(`Processing event ${event.id}`)
 
-        if (conf().VERBOSE) debug(`JSON: ${JSON.stringify(event, null, 2)}`)
+        if (conf().VERBOSE) debug(`JSON: ${stringify(event)}`)
 
         const ctx = {
           ...blockData,
