@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@polkadot/api": "^6.4.2",
-    "expect": "^27.2.5",
+    "expect": "^27.3.1",
     "graphql": "^15.6.1",
     "graphql-ws": "^5.5.0",
     "node-fetch": "^2.6.1"

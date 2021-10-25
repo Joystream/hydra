@@ -127,3 +127,19 @@ type SystemEvent @entity {
   params: EventParam!
   arrayField: [String!]
 }
+
+type Issue @entity {
+  id: ID!
+  payment: IssuePayment @derivedFrom(field: "issue")
+  cancellation: IssueCancellation @derivedFrom(field: "issue")
+}
+
+type IssuePayment @entity {
+  issue: Issue! @unique
+  amount: Int!
+}
+
+type IssueCancellation @entity {
+  issue: Issue! @unique
+  block: Int!
+}

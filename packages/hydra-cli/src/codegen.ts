@@ -103,13 +103,26 @@ function generateOrmModels(model: Model, dir: OutDir): void {
             )
             break
           case 'fk':
-            imports.useTypeorm('ManyToOne', 'Index')
-            out.line('@Index_()')
-            out.line(
-              `@ManyToOne_(() => ${prop.type.foreignEntity}, {nullable: ${prop.nullable}})`
-            )
+            if (prop.unique) {
+              imports.useTypeorm('OneToOne', 'Index', 'JoinColumn')
+              out.line(`@Index_({unique: true})`)
+              out.line(
+                `@OneToOne_(() => ${prop.type.foreignEntity}, {nullable: false})`
+              )
+              out.line(`@JoinColumn_()`)
+            } else {
+              imports.useTypeorm('ManyToOne', 'Index')
+              out.line('@Index_()')
+              out.line(
+                `@ManyToOne_(() => ${prop.type.foreignEntity}, {nullable: ${prop.nullable}})`
+              )
+            }
             break
-          case 'list-relation':
+          case 'lookup':
+            imports.useTypeorm('OneToOne')
+            out.line(`@OneToOne_(() => ${prop.type.entity})`)
+            break
+          case 'list-lookup':
             imports.useTypeorm('OneToMany')
             out.line(
               `@OneToMany_(() => ${prop.type.entity}, e => e.${prop.type.field})`
@@ -263,7 +276,8 @@ function generateOrmModels(model: Model, dir: OutDir): void {
       case 'fk':
         imports.useModel(prop.type.foreignEntity)
         break
-      case 'list-relation':
+      case 'lookup':
+      case 'list-lookup':
         imports.useModel(prop.type.entity)
         break
       case 'list':
@@ -396,6 +410,12 @@ function getPropJsType(owner: 'entity' | 'object', prop: Prop): string {
         type = 'string'
       }
       break
+    case 'lookup':
+      type = prop.type.entity
+      break
+    case 'list-lookup':
+      type = prop.type.entity + '[]'
+      break
     case 'list':
       type = getPropJsType('object', prop.type.item)
       if (type.indexOf('|')) {
@@ -403,9 +423,6 @@ function getPropJsType(owner: 'entity' | 'object', prop: Prop): string {
       } else {
         type += '[]'
       }
-      break
-    case 'list-relation':
-      type = prop.type.entity + '[]'
       break
     default:
       throw unsupportedCase((prop.type as any).kind)

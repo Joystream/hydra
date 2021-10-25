@@ -1971,10 +1971,10 @@
   resolved "https://registry.yarnpkg.com/@subsquid/graphiql-console/-/graphiql-console-0.2.0.tgz#53edcc562342735e800361bb3892c54388b2e717"
   integrity sha512-Wh2Oxi9JkK79Y728yDEeY7JelcY1cGiQTbzVIRMFLT2tjkkoQ69goAGXdh9QmM/ANAVrHQkBUNJOLd5oAg//oQ==
 
-"@subsquid/openreader@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@subsquid/openreader/-/openreader-0.1.0.tgz#2ad8cbab75bd363b038e1af7a418392003c207fe"
-  integrity sha512-QF1LZwj5I1SSBSRq58Du7R2NvjPN87k+zLIb7W+GPVEZ5o1F7Bn048LyCCZZJeoZyT4zyKsyh7rN1F95lHKDhA==
+"@subsquid/openreader@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@subsquid/openreader/-/openreader-0.2.0.tgz#1e90344b033e8e3757f40c240800a7dab4e8c2a8"
+  integrity sha512-XeCg38AFqflUcDugW6PjKPNEBUAtZ8SHQhSxkhZnPN0cqT1JUf7N1oHmEqGSuend+H5S3tJdhYaQkmzdvCYdrg==
   dependencies:
     "@graphql-tools/merge" "^8"
     "@graphql-tools/utils" "^8"
@@ -4894,7 +4894,7 @@ expand-tilde@^2.0.0, expand-tilde@^2.0.2:
   dependencies:
     homedir-polyfill "^1.0.1"
 
-expect@^27.2.5, expect@^27.3.1:
+expect@^27.3.1:
   version "27.3.1"
   resolved "https://registry.yarnpkg.com/expect/-/expect-27.3.1.tgz#d0f170b1f5c8a2009bab0beffd4bb94f043e38e7"
   integrity sha512-MrNXV2sL9iDRebWPGOGFdPQRl2eDQNu/uhxIMShjjx74T6kC6jFIkmQ6OqXDtevjGUkyB2IT56RzDBqXf/QPCg==

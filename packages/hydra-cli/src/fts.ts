@@ -23,8 +23,6 @@ function generateMigration(name: string, query: FTS_Query, dir: OutDir): void {
       const table = toTable(src.entity)
       const ginIndex = `${snakeCase(name)}_${snakeCase(src.entity)}_idx`
       const tsvColumn = `${snakeCase(name)}_tsv`
-      const docColumn = `${snakeCase(name)}_doc`
-
       const tsvectorValue = src.fields
         .map((f) => {
           return `setweight(to_tsvector('english', coalesce(${toColumn(
@@ -32,14 +30,7 @@ function generateMigration(name: string, query: FTS_Query, dir: OutDir): void {
           )}, '')), 'A')`
         })
         .join(' || ')
-
-      const docValue = src.fields
-        .map((f) => {
-          return `coalesce(${toColumn(f)}, '')`
-        })
-        .join(` || E'\\n\\n' || `)
-
-      return { table, ginIndex, tsvColumn, docColumn, tsvectorValue, docValue }
+      return { table, ginIndex, tsvColumn, tsvectorValue }
     })
 
     out.line()
@@ -47,9 +38,6 @@ function generateMigration(name: string, query: FTS_Query, dir: OutDir): void {
       sources.forEach((src) => {
         out.line(
           `await queryRunner.query(\`ALTER TABLE "${src.table}" ADD COLUMN "${src.tsvColumn}" tsvector GENERATED ALWAYS AS (${src.tsvectorValue}) STORED\`)`
-        )
-        out.line(
-          `await queryRunner.query(\`ALTER TABLE "${src.table}" ADD COLUMN "${src.docColumn}" text GENERATED ALWAYS AS (${src.docValue}) STORED\`)`
         )
         out.line(
           `await queryRunner.query(\`CREATE INDEX "${src.ginIndex}" ON "${src.table}" USING GIN ("${src.tsvColumn}")\`)`
@@ -61,9 +49,6 @@ function generateMigration(name: string, query: FTS_Query, dir: OutDir): void {
     out.block('async down(queryRunner)', () => {
       sources.forEach((src) => {
         out.line(`await queryRunner.query('DROP INDEX "${src.ginIndex}"')`)
-        out.line(
-          `await queryRunner.query('ALTER TABLE "${src.table}" DROP "${src.docColumn}"')`
-        )
         out.line(
           `await queryRunner.query('ALTER TABLE "${src.table}" DROP "${src.tsvColumn}"')`
         )

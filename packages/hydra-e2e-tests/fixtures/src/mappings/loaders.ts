@@ -9,11 +9,15 @@ import {
   Network,
   SystemEvent,
   HappyPoor,
+  Issue,
+  IssuePayment,
+  IssueCancellation,
 } from '../generated/model'
 
 export async function loader(ctx: BlockContext & StoreContext) {
   await eventLoader(ctx)
   await jsonFieldLoader(ctx)
+  await issueLoader(ctx)
 }
 
 // run before genesis
@@ -70,4 +74,23 @@ export async function jsonFieldLoader({ store }: BlockContext & StoreContext) {
   e.params = params
   e.arrayField = ['aaa', 'bbb', 'ccc']
   await store.save(e)
+}
+
+async function issueLoader({ store }: StoreContext) {
+  const issue1 = new Issue({ id: '1' })
+  const issue2 = new Issue({ id: '2' })
+  await store.save(issue1)
+  await store.save(issue2)
+
+  const issue1Payment = new IssuePayment()
+  issue1Payment.id = '1'
+  issue1Payment.issue = issue1
+  issue1Payment.amount = 10
+  await store.save(issue1Payment)
+
+  const issue2Cancellation = new IssueCancellation()
+  issue2Cancellation.id = '2'
+  issue2Cancellation.issue = issue2
+  issue2Cancellation.block = 100
+  await store.save(issue2Cancellation)
 }
