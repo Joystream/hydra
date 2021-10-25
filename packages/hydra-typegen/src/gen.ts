@@ -47,7 +47,6 @@ export function typegen(options: TypegenOptions): void {
 
     index.line(`export * from './${mod.name}'`)
     const out = dir.file(mod.name + '.ts')
-    out.line(`import assert from 'assert'`)
     out.line(`import {create} from './_registry'`)
     out.lazy(() => imports.render())
     out.line()
@@ -57,13 +56,7 @@ export function typegen(options: TypegenOptions): void {
         e.args.forEach((arg) => imports.use(arg))
         out.blockComment(e.docs)
         out.block(`export class ${e.name}Event`, () => {
-          out.block('constructor(private event: SubstrateEvent)', () => {
-            e.args.forEach((arg, idx) => {
-              out.line(
-                `assert.strictEqual(this.event.params[${idx}].type, '${arg}', 'unexpected type for param ${idx} of ${mod.name}.${e.name}')`
-              )
-            })
-          })
+          out.line('constructor(private event: SubstrateEvent) {}')
           out.line()
           out.block(
             `get params(): [${e.args.map(convertTuples).join(', ')}]`,
@@ -91,11 +84,6 @@ export function typegen(options: TypegenOptions): void {
           out.line()
           out.block(`constructor(extrinsic: SubstrateExtrinsic)`, () => {
             out.line(`this._extrinsic = extrinsic`)
-            c.args.forEach((arg, idx) => {
-              out.line(
-                `assert.strictEqual('${arg.type}', this._extrinsic.args[${idx}].type)`
-              )
-            })
           })
           c.args.forEach((arg, idx) => {
             out.line()
