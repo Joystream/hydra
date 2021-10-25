@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.6 (2021-10-25)
+
+
+### Features
+
+* expose extrinsic id, specify .rootDir in scaffolded tsconfig.json ([#132](https://github.com/Joystream/hydra/issues/132)) ([8978904](https://github.com/Joystream/hydra/commit/8978904683fe0ab5ee1b6d699bd87fe1c54202ec))
+
+
+
 ## 5.0.0-alpha.5 (2021-10-25)
 
 
