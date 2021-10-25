@@ -58,9 +58,6 @@ export function typegen(options: TypegenOptions): void {
         out.blockComment(e.docs)
         out.block(`export class ${e.name}Event`, () => {
           out.block('constructor(private event: SubstrateEvent)', () => {
-            out.line(
-              `assert.strictEqual(this.event.params.length, ${e.args.length}, 'unexpected number of arguments for event ${mod.name}.${e.name}')`
-            )
             e.args.forEach((arg, idx) => {
               out.line(
                 `assert.strictEqual(this.event.params[${idx}].type, '${arg}', 'unexpected type for param ${idx} of ${mod.name}.${e.name}')`
@@ -94,6 +91,11 @@ export function typegen(options: TypegenOptions): void {
           out.line()
           out.block(`constructor(extrinsic: SubstrateExtrinsic)`, () => {
             out.line(`this._extrinsic = extrinsic`)
+            c.args.forEach((arg, idx) => {
+              out.line(
+                `assert.strictEqual('${arg.type}', this._extrinsic.args[${idx}].type)`
+              )
+            })
           })
           c.args.forEach((arg, idx) => {
             out.line()
