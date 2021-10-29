@@ -1,5 +1,5 @@
 import Container from 'typedi'
-import { Config } from 'warthog'
+import { Config } from '@joystream/warthog'
 import { RedisClientFactory } from '@joystream/hydra-db-utils'
 import Debug from 'debug'
 const debug = Debug('index-server:index')

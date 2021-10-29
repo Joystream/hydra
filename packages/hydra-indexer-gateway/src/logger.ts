@@ -2,7 +2,7 @@
 
 import * as util from 'util'
 
-import { getBindingError } from 'warthog'
+import { getBindingError } from '@joystream/warthog'
 import Debug from 'debug'
 const debug = Debug('index-server:logger')
 

@@ -1,7 +1,7 @@
 import { Service } from 'typedi'
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
-import { BaseService } from 'warthog'
+import { BaseService } from '@joystream/warthog'
 
 import { SubstrateExtrinsic } from './substrate-extrinsic.model'
 

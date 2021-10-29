@@ -7,7 +7,7 @@ import {
   InputType,
 } from 'type-graphql'
 import { Inject } from 'typedi'
-import { PaginationArgs } from 'warthog'
+import { PaginationArgs } from '@joystream/warthog'
 import { SubstrateBlockService } from './substrate-block.service'
 import { SubstrateBlock } from './substrate-block.model'
 

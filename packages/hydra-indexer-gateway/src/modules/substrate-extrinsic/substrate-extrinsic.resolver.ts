@@ -1,6 +1,6 @@
 import { Arg, Args, Query, Resolver } from 'type-graphql'
 import { Inject } from 'typedi'
-import { Fields } from 'warthog'
+import { Fields } from '@joystream/warthog'
 
 import {
   SubstrateExtrinsicWhereArgs,

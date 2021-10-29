@@ -6,7 +6,7 @@ import {
   JSONField,
   IntField,
   WarthogField,
-} from 'warthog'
+} from '@joystream/warthog'
 import BN from 'bn.js'
 import { ObjectType, Field } from 'type-graphql'
 import { Column, OneToOne, JoinColumn } from 'typeorm'

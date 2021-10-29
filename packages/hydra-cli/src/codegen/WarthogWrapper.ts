@@ -187,6 +187,9 @@ export default class WarthogWrapper {
       scripts: Record<string, string>
       dependencies: Record<string, string>
       devDependencies: Record<string, string>
+
+      // temporary fix for specific typeorm version needed (see https://github.com/Joystream/hydra/pull/453 for more info)
+      resolutions: Record<string, string>
     }
 
     // Ensure version is greater than '0.0.0'
@@ -205,6 +208,12 @@ export default class WarthogWrapper {
       // this should overwrite warthog dep as well
       ...pkgFile.dependencies,
       ...extraDependencies,
+    }
+
+    // temporary fix for specific typeorm version needed (see https://github.com/Joystream/hydra/pull/453 for more info)
+    pkgFile.resolutions = {
+      ...(pkgFile.resolutions || {}),
+      typeorm: '0.2.34',
     }
 
     debug(`Writing package.json: ${JSON.stringify(pkgFile, null, 2)}`)

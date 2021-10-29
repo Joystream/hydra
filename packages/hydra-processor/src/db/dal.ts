@@ -51,11 +51,11 @@ export async function countProcessedEvents(
   processorID: string
 ): Promise<number> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { cnt } = await getRepository(ProcessedEventsLogEntity)
+  const { cnt } = (await getRepository(ProcessedEventsLogEntity)
     .createQueryBuilder('events')
     .select('COUNT(DISTINCT(events.event_id))', 'cnt')
     .where({ processor: processorID })
-    .getRawOne()
+    .getRawOne()) || { cnt: 0 }
 
   debug(`Total events count ${String(cnt)}`)
 
