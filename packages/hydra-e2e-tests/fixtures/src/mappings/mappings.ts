@@ -15,6 +15,7 @@ import {
   StoreContext,
   DatabaseManager,
 } from '@subsquid/hydra-common'
+import assert from 'assert'
 
 async function getOrCreate<T>(
   E: { new (...args: any[]): T },
@@ -38,6 +39,8 @@ export async function balancesTransfer({
   block,
   extrinsic,
 }: EventContext & StoreContext) {
+  assert(event.section !== undefined, 'Event section is not defined')
+
   const transfer = new Transfer()
   const [from, to, value] = new Balances.TransferEvent(event).params
   transfer.from = Buffer.from(from.toHex())

@@ -61,7 +61,7 @@ export class GraphQLSource implements IProcessorSource {
   }
 
   async getIndexerStatus(): Promise<IndexerStatus> {
-    const status = await this.graphClient.request<{
+    const status = await this.request<{
       indexerStatus: IndexerStatus
     }>(GET_INDEXER_STATUS)
     return status.indexerStatus as IndexerStatus
@@ -168,7 +168,7 @@ export class GraphQLSource implements IProcessorSource {
     return this.request<T, SubstrateType>(query, REVIVE_SUBSTRATE_FIELDS)
   }
 
-  private async request<T, K>(
+  private async request<T, K = unknown>(
     query: string,
     revive: Partial<
       {
@@ -176,16 +176,17 @@ export class GraphQLSource implements IProcessorSource {
           ? 'BigInt' | 'Number'
           : never
       }
-    >
+    > = {}
   ): Promise<T> {
     const raw = await pRetry(() => this.graphClient.request<T>(query), {
       retries: conf().INDEXER_CALL_RETRIES,
       onFailedAttempt: (i) => {
-        debug(`Failed to connect to the indexer endpoint: ${i.toString()}`)
         debug(
           `Failed to connect to the indexer endpoint "${
             conf().INDEXER_ENDPOINT_URL
-          }" after ${i.attemptNumber} attempts. Retries left: ${i.retriesLeft}`
+          }" after ${i.attemptNumber} attempts: ${i.message}. Stack: ${
+            i.stack
+          }. Retries left: ${i.retriesLeft}`
         )
       },
     })
@@ -243,6 +244,7 @@ export function getEventsGraphQLQuery({
   substrate_event(where: {${eventsFilter}${extrinsicsFilter}${idFilter} blockNumber: {_gt: ${block_gt}, _lte: ${block_lte}}}, limit: ${limit}, order_by: {id: asc}) {
     id
     name
+    section
     method
     params
     indexInBlock
