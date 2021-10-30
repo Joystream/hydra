@@ -8,7 +8,7 @@ import {
   Model,
   StringField,
   JSONField,
-} from 'warthog'
+} from '@joystream/warthog'
 import GraphQLBigNumber from '../../types/bn-graphql'
 
 @ObjectType()

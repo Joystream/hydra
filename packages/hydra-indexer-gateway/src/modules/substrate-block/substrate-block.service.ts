@@ -1,4 +1,4 @@
-import { BaseService } from 'warthog'
+import { BaseService } from '@joystream/warthog'
 import { Service } from 'typedi'
 import { SubstrateBlock } from './substrate-block.model'
 import { Repository } from 'typeorm'

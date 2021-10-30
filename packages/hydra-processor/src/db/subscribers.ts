@@ -18,6 +18,10 @@ export class SanitizationSubscriber implements EntitySubscriberInterface {
   }
 
   beforeUpdate(event: UpdateEvent<Entity>) {
+    if (!event.entity) {
+      return
+    }
+
     sanitizeEntity(event.entity, event.metadata)
   }
 }

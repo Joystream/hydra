@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm'
-import { IDType } from 'warthog'
+import { IDType } from '@joystream/warthog'
 
 import 'reflect-metadata'
 

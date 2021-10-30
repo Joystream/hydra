@@ -19,7 +19,7 @@ import { registerEnumType, GraphQLISODateTime as DateTime } from "type-graphql";
 const { GraphQLJSONObject } = require('graphql-type-json');
 // prettier-ignore
 // @ts-ignore
-import { BaseWhereInput, JsonObject, PaginationArgs, DateOnlyString, DateTimeString } from 'warthog';
+import { BaseWhereInput, JsonObject, PaginationArgs, DateOnlyString, DateTimeString } from '@joystream/warthog';
 
 // @ts-ignore
 import { EventInfo } from '../src/modules/substrate-block/substrate-block.model'

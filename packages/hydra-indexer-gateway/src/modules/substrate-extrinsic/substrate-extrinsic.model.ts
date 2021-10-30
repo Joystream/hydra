@@ -7,7 +7,7 @@ import {
   BooleanField,
   JsonObject,
   WarthogField,
-} from 'warthog'
+} from '@joystream/warthog'
 import { Field } from 'type-graphql'
 import { SubstrateEvent } from '../substrate-event/substrate-event.model'
 import * as BN from 'bn.js'

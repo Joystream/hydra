@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { BaseContext, Server } from 'warthog'
+import { BaseContext, Server } from '@joystream/warthog'
 import { Logger } from './logger'
 
 // TODO: add authentication

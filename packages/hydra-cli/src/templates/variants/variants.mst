@@ -115,12 +115,12 @@ export class {{name}} {
         {{^array}}
           const data: any = {}
           const relationData = await getRepository({{tsType}}).find({
-            where: { id: In(records.map((r: any) => (r[unionFieldName] as {{name}}).{{camelName}}Id)) }
+            where: { id: In(records.map((r: any) => (r[unionFieldName] as {{name}})?.{{camelName}}Id)) }
           });
           relationData.map((r: any) => data[r.id] = r);
 
           for (const record of records) {
-            const m = data[(record[unionFieldName] as {{name}}).{{camelName}}Id]
+            const m = data[(record[unionFieldName] as {{name}})?.{{camelName}}Id]
             if (m) {
               (record[unionFieldName] as {{name}}).{{camelName}} = m
             }

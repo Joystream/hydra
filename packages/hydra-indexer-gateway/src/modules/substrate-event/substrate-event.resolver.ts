@@ -13,7 +13,7 @@ import {
 } from 'type-graphql'
 import { Inject } from 'typedi'
 import { Min } from 'class-validator'
-import { PageInfo, Fields, RawFields, NestedFields } from 'warthog'
+import { PageInfo, Fields, RawFields, NestedFields } from '@joystream/warthog'
 
 import {
   SubstrateEventWhereArgs,

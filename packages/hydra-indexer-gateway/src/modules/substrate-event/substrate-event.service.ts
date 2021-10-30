@@ -1,11 +1,15 @@
 import { Service } from 'typedi'
 import { Repository, createQueryBuilder } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
-import { BaseService, RelayPageOptionsInput, ConnectionResult } from 'warthog'
+import {
+  BaseService,
+  RelayPageOptionsInput,
+  ConnectionResult,
+} from '@joystream/warthog'
 import { SubstrateEvent } from './substrate-event.model'
 import { SubstrateExtrinsic } from '../substrate-extrinsic/substrate-extrinsic.model'
 import { SubstrateEventWhereInput } from '../../../generated'
-import { ConnectionInputFields } from 'warthog/dist/types/core/GraphQLInfoService'
+import { ConnectionInputFields } from '@joystream/warthog/dist/types/core/GraphQLInfoService'
 import Debug from 'debug'
 
 const debug = Debug('index-server:event-server')
@@ -72,7 +76,7 @@ export class SubstrateEventService extends BaseService<SubstrateEvent> {
       )
     } catch (e) {
       // HACK around https://github.com/goldcaddy77/warthog/blob/b4649819be8b9af1627f2261532fcae6140246a2/src/core/RelayService.ts#L89
-      if (e && e.message === 'Items is empty') {
+      if (e && (e as Error).message === 'Items is empty') {
         return emptyResult
       }
       throw e

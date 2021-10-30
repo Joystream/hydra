@@ -80,8 +80,7 @@
     "lodash": "^4.17.20",
     "pg": "^8.3.2",
     "pg-listen": "^1.7.0",
-    "@joystream/warthog": "^2.40.0",
-    "typeorm": "^0.2.31"
+    "@joystream/warthog": "^2.40.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1",

@@ -102,7 +102,11 @@ async function fromChain(
     } catch (e) {
       reject(
         new Error(
-          `Cannot fetch metadata: ${e.message}, ${JSON.stringify(e, null, 2)}`
+          `Cannot fetch metadata: ${(e as Error).message}, ${JSON.stringify(
+            e,
+            null,
+            2
+          )}`
         )
       )
     }

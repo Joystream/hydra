@@ -29,7 +29,7 @@ export class {{className}}Service {
      @Inject('{{className}}Service') public readonly {{camelName}}Service: {{className}}Service,
     {{/subclasses}}
   ) {
-    {{#subclasses}}  
+    {{#subclasses}}
     this.typeToService['{{className}}'] = {{camelName}}Service;
     {{/subclasses}}
   }
@@ -74,7 +74,6 @@ export class {{className}}Service {
             undefined,
             undefined,
             commonFields,
-            camelCase(t),
             (field) => snakeCase(field)
           )
           .addSelect(`'${t}'`, 'type')
@@ -112,7 +111,7 @@ export class {{className}}Service {
         limit,
         undefined,
         fields.filter((f) => service.columnMap[f] !== undefined)
-      );
+      ).then(tmpResults => tmpResults.map(item => (item.type = t, item)));
     });
 
     const result = (await Promise.all<Event[]>(entityPromises)).reduce(
