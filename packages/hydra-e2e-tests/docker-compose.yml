@@ -31,6 +31,7 @@ services:
       - CHAIN_NODE=ws://node-template:9944
       - POLL_INTERVAL_MS=500 # refresh every second
       - DEBUG=hydra*
+      - VERBOSE=true
     depends_on:
       - hydra-indexer-gateway
     command: >

@@ -1,5 +1,6 @@
 import {
   FIFOCache,
+  formatEventId,
   SubstrateBlock,
   SubstrateEvent,
   SubstrateExtrinsic,
@@ -72,12 +73,10 @@ export class GraphQLSource implements IProcessorSource {
       [K in keyof T]: IndexerQuery
     }
   ): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }> {
-    const query = collectQueries(queries)
-    if (conf().VERBOSE) debug(`GraphqQL Query: ${query}`)
+    if (conf().VERBOSE)
+      debug(`Next batch queries: ${JSON.stringify(queries, null, 2)}`)
 
-    // const raw = await this.graphClient.request<
-    //   { [K in keyof typeof queries]: SubstrateEvent[] }
-    // >(query)
+    const query = collectQueries(queries)
 
     const raw = await this.requestSubstrateData<
       { [K in keyof typeof queries]: SubstrateEvent[] }
@@ -89,8 +88,6 @@ export class GraphQLSource implements IProcessorSource {
         0
       )} events`
     )
-
-    if (conf().VERBOSE) debug(`Results: ${stringify(raw)}`)
 
     return raw as {
       [K in keyof typeof queries]: SubstrateEvent[]
@@ -165,6 +162,8 @@ export class GraphQLSource implements IProcessorSource {
 
   private requestSubstrateData<T>(query: string): Promise<T> {
     // TODO: use timeouts?
+    if (conf().VERBOSE) debug(`GraphqQL Query: ${query}`)
+
     return this.request<T, SubstrateType>(query, REVIVE_SUBSTRATE_FIELDS)
   }
 
@@ -191,7 +190,7 @@ export class GraphQLSource implements IProcessorSource {
       },
     })
 
-    return JSON.parse(JSON.stringify(raw), (k, v) => {
+    const revived = JSON.parse(JSON.stringify(raw), (k, v) => {
       if (revive[k as keyof K] === 'BigInt' && typeof v === 'string') {
         return BigInt(v)
       }
@@ -200,6 +199,10 @@ export class GraphQLSource implements IProcessorSource {
       }
       return v
     })
+
+    if (conf().VERBOSE) debug(`Results: ${stringify(revived)}`)
+
+    return revived
   }
 }
 
@@ -234,14 +237,11 @@ export function getEventsGraphQLQuery({
       ? `extrinsic: {name: {_in: [${quotedJoin(extrinsic_in as string[])}]}},`
       : ''
 
-  const idFilter = id.gt ? `id: {_gt: "${id.gt}"},` : ''
-
-  // FIXME: very rough...
-  const block_gt = block.gt || 0
-  const block_lte = block.lte
-
   return `
-  substrate_event(where: {${eventsFilter}${extrinsicsFilter}${idFilter} blockNumber: {_gt: ${block_gt}, _lte: ${block_lte}}}, limit: ${limit}, order_by: {id: asc}) {
+  substrate_event(where: { ${eventsFilter}${extrinsicsFilter}${getIdFilter({
+    id,
+    block,
+  })} }, limit: ${limit}, order_by: {id: asc}) {
     id
     name
     section
@@ -263,4 +263,25 @@ export function getEventsGraphQLQuery({
     }
   }
 `
+}
+
+export function getIdFilter(input: {
+  id: { gt?: string | number }
+  block: { gt?: string | number; lte?: string | number }
+}): string {
+  const block_gt = input.block.gt !== undefined ? Number(input.block.gt) : 0
+
+  const block_gt_id_filter: string = formatEventId(block_gt, 0)
+
+  const block_lte_id_filter: string =
+    input.block.lte !== undefined
+      ? `, _lt: "${formatEventId(Number(input.block.lte) + 1, 0)}"`
+      : ''
+
+  const id_gt_filter: string =
+    input.id.gt !== undefined ? String(input.id.gt) : formatEventId(0, 0) // we should always have something
+
+  return `id: { _gt: "${
+    block_gt_id_filter > id_gt_filter ? block_gt_id_filter : id_gt_filter
+  }"${block_lte_id_filter} }`
 }
