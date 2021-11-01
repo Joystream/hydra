@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.8 (2021-11-01)
+
+
+### Features
+
+* **hydra-processor:** replace block filters with id filters  ([#138](https://github.com/subsquid/hydra/issues/138)) ([2b51167](https://github.com/subsquid/hydra/commit/2b511672744d490dc76c53058cf6ce37dd8acf87))
+
+
+
 ## 5.0.0-alpha.7 (2021-10-29)
 
 **Note:** Version bump only for package hydra
