@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.9 (2021-11-01)
+
+
+### Bug Fixes
+
+* erroneous event handler calls ([86cca10](https://github.com/Joystream/hydra/commit/86cca10c0dcb7c8279448bdf98b9420fd2452ca1))
+
+
+
 ## 5.0.0-alpha.8 (2021-11-01)
 
 
