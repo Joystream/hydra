@@ -1,24 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any  */
-import Debug from 'debug'
-import { compact } from 'lodash'
 import {
-  EventHandler,
-  ExtrinsicHandler,
-  MappingHandler,
-  MappingsDef,
-  Filter,
-} from '../start/manifest'
+  EventContext,
+  ExecContext,
+  ExtrinsicContext,
+  MappingContext,
+} from '@subsquid/hydra-common'
+import Debug from 'debug'
 
 import { BlockData, EventData, Kind } from '../queue'
 import { getConfig as conf } from '../start/config'
-import { isInRange, stringify } from '../util'
 import {
-  MappingContext,
-  EventContext,
-  ExtrinsicContext,
-  ExecContext,
-} from '@subsquid/hydra-common'
-import { IMappingsLookup, BlockMappings } from './IMappingsLookup'
+  EventHandler,
+  ExtrinsicHandler,
+  Filter,
+  MappingHandler,
+  MappingsDef,
+} from '../start/manifest'
+import { isInRange, stringify } from '../util'
+import { BlockMappings, IMappingsLookup } from './IMappingsLookup'
+
 const debug = Debug('hydra-processor:handler-lookup-service')
 
 // export function isBlockHookContext(
@@ -74,18 +74,13 @@ export class MappingsLookupService implements IMappingsLookup {
     debug(`Post-hooks: ${stringify(this.mappings.postBlockHooks)}`)
   }
 
-  lookupHandlers(blockData: BlockData): BlockMappings {
+  lookupBlockHandlers(blockData: BlockData): BlockMappings {
     if (conf().VERBOSE)
       debug(`Lookup handlers, block context: ${stringify(blockData)}`)
 
     const filtered = {
       pre: filter(this.mappings.preBlockHooks || [], blockData),
       post: filter(this.mappings.postBlockHooks || [], blockData),
-      mappings: compact(
-        blockData.events.map((eventData) =>
-          this.lookupMapping(eventData, blockData)
-        )
-      ),
     }
 
     if (conf().VERBOSE) debug(`Mappings for the block: ${stringify(filtered)}`)
@@ -93,7 +88,7 @@ export class MappingsLookupService implements IMappingsLookup {
     return filtered
   }
 
-  lookupMapping(
+  lookupEventHandler(
     eventData: EventData,
     blockData: BlockData
   ): MappingHandler | undefined {

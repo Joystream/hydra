@@ -25,13 +25,14 @@ export class TransactionalExecutor implements IMappingExecutor {
     onSuccess: (data: BlockData) => Promise<void>
   ): Promise<void> {
     await getConnection().transaction(async (entityManager: EntityManager) => {
-      const allMappings = this.mappingsLookup.lookupHandlers(blockData)
+      const { pre, post } = this.mappingsLookup.lookupBlockHandlers(blockData)
       if (conf().VERBOSE)
         debug(
-          `Mappings for block ${blockData.block.id}: ${stringify(allMappings)}`
+          `Mappings for block ${blockData.block.id}: ${stringify({
+            pre,
+            post,
+          })}`
         )
-
-      const { pre, post, mappings } = allMappings
 
       const store = getStore(entityManager, blockData)
 
@@ -42,22 +43,24 @@ export class TransactionalExecutor implements IMappingExecutor {
         })
       }
 
-      let i = 0
-      for (const mapping of mappings) {
-        const { event } = blockData.events[i]
-        debug(`Processing event ${event.id}`)
+      for (let i = 0; i < blockData.events.length; i++) {
+        const eventData = blockData.events[i]
+        const handler = this.mappingsLookup.lookupEventHandler(
+          eventData,
+          blockData
+        )
+        if (handler == null) continue
 
+        const event = eventData.event
+        debug(`Processing event ${event.id}`)
         if (conf().VERBOSE) debug(`JSON: ${stringify(event)}`)
 
-        const ctx = {
+        await this.mappingsLookup.call(handler, {
           ...blockData,
           event,
           store,
           extrinsic: event.extrinsic,
-        }
-
-        await this.mappingsLookup.call(mapping, ctx)
-        i++
+        })
 
         debug(`Event ${event.id} done`)
       }
