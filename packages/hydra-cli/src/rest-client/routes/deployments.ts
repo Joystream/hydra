@@ -2,16 +2,21 @@ import { baseUrl } from '../baseUrl'
 import { getCreds } from '../../creds'
 import { request } from '../request'
 
-export type ResponseBody = {
-  id: string
-  status: 'CREATED' | 'BUILDING' | 'ERROR' | 'OK'
+type DeploymentStatus = 'CREATED' | 'BUILDING' | 'ERROR' | 'OK'
+
+export type DeploymentListResponse = {
   name: string
+  version: string
   artifactUrl: string
-  version: number
+  deploymentUrl: string
+  status: DeploymentStatus
+  createdAt: number
 }
 
-export async function deploymentList(): Promise<ResponseBody[] | undefined> {
-  const apiUrl = `${baseUrl}/client/deployment`
+export async function deploymentList(
+  appName: string
+): Promise<DeploymentListResponse[] | undefined> {
+  const apiUrl = `${baseUrl}/client/project/${appName}/versions`
   const response = await request(apiUrl, {
     method: 'get',
     headers: {
@@ -20,7 +25,7 @@ export async function deploymentList(): Promise<ResponseBody[] | undefined> {
       authorization: `token ${getCreds()}`,
     },
   })
-  const responseBody = await response.json()
+  const responseBody: DeploymentListResponse[] = await response.json()
   if (response.status === 200) {
     return responseBody
   }
