@@ -19,11 +19,11 @@ mappings:
     - event: balances.Transfer 
       handler: balancesTransferV1
       filter:
-        specVersion: '[,1045)'
+        specVersion: '[,1050)'
     - event: balances.Transfer 
       handler: balancesTransferV2
       filter:
-        specVersion: '[1045,)'
+        specVersion: '[1050,)'
   preBlockHooks:
     - handler: genesisLoader
       filter:
