@@ -11,13 +11,13 @@ configuration:
     version_info: versionInfo
   custom_root_fields: {}
 array_relationships:
-  name: substrate_events
-  using:
-    foreign_key_constraint_on:
-      column: extrinsic_id
-      table:
-        schema: public
-        name: substrate_event
+  - name: substrate_events
+    using:
+      foreign_key_constraint_on:
+        column: extrinsic_id
+        table:
+          schema: public
+          name: substrate_event
 select_permissions:
 - permission:
     allow_aggregations: true
