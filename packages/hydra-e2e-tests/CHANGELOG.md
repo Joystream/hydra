@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.12 (2021-11-29)
+
+
+### Bug Fixes
+
+* yaml schema error ([13a3fe6](https://github.com/subsquid/hydra/commit/13a3fe6e61eb7a8efa2dfc555b98806aed93cb0f))
+
+
+
 ## 5.0.0-alpha.11 (2021-11-21)
 
 
