@@ -78,7 +78,7 @@ services:
       - hydra-indexer-status-service
       - hydra-indexer
     environment:
-#      DEV_MODE: "true"
+      DEV_MODE: "true"
       DB_NAME: indexer-db
       DB_USER: postgres
       DB_PASS: postgres

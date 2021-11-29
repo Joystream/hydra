@@ -10,16 +10,14 @@ configuration:
     is_signed: isSigned
     version_info: versionInfo
   custom_root_fields: {}
-object_relationships:
-- name: event
+array_relationships:
+  name: substrate_events
   using:
-    manual_configuration:
-      column_mapping:
-        id: extrinsic_id
-      insertion_order: null
-      remote_table:
-        name: substrate_event
+    foreign_key_constraint_on:
+      column: extrinsic_id
+      table:
         schema: public
+        name: substrate_event
 select_permissions:
 - permission:
     allow_aggregations: true
