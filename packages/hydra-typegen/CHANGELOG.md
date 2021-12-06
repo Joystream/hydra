@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.13 (2021-12-06)
+
+
+### Features
+
+* deployment logs & more obvious deploying flow ([#149](https://github.com/Joystream/hydra/issues/149)) ([1e12011](https://github.com/Joystream/hydra/commit/1e12011999e61e9215b9b264abd893e234b9c6ab))
+
+
+
 ## 5.0.0-alpha.12 (2021-11-29)
 
 
