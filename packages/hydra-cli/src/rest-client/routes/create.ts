@@ -12,7 +12,6 @@ export type ResponseBody = {
 
 export async function create(
   name: string,
-  sourceCodeUrl: string,
   description?: string,
   logoUrl?: string,
   websiteUrl?: string
@@ -24,7 +23,6 @@ export async function create(
       name,
       description,
       logoUrl,
-      sourceCodeUrl,
       websiteUrl,
     }),
     headers: {

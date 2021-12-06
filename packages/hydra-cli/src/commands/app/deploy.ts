@@ -9,6 +9,11 @@ import simpleGit, {
   SimpleGitOptions,
 } from 'simple-git'
 import cliSelect from 'cli-select'
+import cli from 'cli-ux'
+import {
+  DeployPipelineStatusEnum,
+  getDeployPipeline,
+} from '../../rest-client/routes/pipeline'
 
 const debug = Debug('qnode-cli:deploy')
 const options: Partial<SimpleGitOptions> = {
@@ -31,6 +36,11 @@ export default class Deploy extends Command {
       description: 'version name',
       required: true,
     }),
+    url: flags.string({
+      char: 'u',
+      description: 'url',
+      required: false,
+    }),
   }
 
   async run(): Promise<void> {
@@ -38,68 +48,142 @@ export default class Deploy extends Command {
     debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}`)
     const appName = flags.name
     const version = flags.version
-
-    let remoteUrl: RemoteWithRefs
-    const remotes = await git.getRemotes(true)
-    if (remotes.length === 0) {
-      this.error(`The remotes were not found`, { code: '1' })
-    } else if (remotes.length === 1) {
-      remoteUrl = remotes[0]
-    } else {
-      const selected = await cliSelect({
-        cleanup: false,
-        values: remotes.map((remote) => remote.name),
-      }).catch(() => {
-        this.error('Canceled', { code: '1' })
+    let deployUrl = flags.url
+    if (!deployUrl) {
+      let remoteUrl: RemoteWithRefs
+      const remotes = await git.getRemotes(true)
+      if (remotes.length === 0) {
+        this.error(`The remotes were not found`, { code: '1' })
+      } else if (remotes.length === 1) {
+        remoteUrl = remotes[0]
+      } else {
+        const selected = await cliSelect({
+          cleanup: false,
+          values: remotes.map((remote) => remote.name),
+        }).catch(() => {
+          this.error('Canceled', { code: '1' })
+        })
+        remoteUrl = remotes.find(
+          (remote) => remote.name === selected.value
+        ) as RemoteWithRefs
+      }
+      await git.listRemote([remoteUrl.name]).catch(() => {
+        this.error(`Remote url with name ${remoteUrl.name} not exists`, {
+          code: '1',
+        })
       })
-      remoteUrl = remotes.find(
-        (remote) => remote.name === selected.value
-      ) as RemoteWithRefs
+      const branch = (await git.branch()).current
+      const status = await git.status()
+      if (status.files && status.files.length) {
+        this.error(`There are unstaged or uncommitted changes`)
+      }
+      await git.fetch()
+      const remoteBranchRefs = await git.listRemote([
+        `${remoteUrl.name}`,
+        `${branch}`,
+      ])
+      if (remoteBranchRefs === '') {
+        this.error(`Remote branch "${remoteUrl.name}/${branch}" not exists`)
+      }
+      const localCommit = await git.log([
+        '-n',
+        1,
+        branch,
+      ] as LogOptions<DefaultLogFields>)
+      const remoteCommit = await git.log([
+        '-n',
+        1,
+        `${remoteUrl.name}/${branch}`,
+      ] as LogOptions<DefaultLogFields>)
+      if (
+        !localCommit.latest ||
+        !remoteCommit.latest ||
+        localCommit.latest.hash !== remoteCommit.latest.hash
+      ) {
+        this.error(
+          `Head origin commit is not the same as the local origin commit`
+        )
+      }
+      deployUrl = `${remoteUrl.refs.fetch}.git#${remoteCommit.latest.hash}`
     }
-    await git.listRemote([remoteUrl.name]).catch(() => {
-      this.error(`Remote url with name ${remoteUrl.name} not exists`, {
-        code: '1',
-      })
-    })
-    const branch = (await git.branch()).current
-    const status = await git.status()
-    if (status.files && status.files.length) {
-      this.error(`There are unstaged or uncommitted changes`)
-    }
-    await git.fetch()
-    const remoteBranchRefs = await git.listRemote([
-      `${remoteUrl.name}`,
-      `${branch}`,
-    ])
-    if (remoteBranchRefs === '') {
-      this.error(`Remote branch "${remoteUrl.name}/${branch}" not exists`)
-    }
-    const localCommit = await git.log([
-      '-n',
-      1,
-      branch,
-    ] as LogOptions<DefaultLogFields>)
-    const remoteCommit = await git.log([
-      '-n',
-      1,
-      `${remoteUrl.name}/${branch}`,
-    ] as LogOptions<DefaultLogFields>)
-    if (
-      !localCommit.latest ||
-      !remoteCommit.latest ||
-      localCommit.latest.hash !== remoteCommit.latest.hash
-    ) {
-      this.error(
-        `Head origin commit is not the same as the local origin commit`
-      )
-    }
-
-    this.log(`🦑 Releasing the Squid at ${remoteUrl.name}`)
-    const message = await deploy(
-      appName,
-      version,
-      `${remoteUrl.refs.fetch}#${remoteCommit.latest.hash}`
+    this.log(`🦑 Releasing the Squid at ${deployUrl}`)
+    const result = await deploy(appName, version, deployUrl)
+    this.log(
+      '◷ You can detach from the resulting build process by pressing Ctrl + C. This does not cancel the deploy.'
     )
-    this.log(message)
+    this.log(
+      '◷ The deploy will continue in the background and will create a new squid as soon as it completes.'
+    )
+    let inProgress = true
+    let lastStatus
+    while (inProgress) {
+      const pipeline = await getDeployPipeline(appName, version)
+      if (pipeline) {
+        if (pipeline.status !== lastStatus) {
+          lastStatus = pipeline.status
+          cli.action.stop('✔️')
+        }
+        switch (pipeline?.status) {
+          case DeployPipelineStatusEnum.CREATED:
+            cli.action.start('◷ Preparing your squid')
+            if (pipeline.isErrorOccurred) {
+              this.error(
+                buildPipelineErrorMessage(
+                  `❌ An error occurred during building process`,
+                  pipeline.comment
+                )
+              )
+            }
+            break
+          case DeployPipelineStatusEnum.IMAGE_BUILDING:
+            cli.action.start('◷ Building your squid')
+            if (pipeline.isErrorOccurred) {
+              this.error(
+                buildPipelineErrorMessage(
+                  `❌ An error occurred during building process`,
+                  pipeline.comment
+                )
+              )
+            }
+            break
+          case DeployPipelineStatusEnum.IMAGE_PUSHING:
+            cli.action.start('◷ Publishing your squid')
+            if (pipeline.isErrorOccurred) {
+              this.error(
+                buildPipelineErrorMessage(
+                  `❌ An error occurred during pushing process`,
+                  pipeline.comment
+                )
+              )
+            }
+            break
+          case DeployPipelineStatusEnum.DEPLOYING:
+            cli.action.start('◷ Almost ready')
+            if (pipeline.isErrorOccurred) {
+              this.error(
+                buildPipelineErrorMessage(
+                  `❌ An error occurred during deploying process`,
+                  pipeline.comment
+                )
+              )
+            }
+            break
+          case DeployPipelineStatusEnum.OK:
+            this.log(
+              `◷ Your squid almost ready and will be accessible on ${result?.deploymentVersion.deploymentUrl}`
+            )
+            inProgress = false
+            break
+          default:
+            this.error('❌ An error occurred. Unexpected status of pipeline.')
+        }
+      }
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+    }
+    this.log('✔️ Done!')
   }
+}
+
+function buildPipelineErrorMessage(text: string, errorMessage: string): string {
+  return `${text} ${errorMessage ? `: ${errorMessage}` : ''}`
 }

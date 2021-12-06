@@ -5,7 +5,7 @@ import { create } from '../../rest-client/routes/create'
 const debug = Debug('qnode-cli:create')
 
 export default class Create extends Command {
-  static description = 'Create'
+  static description = 'Create a project'
 
   static flags = {
     name: flags.string({
@@ -23,11 +23,6 @@ export default class Create extends Command {
       description: 'logo url',
       required: false,
     }),
-    source: flags.string({
-      char: 's',
-      description: 'source code url',
-      required: true,
-    }),
     website: flags.string({
       char: 'w',
       description: 'website url',
@@ -41,12 +36,10 @@ export default class Create extends Command {
     const appName = flags.name
     const description = flags.description
     const logoUrl = flags.logo
-    const sourceCodeUrl = flags.source
     const websiteUrl = flags.website
 
     const createAppMessage = await create(
       appName,
-      sourceCodeUrl,
       description,
       logoUrl,
       websiteUrl

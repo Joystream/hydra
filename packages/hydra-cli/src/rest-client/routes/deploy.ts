@@ -6,7 +6,11 @@ export async function deploy(
   name: string,
   version: string,
   artifactUrl: string
-): Promise<string | undefined> {
+): Promise<{
+  id: number
+  name: string
+  deploymentVersion: { deploymentUrl: string }
+} | void> {
   const apiUrl = `${baseUrl}/client/project/${name}/version`
   const response = await request(apiUrl, {
     method: 'post',
@@ -22,8 +26,6 @@ export async function deploy(
   })
   const responseBody = await response.json()
   if (response.status === 200) {
-    return `Created new version of deployment with name ${responseBody.name}, version: ${version}`
-  } else if (response.status === 404) {
-    return 'App not exists'
+    return responseBody
   }
 }
