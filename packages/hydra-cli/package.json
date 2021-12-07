@@ -58,6 +58,7 @@
     "execa": "^4.1.0",
     "node-fetch": "^2.6.1",
     "pgtools": "^0.3.2",
+    "query-string": "^7.0.1",
     "simple-git": "^2.44.0",
     "tslib": "^2.3.1"
   },
