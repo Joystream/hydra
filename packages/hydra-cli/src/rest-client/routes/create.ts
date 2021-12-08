@@ -2,21 +2,13 @@ import { baseUrl } from '../baseUrl'
 import { getCreds } from '../../creds'
 import { request } from '../request'
 
-export type ResponseBody = {
-  id: string
-  status: 'CREATED' | 'DEPLOYING' | 'ERROR' | 'OK'
-  name: string
-  artifactUrl: string
-  version: number
-}
-
 export async function create(
   name: string,
   description?: string,
   logoUrl?: string,
   websiteUrl?: string
 ): Promise<string | undefined> {
-  const apiUrl = `${baseUrl}/client/project`
+  const apiUrl = `${baseUrl}/client/squid`
   const response = await request(apiUrl, {
     method: 'post',
     body: JSON.stringify({
@@ -33,6 +25,6 @@ export async function create(
   })
   const responseBody = await response.json()
   if (response.status === 200) {
-    return `Created app with name ${responseBody.name}`
+    return `Created squid with name ${responseBody.name}`
   }
 }

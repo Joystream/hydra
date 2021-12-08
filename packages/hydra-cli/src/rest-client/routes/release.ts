@@ -2,26 +2,28 @@ import { baseUrl } from '../baseUrl'
 import { getCreds } from '../../creds'
 import { request } from '../request'
 
-type AppListResponse = {
+/** Release (create) version */
+export async function release(
+  squidName: string,
+  versionName: string,
+  artifactUrl: string,
+  description?: string
+): Promise<{
   id: number
   name: string
-  description: string
-  logoUrl: string
-  sourceCodeUrl: string
-  websiteUrl: string
-}
-
-export async function appList(): Promise<AppListResponse[] | undefined> {
-  const apiUrl = `${baseUrl}/client/project`
+  version: { deploymentUrl: string }
+} | void> {
+  const apiUrl = `${baseUrl}/client/squid/${squidName}/version`
   const response = await request(apiUrl, {
-    method: 'get',
+    method: 'post',
+    body: JSON.stringify({ artifactUrl, versionName, description }),
     headers: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       'Content-Type': 'application/json',
       authorization: `token ${getCreds()}`,
     },
   })
-  const responseBody: AppListResponse[] = await response.json()
+  const responseBody = await response.json()
   if (response.status === 200) {
     return responseBody
   }

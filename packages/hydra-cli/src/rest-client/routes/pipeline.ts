@@ -4,7 +4,7 @@ import { request } from '../request'
 import queryString from 'query-string'
 
 export type DeployPipelineResponse = {
-  projectName: string
+  squidName: string
   version: string
   status: DeployPipelineStatusEnum
   isErrorOccurred: boolean
@@ -22,11 +22,11 @@ export enum DeployPipelineStatusEnum {
 }
 
 export async function getDeployPipeline(
-  name: string,
-  version: string
+  squidName: string,
+  versionName: string
 ): Promise<DeployPipelineResponse | undefined> {
-  const apiUrl = `${baseUrl}/client/project/${name}/pipeline`
-  const params = queryString.stringify({ version })
+  const apiUrl = `${baseUrl}/client/squid/${squidName}/pipeline`
+  const params = queryString.stringify({ name: versionName })
   const response = await request(`${apiUrl}?${params}`, {
     method: 'get',
     headers: {

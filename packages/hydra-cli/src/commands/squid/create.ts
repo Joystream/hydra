@@ -5,14 +5,16 @@ import { create } from '../../rest-client/routes/create'
 const debug = Debug('qnode-cli:create')
 
 export default class Create extends Command {
-  static description = 'Create a project'
+  static description = 'Create a squid'
+  static args = [
+    {
+      name: 'name',
+      description: 'squid name',
+      required: true,
+    },
+  ]
 
   static flags = {
-    name: flags.string({
-      char: 'n',
-      description: 'app name',
-      required: true,
-    }),
     description: flags.string({
       char: 'd',
       description: 'description',
@@ -31,19 +33,19 @@ export default class Create extends Command {
   }
 
   async run(): Promise<void> {
-    const { flags } = this.parse(Create)
-    debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}`)
-    const appName = flags.name
+    const { flags, args } = this.parse(Create)
+    debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}, args: ${args}`)
+    const name = args.name
     const description = flags.description
     const logoUrl = flags.logo
     const websiteUrl = flags.website
 
-    const createAppMessage = await create(
-      appName,
+    const createSquidMessage = await create(
+      name,
       description,
       logoUrl,
       websiteUrl
     )
-    this.log(createAppMessage)
+    this.log(createSquidMessage)
   }
 }

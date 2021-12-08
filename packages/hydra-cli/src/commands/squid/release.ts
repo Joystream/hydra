@@ -1,5 +1,5 @@
 import { Command, flags } from '@oclif/command'
-import { deploy } from '../../rest-client/routes/deploy'
+import { release } from '../../rest-client/routes/release'
 import Debug from 'debug'
 import simpleGit, {
   DefaultLogFields,
@@ -14,6 +14,7 @@ import {
   DeployPipelineStatusEnum,
   getDeployPipeline,
 } from '../../rest-client/routes/pipeline'
+import { parseNameAndVersion } from '../../utils/helper'
 
 const debug = Debug('qnode-cli:deploy')
 const options: Partial<SimpleGitOptions> = {
@@ -22,33 +23,36 @@ const options: Partial<SimpleGitOptions> = {
 }
 const git: SimpleGit = simpleGit(options)
 
-export default class Deploy extends Command {
-  static description = 'Create a deployment'
+export default class Release extends Command {
+  static description = 'Create a version'
+  static args = [
+    {
+      name: 'nameAndVersion',
+      description: 'name@version',
+      required: true,
+    },
+  ]
 
   static flags = {
-    name: flags.string({
-      char: 'n',
-      description: 'app name',
-      required: true,
+    source: flags.string({
+      char: 's',
+      description: 'source',
+      required: false,
     }),
-    version: flags.string({
-      char: 'v',
-      description: 'version name',
-      required: true,
-    }),
-    url: flags.string({
-      char: 'u',
-      description: 'url',
+    description: flags.string({
+      char: 'd',
+      description: 'description',
       required: false,
     }),
   }
 
   async run(): Promise<void> {
-    const { flags } = this.parse(Deploy)
-    debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}`)
-    const appName = flags.name
-    const version = flags.version
-    let deployUrl = flags.url
+    const { flags, args } = this.parse(Release)
+    debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}, args: ${args}`)
+    const description = flags.description
+    const nameAndVersion = args.nameAndVersion
+    const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this)
+    let deployUrl = flags.source
     if (!deployUrl) {
       let remoteUrl: RemoteWithRefs
       const remotes = await git.getRemotes(true)
@@ -107,7 +111,7 @@ export default class Deploy extends Command {
       deployUrl = `${remoteUrl.refs.fetch}.git#${remoteCommit.latest.hash}`
     }
     this.log(`🦑 Releasing the Squid at ${deployUrl}`)
-    const result = await deploy(appName, version, deployUrl)
+    const result = await release(squidName, versionName, deployUrl, description)
     this.log(
       '◷ You can detach from the resulting build process by pressing Ctrl + C. This does not cancel the deploy.'
     )
@@ -117,7 +121,7 @@ export default class Deploy extends Command {
     let inProgress = true
     let lastStatus
     while (inProgress) {
-      const pipeline = await getDeployPipeline(appName, version)
+      const pipeline = await getDeployPipeline(squidName, versionName)
       if (pipeline) {
         if (pipeline.status !== lastStatus) {
           lastStatus = pipeline.status
@@ -170,7 +174,7 @@ export default class Deploy extends Command {
             break
           case DeployPipelineStatusEnum.OK:
             this.log(
-              `◷ Your squid almost ready and will be accessible on ${result?.deploymentVersion.deploymentUrl}`
+              `◷ Your squid almost ready and will be accessible on ${result?.version.deploymentUrl}`
             )
             inProgress = false
             break

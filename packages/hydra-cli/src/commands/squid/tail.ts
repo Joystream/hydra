@@ -1,23 +1,21 @@
 import { Command, flags } from '@oclif/command'
 import Debug from 'debug'
 import { log } from '../../rest-client/routes/log'
+import { parseNameAndVersion } from '../../utils/helper'
 
 const debug = Debug('qnode-cli:log')
 
-export default class Log extends Command {
-  static description = 'Getting logs about deployment'
+export default class Tail extends Command {
+  static description = 'Getting logs about version'
+  static args = [
+    {
+      name: 'nameAndVersion',
+      description: 'name@version',
+      required: true,
+    },
+  ]
 
   static flags = {
-    name: flags.string({
-      char: 'n',
-      description: 'app name',
-      required: true,
-    }),
-    version: flags.string({
-      char: 'v',
-      description: 'version name',
-      required: true,
-    }),
     follow: flags.boolean({
       char: 'f',
       description: 'will continue streaming the new logs',
@@ -33,14 +31,14 @@ export default class Log extends Command {
   }
 
   async run(): Promise<void> {
-    const { flags } = this.parse(Log)
-    debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}`)
-    const appName = flags.name
-    const version = flags.version
+    const { flags, args } = this.parse(Tail)
+    debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}, args: ${args}`)
+    const nameAndVersion = args.nameAndVersion
+    const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this)
     const follow = flags.follow
     const lines = flags.lines
 
     this.log('Getting logs...')
-    await log(appName, version, follow, lines)
+    await log(squidName, versionName, follow, lines)
   }
 }

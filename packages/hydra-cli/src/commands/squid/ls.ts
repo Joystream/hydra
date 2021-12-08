@@ -1,17 +1,17 @@
 import { Command, flags } from '@oclif/command'
 import { cli } from 'cli-ux'
-import { appList } from '../../rest-client/routes/apps'
+import { squidList } from '../../rest-client/routes/squids'
 import Debug from 'debug'
-import { deploymentList } from '../../rest-client/routes/deployments'
+import { versionList } from '../../rest-client/routes/versions'
 
 const debug = Debug('qnode-cli:deployment-list')
 export default class Ls extends Command {
-  static description = 'App or deployments list'
+  static description = 'Squid or versions list'
 
   static flags = {
     name: flags.string({
       char: 'n',
-      description: 'app name',
+      description: 'squid name',
       required: false,
     }),
     truncate: flags.boolean({
@@ -26,15 +26,15 @@ export default class Ls extends Command {
     const { flags } = this.parse(Ls)
     debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}`)
     const noTruncate = !flags.truncate
-    const appName = flags.name
+    const squidName = flags.name
 
-    if (appName) {
-      const deployments = await deploymentList(appName)
+    if (squidName) {
+      const deployments = await versionList(squidName)
       if (deployments) {
         cli.table(
           deployments,
           {
-            version: { header: 'version' },
+            name: { header: 'version name' },
             artifactUrl: { header: 'artifactUrl' },
             deploymentUrl: { header: 'deploymentUrl' },
             status: {},
@@ -44,10 +44,10 @@ export default class Ls extends Command {
         )
       }
     } else {
-      const apps = await appList()
-      if (apps) {
+      const squids = await squidList()
+      if (squids) {
         cli.table(
-          apps,
+          squids,
           {
             name: {},
             description: {},

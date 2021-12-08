@@ -4,14 +4,14 @@ import queryString from 'query-string'
 import * as fetch from 'node-fetch'
 
 export async function log(
-  name: string,
-  version: string,
+  squidName: string,
+  versionName: string,
   follow: boolean,
   lines: number
 ): Promise<void> {
-  const apiUrl = `${baseUrl}/client/project/${name}/logs`
+  const apiUrl = `${baseUrl}/client/squid/${squidName}/logs`
   const params = queryString.stringify({
-    version,
+    name: versionName,
     follow,
     lines,
   })

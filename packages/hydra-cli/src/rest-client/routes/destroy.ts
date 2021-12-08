@@ -3,10 +3,10 @@ import { getCreds } from '../../creds'
 import { request } from '../request'
 
 export async function destroyDeployment(
-  appName: string,
+  squidName: string,
   version: string
 ): Promise<string | undefined> {
-  const apiUrl = `${baseUrl}/client/project/${appName}/version?version=${version}`
+  const apiUrl = `${baseUrl}/client/squid/${squidName}/version?name=${version}`
   const response = await request(apiUrl, {
     method: 'delete',
     headers: {
@@ -17,12 +17,12 @@ export async function destroyDeployment(
   })
   const responseBody = await response.json()
   if (response.status === 200) {
-    return `Destroyed deployment with name ${responseBody.projectName}`
+    return `Destroyed version with name ${responseBody.squidName}`
   }
 }
 
 export async function destroyApp(name: string): Promise<string | undefined> {
-  const apiUrl = `${baseUrl}/client/project/${name}`
+  const apiUrl = `${baseUrl}/client/squid/${name}`
   const response = await request(apiUrl, {
     method: 'delete',
     headers: {
@@ -33,6 +33,6 @@ export async function destroyApp(name: string): Promise<string | undefined> {
   })
   const responseBody = await response.json()
   if (response.status === 200) {
-    return `Destroyed app with name ${responseBody.name}`
+    return `Destroyed squid with name ${responseBody.name}`
   }
 }
