@@ -11,8 +11,13 @@ export function startPromEndpoint(): Server {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   server.get('/metrics', (req: any, res: any) => {
     try {
-      res.set('Content-Type', register.contentType)
-      res.end(register.metrics())
+      if (req.query.json === 'true') {
+        res.end(register.metrics())
+        res.json(register.getMetricsAsJSON())
+      } else {
+        res.set('Content-Type', register.contentType)
+        res.end(register.metrics())
+      }
     } catch (ex) {
       res.status(500).end(ex)
     }
