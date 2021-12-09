@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.15 (2021-12-09)
+
+
+### Bug Fixes
+
+* fixed version type in delete command ([e848b6b](https://github.com/subsquid/hydra/commit/e848b6bb007f76994e82188b1d9aee39c199be07))
+
+
+
 ## 5.0.0-alpha.14 (2021-12-07)
 
 **Note:** Version bump only for package hydra
