@@ -13,7 +13,7 @@ export default class Delete extends Command {
       description: 'app name',
       required: true,
     }),
-    version: flags.integer({
+    version: flags.string({
       char: 'v',
       description: 'version name',
       required: false,
@@ -25,7 +25,6 @@ export default class Delete extends Command {
     debug(`Parsed flags: ${JSON.stringify(flags, null, 2)}`)
     const appName = flags.name
     const version = flags.version
-
     let message
     if (version) {
       message = await destroyDeployment(appName, version)

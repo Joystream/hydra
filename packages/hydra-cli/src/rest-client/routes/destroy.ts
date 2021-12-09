@@ -4,7 +4,7 @@ import { request } from '../request'
 
 export async function destroyDeployment(
   appName: string,
-  version: number
+  version: string
 ): Promise<string | undefined> {
   const apiUrl = `${baseUrl}/client/project/${appName}/version?version=${version}`
   const response = await request(apiUrl, {
