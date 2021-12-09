@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.16 (2021-12-09)
+
+
+### Features
+
+* hydra-processor metrics extension ([faf193e](https://github.com/Joystream/hydra/commit/faf193e3d553a485f2d842e7b0dad714a6986ad7))
+
+
+
 ## 5.0.0-alpha.15 (2021-12-09)
 
 
