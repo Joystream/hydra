@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.17 (2021-12-14)
+
+
+### Features
+
+* change naming in cli ([09abe3b](https://github.com/Joystream/hydra/commit/09abe3bb941916669958740146bc5e45f798d841))
+
+
+
 ## 5.0.0-alpha.16 (2021-12-09)
 
 
