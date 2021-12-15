@@ -108,7 +108,15 @@ export default class Release extends Command {
           `Head origin commit is not the same as the local origin commit`
         )
       }
-      deployUrl = `${remoteUrl.refs.fetch}.git#${remoteCommit.latest.hash}`
+      deployUrl = `${remoteUrl.refs.fetch}${
+        remoteUrl.refs.fetch.endsWith('.git') ? '' : '.git'
+      }#${remoteCommit.latest.hash}`
+    } else {
+      deployUrl = deployUrl.split('#')[0].endsWith('.git')
+        ? deployUrl
+        : `${deployUrl.split('#')[0]}.git${
+            deployUrl.split('#')[1] ? '#' + deployUrl.split('#')[1] : ''
+          }`
     }
     this.log(`🦑 Releasing the Squid at ${deployUrl}`)
     const result = await release(squidName, versionName, deployUrl, description)
