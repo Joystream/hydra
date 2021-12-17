@@ -1,9 +1,4 @@
-import {
-  EventInfo,
-  ExtrinsicInfo,
-  formatId,
-  SubstrateBlock,
-} from '@subsquid/hydra-common'
+import { ExtrinsicInfo, formatId } from '@subsquid/hydra-common'
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm'
 import { BlockData, fullName, getExtrinsic } from '../model'
 import { AbstractWarthogModel } from './AbstractWarthogModel'
@@ -14,10 +9,7 @@ import { AbstractWarthogModel } from './AbstractWarthogModel'
 @Entity({
   name: 'substrate_block',
 })
-export class SubstrateBlockEntity
-  extends AbstractWarthogModel
-  implements SubstrateBlock
-{
+export class SubstrateBlockEntity extends AbstractWarthogModel {
   @PrimaryColumn()
   id!: string
 
@@ -52,7 +44,11 @@ export class SubstrateBlockEntity
   lastRuntimeUpgrade!: unknown
 
   @Column({ type: 'jsonb' })
-  events!: EventInfo[]
+  events!: {
+    id: string
+    name: string
+    extrinsic: string
+  }[]
 
   @Column({ type: 'jsonb' })
   extrinsics!: ExtrinsicInfo[]

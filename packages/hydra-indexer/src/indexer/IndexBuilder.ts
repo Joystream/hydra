@@ -6,7 +6,7 @@ import {
   getExtrinsicIndex,
   getOrUndefined,
 } from '../model'
-import { toPayload } from '@subsquid/hydra-common'
+import { BlockPayload } from '@subsquid/hydra-common'
 import { PooledExecutor } from './PooledExecutor'
 import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { IStatusService } from '../status-service/IStatusService'
@@ -165,6 +165,17 @@ export class IndexBuilder {
       }
     })
 
-    eventEmitter.emit(IndexerEvents.BLOCK_COMPLETED, toPayload(blockEntity))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const spec = (blockEntity.runtimeVersion as any)?.specVersion
+    const blockPayload: BlockPayload = {
+      height: blockEntity.height,
+      hash: blockEntity.hash,
+      parentHash: blockEntity.parentHash,
+      ts: blockEntity.timestamp,
+      events: blockEntity.events,
+      extrinsics: blockEntity.extrinsics,
+      runtimeVersion: spec ? { specVersion: String(spec) } : {},
+    }
+    eventEmitter.emit(IndexerEvents.BLOCK_COMPLETED, blockPayload)
   }
 }

@@ -13,7 +13,8 @@ export interface ExtrinsicArg {
 export interface EventInfo {
   id: string
   name: string
-  extrinsic: string
+  extrinsicId: string
+  extrinsicName: string
 }
 
 export interface ExtrinsicInfo {
