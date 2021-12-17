@@ -58,8 +58,7 @@ export function renderTypedParams(argTypes: string[]): string {
 }
 
 function renderCreateTypeStmt(argType: string, ctxValueGetter: string) {
-  return `createTypeUnsafe<${convertTuples(argType)} & Codec>(
-            typeRegistry, '${argType}', ${ctxValueGetter}) `
+  return `createTypeUnsafe(typeRegistry, '${argType}', ${ctxValueGetter}) `
 }
 
 /**
