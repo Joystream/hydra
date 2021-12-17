@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.18 (2021-12-17)
+
+
+### Features
+
+* **hydra-processor:** add extrinsic id to the block header to new indexers ([af701d6](https://github.com/subsquid/hydra/commit/af701d6ed686617757410536ea8b2556385add50))
+
+
+
 ## 5.0.0-alpha.17 (2021-12-14)
 
 
