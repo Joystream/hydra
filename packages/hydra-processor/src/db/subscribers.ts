@@ -44,11 +44,11 @@ function sanitizeEntity(entity: Entity, entityMetadata: EntityMetadata) {
   Replaces string made of only UTF-8 null characters by an empty string.
 */
 function sanitizeNullCharacter(entity: Record<string, string>, field: string) {
-  if (!entity[field] || !entity[field].match('\0+')) {
+  if (!entity || !entity[field] || !entity[field].match(/\u0000/)) {
     return
   }
 
-  entity[field] = ''
+  entity[field] = entity[field].replace(/\u0000/g, '')
 }
 
 // cache for list of entity string fields
