@@ -19,7 +19,8 @@
     "strictNullChecks": true,
     "types": ["isomorphic-fetch", "node"],
     "esModuleInterop": true,
-    "declaration": true
+    "declaration": true,
+    "useUnknownInCatchVariables": false
   },
   "include": ["src/**/*", "db/**/*", "model/**/*"],
   "exclude": ["node_modules/**/*", "generated/**/*", "tools/**/*"]
