@@ -43,9 +43,9 @@ export class {{query.typePrefix}}FTSService {
       const repositories = [{{#entities}}this.{{fieldName}}Repository, {{/entities}}]
       let [queries, parameters, parameterCounter]: [string, any[], number] = [``, [], 0];
 
-      const generateSqlQuery = (table: string, where: string) =>
+      const generateSqlQuery = (table: string, joins: string, where: string, having: string) =>
         `
-  SELECT '${table}_' || id AS unique_id FROM "${table}" ` + where;
+  SELECT '${table}_' || id AS unique_id FROM "${table}" ` + joins + ' ' + where + ' ' + having;
 
       wheres.map((w, index) => {
         if (w) {
@@ -98,7 +98,7 @@ export class {{query.typePrefix}}FTSService {
           WHERE = WHERE.slice(0, -4);
 
           // Add new query to queryString
-          queries = queries.concat(generateSqlQuery(repositories[index].metadata.tableName, WHERE));
+          queries = queries.concat(generateSqlQuery(repositories[index].metadata.tableName, qb.createJoinExpression(), WHERE, qb.createHavingExpression()));
         }
       });
 
