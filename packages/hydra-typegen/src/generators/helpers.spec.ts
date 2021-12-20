@@ -22,10 +22,8 @@ describe('helpers', () => {
       args: ['Type1', 'Type2 & Balance'],
     })
     expect(c(prmsReturnStmt())).to.equal(
-      c(`return [createTypeUnsafe<Type1 & Codec>(
-            typeRegistry, 'Type1', [this.ctx.params[0].value]), 
-            createTypeUnsafe<Type2 & Balance & Codec>(
-            typeRegistry, 'Type2 & Balance', [this.ctx.params[1].value])]`)
+      c(`return [createTypeUnsafe(typeRegistry, 'Type1', [this.ctx.params[0].value]), 
+            createTypeUnsafe(typeRegistry, 'Type2 & Balance', [this.ctx.params[1].value])]`)
     )
   })
 
@@ -34,8 +32,9 @@ describe('helpers', () => {
       args: ['Vec<(Type1,Type2,(Balance1,Balance2))>'],
     })
     expect(c(prmsReturnStmt())).to.equal(
-      c(`return [createTypeUnsafe<Vec<[Type1,Type2,[Balance1,Balance2] & Codec] & Codec> & Codec>(
-            typeRegistry, 'Vec<(Type1,Type2,(Balance1,Balance2))>', [this.ctx.params[0].value])]`)
+      c(
+        `return [createTypeUnsafe(typeRegistry, 'Vec<(Type1,Type2,(Balance1,Balance2))>', [this.ctx.params[0].value])]`
+      )
     )
   })
 })
