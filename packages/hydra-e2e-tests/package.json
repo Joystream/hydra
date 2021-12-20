@@ -22,8 +22,8 @@
     "e2e-test": "bash run-tests.sh"
   },
   "dependencies": {
-    "@polkadot/api": "4.16.2",
-    "@polkadot/keyring": "6.9.1",
+    "@polkadot/api": "5.9.1",
+    "@polkadot/keyring": "7.9.2",
     "fetch": "^1.1.0",
     "graphql-request": "^3.3.0",
     "graphql-subscriptions-client": "^0.16.0",
@@ -40,7 +40,7 @@
     "mocha": "^8.1.3",
     "nyc": "^15.1.0",
     "prettier": "^2.1.2",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.3"
+    "ts-node": "^10.2.1",
+    "typescript": "4.4.2"
   }
 }
