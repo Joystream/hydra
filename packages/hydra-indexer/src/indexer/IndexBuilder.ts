@@ -68,6 +68,17 @@ export class IndexBuilder {
 
     debug('Started a pool of indexers.')
     eventEmitter.on(IndexerEvents.INDEXER_STOP, async () => await this.stop())
+    eventEmitter.on(
+      IndexerEvents.BLOCK_COMPLETED,
+      _.debounce(async () => {
+        debug(
+          `No block has been completed within last ${
+            getConfig().BLOCK_COMPLETED_TIMEOUT_MS / 1000
+          } seconds. Stopping...`
+        )
+        eventEmitter.emit(IndexerEvents.INDEXER_STOP)
+      }, getConfig().BLOCK_COMPLETED_TIMEOUT_MS)
+    )
 
     try {
       await poolExecutor.run(() => this._stopped)

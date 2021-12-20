@@ -31,6 +31,7 @@ let conf: {
   SUBSTRATE_API_TIMEOUT: number
   SUBSTRATE_API_CALL_RETRIES: number
   NEW_BLOCK_TIMEOUT_MS: number
+  BLOCK_COMPLETED_TIMEOUT_MS: number
   HEADER_CACHE_CAPACITY: number
   FINALITY_THRESHOLD: number
   EVENT_BATCH_SIZE: number
@@ -194,6 +195,11 @@ export function configure(): void {
         desc: `If the block producer does not recieve a new block within this time limit,
 panic and throw an error. This is needed to prevent the situation when the
 API is disconnected yet no error is thrown, with the block producer stuck in the waiting loop`,
+      }),
+
+      BLOCK_COMPLETED_TIMEOUT_MS: num({
+        default: 60 * 1000,
+        desc: `Stop an indexer if there is no a completed block within this time limit`,
       }),
 
       // number of finalized block headers retained in memory
