@@ -69,15 +69,15 @@ export class IndexBuilder {
     debug('Started a pool of indexers.')
     eventEmitter.on(IndexerEvents.INDEXER_STOP, async () => await this.stop())
     eventEmitter.on(
-      IndexerEvents.BLOCK_COMPLETED,
+      IndexerEvents.RESET_INACTIVITY,
       _.debounce(async () => {
         debug(
-          `No block has been completed within last ${
-            getConfig().BLOCK_COMPLETED_TIMEOUT_MS / 1000
+          `No activity has been found within last ${
+            getConfig().INACTIVITY_TIMEOUT_MS / 1000
           } seconds. Stopping...`
         )
         eventEmitter.emit(IndexerEvents.INDEXER_STOP)
-      }, getConfig().BLOCK_COMPLETED_TIMEOUT_MS)
+      }, getConfig().INACTIVITY_TIMEOUT_MS)
     )
 
     try {
@@ -128,6 +128,7 @@ export class IndexBuilder {
       debug(`Saving block data`)
       await em.save(blockEntity)
       debug(`Saved block data`)
+      eventEmitter.emit(IndexerEvents.RESET_INACTIVITY)
 
       debug(`Saving extrinsics`)
       const {
@@ -144,6 +145,7 @@ export class IndexBuilder {
         )
       await em.save(extrinsicEntities)
       debug(`Saved ${extrinsicEntities.length} extrinsics`)
+      eventEmitter.emit(IndexerEvents.RESET_INACTIVITY)
 
       debug(`Saving event entities`)
       const queryEventsBlock = fromBlockData(blockData)
@@ -173,6 +175,7 @@ export class IndexBuilder {
         saved += qeEntities.length
         batch = []
         debug(`Saved ${saved} events`)
+        eventEmitter.emit(IndexerEvents.RESET_INACTIVITY)
       }
     })
 

@@ -11,4 +11,5 @@ export enum IndexerEvents {
   API_CONNECTED = 'API_CONNECTED', // api has been (re)-connected
   BLOCK_COMPLETED = 'BLOCK_COMPLETED', // a full block hash been successfully saved
   BLOCK_STARTED = 'BLOCK_STARTED', // block processing started
+  RESET_INACTIVITY = 'RESET_INACTIVITY', // emits on some activity while block handling
 }
