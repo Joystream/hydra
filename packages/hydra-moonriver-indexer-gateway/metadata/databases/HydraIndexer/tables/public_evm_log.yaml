@@ -1,0 +1,3 @@
+table:
+  name: evm_log
+  schema: public
