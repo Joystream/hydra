@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.19 (2021-12-22)
+
+
+### Features
+
+* **hydra-indexer:** stop an indexer if no activity within INACTIVITY_TIMEOUT_MS ([76fa589](https://github.com/subsquid/hydra/commit/76fa589c95e1ffdb00eac87dd8892619af9e3cab))
+
+
+
 ## 5.0.0-alpha.18 (2021-12-17)
 
 
