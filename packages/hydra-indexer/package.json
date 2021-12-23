@@ -18,7 +18,7 @@
     "docker:build": "docker build . -t hydra-indexer:latest",
     "docker:tag": "docker tag hydra-indexer:latest joystream/hydra-indexer:v${VERSION_TAG} && docker tag hydra-indexer:latest joystream/hydra-indexer:${MAJOR_VERSION_TAG} && docker tag hydra-indexer:latest joystream/hydra-indexer:${RELEASE_TAG:-next}",
     "docker:publish": "export VERSION_TAG=$(node -p 'require(\"./package.json\").version') && export MAJOR_VERSION_TAG=$(echo $VERSION_TAG|cut -d'.' -f1) && yarn docker:build && yarn docker:tag && docker push joystream/hydra-indexer --all-tags",
-    "build": "rm -rf lib && tsc --build tsconfig.json",
+    "build": "rm -rf lib && yarn tsc --build tsconfig.json",
     "lint": "eslint . --cache --ext .ts",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "i-test": "docker-compose -f docker-compose-test.yml up -d && sh ./run-integration-tests.sh",
@@ -39,7 +39,7 @@
     "@joystream/bn-typeorm": "^3.1.0-alpha.14",
     "@joystream/hydra-common": "^3.1.0-alpha.14",
     "@joystream/hydra-db-utils": "^3.1.0-alpha.14",
-    "@polkadot/api": "4.16.2",
+    "@polkadot/api": "5.9.1",
     "@types/express": "^4.17.8",
     "@types/ioredis": "^4.17.4",
     "@types/lodash": "^4.14.161",
@@ -94,7 +94,7 @@
     "nyc": "^15.1.0",
     "prettier": "^2.1.2",
     "ts-mockito": "^2.6.1",
-    "ts-node": "^9.0.0",
-    "typescript": "^3.8"
+    "ts-node": "^10.2.1",
+    "typescript": "4.4.2"
   }
 }

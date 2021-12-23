@@ -6,18 +6,18 @@
   "main": "lib/mappings/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf lib && tsc --build tsconfig.json && copyfiles generated/**/*.json lib/mappings",
+    "build": "rimraf lib && yarn tsc --build tsconfig.json && copyfiles generated/**/*.json lib/mappings",
     "lint": "echo \"Skippinng\"",
     "clean": "rimraf lib"
   },
   "dependencies": {
     "@joystream/hydra-common": "^3.1.0-alpha.14",
-    "@polkadot/types": "4.2.1"
+    "@polkadot/types": "5.9.1"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
     "rimraf": "^3.0.2",
-    "ts-node": "^9.0.0",
-    "typescript": "^3.8"
+    "ts-node": "^10.2.1",
+    "typescript": "4.4.2"
   }
 }
