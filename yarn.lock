@@ -1171,10 +1171,10 @@
   resolved "https://registry.yarnpkg.com/@joystream/prettier-config/-/prettier-config-1.0.0.tgz#d87c6370244f39281d9052c619977ca60f6e21cd"
   integrity sha512-ZY2H1PH05Yhn22B7G8ilLyIT9LxQ9b/PyErkPx8OOW+znary5QgExMhgBl1Gmv3k9m/QX1qIxKHZveO4R2yfeA==
 
-"@joystream/warthog@2.41":
-  version "2.41.0"
-  resolved "https://registry.yarnpkg.com/@joystream/warthog/-/warthog-2.41.0.tgz#c5e97b75e041fdcf4c84a01bfa79482614e83bfc"
-  integrity sha512-0TsHFa78wWC1iAIHA883BEO1pYv8tu6rugCHpTT+9OLUcq9cJ8/sGrNtECDRbAJixI66OcSeDZGrTy3BBd7WKg==
+"@joystream/warthog@~2.41.1":
+  version "2.41.1"
+  resolved "https://registry.yarnpkg.com/@joystream/warthog/-/warthog-2.41.1.tgz#060be37d988c11fd74b457c663811ad21e1b0e86"
+  integrity sha512-ysUaivwy8slX2B5jeFVV8pgwfzdDTPTHh5focqQJJCHhGBbNmzIkjXcRKehRrKypJe3xoDO75PhvoI/x67ELnQ==
   dependencies:
     "@apollographql/graphql-playground-react" "https://github.com/Joystream/graphql-playground/releases/download/query-templates%401.7.27/graphql-playground-react-v1.7.27.tgz"
     "@types/app-root-path" "^1.2.4"
@@ -1235,7 +1235,7 @@
     typedi "^0.8.0"
     typeorm "0.2.37"
     typeorm-typedi-extensions "^0.4.1"
-    typescript "^3.9.7"
+    typescript "^4.4"
 
 "@lerna/add@3.21.0":
   version "3.21.0"
@@ -16215,10 +16215,10 @@ typescript@4.4.2:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.2.tgz#6d618640d430e3569a1dfb44f7d7e600ced3ee86"
   integrity sha512-gzP+t5W4hdy4c+68bfcv0t400HVJMMd2+H9B7gae1nQlBzCqvrXX+6GL/b3GAgyTH966pzrZ70/fRjwAtZksSQ==
 
-typescript@^3.9.7:
-  version "3.9.10"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.10.tgz#70f3910ac7a51ed6bef79da7800690b19bf778b8"
-  integrity sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==
+typescript@^4.4:
+  version "4.5.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.4.tgz#a17d3a0263bf5c8723b9c52f43c5084edf13c2e8"
+  integrity sha512-VgYs2A2QIRuGphtzFV7aQJduJ2gyfTljngLzjpfW9FoYZF6xuw1W0vW9ghCKLfcWrCFxK81CSGRAvS1pn4fIUg==
 
 typescript@^4.4.3:
   version "4.4.4"
