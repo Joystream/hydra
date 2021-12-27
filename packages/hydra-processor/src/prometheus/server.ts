@@ -12,7 +12,6 @@ export function startPromEndpoint(): Server {
   server.get('/metrics', (req: any, res: any) => {
     try {
       if (req.query.json === 'true') {
-        res.end(register.metrics())
         res.json(register.getMetricsAsJSON())
       } else {
         res.set('Content-Type', register.contentType)
