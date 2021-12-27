@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.20 (2021-12-27)
+
+
+### Bug Fixes
+
+* fixed bug with returning metrics in json format ([be45403](https://github.com/subsquid/hydra/commit/be454033b6dd99ad943792a3b2481eda470d0e91))
+
+
+
 ## 5.0.0-alpha.19 (2021-12-22)
 
 

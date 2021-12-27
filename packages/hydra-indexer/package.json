@@ -2,7 +2,7 @@
   "name": "@subsquid/hydra-indexer",
   "private": "true",
   "description": "Block index builder for substrate based chains",
-  "version": "5.0.0-alpha.19",
+  "version": "5.0.0-alpha.20",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@polkadot/api": "^6.4.2",
-    "@subsquid/hydra-common": "^5.0.0-alpha.19",
+    "@subsquid/hydra-common": "^5.0.0-alpha.20",
     "commander": "^8.1.0",
     "debug": "^4.3.2",
     "delay": "~5.0.0",
