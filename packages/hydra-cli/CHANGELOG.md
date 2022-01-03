@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.16 (2022-01-03)
+
+
+### Features
+
+* update warthog dependency - playground subscription endpoint change fix ([81652d2](https://github.com/Joystream/hydra/commit/81652d2b8db2f75d595b435edf3d21d13e9bf987))
+
+
+
 ## 3.1.0-alpha.15 (2021-12-23)
 
 **Note:** Version bump only for package @joystream/hydra-cli
