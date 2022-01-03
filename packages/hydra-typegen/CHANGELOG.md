@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.21 (2022-01-03)
+
+
+### Features
+
+* **hydra-moonriver-indexer-gateway:** create a package for moonriver's gateway ([1f5038b](https://github.com/Joystream/hydra/commit/1f5038bf0b14d89718ccb7e527b969a353713198))
+
+
+
 ## 5.0.0-alpha.20 (2021-12-27)
 
 
