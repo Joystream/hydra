@@ -1,3 +1,17 @@
 table:
   name: evm_log
   schema: public
+configuration:
+  custom_column_names:
+    block_hash: blockHash
+    block_number: blockNumber
+  custom_root_fields: {}
+select_permissions:
+- permission:
+    allow_aggregations: true
+    columns:
+    - block_hash
+    - block_number
+    - value
+    filter: {}
+  role: user
