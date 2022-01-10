@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.22 (2022-01-10)
+
+
+### Bug Fixes
+
+* **hydra-moonriver-indexer-gateway:** fix permissions for evm_log ([a2c3df9](https://github.com/subsquid/hydra/commit/a2c3df92a43d82092c70db3ea4d00ee06735903f))
+
+
+
 ## 5.0.0-alpha.21 (2022-01-03)
 
 
