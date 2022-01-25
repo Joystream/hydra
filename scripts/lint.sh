@@ -13,7 +13,7 @@ set -e
 
 for pkg in packages/*; do
   case "$pkg" in
-    packages/hydra-indexer-gateway | packages/hydra-moonriver-indexer-gateway | packages/warthog)
+    packages/hydra-indexer-gateway | packages/warthog)
       # skip
       ;;
     packages/hydra-e2e-tests)

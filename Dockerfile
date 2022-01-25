@@ -48,6 +48,18 @@ RUN npm install --production
 COPY --from=indexer-build /hydra/packages/hydra-indexer/lib lib/
 CMD ["node", "./lib/run.js", "index"]
 
+FROM node AS indexer-evm
+WORKDIR /hydra-indexer
+COPY --from=common-build  /hydra/packages/hydra-common/package.tgz /hydra-common.tgz
+COPY --from=indexer-build /hydra/packages/hydra-indexer/package.json .
+ADD scripts/patch-deps.js /patch-deps.js
+RUN node /patch-deps.js
+ENV NODE_ENV production
+RUN npm install --production
+COPY --from=indexer-build /hydra/packages/hydra-indexer/lib lib/
+COPY --from=indexer-build /hydra/packages/hydra-indexer/lib/migrations/evm lib/migrations/v4
+CMD ["node", "./lib/run.js", "index"]
+
 
 FROM base AS indexer-status-service-builder
 WORKDIR /hydra/packages/hydra-indexer-status-service
@@ -129,7 +141,7 @@ RUN apt-get -y update \
     && rm -rf /usr/share/man/ \
     && rm -rf /usr/share/locale/
 RUN mv /bin/docker-entrypoint.sh /bin/hasura-entrypoint.sh
-ADD packages/hydra-indexer-gateway/metadata /hasura-metadata/
+ADD packages/hydra-indexer-gateway/substrate-metadata /hasura-metadata/
 ADD packages/hydra-indexer-gateway/docker-entrypoint.sh .
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 EXPOSE 8080
@@ -150,7 +162,28 @@ RUN apt-get -y update \
     && rm -rf /usr/share/man/ \
     && rm -rf /usr/share/locale/
 RUN mv /bin/docker-entrypoint.sh /bin/hasura-entrypoint.sh
-ADD packages/hydra-moonriver-indexer-gateway/metadata /hasura-metadata/
-ADD packages/hydra-moonriver-indexer-gateway/docker-entrypoint.sh .
+ADD packages/hydra-indexer-gateway/moonriver-metadata /hasura-metadata/
+ADD packages/hydra-indexer-gateway/docker-entrypoint.sh .
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+EXPOSE 8080
+
+
+FROM hasura-with-migrations AS moonriver-flat-indexer-gateway
+RUN apt-get -y update \
+    && apt-get install -y curl ca-certificates gnupg lsb-release \
+    && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get -y update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-client-12 \
+    && apt-get purge -y curl lsb-release gnupg \
+    && apt-get -y autoremove \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/share/doc/ \
+    && rm -rf /usr/share/man/ \
+    && rm -rf /usr/share/locale/
+RUN mv /bin/docker-entrypoint.sh /bin/hasura-entrypoint.sh
+ADD packages/hydra-indexer-gateway/moonriver-flat-metadata /hasura-metadata/
+ADD packages/hydra-indexer-gateway/docker-entrypoint.sh .
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 EXPOSE 8080

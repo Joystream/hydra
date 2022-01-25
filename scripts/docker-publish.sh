@@ -3,7 +3,7 @@
 
 for p in "$@"; do
     target="${p#hydra-}"
-    version=$(cd "packages/$p" && node -p "require('./package.json').version")
+    version=$(node -p "require('./lerna.json').version")
     major=$(echo $version | cut -d '.' -f1)
 
     docker build . --target "$target" \
