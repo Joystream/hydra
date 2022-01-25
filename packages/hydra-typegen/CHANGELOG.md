@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.23 (2022-01-25)
+
+
+### Features
+
+* moon archive ([b847a9b](https://github.com/Joystream/hydra/commit/b847a9b2db5d45a91076e127f8f7d9316d0e2448))
+
+
+
 ## 5.0.0-alpha.22 (2022-01-10)
 
 
