@@ -25,6 +25,7 @@ import pRetry from 'p-retry'
 import BN from 'bn.js'
 import { BlockData } from '../model'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
+import { ApiDecoration } from '@polkadot/api/types'
 
 const debug = Debug('hydra-indexer:substrate-service')
 
@@ -121,10 +122,18 @@ export class SubstrateService implements ISubstrateService {
     hash: Hash | Uint8Array | string
   ): Promise<EventRecord[] & Codec> {
     debug(`Fething events. BlockHash:  ${JSON.stringify(hash)}`)
-    return this.apiCall(
-      (api) => api.query.system.events.at(hash),
+    const apiAt = await this.apiAt(
+      hash,
       `get block events of block ${JSON.stringify(hash)}`
     )
+    return await apiAt.query.system.events()
+  }
+
+  private async apiAt(
+    hash: Hash | Uint8Array | string,
+    functionName?: string
+  ): Promise<ApiDecoration<'promise'>> {
+    return await this.apiCall((api) => api.at(hash), functionName)
   }
 
   private async apiCall<T>(
@@ -185,7 +194,8 @@ export class SubstrateService implements ISubstrateService {
   }
 
   async timestamp(hash: Hash): Promise<BN> {
-    return this.apiCall((api) => api.query.timestamp.now.at(hash))
+    const apiAt = await this.apiAt(hash)
+    return await apiAt.query.timestamp.now()
   }
 
   async validatorId(hash: Hash): Promise<AccountId | undefined> {
@@ -198,10 +208,9 @@ export class SubstrateService implements ISubstrateService {
   async lastRuntimeUpgrade(
     hash: Hash
   ): Promise<LastRuntimeUpgradeInfo | undefined> {
-    const info = await this.apiCall((api) =>
-      api.query.system.lastRuntimeUpgrade.at(hash)
-    )
-    return info.unwrapOr(undefined)
+    const apiAt = await this.apiAt(hash)
+    const info = await apiAt.query.system.lastRuntimeUpgrade?.()
+    return info?.unwrapOr(undefined)
   }
 
   async stop(): Promise<void> {
