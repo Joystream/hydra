@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/hydra-indexer-gateway",
   "private": "true",
-  "version": "5.0.0-alpha.23",
+  "version": "5.0.0-alpha.24",
   "description": "GraphQL API for Hydra indexer",
   "license": "MIT",
   "scripts": {

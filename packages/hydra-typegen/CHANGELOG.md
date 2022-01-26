@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.24 (2022-01-26)
+
+
+### Bug Fixes
+
+* **hydra-indexer:** remove deprecated ([e1751d5](https://github.com/Joystream/hydra/commit/e1751d536eaa12a0fbe07f9f192a9caebdbe807f))
+
+
+
 ## 5.0.0-alpha.23 (2022-01-25)
 
 
