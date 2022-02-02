@@ -124,11 +124,17 @@ export class SubstrateService implements ISubstrateService {
     hash: Hash | Uint8Array | string
   ): Promise<EventRecord[] & Codec> {
     debug(`Fething events. BlockHash:  ${JSON.stringify(hash)}`)
-    const apiAt = await this.apiAt(hash)
     const end = this.timingHist.startTimer({ method: 'system_events' })
-    const result = await apiAt.query.system.events()
-    end()
-    return result
+
+    try {
+      const apiAt = await this.apiAt(hash)
+      const result = await apiAt.query.system.events()
+      end({ status: '200' })
+      return result
+    } catch (e) {
+      end({ status: '500' })
+      throw e
+    }
   }
 
   private async apiAt(
@@ -213,10 +219,14 @@ export class SubstrateService implements ISubstrateService {
     const apiAt = await this.apiAt(hash)
 
     const end = this.timingHist.startTimer({ method: 'timestamp' })
-    const result = await apiAt.query.timestamp.now()
-    end()
-
-    return result
+    try {
+      const result = await apiAt.query.timestamp.now()
+      end({ status: '200' })
+      return result
+    } catch (e) {
+      end({ status: '500' })
+      throw e
+    }
   }
 
   async validatorId(hash: Hash): Promise<AccountId | undefined> {
@@ -233,10 +243,14 @@ export class SubstrateService implements ISubstrateService {
     const apiAt = await this.apiAt(hash)
 
     const end = this.timingHist.startTimer({ method: 'last_runtime_upgrade' })
-    const info = await apiAt.query.system.lastRuntimeUpgrade?.()
-    end()
-
-    return info?.unwrapOr(undefined)
+    try {
+      const info = await apiAt.query.system.lastRuntimeUpgrade?.()
+      end({ status: '200' })
+      return info?.unwrapOr(undefined)
+    } catch (e) {
+      end({ status: '500' })
+      throw e
+    }
   }
 
   async stop(): Promise<void> {
