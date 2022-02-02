@@ -34,7 +34,8 @@ const debug = Debug('hydra-indexer:substrate-service')
 export class SubstrateService implements ISubstrateService {
   private shouldStop = false
   // prometheus gauge for metering execution
-  private timingHist: Histogram<'method'> = prometheus.gRPCRequestHistogram()
+  private timingHist: Histogram<'method' | 'status'> =
+    prometheus.gRPCRequestHistogram()
 
   async init(): Promise<void> {
     debug(`Initializing SubstrateService`)
@@ -140,6 +141,8 @@ export class SubstrateService implements ISubstrateService {
     promiseFn: (api: ApiPromise) => Promise<T>,
     functionName = 'api_request'
   ): Promise<T> {
+    let end: any = null
+
     return pRetry(
       async () => {
         if (this.shouldStop) {
@@ -147,20 +150,24 @@ export class SubstrateService implements ISubstrateService {
             'The indexer is stopping, aborting all API calls'
           )
         }
-        const end = this.timingHist.startTimer({ method: functionName })
+
+        end = this.timingHist.startTimer({ method: functionName })
 
         const api = await getApiPromise()
         const result = await promiseFn(api)
 
-        end()
+        end({ status: '200' })
+        end = null
         return result
       },
       {
         retries: getConfig().SUBSTRATE_API_CALL_RETRIES,
-        onFailedAttempt: (i) =>
-          debug(
-            `Failed to execute "${functionName}" after ${i.attemptNumber} attempts. Retries left: ${i.retriesLeft}`
-          ),
+        onFailedAttempt: () => {
+          if (end) {
+            end({ status: '500' })
+            end = null
+          }
+        },
       }
     )
   }

@@ -42,12 +42,6 @@ class Prometheus {
     aggregator: 'max',
   })
 
-  private archivedBlocks = new Counter({
-    name: 'sqd_archive_archived_blocks_count',
-    help: 'Number of observed archived blocks',
-    registers: [this.registry],
-  })
-
   private headUpdates = new Counter({
     name: 'sqd_archive_archived_head_updates',
     help: 'Number of times head value has been updated',
@@ -91,11 +85,11 @@ class Prometheus {
     name: 'sqd_arhive_grpc_request_time',
     help: 'Time spend requesting data from a blockchain node via gRPC, seconds',
     registers: [this.registry],
-    labelNames: ['method'],
+    labelNames: ['method', 'status'],
     buckets: [0.01, 0.05, 0.1, 0.5, 1, 2.5, 5, 10],
   })
 
-  gRPCRequestHistogram(): Histogram<'method'> {
+  gRPCRequestHistogram(): Histogram<'method' | 'status'> {
     return this.gRPCRequestTime
   }
 
@@ -128,7 +122,6 @@ class Prometheus {
         return
       }
       this.archiveTime.observe((Date.now() - start) / 1000)
-      this.archivedBlocks.inc()
     })
 
     // We cache block headers to save on API calls
