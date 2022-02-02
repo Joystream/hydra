@@ -222,10 +222,10 @@ by at least that many blocks`,
         desc: 'maximal number of events from a block to be saved in an single db insert batch',
       }),
 
-      PROMETHEUS_PORT: port({ 
-        default: 9090, 
-        desc: 'prometheus metrics server listening port'
-      })
+      PROMETHEUS_PORT: port({
+        default: 9090,
+        desc: 'prometheus metrics server listening port',
+      }),
     }),
     ...getDBConfig(),
   }

@@ -30,7 +30,11 @@ export class ArchiveStarter {
     debug(`PubSub OK`)
 
     promServer = await prometheus.serve(getConfig().PROMETHEUS_PORT)
-    console.log(`Prometheus metrics service listening on port ${getConfig().PROMETHEUS_PORT}`)
+    console.log(
+      `Prometheus metrics service listening on port ${
+        getConfig().PROMETHEUS_PORT
+      }`
+    )
 
     // Start only the indexer
     const indexBuilder = new IndexBuilder()

@@ -104,7 +104,7 @@ export class IndexBuilder {
       }
 
       eventEmitter.emit(IndexerEvents.BLOCK_STARTED, {
-        height: h
+        height: h,
       })
 
       const blockData = await this.producer.fetchBlock(h)
@@ -114,7 +114,6 @@ export class IndexBuilder {
       })
 
       await this.transformAndPersist(blockData)
-
 
       debug(`Done block #${h.toString()}`)
     }
@@ -161,7 +160,7 @@ export class IndexBuilder {
       debug(
         `Read ${queryEventsBlock.blockEvents.length} events; saving in ${batches.length} batches`
       )
-      
+
       prometheus.getEventsInBlock().set(queryEventsBlock.blockEvents.length)
 
       let saved = 0

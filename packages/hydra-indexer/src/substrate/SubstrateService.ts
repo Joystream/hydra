@@ -34,7 +34,7 @@ const debug = Debug('hydra-indexer:substrate-service')
 export class SubstrateService implements ISubstrateService {
   private shouldStop = false
   // prometheus gauge for metering execution
-  private timingHist: Histogram<"method"> = prometheus.gRPCRequestHistogram()
+  private timingHist: Histogram<'method'> = prometheus.gRPCRequestHistogram()
 
   async init(): Promise<void> {
     debug(`Initializing SubstrateService`)
@@ -57,10 +57,7 @@ export class SubstrateService implements ISubstrateService {
   }
 
   async getHeader(hash: Hash | Uint8Array | string): Promise<Header> {
-    return this.apiCall(
-      (api) => api.rpc.chain.getHeader(hash),
-      `get_header`
-    )
+    return this.apiCall((api) => api.rpc.chain.getHeader(hash), `get_header`)
   }
 
   getFinalizedHead(): Promise<Hash> {
@@ -126,10 +123,8 @@ export class SubstrateService implements ISubstrateService {
     hash: Hash | Uint8Array | string
   ): Promise<EventRecord[] & Codec> {
     debug(`Fething events. BlockHash:  ${JSON.stringify(hash)}`)
-    const apiAt = await this.apiAt(
-      hash
-    )
-    const end = this.timingHist.startTimer({method: 'system_events'})
+    const apiAt = await this.apiAt(hash)
+    const end = this.timingHist.startTimer({ method: 'system_events' })
     const result = await apiAt.query.system.events()
     end()
     return result
@@ -152,11 +147,11 @@ export class SubstrateService implements ISubstrateService {
             'The indexer is stopping, aborting all API calls'
           )
         }
-        const end = this.timingHist.startTimer({method: functionName})
-        
+        const end = this.timingHist.startTimer({ method: functionName })
+
         const api = await getApiPromise()
         const result = await promiseFn(api)
-        
+
         end()
         return result
       },
@@ -193,20 +188,24 @@ export class SubstrateService implements ISubstrateService {
   }
 
   async metadata(hash: Hash): Promise<MetadataLatest> {
-    const metadata = await this.apiCall((api) =>
-      api.rpc.state.getMetadata(hash), 'get_metadata'
+    const metadata = await this.apiCall(
+      (api) => api.rpc.state.getMetadata(hash),
+      'get_metadata'
     )
     return metadata.asLatest
   }
 
   async runtimeVersion(hash: Hash): Promise<RuntimeVersion> {
-    return this.apiCall((api) => api.rpc.state.getRuntimeVersion(hash), 'get_runtime_version')
+    return this.apiCall(
+      (api) => api.rpc.state.getRuntimeVersion(hash),
+      'get_runtime_version'
+    )
   }
 
   async timestamp(hash: Hash): Promise<BN> {
     const apiAt = await this.apiAt(hash)
-    
-    const end = this.timingHist.startTimer({method: 'timestamp'})
+
+    const end = this.timingHist.startTimer({ method: 'timestamp' })
     const result = await apiAt.query.timestamp.now()
     end()
 
@@ -214,9 +213,10 @@ export class SubstrateService implements ISubstrateService {
   }
 
   async validatorId(hash: Hash): Promise<AccountId | undefined> {
-    const headerExtended = await this.apiCall((api) =>
-      api.derive.chain.getHeader(hash)
-    , 'get_header')
+    const headerExtended = await this.apiCall(
+      (api) => api.derive.chain.getHeader(hash),
+      'get_header'
+    )
     return headerExtended?.author
   }
 
@@ -225,7 +225,7 @@ export class SubstrateService implements ISubstrateService {
   ): Promise<LastRuntimeUpgradeInfo | undefined> {
     const apiAt = await this.apiAt(hash)
 
-    const end = this.timingHist.startTimer({method: 'last_runtime_upgrade'})
+    const end = this.timingHist.startTimer({ method: 'last_runtime_upgrade' })
     const info = await apiAt.query.system.lastRuntimeUpgrade?.()
     end()
 
