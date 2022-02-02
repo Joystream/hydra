@@ -66,6 +66,8 @@ services:
       - db
       - redis
       - node-template
+    ports:
+      - "9090:9090"
 
   hydra-indexer-gateway:
     build:

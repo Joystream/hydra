@@ -57,6 +57,7 @@
     "reflect-metadata": "^0.1.13",
     "set-interval-async": "~2.0.3",
     "shortid": "^2.2.16",
+    "stoppable": "^1.1.0",
     "typeorm": "0.2.38",
     "util": "^0.12.4"
   },
@@ -68,6 +69,7 @@
     "@types/lodash": "^4.14.172",
     "@types/pg": "^7.14.11",
     "@types/set-interval-async": "^1.0.0",
-    "@types/shortid": "^0.0.29"
+    "@types/shortid": "^0.0.29",
+    "@types/stoppable": "^1.1.1"
   }
 }

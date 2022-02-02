@@ -1,4 +1,4 @@
-import { configure } from '.'
+import { configure, getConfig, ListeningServer, prometheus } from '.'
 import { createDBConnection } from '../db/dal'
 import { Connection, getConnection } from 'typeorm'
 import Debug from 'debug'
@@ -9,16 +9,17 @@ import { IndexBuilder } from '../indexer'
 
 const debug = Debug('hydra-indexer:manager')
 
+let promServer: ListeningServer
 /**
- * A wrapper class for running the indexer and migrations
+ * A wrapper class for running the archive and migrations
  */
-export class IndexerStarter {
+export class ArchiveStarter {
   /**
-   * Starts the indexer
+   * Runs the archive
    *
-   * @param options options passed to create the indexer service
+   * @param options options passed to create the archive service
    */
-  static async index(): Promise<void> {
+  static async run(): Promise<void> {
     debug(`Hydra Indexer version: ${getHydraVersion()}`)
 
     configure()
@@ -27,6 +28,9 @@ export class IndexerStarter {
 
     initPubSub()
     debug(`PubSub OK`)
+
+    promServer = await prometheus.serve(getConfig().PROMETHEUS_PORT)
+    console.log(`Prometheus metrics service listening on port ${getConfig().PROMETHEUS_PORT}`)
 
     // Start only the indexer
     const indexBuilder = new IndexBuilder()
@@ -75,6 +79,12 @@ export async function cleanUp(): Promise<void> {
   } catch (e) {
     debug(`Error cleaning up: ${logError(e)}`)
   }
+
+  if (promServer) {
+    debug('Shutting down the Prometheus server')
+    await promServer.close()
+  }
+
   debug(`Bye!`)
   process.exit()
 }

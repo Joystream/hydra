@@ -174,6 +174,7 @@ export class IndexerStatusService implements IStatusService {
       debug(`Updating the indexer head from ${currentHead} to ${head}`)
       await dal.setIndexerHeight(head)
       await this.updateHeadKey(head)
+      eventEmitter.emit(IndexerEvents.NEW_ARCHIVE_HEAD, { height: head })
     }
   }
 }

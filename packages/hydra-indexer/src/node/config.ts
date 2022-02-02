@@ -35,6 +35,7 @@ let conf: {
   HEADER_CACHE_CAPACITY: number
   FINALITY_THRESHOLD: number
   EVENT_BATCH_SIZE: number
+  PROMETHEUS_PORT: number
 }
 
 let dbConf: {
@@ -220,6 +221,11 @@ by at least that many blocks`,
         default: 100,
         desc: 'maximal number of events from a block to be saved in an single db insert batch',
       }),
+
+      PROMETHEUS_PORT: port({ 
+        default: 9090, 
+        desc: 'prometheus metrics server listening port'
+      })
     }),
     ...getDBConfig(),
   }

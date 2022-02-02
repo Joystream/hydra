@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import chalk from 'chalk'
 import figlet from 'figlet'
 import commander from 'commander'
-import { configure, IndexerStarter, cleanUp } from './node'
+import { configure, ArchiveStarter, cleanUp } from './node'
 
 function info(msg: string): void {
   console.log(`${chalk.green('INFO')}: ${msg}`)
@@ -43,7 +43,7 @@ function main(): commander.Command {
     .option('--provider [chain]', 'substrate chain provider url')
     .option('-e, --env <file>', '.env file location', '.env')
     .description('Index all events and extrinsics in the substrate chain')
-    .action(withErrors(withEnvs(runIndexer)))
+    .action(withErrors(withEnvs(runArchive)))
 
   program
     .command('migrate')
@@ -74,15 +74,15 @@ function setUp(opts: Record<string, string>) {
     opts.provider || process.env.WS_PROVIDER_ENDPOINT_URI
 }
 
-async function runIndexer() {
+async function runArchive() {
   configure()
-  info('Starting indexer')
-  await IndexerStarter.index()
+  info('Starting Squid Archive')
+  await ArchiveStarter.run()
 }
 
 async function runMigrations() {
   info(`Running migrations`)
-  await IndexerStarter.migrate()
+  await ArchiveStarter.migrate()
 }
 
 process.on('SIGINT', async () => {

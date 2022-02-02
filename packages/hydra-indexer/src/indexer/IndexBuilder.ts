@@ -11,7 +11,7 @@ import { PooledExecutor } from './PooledExecutor'
 import { SubstrateEventEntity, SubstrateExtrinsicEntity } from '../entities'
 import { IStatusService } from '../status-service/IStatusService'
 import { getConnection, EntityManager } from 'typeorm'
-import { getConfig } from '../node'
+import { getConfig, prometheus } from '../node'
 import { BlockProducer } from '.'
 import { getStatusService } from '../status-service'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
@@ -104,12 +104,17 @@ export class IndexBuilder {
       }
 
       eventEmitter.emit(IndexerEvents.BLOCK_STARTED, {
-        height: h,
+        height: h
       })
 
       const blockData = await this.producer.fetchBlock(h)
 
+      eventEmitter.emit(IndexerEvents.BLOCK_INGESTION_COMPLETE, {
+        height: h,
+      })
+
       await this.transformAndPersist(blockData)
+
 
       debug(`Done block #${h.toString()}`)
     }
@@ -156,6 +161,8 @@ export class IndexBuilder {
       debug(
         `Read ${queryEventsBlock.blockEvents.length} events; saving in ${batches.length} batches`
       )
+      
+      prometheus.getEventsInBlock().set(queryEventsBlock.blockEvents.length)
 
       let saved = 0
       for (let batch of batches) {
@@ -175,6 +182,7 @@ export class IndexBuilder {
         saved += qeEntities.length
         batch = []
         debug(`Saved ${saved} events`)
+        prometheus.getProcessedEventsCounter().inc(saved)
         eventEmitter.emit(IndexerEvents.RESET_INACTIVITY)
       }
     })
