@@ -23,40 +23,40 @@ class Prometheus {
 
   private chainLastFinalizedHeight = new Gauge({
     name: 'sqd_archive_chain_last_finalized_height',
-    help: 'Last finalized block height as recevied from the chain',
+    help: 'Last finalized block height recevied from the chain',
     registers: [this.registry],
     aggregator: 'max',
   })
 
   private chainBestHeight = new Gauge({
     name: 'sqd_archive_chain_best_height',
-    help: 'Last best height as reported from the chain',
+    help: 'Last best height recevied from the chain',
     registers: [this.registry],
     aggregator: 'max',
   })
 
   private headBlock = new Gauge({
     name: 'sqd_archive_head_block',
-    help: 'Archive head block. All blocks up to the head block are indexed.',
+    help: 'Last archive head block. All the blocks up to the head have been archived.',
     registers: [this.registry],
     aggregator: 'max',
   })
 
   private headUpdates = new Counter({
     name: 'sqd_archive_archived_head_updates',
-    help: 'Number of times head value has been updated',
+    help: 'Number of times the head block height has been updated',
     registers: [this.registry],
   })
 
   private processedEvents = new Counter({
     name: 'sqd_archive_processed_events',
-    help: 'Number of archived events (including uncommited)',
+    help: 'Number of archived events (including not yet commited to storage)',
     registers: [this.registry],
   })
 
   private eventsInBlock = new Gauge({
     name: 'sqd_archive_events_in_block',
-    help: 'Peak number of events observed in a block',
+    help: 'Peak number of events observed in a single block',
     registers: [this.registry],
     aggregator: 'max',
   })
@@ -69,21 +69,21 @@ class Prometheus {
 
   private ingestTime = new Histogram({
     name: 'sqd_archive_block_ingest_time_sec',
-    help: 'Average time of block ingestion and decoding, in seconds',
+    help: 'Block ingestion and decoding time',
     registers: [this.registry],
     buckets: [0.05, 0.1, 0.5, 1, 10, 100, 1000],
   })
 
   private archiveTime = new Histogram({
     name: 'sqd_archive_block_archival_time_sec',
-    help: 'Average time of block archival, in seconds',
+    help: 'End to end block archival time',
     registers: [this.registry],
     buckets: [0.05, 0.1, 0.5, 1, 10, 100, 1000],
   })
 
   private gRPCRequestTime = new Histogram({
     name: 'sqd_arhive_grpc_request_time',
-    help: 'Time spend requesting data from a blockchain node via gRPC, seconds',
+    help: 'Distribution of the gRPC requests to the node endpoint',
     registers: [this.registry],
     labelNames: ['method', 'status'],
     buckets: [0.01, 0.05, 0.1, 0.5, 1, 2.5, 5, 10],
