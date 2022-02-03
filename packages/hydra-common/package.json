@@ -1,6 +1,6 @@
 {
   "name": "@subsquid/hydra-common",
-  "version": "5.0.0-alpha.24",
+  "version": "5.0.0-alpha.25",
   "description": "Common Hydra tools",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
