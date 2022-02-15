@@ -1,7 +1,7 @@
 #!/bin/bash
 name=$DB_NAME
 if [[ ! -e $name_status_old_value.txt  ]]; then 
-  curl -X POST https://$name.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head > $hame_status_old_value.txt
+  curl -X POST https://$name.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head > $name_status_old_value.txt
   result=1
 else
   current=$(curl -X POST https://$name.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head)
