@@ -1,15 +1,21 @@
 #!/bin/bash
-name=$DB_NAME
-if [[ ! -e $name_status_old_value.txt  ]]; then 
-  curl -X POST https://$name.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head > $name_status_old_value.txt
+if [[ -n "$DB_NAME" ]]; then
+    CHAIN="$DB_NAME"
+else
+  echo "Environment variable DB_NAME not set"
+  exit 1
+fi
+if [[ ! -e $CHAIN.txt  ]]; then 
+  curl -X POST https://$CHAIN.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head > $CHAIN.txt
   result=1
 else
-  current=$(curl -X POST https://$name.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head)
-  result=$current-$(cat $name_status_old_value.txt)
+  current=$(curl -X POST https://$CHAIN.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head)
+  result=$current-$(cat $CHAIN.txt)
+  echo "$current" > $CHAIN.txt
 fi
 if [[ $result -gt 0 ]]; then
-  echo "$current" > $name_status_old_value.txt
   exit 0
 else
+  echo "Head block of change not changed a 10 minuts"
   exit 1
 fi
