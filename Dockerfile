@@ -42,6 +42,8 @@ WORKDIR /hydra-indexer
 COPY --from=common-build  /hydra/packages/hydra-common/package.tgz /hydra-common.tgz
 COPY --from=indexer-build /hydra/packages/hydra-indexer/package.json .
 ADD scripts/patch-deps.js /patch-deps.js
+ADD scripts/livnesprobe.sh /livnesprobe.sh
+RUN apk add --no-cache curl jq bash
 RUN node /patch-deps.js
 ENV NODE_ENV production
 RUN npm install --production
@@ -53,6 +55,8 @@ WORKDIR /hydra-indexer
 COPY --from=common-build  /hydra/packages/hydra-common/package.tgz /hydra-common.tgz
 COPY --from=indexer-build /hydra/packages/hydra-indexer/package.json .
 ADD scripts/patch-deps.js /patch-deps.js
+ADD scripts/livnesprobe.sh /livnesprobe.sh
+RUN apk add --no-cache curl jq bash
 RUN node /patch-deps.js
 ENV NODE_ENV production
 RUN npm install --production
