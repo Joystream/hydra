@@ -1,17 +1,11 @@
 #!/bin/bash
-if [[ -n "$DB_NAME" ]]; then
-    CHAIN="$DB_NAME"
-else
-  echo "Environment variable DB_NAME not set"
-  exit 1
-fi
-if [[ ! -e $CHAIN.txt  ]]; then 
-  curl -X POST https://$CHAIN.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head > $CHAIN.txt
+if [[ ! -e old_head.txt  ]]; then 
+  curl localhost:9090/metrics | grep sqd_archive_chain_last_finalized_height | awk '{print $2}' > old_head.txt
   result=1
 else
-  current=$(curl -X POST https://$CHAIN.indexer.gc.subsquid.io/v4/graphql -d '{"query":"query MyQuery {\n  indexerStatus {\n    head\n  }\n}\n","variables":null,"operationName":"MyQuery"}' | jq .data.indexerStatus.head)
+  current=$(curl localhost:9090/metrics | grep sqd_archive_chain_last_finalized_height | awk '{print $2}')
   result=$current-$(cat $CHAIN.txt)
-  echo "$current" > $CHAIN.txt
+  echo "$current" > old_head.txt
 fi
 if [[ $result -gt 0 ]]; then
   exit 0
