@@ -43,7 +43,7 @@ COPY --from=common-build  /hydra/packages/hydra-common/package.tgz /hydra-common
 COPY --from=indexer-build /hydra/packages/hydra-indexer/package.json .
 ADD scripts/patch-deps.js /patch-deps.js
 ADD scripts/livnesprobe.sh /livnesprobe.sh
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl bash
 RUN node /patch-deps.js
 ENV NODE_ENV production
 RUN npm install --production
@@ -56,7 +56,7 @@ COPY --from=common-build  /hydra/packages/hydra-common/package.tgz /hydra-common
 COPY --from=indexer-build /hydra/packages/hydra-indexer/package.json .
 ADD scripts/patch-deps.js /patch-deps.js
 ADD scripts/livnesprobe.sh /livnesprobe.sh
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl bash
 RUN node /patch-deps.js
 ENV NODE_ENV production
 RUN npm install --production

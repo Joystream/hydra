@@ -4,7 +4,7 @@ if [[ ! -e old_head.txt  ]]; then
   result=1
 else
   current=$(curl localhost:9090/metrics | grep '^sqd_archive_chain_last_finalized_height' | awk '{print $2}')
-  result=$current-$(cat $CHAIN.txt)
+  result=$current-$(cat old_head.txt)
   echo "$current" > old_head.txt
 fi
 if [[ $result -gt 0 ]]; then
