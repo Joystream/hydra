@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.17 (2022-02-22)
+
+
+### Bug Fixes
+
+* **Generate deterministic entity ids, remove shortId:** generate deterministic entity ids, remove sh ([#473](https://github.com/Joystream/hydra/issues/473)) ([0b7d18f](https://github.com/Joystream/hydra/commit/0b7d18f1cd7c52f3b77998a0fce21e797ba510bc)), closes [#399](https://github.com/Joystream/hydra/issues/399)
+
+
+
 ## 3.1.0-alpha.16 (2022-01-03)
 
 
