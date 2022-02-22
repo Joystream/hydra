@@ -1,5 +1,4 @@
 import { getConnection, EntityManager } from 'typeorm'
-import * as shortid from 'shortid'
 import { getConfig as conf } from '../start/config'
 import Debug from 'debug'
 import { info } from '../util/log'
@@ -12,6 +11,7 @@ import {
   DatabaseManager,
 } from '@joystream/hydra-common'
 import { TxAwareBlockContext } from './tx-aware'
+import { ObjectType } from 'typedi'
 
 const debug = Debug('hydra-processor:mappings-executor')
 
@@ -85,6 +85,76 @@ export class TransactionalExecutor implements IMappingExecutor {
   }
 }
 
+class EntityIdGenerator {
+  private entityClass: ObjectType<{ id: string }>
+  private lastKnownEntityId: string | undefined
+  // each id is 6 chars out of 62-size alphabet, giving us 56800235584 possible ids (per entity type)
+  public static alphabet =
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+
+  public static idSize = 6
+
+  constructor(entityClass: ObjectType<{ id: string }>) {
+    this.entityClass = entityClass
+  }
+
+  private async queryLastEntityId(
+    em: EntityManager
+  ): Promise<string | undefined> {
+    const lastEntity = await em.findOne(this.entityClass, {
+      order: { id: 'DESC' },
+    })
+
+    return lastEntity?.id
+  }
+
+  private async getLastKnownEntityId(
+    em: EntityManager
+  ): Promise<string | undefined> {
+    if (this.lastKnownEntityId === undefined) {
+      this.lastKnownEntityId = await this.queryLastEntityId(em)
+    }
+    return this.lastKnownEntityId
+  }
+
+  public async createNextEntityId(em: EntityManager): Promise<string> {
+    const lastKnownId = await this.getLastKnownEntityId(em)
+    const { alphabet, idSize } = EntityIdGenerator
+    if (!lastKnownId) {
+      this.lastKnownEntityId = Array.from(
+        { length: idSize },
+        () => alphabet[0]
+      ).join('')
+      return this.lastKnownEntityId
+    }
+
+    let targetIdIndexToChange = idSize - 1
+    while (
+      targetIdIndexToChange >= 0 &&
+      lastKnownId[targetIdIndexToChange] === alphabet[alphabet.length - 1]
+    ) {
+      --targetIdIndexToChange
+    }
+
+    if (targetIdIndexToChange < 0) {
+      throw new Error('EntityIdGenerator: Ran out of possible ids!')
+    }
+
+    const nextEntityIdChars = [...lastKnownId]
+    const nextAlphabetCharIndex =
+      alphabet.indexOf(lastKnownId[targetIdIndexToChange]) + 1
+    nextEntityIdChars[targetIdIndexToChange] = alphabet[nextAlphabetCharIndex]
+    for (let i = idSize - 1; i > targetIdIndexToChange; --i) {
+      nextEntityIdChars[i] = alphabet[0]
+    }
+
+    this.lastKnownEntityId = nextEntityIdChars.join('')
+    return this.lastKnownEntityId
+  }
+}
+
+const entityIdGenerators = new Map<string, EntityIdGenerator>()
+
 /**
  * Create database manager.
  * @param entityManager EntityManager
@@ -95,7 +165,7 @@ export function makeDatabaseManager(
 ): DatabaseManager {
   return {
     save: async <T>(entity: DeepPartial<T>): Promise<void> => {
-      entity = fillRequiredWarthogFields(entity, blockData)
+      entity = await fillRequiredWarthogFields(entity, entityManager, blockData)
       await entityManager.save(entity)
     },
     remove: async <T>(entity: DeepPartial<T>): Promise<void> => {
@@ -127,17 +197,35 @@ export function makeDatabaseManager(
  *
  * @param entity: DeepPartial<T>
  */
-function fillRequiredWarthogFields<T>(
+async function fillRequiredWarthogFields<T>(
   entity: DeepPartial<T>,
+  entityManager: EntityManager,
   { block }: BlockData
-): DeepPartial<T> {
+): Promise<DeepPartial<T>> {
   // eslint-disable-next-line no-prototype-builtins
   if (!entity.hasOwnProperty('id')) {
-    Object.assign(entity, { id: shortid.generate() })
+    const entityClass = ((entity as unknown) as {
+      constructor: ObjectType<{ id: string }>
+    }).constructor
+
+    if (!entityIdGenerators.has(entityClass.name)) {
+      entityIdGenerators.set(
+        entityClass.name,
+        new EntityIdGenerator(entityClass)
+      )
+    }
+
+    const idGenerator = entityIdGenerators.get(
+      entityClass.name
+    ) as EntityIdGenerator
+
+    Object.assign(entity, {
+      id: await idGenerator.createNextEntityId(entityManager),
+    })
   }
   // eslint-disable-next-line no-prototype-builtins
   if (!entity.hasOwnProperty('createdById')) {
-    Object.assign(entity, { createdById: shortid.generate() })
+    Object.assign(entity, { createdById: '-' })
   }
   // eslint-disable-next-line no-prototype-builtins
   if (!entity.hasOwnProperty('version')) {
