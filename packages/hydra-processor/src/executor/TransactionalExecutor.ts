@@ -87,6 +87,7 @@ export class TransactionalExecutor implements IMappingExecutor {
 
 class EntityIdGenerator {
   private entityClass: ObjectType<{ id: string }>
+  private nextEntityIdPromise: Promise<string> | undefined
   private lastKnownEntityId: string | undefined
   // each id is 6 chars out of 62-size alphabet, giving us 56800235584 possible ids (per entity type)
   public static alphabet =
@@ -117,7 +118,7 @@ class EntityIdGenerator {
     return this.lastKnownEntityId
   }
 
-  public async createNextEntityId(em: EntityManager): Promise<string> {
+  private async generateNextEntityId(em: EntityManager): Promise<string> {
     const lastKnownId = await this.getLastKnownEntityId(em)
     const { alphabet, idSize } = EntityIdGenerator
     if (!lastKnownId) {
@@ -150,6 +151,15 @@ class EntityIdGenerator {
 
     this.lastKnownEntityId = nextEntityIdChars.join('')
     return this.lastKnownEntityId
+  }
+
+  public async getNextEntityId(em: EntityManager): Promise<string> {
+    // Make sure the ids are generated sequentially!
+    if (this.nextEntityIdPromise) {
+      await this.nextEntityIdPromise
+    }
+    this.nextEntityIdPromise = this.generateNextEntityId(em)
+    return this.nextEntityIdPromise
   }
 }
 
@@ -220,7 +230,7 @@ async function fillRequiredWarthogFields<T>(
     ) as EntityIdGenerator
 
     Object.assign(entity, {
-      id: await idGenerator.createNextEntityId(entityManager),
+      id: await idGenerator.getNextEntityId(entityManager),
     })
   }
   // eslint-disable-next-line no-prototype-builtins
