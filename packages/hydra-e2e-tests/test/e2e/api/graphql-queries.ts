@@ -207,3 +207,11 @@ export const ARRAY_FIELD_QUERY_ANY = gql`
     }
   }
 `
+
+export const TRANSFER_CHUNKS_BY_TRANSFER = gql`
+  query transferChunksByTransferId($transferId: ID!, $limit: Int) {
+    transferChunks(where: { transfer: { id_eq: $transferId } }, limit: $limit) {
+      id
+    }
+  }
+`
