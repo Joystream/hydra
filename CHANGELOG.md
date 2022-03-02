@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.19 (2022-03-02)
+
+
+### Features
+
+* query templates support for GraphQL playground + warthog update ([#475](https://github.com/Joystream/hydra/issues/475)) ([8f99a30](https://github.com/Joystream/hydra/commit/8f99a30c6c97e243a0604523c5d34f4b5fa97f8a))
+
+
+
 ## 3.1.0-alpha.18 (2022-03-02)
 
 **Note:** Version bump only for package hydra
