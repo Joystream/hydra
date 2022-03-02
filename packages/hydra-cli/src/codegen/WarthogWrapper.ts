@@ -164,6 +164,7 @@ export default class WarthogWrapper {
       'src/pubsub.ts',
       'src/WarthogBaseService.ts',
       'src/processor.resolver.ts',
+      'src/queryTemplates.ts',
       'tsconfig.json',
     ]
 

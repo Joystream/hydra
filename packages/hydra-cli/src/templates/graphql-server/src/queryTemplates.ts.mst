@@ -1,0 +1,43 @@
+// provides GraphQL query examples to GraphQL PLayground
+// overwrite this generated file with file containing custom templates for your project
+
+import { IQueryTemplate } from '@apollographql/graphql-playground-react/lib/components/Playground/QueryTemplates/templateUtils'
+
+// empty examples by default
+export const queryTemplates: IQueryTemplate[] = []
+
+/* Example of how to create custom template queries
+
+import { IQueryTemplate, queryTemplateUtils } from '@apollographql/graphql-playground-react/lib/components/Playground/QueryTemplates/templateUtils'
+
+// fields that will be ignored by autofill
+const commonIgnoredFields = [
+  'deletedAt',
+  'createdById',
+  'updatedById',
+  'deletedById',
+  'version',
+]
+
+const dataObjectIgnoredFields = [
+  ...commonIgnoredFields,
+
+  // dataObject's `owner` is problematic because it's variant and will need some special handling
+  'owner',
+]
+
+const exampleDate = `"2018-01-31 23:59"`
+
+export const queryTemplates: IQueryTemplate[] = [
+  ...queryTemplateUtils.getOneGetAllTemplates('video', 'videos', 'videos', dataObjectIgnoredFields),
+  {
+    title: 'Featured videos',
+    description: 'Get all featured videos.',
+    ignoredFields: commonIgnoredFields,
+    query: `query {
+      ${queryTemplateUtils.descriptionMarker}
+      videos(where: { isFeatured_eq: true }) { ${queryTemplateUtils.allPropsMarker} }
+    }`,
+  },
+].map(queryTemplateUtils.formatQuery)
+*/

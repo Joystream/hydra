@@ -8,6 +8,7 @@ import { Logger } from '../src/logger';
 
 import { buildServerSchema, getServer } from './server';
 import { startPgSubsribers } from './pubsub';
+import { queryTemplates } from './queryTemplates'
 
 
 class CustomNamingStrategy extends SnakeNamingStrategy {
@@ -27,7 +28,9 @@ async function bootstrap() {
       playgroundConfig: {
         version: process.env.GRAPHQL_PLAYGROUND_VERSION || undefined,
         cdnUrl: process.env.GRAPHQL_PLAYGROUND_CDN_URL || undefined,
+        endpoint: process.env.GRAPHQL_PLAYGROUND_ENDPOINT || undefined,
         subscriptionEndpoint: process.env.GRAPHQL_PLAYGROUND_SUBSCRIPTION_ENDPOINT || undefined,
+        queryTemplates,
       }
     },
     {
