@@ -1,5 +1,6 @@
 import {
   Transfer,
+  TransferChunk,
   BlockTimestamp,
   BlockHook,
   HookType,
@@ -80,6 +81,23 @@ export async function balancesTransfer({
   transfer.timestamp = new BN(block.timestamp)
   console.log(`Saving transfer: ${JSON.stringify(transfer, null, 2)}`)
   await store.save<Transfer>(transfer)
+
+  const remaining = transfer.value
+  const numChunks = 100
+  await Promise.all(
+    Array.from({ length: numChunks }, (_, i) => {
+      const chunkSize =
+        i === numChunks - 1
+          ? remaining.toNumber()
+          : Math.floor(transfer.value.divn(numChunks).toNumber())
+      remaining.subn(chunkSize)
+      const chunk = new TransferChunk({
+        chunkSize,
+        transfer,
+      })
+      return store.save<TransferChunk>(chunk)
+    })
+  )
 }
 
 export async function timestampCall({

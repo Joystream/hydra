@@ -11,6 +11,7 @@ import {
   LAST_BLOCK_TIMESTAMP,
   PROCESSOR_SUBSCRIPTION,
   INTERFACES_FILTERING_BY_ENUM,
+  TRANSFER_CHUNKS_BY_TRANSFER,
 } from './graphql-queries'
 import { SystemEvent } from './types'
 
@@ -178,4 +179,20 @@ export async function fetchTypedJsonFields(
     systemEvents: SystemEvent[]
   }>(query)
   return systemEvents
+}
+
+export async function transferChunksByTransferId(
+  transferId: string,
+  limit = 1000
+): Promise<
+  {
+    id: string
+  }[]
+> {
+  const result = await getGQLClient().request<{
+    transferChunks: {
+      id: string
+    }[]
+  }>(TRANSFER_CHUNKS_BY_TRANSFER, { transferId, limit })
+  return result.transferChunks
 }

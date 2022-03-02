@@ -12,6 +12,12 @@ type Transfer @entity {
   insertedAt: DateTime!
 }
 
+" Transfer chunk "
+type TransferChunk @entity {
+  chunkSize: Int!
+  transfer: Transfer!
+}
+
 " Tracks block timestamps "
 type BlockTimestamp @entity {
   blockNumber: Int!
