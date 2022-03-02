@@ -8,6 +8,7 @@ import {
   getProcessorStatus,
   accountByOutgoingTxValue,
   getGQLClient,
+  transferChunksByTransferId,
 } from './api/processor-api'
 import { transfer } from './api/substrate-api'
 import pWaitFor from 'p-wait-for'
@@ -18,6 +19,7 @@ import {
   TRANSFER_IN_QUERY,
   VARIANT_FILTER_MISREABLE_ACCOUNTS,
 } from './api/graphql-queries'
+import { EntityIdGenerator } from '@joystream/hydra-processor/src/executor/TransactionalExecutor'
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
@@ -234,5 +236,18 @@ describe('end-to-end transfer tests', () => {
     }>(VARIANT_FILTER_MISREABLE_ACCOUNTS)
 
     expect(result.accounts.length).gt(0, 'should find a miserable account')
+  })
+
+  it('should create transfer chunks with auto-generated ids', async () => {
+    const chunks = await transferChunksByTransferId(
+      EntityIdGenerator.firstEntityId
+    )
+    let id: string | undefined
+    const expectedIds = Array.from(
+      { length: 100 },
+      () => (id = EntityIdGenerator.entityIdAfter(id))
+    )
+
+    expect(chunks.map((c) => c.id)).to.have.same.members(expectedIds)
   })
 })

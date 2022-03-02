@@ -12,6 +12,7 @@ import {
 } from '@joystream/hydra-common'
 import { TxAwareBlockContext } from './tx-aware'
 import { ObjectType } from 'typedi'
+import AsyncLock from 'async-lock'
 
 const debug = Debug('hydra-processor:mappings-executor')
 
@@ -85,17 +86,53 @@ export class TransactionalExecutor implements IMappingExecutor {
   }
 }
 
-class EntityIdGenerator {
+export class EntityIdGenerator {
   private entityClass: ObjectType<{ id: string }>
+  private nextEntityIdPromise: Promise<string> | undefined
   private lastKnownEntityId: string | undefined
+  private static lock = new AsyncLock({ maxPending: 10000 })
   // each id is 6 chars out of 62-size alphabet, giving us 56800235584 possible ids (per entity type)
   public static alphabet =
     '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
   public static idSize = 6
 
+  public static firstEntityId = Array.from(
+    { length: EntityIdGenerator.idSize },
+    () => EntityIdGenerator.alphabet[0]
+  ).join('')
+
   constructor(entityClass: ObjectType<{ id: string }>) {
     this.entityClass = entityClass
+  }
+
+  public static entityIdAfter(id?: string): string {
+    if (id === undefined) {
+      return EntityIdGenerator.firstEntityId
+    }
+
+    const { alphabet, idSize } = EntityIdGenerator
+    let targetIdIndexToChange = idSize - 1
+    while (
+      targetIdIndexToChange >= 0 &&
+      id[targetIdIndexToChange] === alphabet[alphabet.length - 1]
+    ) {
+      --targetIdIndexToChange
+    }
+
+    if (targetIdIndexToChange < 0) {
+      throw new Error(`EntityIdGenerator: Cannot get entity id after: ${id}!`)
+    }
+
+    const nextEntityIdChars = [...id]
+    const nextAlphabetCharIndex =
+      alphabet.indexOf(id[targetIdIndexToChange]) + 1
+    nextEntityIdChars[targetIdIndexToChange] = alphabet[nextAlphabetCharIndex]
+    for (let i = idSize - 1; i > targetIdIndexToChange; --i) {
+      nextEntityIdChars[i] = alphabet[0]
+    }
+
+    return nextEntityIdChars.join('')
   }
 
   private async queryLastEntityId(
@@ -117,39 +154,18 @@ class EntityIdGenerator {
     return this.lastKnownEntityId
   }
 
-  public async createNextEntityId(em: EntityManager): Promise<string> {
+  private async generateNextEntityId(em: EntityManager): Promise<string> {
     const lastKnownId = await this.getLastKnownEntityId(em)
-    const { alphabet, idSize } = EntityIdGenerator
-    if (!lastKnownId) {
-      this.lastKnownEntityId = Array.from(
-        { length: idSize },
-        () => alphabet[0]
-      ).join('')
-      return this.lastKnownEntityId
-    }
+    const nextEntityId = EntityIdGenerator.entityIdAfter(lastKnownId)
+    this.lastKnownEntityId = nextEntityId
 
-    let targetIdIndexToChange = idSize - 1
-    while (
-      targetIdIndexToChange >= 0 &&
-      lastKnownId[targetIdIndexToChange] === alphabet[alphabet.length - 1]
-    ) {
-      --targetIdIndexToChange
-    }
-
-    if (targetIdIndexToChange < 0) {
-      throw new Error('EntityIdGenerator: Ran out of possible ids!')
-    }
-
-    const nextEntityIdChars = [...lastKnownId]
-    const nextAlphabetCharIndex =
-      alphabet.indexOf(lastKnownId[targetIdIndexToChange]) + 1
-    nextEntityIdChars[targetIdIndexToChange] = alphabet[nextAlphabetCharIndex]
-    for (let i = idSize - 1; i > targetIdIndexToChange; --i) {
-      nextEntityIdChars[i] = alphabet[0]
-    }
-
-    this.lastKnownEntityId = nextEntityIdChars.join('')
     return this.lastKnownEntityId
+  }
+
+  public async getNextEntityId(em: EntityManager): Promise<string> {
+    return EntityIdGenerator.lock.acquire(this.entityClass.name, () =>
+      this.generateNextEntityId(em)
+    )
   }
 }
 
@@ -220,7 +236,7 @@ async function fillRequiredWarthogFields<T>(
     ) as EntityIdGenerator
 
     Object.assign(entity, {
-      id: await idGenerator.createNextEntityId(entityManager),
+      id: await idGenerator.getNextEntityId(entityManager),
     })
   }
   // eslint-disable-next-line no-prototype-builtins

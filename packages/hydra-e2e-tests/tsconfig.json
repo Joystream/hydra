@@ -9,6 +9,7 @@
 		"target": "es2017",
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
+        "esModuleInterop": true,
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"inlineSources": false,
