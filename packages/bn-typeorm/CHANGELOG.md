@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.20 (2022-03-10)
+
+
+### Features
+
+* graphQL Playground + Warthog version update ([#477](https://github.com/Joystream/hydra/issues/477)) ([c0939d8](https://github.com/Joystream/hydra/commit/c0939d8462259f2449990c6faa38d59a4a411aeb))
+
+
+
 ## 3.1.0-alpha.19 (2022-03-02)
 
 
