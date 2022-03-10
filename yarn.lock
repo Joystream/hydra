@@ -33,9 +33,9 @@
   dependencies:
     xss "^1.0.8"
 
-"@apollographql/graphql-playground-react@https://github.com/Joystream/graphql-playground/releases/download/joystream%401.7.28/graphql-playground-react-v1.7.28.tgz":
-  version "1.7.28"
-  resolved "https://github.com/Joystream/graphql-playground/releases/download/joystream%401.7.28/graphql-playground-react-v1.7.28.tgz#24c9c54e14ae0ba13c894738b4b87301f5801b26"
+"@apollographql/graphql-playground-react@https://github.com/Joystream/graphql-playground/releases/download/graphql-playground-react%401.7.29/graphql-playground-react-v1.7.29.tgz":
+  version "1.7.29"
+  resolved "https://github.com/Joystream/graphql-playground/releases/download/graphql-playground-react%401.7.29/graphql-playground-react-v1.7.29.tgz#bf0bf4a72f74de156ccf2a8638e7cb617a8b41e2"
   dependencies:
     "@types/lru-cache" "^4.1.1"
     apollo-link "^1.2.13"
@@ -1171,12 +1171,12 @@
   resolved "https://registry.yarnpkg.com/@joystream/prettier-config/-/prettier-config-1.0.0.tgz#d87c6370244f39281d9052c619977ca60f6e21cd"
   integrity sha512-ZY2H1PH05Yhn22B7G8ilLyIT9LxQ9b/PyErkPx8OOW+znary5QgExMhgBl1Gmv3k9m/QX1qIxKHZveO4R2yfeA==
 
-"@joystream/warthog@^2.41.3":
-  version "2.41.3"
-  resolved "https://registry.yarnpkg.com/@joystream/warthog/-/warthog-2.41.3.tgz#12f1ff73f29264dd6ebce1c90ff2dad6b1467871"
-  integrity sha512-CM337UO31zHRgkK1RWpvUr3esQIYmLrpqv/yBOgescNLth/MlfnUpDHV/9fCGfquvFdk/HSUyZFy/6KrJrPXjA==
+"@joystream/warthog@^2.41.4":
+  version "2.41.4"
+  resolved "https://registry.yarnpkg.com/@joystream/warthog/-/warthog-2.41.4.tgz#4b0a396d9d6eee9e469a36b1ca1c86c3890d56d6"
+  integrity sha512-yfGgrjbg3alGR+7g1NcSTdlpYtgH0kDFNDSKFWiYFEPNsjwwCBgWnsVQ+ED1PWAa2RhUhwp9J4dsI5U21P543A==
   dependencies:
-    "@apollographql/graphql-playground-react" "https://github.com/Joystream/graphql-playground/releases/download/joystream%401.7.28/graphql-playground-react-v1.7.28.tgz"
+    "@apollographql/graphql-playground-react" "https://github.com/Joystream/graphql-playground/releases/download/graphql-playground-react%401.7.29/graphql-playground-react-v1.7.29.tgz"
     "@types/app-root-path" "^1.2.4"
     "@types/bn.js" "^4.11.6"
     "@types/caller" "^1.0.0"
