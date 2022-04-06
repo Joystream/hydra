@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.22 (2022-04-06)
+
+
+### Features
+
+* nullable variant support II ([2ceb8c1](https://github.com/Joystream/hydra/commit/2ceb8c18d60978864012d43ac43b02b6fc7be693))
+
+
+
 ## 3.1.0-alpha.21 (2022-04-06)
 
 
