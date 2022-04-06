@@ -5,7 +5,7 @@
     "./generated/*",
     "./mappings"
   ],
-  "version": "3.1.0-alpha.20",
+  "version": "3.1.0-alpha.21",
   "description": "GraphQL-based query node and Substrate processor. Generated with ♥ by Hydra-CLI",
   "scripts": {
     "build": "yarn clean && yarn codegen",
@@ -44,11 +44,11 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
-    "@joystream/hydra-cli": "^3.1.0-alpha.20",
-    "@joystream/hydra-common": "^3.1.0-alpha.20",
-    "@joystream/hydra-db-utils": "^3.1.0-alpha.20",
-    "@joystream/hydra-processor": "^3.1.0-alpha.20",
-    "@joystream/hydra-typegen": "^3.1.0-alpha.20",
+    "@joystream/hydra-cli": "^3.1.0-alpha.21",
+    "@joystream/hydra-common": "^3.1.0-alpha.21",
+    "@joystream/hydra-db-utils": "^3.1.0-alpha.21",
+    "@joystream/hydra-processor": "^3.1.0-alpha.21",
+    "@joystream/hydra-typegen": "^3.1.0-alpha.21",
     "envsub": "^4.0.7"
   },
   "resolutions": {
