@@ -153,7 +153,7 @@ export class {{className}} {{^isInterface}}extends BaseModel{{/isInterface}} {
 
 
   {{#is.union}} 
-	@Column({{#required}}{ type: 'jsonb', nullable: true }{{/required}}{{^required}}'jsonb'{{/required}})
+	@Column({{#required}}'jsonb'{{/required}}{{^required}}{ type: 'jsonb', nullable: true }{{/required}})
 	@WarthogField('json')
 	@Field(type => {{tsType}}, {
       {{^required}}nullable: true,{{/required}} 
