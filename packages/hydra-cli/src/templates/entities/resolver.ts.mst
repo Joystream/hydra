@@ -116,7 +116,13 @@ export class {{className}}Resolver {
     @Info() info: any
   ): Promise<{{className}}Connection> {
     
-    const rawFields = graphqlFields(info, {}, { excludedFields: ['__typename'] });
+    const rawFields = graphqlFields(info, {}, {});
+    
+    Object.keys(rawFields.edges.node).map((item) => {
+      if (Object.keys(rawFields.edges.node[item]).includes('__typename')) {
+        rawFields.edges.node[item] = {};
+      }
+    });
 
     let result: any = {
       totalCount: 0,
