@@ -1,6 +1,6 @@
 {
   "name": "@joystream/hydra-e2e-tests",
-  "version": "3.1.0-alpha.22",
+  "version": "3.1.0-alpha.23",
   "private": "true",
   "description": "End-to-end tests for Hydra services",
   "main": "index.js",
@@ -32,7 +32,7 @@
     "typedi": "^0.8.0"
   },
   "devDependencies": {
-    "@joystream/hydra-cli": "^3.1.0-alpha.22",
+    "@joystream/hydra-cli": "^3.1.0-alpha.23",
     "@types/chai": "^4.2.13",
     "@types/mocha": "^8.0.3",
     "chai": "^4.2.0",

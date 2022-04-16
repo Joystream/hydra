@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.23 (2022-04-16)
+
+**Note:** Version bump only for package @joystream/bn-typeorm
+
+
+
+
+
 ## 3.1.0-alpha.22 (2022-04-06)
 
 
