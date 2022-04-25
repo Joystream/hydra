@@ -92,8 +92,7 @@ export class EntityIdGenerator {
   private lastKnownEntityId: string | undefined
   private static lock = new AsyncLock({ maxPending: 10000 })
   // each id is 8 chars out of 36-size alphabet, giving us 2821109907456 possible ids (per entity type)
-  public static alphabet =
-    '0123456789abcdefghijklmnopqrstuvwxyz'
+  public static alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
 
   public static idSize = 8
 
