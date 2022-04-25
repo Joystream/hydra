@@ -91,11 +91,11 @@ export class EntityIdGenerator {
   private nextEntityIdPromise: Promise<string> | undefined
   private lastKnownEntityId: string | undefined
   private static lock = new AsyncLock({ maxPending: 10000 })
-  // each id is 6 chars out of 62-size alphabet, giving us 56800235584 possible ids (per entity type)
+  // each id is 8 chars out of 36-size alphabet, giving us 2821109907456 possible ids (per entity type)
   public static alphabet =
-    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    '0123456789abcdefghijklmnopqrstuvwxyz'
 
-  public static idSize = 6
+  public static idSize = 8
 
   public static firstEntityId = Array.from(
     { length: EntityIdGenerator.idSize },
