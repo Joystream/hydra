@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.24 (2022-04-26)
+
+
+### Bug Fixes
+
+* processor's deterministic ids alphabet update ([#484](https://github.com/Joystream/hydra/issues/484)) ([5636857](https://github.com/Joystream/hydra/commit/56368573a011c5f6deaf346f234f92e408f8a0da))
+
+
+
 ## 3.1.0-alpha.23 (2022-04-16)
 
 **Note:** Version bump only for package @joystream/hydra-processor
