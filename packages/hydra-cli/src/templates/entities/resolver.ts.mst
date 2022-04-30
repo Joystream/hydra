@@ -118,11 +118,13 @@ export class {{className}}Resolver {
     
     const rawFields = graphqlFields(info, {}, {});
     
-    Object.keys(rawFields.edges.node).map((item) => {
-      if (Object.keys(rawFields.edges.node[item]).includes('__typename')) {
-        rawFields.edges.node[item] = {};
-      }
-    });
+    if (rawFields.edges && rawFields.edges.nodes) {
+      Object.keys(rawFields.edges.node).map((item) => {
+        if (Object.keys(rawFields.edges.node[item]).includes("__typename")) {
+          rawFields.edges.node[item] = {};
+        }
+      });
+    }
 
     let result: any = {
       totalCount: 0,
