@@ -118,7 +118,7 @@ export class {{className}}Resolver {
     
     const rawFields = graphqlFields(info, {}, {});
     
-    if (rawFields.edges && rawFields.edges.nodes) {
+    if (rawFields.edges && rawFields.edges.node) {
       Object.keys(rawFields.edges.node).map((item) => {
         if (Object.keys(rawFields.edges.node[item]).includes("__typename")) {
           rawFields.edges.node[item] = {};
