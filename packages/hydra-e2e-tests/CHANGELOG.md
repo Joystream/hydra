@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 3.1.0-alpha.26 (2022-05-09)
+
+**Note:** Version bump only for package @joystream/hydra-e2e-tests
+
+
+
+
+
+## 3.1.0-alpha.25 (2022-04-30)
+
+**Note:** Version bump only for package @joystream/hydra-e2e-tests
+
+
+
+
+
 ## 3.1.0-alpha.24 (2022-04-26)
 
 
