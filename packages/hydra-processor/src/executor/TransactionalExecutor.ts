@@ -180,7 +180,8 @@ export function makeDatabaseManager(
 ): DatabaseManager {
   return {
     save: async <T>(entity: DeepPartial<T>): Promise<void> => {
-      entity = await fillRequiredWarthogFields(entity, entityManager, blockData)
+      // TODO: try to move ` as DeepPartial<T & object>` typecast to function definition
+      entity = await fillRequiredWarthogFields(entity as DeepPartial<T & object>, entityManager, blockData)
       await entityManager.save(entity)
     },
     remove: async <T>(entity: DeepPartial<T>): Promise<void> => {
@@ -191,7 +192,7 @@ export function makeDatabaseManager(
       entity: { new (...args: any[]): T },
       options: FindOneOptions<T>
     ): Promise<T | undefined> => {
-      return await entityManager.findOne(entity, options)
+      return await entityManager.findOne(entity, options) || undefined
     },
     getMany: async <T>(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -212,11 +213,17 @@ export function makeDatabaseManager(
  *
  * @param entity: DeepPartial<T>
  */
-async function fillRequiredWarthogFields<T>(
+async function fillRequiredWarthogFields<T extends object>(
   entity: DeepPartial<T>,
   entityManager: EntityManager,
   { block }: BlockData
 ): Promise<DeepPartial<T>> {
+  // TODO: find a way how to remove this; needed to limit possible `entity` types
+  //       to `object` to keep `hasOwnProperty` functional after typeorm upgrade
+  if (!(entity as any).hasOwnProperty) {
+    throw 'Unexpected situation in prefilling Warthog fields'
+  }
+
   // eslint-disable-next-line no-prototype-builtins
   if (!entity.hasOwnProperty('id')) {
     const entityClass = ((entity as unknown) as {

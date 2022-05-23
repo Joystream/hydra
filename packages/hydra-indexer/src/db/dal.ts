@@ -3,6 +3,7 @@ import {
   Connection,
   createConnection,
   getConnection,
+  MixedList,
 } from 'typeorm'
 import { EVENT_TABLE_NAME } from '../entities/SubstrateEventEntity'
 import Debug from 'debug'
@@ -15,8 +16,21 @@ const debug = Debug('index-builder:helper')
 export async function createDBConnection(
   entities: any[] = []
 ): Promise<Connection> {
-  // const connectionOptions = await getConnectionOptions();
-  const _config = config()
+  function mixedListToArray<T>(mixedList: MixedList<T> | undefined): T[] {
+    return mixedList
+      ? Array.isArray(mixedList)
+        ? mixedList
+        : Object.values(mixedList)
+      : []
+  }
+
+  const tmpConfig = config()
+  const _config = {
+    ...tmpConfig,
+    entities: mixedListToArray(entities),
+  }
+
+
   entities.map((e) => _config.entities?.push(e))
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
   return createConnection(_config)

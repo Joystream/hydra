@@ -47,7 +47,6 @@
     "prettier": "2.0.2"
   },
   "resolutions": {
-    "typeorm": "0.2.34",
     "@polkadot/types": "5.9.1"
   },
   "lint-staged": {
