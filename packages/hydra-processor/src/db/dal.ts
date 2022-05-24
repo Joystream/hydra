@@ -1,4 +1,4 @@
-import { getRepository, Connection, createConnection, EntitySubscriberInterface, MixedList } from 'typeorm'
+import { getRepository, Connection, createConnection, MixedList } from 'typeorm'
 
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 import Debug from 'debug'
@@ -22,8 +22,12 @@ export async function createDBConnection(
 
   const _config = {
     ...tmpConfig,
-    subscribers: mixedListToArray(tmpConfig.subscribers).concat([SanitizationSubscriber]),
-    entities: mixedListToArray(tmpConfig.entities).concat(mixedListToArray(entities)),
+    subscribers: mixedListToArray(tmpConfig.subscribers).concat([
+      SanitizationSubscriber,
+    ]),
+    entities: mixedListToArray(tmpConfig.entities).concat(
+      mixedListToArray(entities)
+    ),
   }
 
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)

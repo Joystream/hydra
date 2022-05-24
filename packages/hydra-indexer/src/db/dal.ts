@@ -30,7 +30,6 @@ export async function createDBConnection(
     entities: mixedListToArray(entities),
   }
 
-
   entities.map((e) => _config.entities?.push(e))
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
   return createConnection(_config)
