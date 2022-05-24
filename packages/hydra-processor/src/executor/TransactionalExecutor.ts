@@ -259,22 +259,16 @@ async function fillRequiredWarthogFields<T extends Record<string, unknown>>(
   }
 
   // set createdAt to the block timestamp if not set
-  if (
-    // eslint-disable-next-line no-prototype-builtins
-    !entity.hasOwnProperty('createdAt') ||
-    (entity as { createdAt: unknown }).createdAt === undefined
-  ) {
+  // eslint-disable-next-line no-prototype-builtins
+  if (entity.hasOwnProperty('createdAt') || entity.createdAt === undefined) {
     Object.assign(entity, {
       createdAt: new Date(block.timestamp),
     })
   }
 
   // set updatedAt to the block timestamp if not set
-  if (
-    // eslint-disable-next-line no-prototype-builtins
-    !entity.hasOwnProperty('updatedAt') ||
-    (entity as { updatedAt: unknown }).updatedAt === undefined
-  ) {
+  // eslint-disable-next-line no-prototype-builtins
+  if (!entity.hasOwnProperty('updatedAt') || entity.updatedAt === undefined) {
     Object.assign(entity, {
       updatedAt: new Date(block.timestamp),
     })
