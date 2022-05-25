@@ -1,7 +1,6 @@
 import {
   Arg,
   Args,
-  Mutation,
   Query,
   Root,
   Resolver,
@@ -16,7 +15,7 @@ import {
 import graphqlFields from 'graphql-fields';
 import { Inject } from 'typedi';
 import { Min } from 'class-validator'
-import { Fields, StandardDeleteResponse, UserId, PageInfo, RawFields, NestedFields, BaseContext } from '@joystream/warthog';
+import { Fields, PageInfo, BaseContext } from '@joystream/warthog';
 
 import {
   {{className}}CreateInput,

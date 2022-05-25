@@ -26,7 +26,7 @@ async function getOrCreate<T>(
   store: DatabaseManager
 ): Promise<T> {
   let entity: T | undefined = await store.get<T>(E, {
-    where: { id } as unknown as FindOptionsWhere<T>,
+    where: ({ id } as unknown) as FindOptionsWhere<T>,
   })
 
   if (entity === undefined) {

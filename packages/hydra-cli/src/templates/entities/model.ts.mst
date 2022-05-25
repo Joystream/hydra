@@ -15,7 +15,6 @@ import {
   {{#has.array}}CustomField,{{/has.array}}
   {{#has.enum}}EnumField,{{/has.enum}}
   StringField,
-  JSONField,
 } from '@joystream/warthog';  {{! we don't need extra twists here }}
 
 {{#has.numeric}} import BN from 'bn.js' {{/has.numeric}}
@@ -38,7 +37,7 @@ import { InterfaceType } from 'type-graphql';
   {{{ . }}}
 {{/relatedEntityImports}}
 
-import * as jsonTypes from '../jsonfields/jsonfields.model';
+{{#has.json}}import * as jsonTypes from '../jsonfields/jsonfields.model';{{/has.json}}
 
 {{#enums}}
   import { {{name}} } from '../enums/enums';

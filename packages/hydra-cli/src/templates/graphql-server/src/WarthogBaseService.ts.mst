@@ -1,5 +1,5 @@
-import { BaseService, BaseModel, WhereInput, LimitOffset, addQueryBuilderWhereItem } from '@joystream/warthog';
-import { Brackets, SelectQueryBuilder } from 'typeorm';
+import { BaseService, BaseModel, WhereInput, LimitOffset } from '@joystream/warthog';
+import { SelectQueryBuilder } from 'typeorm';
 
 type WhereExpression = {
   AND?: WhereExpression[];
