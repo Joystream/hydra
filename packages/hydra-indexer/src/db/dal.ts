@@ -27,9 +27,8 @@ export async function createDBConnection(
   const tmpConfig = config()
   const _config = {
     ...tmpConfig,
-    entities: mixedListToArray(entities),
+    entities: mixedListToArray(tmpConfig.entities),
   }
-
   entities.map((e) => _config.entities?.push(e))
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
   return createConnection(_config)

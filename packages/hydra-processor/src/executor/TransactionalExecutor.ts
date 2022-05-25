@@ -138,6 +138,7 @@ export class EntityIdGenerator {
     em: EntityManager
   ): Promise<string | undefined> {
     const lastEntity = await em.findOne(this.entityClass, {
+      where: {}, // required by typeorm '0.3.5'
       order: { id: 'DESC' },
     })
 
@@ -196,14 +197,22 @@ export function makeDatabaseManager(
       entity: { new (...args: any[]): T },
       options: FindOneOptions<T>
     ): Promise<T | undefined> => {
-      return (await entityManager.findOne(entity, options)) || undefined
+      const fixedOptions = {
+        ...options,
+        where: options.where || {},
+      } // required by typeorm '0.3.5'
+      return (await entityManager.findOne(entity, fixedOptions)) || undefined
     },
     getMany: async <T>(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       entity: { new (...args: any[]): T },
       options: FindOneOptions<T>
     ): Promise<T[]> => {
-      return await entityManager.find(entity, options)
+      const fixedOptions = {
+        ...options,
+        where: options.where || {},
+      } // required by typeorm '0.3.5'
+      return await entityManager.find(entity, fixedOptions)
     },
   } as DatabaseManager
 }

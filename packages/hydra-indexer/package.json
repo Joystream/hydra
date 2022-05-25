@@ -49,6 +49,7 @@
     "delay": "~5.0.0",
     "envalid": "^7.1.0",
     "express": "^4.17.1",
+    "figlet": "^1.5.2",
     "graphql": "15",
     "graphql-request": "^3.1.0",
     "ioredis": "^4.17.3",

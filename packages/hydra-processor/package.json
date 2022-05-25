@@ -49,6 +49,7 @@
     "dotenv": "^8.2.0",
     "envalid": "^6.0.2",
     "express": "^4.17.1",
+    "figlet": "^1.5.2",
     "graphql": "^15.4.0",
     "graphql-request": "^3.3.0",
     "p-immediate": "^3.2.0",
