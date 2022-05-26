@@ -33,6 +33,7 @@ describe('MappingsProcessor', () => {
 
     // retrieve db record created by event mapping
     const testEntity = await db.findOne(TestEntity, {
+      where: {}, // required by typeorm '0.3.5'
       order: { primaryKey: 'DESC' },
     })
 

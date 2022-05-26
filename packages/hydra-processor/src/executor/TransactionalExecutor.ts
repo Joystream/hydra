@@ -138,6 +138,7 @@ export class EntityIdGenerator {
     em: EntityManager
   ): Promise<string | undefined> {
     const lastEntity = await em.findOne(this.entityClass, {
+      where: {}, // required by typeorm '0.3.5'
       order: { id: 'DESC' },
     })
 
@@ -180,7 +181,12 @@ export function makeDatabaseManager(
 ): DatabaseManager {
   return {
     save: async <T>(entity: DeepPartial<T>): Promise<void> => {
-      entity = await fillRequiredWarthogFields(entity, entityManager, blockData)
+      // TODO: try to move ` as DeepPartial<T & Record<string, unknown>>` typecast to function definition
+      entity = await fillRequiredWarthogFields(
+        entity as DeepPartial<T & Record<string, unknown>>,
+        entityManager,
+        blockData
+      )
       await entityManager.save(entity)
     },
     remove: async <T>(entity: DeepPartial<T>): Promise<void> => {
@@ -191,14 +197,22 @@ export function makeDatabaseManager(
       entity: { new (...args: any[]): T },
       options: FindOneOptions<T>
     ): Promise<T | undefined> => {
-      return await entityManager.findOne(entity, options)
+      const fixedOptions = {
+        ...options,
+        where: options.where || {},
+      } // required by typeorm '0.3.5'
+      return (await entityManager.findOne(entity, fixedOptions)) || undefined
     },
     getMany: async <T>(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       entity: { new (...args: any[]): T },
       options: FindOneOptions<T>
     ): Promise<T[]> => {
-      return await entityManager.find(entity, options)
+      const fixedOptions = {
+        ...options,
+        where: options.where || {},
+      } // required by typeorm '0.3.5'
+      return await entityManager.find(entity, fixedOptions)
     },
   } as DatabaseManager
 }
@@ -212,11 +226,17 @@ export function makeDatabaseManager(
  *
  * @param entity: DeepPartial<T>
  */
-async function fillRequiredWarthogFields<T>(
+async function fillRequiredWarthogFields<T extends Record<string, unknown>>(
   entity: DeepPartial<T>,
   entityManager: EntityManager,
   { block }: BlockData
 ): Promise<DeepPartial<T>> {
+  // TODO: find a way how to remove this; needed to limit possible `entity` types
+  //       to `object` to keep `hasOwnProperty` functional after typeorm upgrade
+  if (!(entity as any).hasOwnProperty) {
+    throw new Error('Unexpected situation in prefilling Warthog fields')
+  }
+
   // eslint-disable-next-line no-prototype-builtins
   if (!entity.hasOwnProperty('id')) {
     const entityClass = ((entity as unknown) as {
@@ -248,22 +268,16 @@ async function fillRequiredWarthogFields<T>(
   }
 
   // set createdAt to the block timestamp if not set
-  if (
-    // eslint-disable-next-line no-prototype-builtins
-    !entity.hasOwnProperty('createdAt') ||
-    (entity as { createdAt: unknown }).createdAt === undefined
-  ) {
+  // eslint-disable-next-line no-prototype-builtins
+  if (entity.hasOwnProperty('createdAt') || entity.createdAt === undefined) {
     Object.assign(entity, {
       createdAt: new Date(block.timestamp),
     })
   }
 
   // set updatedAt to the block timestamp if not set
-  if (
-    // eslint-disable-next-line no-prototype-builtins
-    !entity.hasOwnProperty('updatedAt') ||
-    (entity as { updatedAt: unknown }).updatedAt === undefined
-  ) {
+  // eslint-disable-next-line no-prototype-builtins
+  if (!entity.hasOwnProperty('updatedAt') || entity.updatedAt === undefined) {
     Object.assign(entity, {
       updatedAt: new Date(block.timestamp),
     })

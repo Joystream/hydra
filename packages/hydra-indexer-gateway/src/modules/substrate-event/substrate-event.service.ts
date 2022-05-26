@@ -24,10 +24,12 @@ export class SubstrateEventService extends BaseService<SubstrateEvent> {
   }
 
   async getExtrinsic(eventID: string): Promise<SubstrateExtrinsic | undefined> {
-    return createQueryBuilder(SubstrateExtrinsic, 'extrinsic')
-      .innerJoin('extrinsic.event', 'event')
-      .where('event.id = :id', { id: eventID })
-      .getOne()
+    return (
+      (await createQueryBuilder(SubstrateExtrinsic, 'extrinsic')
+        .innerJoin('extrinsic.event', 'event')
+        .where('event.id = :id', { id: eventID })
+        .getOne()) || undefined
+    )
   }
 
   async findAfter<W extends SubstrateEventWhereInput>(

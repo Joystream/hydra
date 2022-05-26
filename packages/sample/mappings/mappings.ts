@@ -16,6 +16,7 @@ import {
   BlockContext,
   StoreContext,
   DatabaseManager,
+  FindOptionsWhere,
 } from '@joystream/hydra-common'
 
 const start = Date.now()
@@ -29,7 +30,7 @@ async function getOrCreate<T>(
   store: DatabaseManager
 ): Promise<T> {
   let entity: T | undefined = await store.get<T>(e, {
-    where: { id },
+    where: { id } as unknown as FindOptionsWhere<T>,
   })
 
   if (entity === undefined) {

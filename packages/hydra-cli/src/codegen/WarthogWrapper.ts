@@ -211,10 +211,10 @@ export default class WarthogWrapper {
       ...extraDependencies,
     }
 
-    // temporary fix for specific typeorm version needed (see https://github.com/Joystream/hydra/pull/453 for more info)
+    // resolutions can be used for fixing temporary package dependency issues
     pkgFile.resolutions = {
       ...(pkgFile.resolutions || {}),
-      typeorm: '0.2.34',
+      // typeorm: '0.2.34', // example
     }
 
     debug(`Writing package.json: ${JSON.stringify(pkgFile, null, 2)}`)

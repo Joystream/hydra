@@ -1,4 +1,4 @@
-import { getRepository, Connection, createConnection } from 'typeorm'
+import { getRepository, Connection, createConnection, MixedList } from 'typeorm'
 
 import { ProcessedEventsLogEntity } from '../entities/ProcessedEventsLogEntity'
 import Debug from 'debug'
@@ -8,16 +8,27 @@ import { SanitizationSubscriber } from './subscribers'
 const debug = Debug('hydra-processor:dal')
 
 export async function createDBConnection(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  entities: any[] = []
+  entities: ReturnType<typeof config>['entities'] = []
 ): Promise<Connection> {
-  const tmpConfig = config()
-  const _config = {
-    ...tmpConfig,
-    subscribers: [...(tmpConfig.subscribers || []), SanitizationSubscriber],
+  function mixedListToArray<T>(mixedList: MixedList<T> | undefined): T[] {
+    return mixedList
+      ? Array.isArray(mixedList)
+        ? mixedList
+        : Object.values(mixedList)
+      : []
   }
 
-  entities.map((e) => _config.entities?.push(e))
+  const tmpConfig = config()
+
+  const _config = {
+    ...tmpConfig,
+    subscribers: mixedListToArray(tmpConfig.subscribers).concat([
+      SanitizationSubscriber,
+    ]),
+    entities: mixedListToArray(tmpConfig.entities).concat(
+      mixedListToArray(entities)
+    ),
+  }
 
   debug(`DB config: ${JSON.stringify(_config, null, 2)}`)
   return createConnection(_config)
@@ -31,7 +42,7 @@ export async function createDBConnection(
 export async function loadState(
   processorID: string
 ): Promise<ProcessedEventsLogEntity | undefined> {
-  return await getRepository(ProcessedEventsLogEntity).findOne({
+  const item = await getRepository(ProcessedEventsLogEntity).findOne({
     where: {
       processor: processorID,
     },
@@ -40,6 +51,8 @@ export async function loadState(
       lastScannedBlock: 'DESC',
     },
   })
+
+  return item || undefined
 }
 
 /**
