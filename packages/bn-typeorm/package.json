@@ -1,6 +1,6 @@
 {
   "name": "@joystream/bn-typeorm",
-  "version": "3.1.0-alpha.26",
+  "version": "3.1.0-alpha.27",
   "description": "TypeORM transformer for BigNumber",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

@@ -2,7 +2,7 @@
   "name": "@joystream/hydra-indexer",
   "private": "true",
   "description": "Block index builder for substrate based chains",
-  "version": "3.1.0-alpha.26",
+  "version": "3.1.0-alpha.27",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
@@ -36,9 +36,9 @@
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only --exclude \"test/integration/**/*.test.ts\"  \"test/**/*.test.ts\" \"src/**/*.test.ts\""
   },
   "dependencies": {
-    "@joystream/bn-typeorm": "^3.1.0-alpha.26",
-    "@joystream/hydra-common": "^3.1.0-alpha.26",
-    "@joystream/hydra-db-utils": "^3.1.0-alpha.26",
+    "@joystream/bn-typeorm": "^3.1.0-alpha.27",
+    "@joystream/hydra-common": "^3.1.0-alpha.27",
+    "@joystream/hydra-db-utils": "^3.1.0-alpha.27",
     "@polkadot/api": "5.9.1",
     "@types/express": "^4.17.8",
     "@types/ioredis": "^4.17.4",
