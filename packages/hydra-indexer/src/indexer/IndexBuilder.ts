@@ -126,14 +126,14 @@ export class IndexBuilder {
         signedBlock: { block },
       } = blockData
 
-      const extrinsicEntities: SubstrateExtrinsicEntity[] = block.extrinsics.map(
-        (e, index) =>
+      const extrinsicEntities: SubstrateExtrinsicEntity[] =
+        block.extrinsics.map((e, index) =>
           fromBlockExtrinsic({
             e,
             blockEntity,
             indexInBlock: index,
           })
-      )
+        )
       await em.save(extrinsicEntities)
       debug(`Saved ${extrinsicEntities.length} extrinsics`)
 

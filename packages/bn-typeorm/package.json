@@ -16,7 +16,7 @@
     "pub": "yarn build && yarn publish --access public",
     "build": "rm -rf lib && yarn tsc --build tsconfig.json",
     "prepack": "yarn build",
-    "lint": "eslint . --cache --ext .ts"
+    "lint": "eslint . --ext .ts"
   },
   "dependencies": {
     "bn.js": "^5.2.1",

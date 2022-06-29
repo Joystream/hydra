@@ -14,7 +14,7 @@
   "scripts": {
     "pub": "yarn build && yarn publish --access public",
     "build": "rm -rf lib && yarn tsc --build tsconfig.json",
-    "lint": "eslint . --cache --ext .ts",
+    "lint": "eslint . --ext .ts",
     "prepack": "yarn build",
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },

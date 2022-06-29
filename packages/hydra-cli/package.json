@@ -40,7 +40,7 @@
   "scripts": {
     "build": "rm -rf lib && yarn tsc --build tsconfig.json",
     "postpack": "rm -f oclif.manifest.json",
-    "lint": "eslint . --cache --ext .ts",
+    "lint": "eslint . --ext .ts",
     "prepack": "rm -rf lib && yarn tsc -b && cp -R ./src/templates ./lib/src/templates && oclif-dev manifest",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\""
   },

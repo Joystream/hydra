@@ -32,7 +32,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "test-build": "rm -rf test-lib && yarn tsc --build ./test/tsconfig.json",
     "prepack": "yarn build && oclif-dev manifest",
-    "lint": "eslint . --cache --ext .ts",
+    "lint": "eslint . --ext .ts",
     "test": "bash run-tests.sh",
     "test:run": "yarn nyc --extension .ts mocha --timeout 70000 --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
   },

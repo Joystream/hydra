@@ -24,7 +24,7 @@
     "build": "yarn clean && yarn tsc && yarn copy-templates",
     "run-dev": "node ./bin/run",
     "postpack": "rm -f oclif.manifest.json",
-    "lint": "eslint . --cache --ext .ts",
+    "lint": "eslint . --ext .ts",
     "prepack": "yarn build && oclif-dev manifest",
     "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
   },
