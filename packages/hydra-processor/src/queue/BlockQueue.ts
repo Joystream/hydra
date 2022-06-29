@@ -348,9 +348,9 @@ export function sortAndTrim(
   return mappingData
 }
 
-export function prepareIndexerQueries(
-  filter: MappingFilter
-): { [key in Kind]?: Partial<IndexerQuery> } {
+export function prepareIndexerQueries(filter: MappingFilter): {
+  [key in Kind]?: Partial<IndexerQuery>
+} {
   const { events, extrinsics } = filter
   const queries: { [key in Kind]?: Partial<IndexerQuery> } = {}
 

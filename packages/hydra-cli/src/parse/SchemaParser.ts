@@ -80,9 +80,8 @@ export class GraphQLSchemaParser {
         (t) => !t.name.startsWith('__') // filter out auxiliarry GraphQL types;
       ),
     ]
-    this._objectTypeDefinations = GraphQLSchemaParser.createObjectTypeDefinations(
-      this.schema
-    )
+    this._objectTypeDefinations =
+      GraphQLSchemaParser.createObjectTypeDefinations(this.schema)
   }
 
   private getUnifiedSchema(schemaPath: string): string {
