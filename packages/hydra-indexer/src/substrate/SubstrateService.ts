@@ -1,3 +1,5 @@
+import '@polkadot/api-augment/substrate'
+
 import {
   Hash,
   Header,

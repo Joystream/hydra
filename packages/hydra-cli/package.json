@@ -40,7 +40,7 @@
   "scripts": {
     "build": "rm -rf lib && yarn tsc --build tsconfig.json",
     "postpack": "rm -f oclif.manifest.json",
-    "lint": "eslint . --cache --ext .ts",
+    "lint": "eslint . --ext .ts",
     "prepack": "rm -rf lib && yarn tsc -b && cp -R ./src/templates ./lib/src/templates && oclif-dev manifest",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\""
   },
@@ -99,7 +99,7 @@
     "mocha": "^5",
     "mocha-chai-snapshot": "^1.0.0",
     "nyc": "^14",
-    "prettier": "^2.0.5",
+    "prettier": "^2.7.1",
     "spawn-command": "^0.0.2-1",
     "temp": "^0.9.1",
     "ts-node": "^10.2.1",

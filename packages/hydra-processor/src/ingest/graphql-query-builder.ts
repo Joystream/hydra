@@ -114,9 +114,9 @@ export function buildQueryFields<T>(fields: QueryFields<T>): string {
         )
       }
       const key = keys[0] as keyof T
-      const nestedFields = (field as Partial<
-        { [P in keyof T]: QueryFields<T[P]> }
-      >)[key] as QueryFields<T[typeof key]>
+      const nestedFields = (
+        field as Partial<{ [P in keyof T]: QueryFields<T[P]> }>
+      )[key] as QueryFields<T[typeof key]>
 
       output = `
       ${output}${key} {
@@ -166,17 +166,15 @@ export function buildQuery<T>({
   }`)
 }
 
-export function collectNamedQueries<T>(
-  queries: {
-    [K in keyof T]: GraphQLQuery<T[K]>
-  }
-): string {
+export function collectNamedQueries<T>(queries: {
+  [K in keyof T]: GraphQLQuery<T[K]>
+}): string {
   return `query {
     ${Object.keys(queries)
       .map((name) => {
-        const query = queries[name as keyof typeof queries] as GraphQLQuery<
-          unknown
-        >
+        const query = queries[
+          name as keyof typeof queries
+        ] as GraphQLQuery<unknown>
         return `${name}: ${buildQuery(query)}`
       })
       .join('\n')}

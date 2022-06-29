@@ -1,15 +1,12 @@
-import { TypeRegistry } from '@polkadot/types'
-{{#if hasTypeDefs}}
+import { TypeRegistry, Metadata } from '@polkadot/types'
+import metadataHex from './metadata.json'
 import path from 'path'
 import fs from 'fs'
-{{/if}}
-const typeRegistry = new TypeRegistry()
 
-{{#if hasTypeDefs}}
-typeRegistry.register(
-  JSON.parse(fs.readFileSync(path.join(__dirname, 'typedefs.json'), 'utf-8'))
-)
-{{/if}}
+const typeRegistry = new TypeRegistry()
+const metadata = new Metadata(typeRegistry, metadataHex as `0x${string}`)
+
+typeRegistry.setMetadata(metadata)
 
 export {
   typeRegistry,

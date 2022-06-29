@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars'
 import { ImportsDef } from './types'
 import { kebabCase, camelCase, upperFirst } from 'lodash'
-import { Arg } from '../metadata'
+import { ExtractedParam, ExtractedVaraintData } from '../metadata'
 
 const debug = require('debug')('hydra-typegen:helpers')
 
@@ -29,13 +29,13 @@ export function renderImports(imports: ImportsDef): string {
 }
 
 export function renderNamedArgs(
-  args: Arg[],
+  args: ExtractedParam[],
   ctxValueGetter: (ctxIndex: number) => string
 ): string {
   debug(`Rendering named args: ${JSON.stringify(args, null, 2)}`)
-  return args.reduce((result, arg: Arg, index) => {
+  return args.reduce((result, arg, index) => {
     const type = arg.type.toString()
-    const name = camelCase(arg.name.toString())
+    const name = camelCase((arg.name || index).toString())
     const getStmt =
       // prettier-ignore
       `get ${name}(): ${type} {
@@ -46,34 +46,19 @@ export function renderNamedArgs(
   }, '')
 }
 
-export function renderTypedParams(argTypes: string[]): string {
-  const returnType = `[${argTypes.map((a) => convertTuples(a)).join(',')}]`
-  console.log(`Return type: ${returnType}`)
-  const returnObjects = argTypes.map((argType, index) =>
-    renderCreateTypeStmt(argType, eventParamValueGetter(index))
-  )
-  return `get params(): ${returnType} {
-    return [${returnObjects.join(',')}]
-  }`
-}
-
-function renderCreateTypeStmt(argType: string, ctxValueGetter: string) {
-  return `createTypeUnsafe(typeRegistry, '${argType}', ${ctxValueGetter}) `
+function renderCreateTypeStmt(typeName: string, ctxValueGetter: string) {
+  return `createTypeUnsafe(typeRegistry, '${typeName}', ${ctxValueGetter}) `
 }
 
 /**
  * Converts tuple types (X, Y, Z) to [X, Y, Z] & Codec
- * @param type
- * @returns
  */
 export function convertTuples(type: string): string {
   let _type = type
 
   // recursively find typles and replace them
-  // eslint-disable-next-line no-useless-escape
-  while (_type.match(/\(([^\(].*)\)/g)) {
-    // eslint-disable-next-line no-useless-escape
-    _type = _type.replace(/\(([^\(].*)\)/, '[$1] & Codec')
+  while (_type.match(/\(([^(].*)\)/g)) {
+    _type = _type.replace(/\(([^(].*)\)/, '[$1] & Codec')
   }
 
   return _type
@@ -81,7 +66,7 @@ export function convertTuples(type: string): string {
 
 export const helper: Handlebars.HelperDeclareSpec = {
   imports() {
-    const { imports } = (this as unknown) as { imports: ImportsDef }
+    const { imports } = this as unknown as { imports: ImportsDef }
     return renderImports(imports)
   },
 
@@ -106,26 +91,21 @@ export const helper: Handlebars.HelperDeclareSpec = {
   },
 
   paramsReturnType() {
-    const { args } = (this as unknown) as { args: string[] }
-    return `[${args.map((a) => convertTuples(a)).join(',')}]`
+    const { params } = this as unknown as ExtractedVaraintData
+    return `[${params.map(({ type }) => convertTuples(type)).join(',')}]`
   },
 
   paramsReturnStmt() {
-    const { args } = (this as unknown) as { args: string[] }
-    const returnObjects = args.map((argType, index) =>
-      renderCreateTypeStmt(argType, eventParamValueGetter(index))
+    const { params } = this as unknown as ExtractedVaraintData
+    const returnObjects = params.map(({ type }, index) =>
+      renderCreateTypeStmt(type, eventParamValueGetter(index))
     )
     return `return [${returnObjects.join(',\n')}]`
   },
 
-  paramGetter() {
-    const { args } = (this as unknown) as { args: string[] }
-    return renderTypedParams(args)
-  },
-
   namedGetters() {
-    const { args } = (this as unknown) as { args: Arg[] }
-    return renderNamedArgs(args, callArgValueGetter)
+    const { params } = this as unknown as ExtractedVaraintData
+    return renderNamedArgs(params, callArgValueGetter)
   },
 }
 

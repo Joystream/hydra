@@ -18,13 +18,11 @@ const debug = Debug('hydra-processor:graphql-source')
 
 type SubstrateType = SubstrateBlock | SubstrateEvent | SubstrateExtrinsic
 
-const REVIVE_SUBSTRATE_FIELDS: Partial<
-  {
-    [P in keyof SubstrateType]: SubstrateType[P] extends number | BigInt
-      ? 'BigInt' | 'Number'
-      : never
-  }
-> = {
+const REVIVE_SUBSTRATE_FIELDS: Partial<{
+  [P in keyof SubstrateType]: SubstrateType[P] extends number | BigInt
+    ? 'BigInt' | 'Number'
+    : never
+}> = {
   'timestamp': 'Number',
   'tip': 'BigInt',
   'blockTimestamp': 'Number',
@@ -67,11 +65,9 @@ export class GraphQLSource implements IProcessorSource {
     return status.indexerStatus as IndexerStatus
   }
 
-  async nextBatch<T>(
-    queries: {
-      [K in keyof T]: IndexerQuery
-    }
-  ): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }> {
+  async nextBatch<T>(queries: {
+    [K in keyof T]: IndexerQuery
+  }): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }> {
     const query = collectQueries(queries)
     if (conf().VERBOSE) debug(`GraphqQL Query: ${query}`)
 
@@ -79,9 +75,9 @@ export class GraphQLSource implements IProcessorSource {
     //   { [K in keyof typeof queries]: SubstrateEvent[] }
     // >(query)
 
-    const raw = await this.requestSubstrateData<
-      { [K in keyof typeof queries]: SubstrateEvent[] }
-    >(query)
+    const raw = await this.requestSubstrateData<{
+      [K in keyof typeof queries]: SubstrateEvent[]
+    }>(query)
 
     debug(
       `Fetched ${Object.keys(raw).reduce(
@@ -97,18 +93,16 @@ export class GraphQLSource implements IProcessorSource {
     }
   }
 
-  executeQueries<T>(
-    queries: {
-      [K in keyof T]: GraphQLQuery<T[K]>
-    }
-  ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }> {
+  executeQueries<T>(queries: {
+    [K in keyof T]: GraphQLQuery<T[K]>
+  }): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }> {
     const bigNamedQuery = collectNamedQueries(queries)
     // return this.graphClient.request<
     //   { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
     // >(bigNamedQuery)
-    return this.requestSubstrateData<
-      { [K in keyof T]: (T[K] & AsJson<T[K]>)[] }
-    >(bigNamedQuery)
+    return this.requestSubstrateData<{
+      [K in keyof T]: (T[K] & AsJson<T[K]>)[]
+    }>(bigNamedQuery)
   }
 
   async getBlock(blockNumber: number): Promise<SubstrateBlock> {
@@ -176,13 +170,9 @@ export class GraphQLSource implements IProcessorSource {
 
   private async request<T, K>(
     query: string,
-    revive: Partial<
-      {
-        [P in keyof K]: K[P] extends number | BigInt
-          ? 'BigInt' | 'Number'
-          : never
-      }
-    >
+    revive: Partial<{
+      [P in keyof K]: K[P] extends number | BigInt ? 'BigInt' | 'Number' : never
+    }>
   ): Promise<T> {
     const raw = await this.graphClient.request<T>(query)
     return JSON.parse(JSON.stringify(raw), (k, v) => {

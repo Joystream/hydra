@@ -8,23 +8,23 @@ import { getConfig as conf } from '../start/config'
 describe('EventQueue', () => {
   it('should properly set the initial filter', () => {
     const eventQueue: BlockQueue = new BlockQueue()
-    eventQueue.stateKeeper = ({
+    eventQueue.stateKeeper = {
       getState: () => {
         return {
           lastScannedBlock: 1000,
           lastProcessedEvent: formatEventId(0, 5),
         } as IProcessorState
       },
-    } as unknown) as IStateKeeper
+    } as unknown as IStateKeeper
 
-    eventQueue.indexerStatus = ({ head: 10000 } as unknown) as IndexerStatus
-    eventQueue.mappingFilter = ({
+    eventQueue.indexerStatus = { head: 10000 } as unknown as IndexerStatus
+    eventQueue.mappingFilter = {
       events: [],
       extrinsics: [],
       range: {
         to: 150000,
       },
-    } as unknown) as MappingFilter
+    } as unknown as MappingFilter
 
     const initFilter = eventQueue.getInitialRange()
 
@@ -41,20 +41,20 @@ describe('EventQueue', () => {
   it('should update the next block range', () => {
     const eventQueue: BlockQueue = new BlockQueue()
 
-    eventQueue.rangeFilter = ({
+    eventQueue.rangeFilter = {
       block: {
         gt: 0,
         lte: 100000,
       },
-    } as unknown) as RangeFilter
+    } as unknown as RangeFilter
 
-    eventQueue.mappingFilter = ({
+    eventQueue.mappingFilter = {
       range: {
         to: 150000,
       },
-    } as unknown) as MappingFilter
+    } as unknown as MappingFilter
 
-    eventQueue.indexerStatus = ({ head: 500000 } as unknown) as IndexerStatus
+    eventQueue.indexerStatus = { head: 500000 } as unknown as IndexerStatus
 
     const next = eventQueue.nextBlockRange(eventQueue.rangeFilter.block)
     expect(next.gt).equals(100000, 'should update the lower block limit')

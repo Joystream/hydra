@@ -26,8 +26,10 @@ export const EVENT_TABLE_NAME = 'substrate_event'
 @Entity({
   name: EVENT_TABLE_NAME,
 })
-export class SubstrateEventEntity extends AbstractWarthogModel
-  implements SubstrateEvent {
+export class SubstrateEventEntity
+  extends AbstractWarthogModel
+  implements SubstrateEvent
+{
   @PrimaryColumn()
   id!: string
 

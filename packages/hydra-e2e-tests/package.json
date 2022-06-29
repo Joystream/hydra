@@ -6,7 +6,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint . --cache --ext .ts --config .eslintrc.js",
+    "lint": "eslint . --ext .ts --config .eslintrc.js",
     "build": "tsc --build tsconfig.json",
     "docker:build": "docker build ./schema -t hydra:${CLITAG:-latest} --no-cache",
     "db:migrate": "bash ./scripts/db.sh --db-name indexer-db --db-host db up  && bash ./scripts/db.sh --db-name processor-db --db-host db up",
@@ -22,8 +22,8 @@
     "e2e-test": "bash run-tests.sh"
   },
   "dependencies": {
-    "@polkadot/api": "5.9.1",
-    "@polkadot/keyring": "7.9.2",
+    "@polkadot/api": "8.9.1",
+    "@polkadot/keyring": "9.5.1",
     "fetch": "^1.1.0",
     "graphql-request": "^3.3.0",
     "graphql-subscriptions-client": "^0.16.0",
@@ -39,7 +39,7 @@
     "eslint": "^7.11.0",
     "mocha": "^8.1.3",
     "nyc": "^15.1.0",
-    "prettier": "^2.1.2",
+    "prettier": "^2.7.1",
     "ts-node": "^10.2.1",
     "typescript": "4.4.2"
   }

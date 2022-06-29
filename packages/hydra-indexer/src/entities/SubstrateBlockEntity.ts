@@ -15,8 +15,10 @@ import { AbstractWarthogModel } from './AbstractWarthogModel'
 @Entity({
   name: 'substrate_block',
 })
-export class SubstrateBlockEntity extends AbstractWarthogModel
-  implements SubstrateBlock {
+export class SubstrateBlockEntity
+  extends AbstractWarthogModel
+  implements SubstrateBlock
+{
   @PrimaryColumn()
   id!: string
 
