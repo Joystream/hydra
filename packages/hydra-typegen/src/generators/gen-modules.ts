@@ -1,14 +1,20 @@
-import { ModuleMeta } from '../metadata'
+import { ExtractedModuleMeta } from '../metadata'
 import { formatWithPrettier, readTemplate, writeFile } from '../util'
 import path from 'path'
 import { buildModuleImports } from './imports'
 import { GeneratorConfig } from '.'
 import { handlebars } from './helpers'
 import { kebabCase } from 'lodash'
+import { ImportsDef } from './types'
 
 const debug = require('debug')('hydra-typegen:gen-modules')
 
 const generateModuleTemplate = handlebars.compile(readTemplate('module'))
+
+type ModuleTemplateProps = {
+  validateArgs: boolean
+  imports: ImportsDef
+} & ExtractedModuleMeta
 
 export function generateModuleTypes(config: GeneratorConfig): void {
   const { modules, dest } = config
@@ -23,9 +29,9 @@ export function generateModuleTypes(config: GeneratorConfig): void {
 }
 
 export function buildModuleProps(
-  meta: ModuleMeta,
+  meta: ExtractedModuleMeta,
   config: GeneratorConfig
-): unknown {
+): ModuleTemplateProps {
   const { validateArgs } = config
   const imports = buildModuleImports(meta, config)
 

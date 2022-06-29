@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@joystream/hydra-common": "{{{hydraCommonVersion}}}",
-    "@polkadot/types": "5.9.1",
+    "@polkadot/types": "8.9.1",
     "@joystream/warthog": "{{{hydraWarthogVersion}}}"
   },
   "devDependencies": {

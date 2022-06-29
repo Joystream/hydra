@@ -12,10 +12,6 @@ const options = {
         source: 'string',
         'blockHash?': 'string',
       },
-      'customTypes?': {
-        lib: 'string',
-        typedefsLoc: 'string',
-      },
       'events?': ['string'],
       'calls?': ['string'],
       outDir: 'string',

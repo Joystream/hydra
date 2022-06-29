@@ -1,8 +1,6 @@
 import { ImportsRegistry } from './types'
-import { CustomTypes } from '../commands/typegen'
 import { warn } from '../log'
 import { builtInClasses, builtInInterfaceDefs } from '../metadata/default-types'
-import { registerCustomTypes } from '../metadata'
 
 const debug = require('debug')('hydra-typegen:imports-registry')
 
@@ -29,9 +27,7 @@ const METADATA = ['Metadata']
 const LOCAL = ['typeRegistry']
 const HYDRA_COMMON = ['substrate']
 
-export function buildImportsRegistry(
-  customTypes: CustomTypes | undefined
-): ImportsRegistry {
+export function buildImportsRegistry(): ImportsRegistry {
   const importsRegistry = {}
   // add primitive classes
   const typeClasses = builtInClasses.filter((name) => !NO_CODEC.includes(name))
@@ -63,10 +59,6 @@ export function buildImportsRegistry(
   }
 
   addPolkadotInterfaces(importsRegistry)
-  // this goes last so that it overrides all previous definitions
-  if (customTypes) {
-    addCustomTypes(importsRegistry, customTypes)
-  }
 
   return importsRegistry
 }
@@ -81,23 +73,5 @@ function addPolkadotInterfaces(importsRegistry: ImportsRegistry) {
       }
       importsRegistry[type] = KNOWN_LOCATIONS.interfaces
     })
-  })
-}
-
-function addCustomTypes(
-  importsRegistry: ImportsRegistry,
-  customTypes: CustomTypes
-) {
-  const { lib, typedefsLoc } = customTypes
-
-  const defs = registerCustomTypes(typedefsLoc)
-
-  Object.keys(defs).forEach((type) => {
-    if (importsRegistry[type]) {
-      warn(
-        `Overwriting duplicated type '${type}' ${importsRegistry[type]} -> ${lib}`
-      )
-    }
-    importsRegistry[type] = lib
   })
 }

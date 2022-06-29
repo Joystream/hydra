@@ -1,20 +1,19 @@
 import { GeneratorConfig, ImportsDef } from './types'
-import { ModuleMeta } from '../metadata'
+import { ExtractedModuleMeta } from '../metadata'
 
 export function buildModuleImports(
-  { types }: ModuleMeta,
+  { types }: ExtractedModuleMeta,
   { importsRegistry }: GeneratorConfig
 ): ImportsDef {
   const importsDef: ImportsDef = {}
 
   types.forEach((i) => {
-    if (importsRegistry[i] === undefined) {
-      throw new Error(`Cannot resolve import for type ${i}`)
+    const importLoc = importsRegistry[i] || '@polkadot/types/lookup'
+
+    if (!importsDef[importLoc]) {
+      importsDef[importLoc] = {}
     }
-    if (!importsDef[importsRegistry[i]]) {
-      importsDef[importsRegistry[i]] = {}
-    }
-    importsDef[importsRegistry[i]][i] = true
+    importsDef[importLoc][i] = true
   })
 
   return importsDef

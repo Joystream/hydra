@@ -10,20 +10,18 @@ const generateIndexTemplate = handlebars.compile(readTemplate('index'))
 
 export function generateIndex({
   modules,
-  customTypes,
+  originalMetadata,
   dest,
 }: GeneratorConfig): void {
-  if (customTypes) {
-    const typedefsPath = path.resolve(customTypes.typedefsLoc)
-    fs.copyFileSync(typedefsPath, path.join(dest, `typedefs.json`))
-  }
+  fs.writeFileSync(
+    path.join(dest, `metadata.json`),
+    JSON.stringify(originalMetadata.toHex())
+  )
 
   writeFile(path.join(dest, `index.ts`), () =>
     formatWithPrettier(
       generateIndexTemplate({
         modules: modules.map((m) => m.module),
-        hasTypeDefs:
-          customTypes !== undefined && customTypes.typedefsLoc !== undefined,
       })
     )
   )
