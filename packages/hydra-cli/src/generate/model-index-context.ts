@@ -5,36 +5,36 @@ import { withNames } from './utils'
 
 const debug = Debug('qnode-cli:model-index-context')
 
-export function withModelNames(
-  model: WarthogModel
-): { modelClasses: GeneratorContext[] } {
+export function withModelNames(model: WarthogModel): {
+  modelClasses: GeneratorContext[]
+} {
   const entities = [...model.interfaces, ...model.entities]
   return {
     modelClasses: entities.map((e) => withNames(e)),
   }
 }
 
-export function withEnumNames(
-  model: WarthogModel
-): { enums: GeneratorContext[] } {
+export function withEnumNames(model: WarthogModel): {
+  enums: GeneratorContext[]
+} {
   return { enums: model.enums.map((en) => withNames(en)) }
 }
 
-export function withUnionNames(
-  model: WarthogModel
-): { unions: GeneratorContext[] } {
+export function withUnionNames(model: WarthogModel): {
+  unions: GeneratorContext[]
+} {
   return { unions: model.unions.map((u) => withNames(u)) }
 }
 
-export function withVariantNames(
-  model: WarthogModel
-): { variants: GeneratorContext[] } {
+export function withVariantNames(model: WarthogModel): {
+  variants: GeneratorContext[]
+} {
   return { variants: model.variants.map((v: ObjectType) => withNames(v)) }
 }
 
-export function withJsonFieldNames(
-  model: WarthogModel
-): { jsonFields: GeneratorContext[] } {
+export function withJsonFieldNames(model: WarthogModel): {
+  jsonFields: GeneratorContext[]
+} {
   return { jsonFields: model.jsonFields.map((j) => withNames(j)) }
 }
 
