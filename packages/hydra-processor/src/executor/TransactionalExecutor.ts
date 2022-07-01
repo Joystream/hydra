@@ -12,7 +12,7 @@ import {
 } from '@joystream/hydra-common'
 import { TxAwareBlockContext } from './tx-aware'
 import { ObjectType } from 'typedi'
-import AsyncLock from 'async-lock'
+import { generateNextId } from './EntityIdGenerator'
 
 const debug = Debug('hydra-processor:mappings-executor')
 
@@ -86,91 +86,6 @@ export class TransactionalExecutor implements IMappingExecutor {
   }
 }
 
-export class EntityIdGenerator {
-  private entityClass: ObjectType<{ id: string }>
-  private nextEntityIdPromise: Promise<string> | undefined
-  private lastKnownEntityId: string | undefined
-  private static lock = new AsyncLock({ maxPending: 10000 })
-  // each id is 8 chars out of 36-size alphabet, giving us 2821109907456 possible ids (per entity type)
-  public static alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
-
-  public static idSize = 8
-
-  public static firstEntityId = Array.from(
-    { length: EntityIdGenerator.idSize },
-    () => EntityIdGenerator.alphabet[0]
-  ).join('')
-
-  constructor(entityClass: ObjectType<{ id: string }>) {
-    this.entityClass = entityClass
-  }
-
-  public static entityIdAfter(id?: string): string {
-    if (id === undefined) {
-      return EntityIdGenerator.firstEntityId
-    }
-
-    const { alphabet, idSize } = EntityIdGenerator
-    let targetIdIndexToChange = idSize - 1
-    while (
-      targetIdIndexToChange >= 0 &&
-      id[targetIdIndexToChange] === alphabet[alphabet.length - 1]
-    ) {
-      --targetIdIndexToChange
-    }
-
-    if (targetIdIndexToChange < 0) {
-      throw new Error(`EntityIdGenerator: Cannot get entity id after: ${id}!`)
-    }
-
-    const nextEntityIdChars = [...id]
-    const nextAlphabetCharIndex =
-      alphabet.indexOf(id[targetIdIndexToChange]) + 1
-    nextEntityIdChars[targetIdIndexToChange] = alphabet[nextAlphabetCharIndex]
-    for (let i = idSize - 1; i > targetIdIndexToChange; --i) {
-      nextEntityIdChars[i] = alphabet[0]
-    }
-
-    return nextEntityIdChars.join('')
-  }
-
-  private async queryLastEntityId(
-    em: EntityManager
-  ): Promise<string | undefined> {
-    const lastEntity = await em.findOne(this.entityClass, {
-      where: {}, // required by typeorm '0.3.5'
-      order: { id: 'DESC' },
-    })
-
-    return lastEntity?.id
-  }
-
-  private async getLastKnownEntityId(
-    em: EntityManager
-  ): Promise<string | undefined> {
-    if (this.lastKnownEntityId === undefined) {
-      this.lastKnownEntityId = await this.queryLastEntityId(em)
-    }
-    return this.lastKnownEntityId
-  }
-
-  private async generateNextEntityId(em: EntityManager): Promise<string> {
-    const lastKnownId = await this.getLastKnownEntityId(em)
-    const nextEntityId = EntityIdGenerator.entityIdAfter(lastKnownId)
-    this.lastKnownEntityId = nextEntityId
-
-    return this.lastKnownEntityId
-  }
-
-  public async getNextEntityId(em: EntityManager): Promise<string> {
-    return EntityIdGenerator.lock.acquire(this.entityClass.name, () =>
-      this.generateNextEntityId(em)
-    )
-  }
-}
-
-const entityIdGenerators = new Map<string, EntityIdGenerator>()
-
 /**
  * Create database manager.
  * @param entityManager EntityManager
@@ -243,19 +158,8 @@ async function fillRequiredWarthogFields<T extends Record<string, unknown>>(
       constructor: ObjectType<{ id: string }>
     }).constructor
 
-    if (!entityIdGenerators.has(entityClass.name)) {
-      entityIdGenerators.set(
-        entityClass.name,
-        new EntityIdGenerator(entityClass)
-      )
-    }
-
-    const idGenerator = entityIdGenerators.get(
-      entityClass.name
-    ) as EntityIdGenerator
-
     Object.assign(entity, {
-      id: await idGenerator.getNextEntityId(entityManager),
+      id: await generateNextId(entityManager, entityClass),
     })
   }
   // eslint-disable-next-line no-prototype-builtins
