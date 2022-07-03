@@ -12,7 +12,7 @@ export class EntityIdGenerator {
 
   public static idSize = 8
 
-  public static firstEntityId = Array.from(
+  public static zeroEntityId = Array.from(
     { length: EntityIdGenerator.idSize },
     () => EntityIdGenerator.alphabet[0]
   ).join('')
@@ -62,7 +62,7 @@ export class EntityIdGenerator {
     if (!this.entityRecord) {
       this.entityRecord = new DeterministicIdEntity()
       this.entityRecord.className = this.entityClass.name
-      this.entityRecord.highestId = EntityIdGenerator.firstEntityId
+      this.entityRecord.highestId = EntityIdGenerator.zeroEntityId
     }
 
     return this.entityRecord
