@@ -1,6 +1,6 @@
 {
   "name": "@joystream/hydra-typegen",
-  "version": "3.1.0-alpha.27",
+  "version": "4.0.0-alpha.0",
   "description": "\"Hydra-cli pluging for generating typed events\"",
   "main": "lib/index.js",
   "repository": "https://github.com/Joystream/hydra",
@@ -24,7 +24,7 @@
     "build": "yarn clean && yarn tsc && yarn copy-templates",
     "run-dev": "node ./bin/run",
     "postpack": "rm -f oclif.manifest.json",
-    "lint": "eslint . --cache --ext .ts",
+    "lint": "eslint . --ext .ts",
     "prepack": "yarn build && oclif-dev manifest",
     "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
   },
@@ -41,7 +41,7 @@
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.3.3",
-    "@polkadot/api": "5.9.1",
+    "@polkadot/api": "8.9.1",
     "debug": "^4.3.1",
     "figlet": "^1.5.2",
     "handlebars": "^4.7.6",

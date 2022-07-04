@@ -82,12 +82,8 @@ describe('end-to-end transfer tests', () => {
   })
 
   it('fetch datetime field from transfer', async () => {
-    const {
-      insertedAt,
-      createdAt,
-      updatedAt,
-      timestamp,
-    } = await fetchDateTimeFieldFromTransfer()
+    const { insertedAt, createdAt, updatedAt, timestamp } =
+      await fetchDateTimeFieldFromTransfer()
     const ts = Number.parseInt(timestamp)
 
     console.log(`Timestamp: ${timestamp}, ts: ${ts}`)

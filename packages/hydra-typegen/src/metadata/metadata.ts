@@ -1,11 +1,8 @@
-import { MetadataLatest } from '@polkadot/types/interfaces'
 import { Metadata } from '@polkadot/types'
 import { TypeRegistry } from '@polkadot/types/create'
 import { WebSocket } from '@polkadot/x-ws'
 import BN from 'bn.js'
 import path from 'path'
-import { TypeDefs } from './types'
-import { readJson } from '../util'
 
 const debug = require('debug')('hydra-typegen:metadata')
 
@@ -26,7 +23,7 @@ interface ChainSpec {
 export async function getMetadata({
   source,
   blockHash,
-}: MetadataSource): Promise<MetadataLatest> {
+}: MetadataSource): Promise<Metadata> {
   let metaHex: string | undefined
   debug(`Reading metadata: from ${source}`)
 
@@ -37,28 +34,12 @@ export async function getMetadata({
     metaHex = require(path.join(process.cwd(), source)).result as string
   }
 
-  const meta = new Metadata(registry, metaHex)
+  const meta = new Metadata(registry, metaHex as `0x${string}`)
 
   registry.setMetadata(meta)
 
-  return meta.asLatest
+  return meta
 }
-
-export function registerCustomTypes(typeDefs: string): TypeDefs {
-  const typeDefsJson = readJson(typeDefs) as TypeDefs
-  registry.register(typeDefsJson)
-  debug(`Registered ${Object.keys(typeDefsJson).join(',')}`)
-  return typeDefsJson
-}
-
-// export function registerTypes(custom: CustomTypes = {}, spec?: ChainSpec) {
-//   registry.setKnownTypes({ types: custom })
-//   if (spec) {
-//     registry.register(
-//       getSpecTypes(registry, spec.chain, spec.name, spec.version)
-//     )
-//   }
-// }
 
 async function fromChain(
   endpoint: string,

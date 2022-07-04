@@ -154,9 +154,11 @@ async function fillRequiredWarthogFields<T extends Record<string, unknown>>(
 
   // eslint-disable-next-line no-prototype-builtins
   if (!entity.hasOwnProperty('id')) {
-    const entityClass = ((entity as unknown) as {
-      constructor: ObjectType<{ id: string }>
-    }).constructor
+    const entityClass = (
+      entity as unknown as {
+        constructor: ObjectType<{ id: string }>
+      }
+    ).constructor
 
     Object.assign(entity, {
       id: await generateNextId(entityManager, entityClass),

@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import Debug from 'debug'
 
-import { MetadataSource, registerCustomTypes } from '../../metadata/metadata'
+import { getMetadata, MetadataSource } from '../../metadata/metadata'
 import { extractMeta } from '../../metadata'
 import {
   generateModuleTypes,
@@ -14,16 +14,10 @@ import {
 import { parseConfigFile } from '../../config/parse-yaml'
 import { validate } from '../../config/validate'
 
-export type CustomTypes = {
-  lib: string // package with types. All custom types will be imported from there
-  typedefsLoc: string // path to type definitions
-}
-
 export interface IConfig {
   metadata: MetadataSource
   events: string[]
   calls: string[]
-  customTypes?: CustomTypes
   outDir: string
   strict?: boolean
 }
@@ -33,8 +27,6 @@ export type Flags = {
   calls: string | undefined
   metadata: string
   blockHash: string | undefined
-  typedefs: string | undefined
-  typelib: string | undefined
   outDir: string
   strict: boolean
   debug: boolean
@@ -73,15 +65,6 @@ Otherwise a relative path to a json file matching the RPC call response is expec
       char: 'h',
       description:
         'Hash of the block from which the metadata will be fetched. Only applied if metadata is pulled via an RPC call',
-    }),
-    typedefs: flags.string({
-      char: 't',
-      description:
-        'A relative path to a file with JSON definitions for custom types used by the chain',
-    }),
-    typelib: flags.string({
-      char: 'i',
-      description: `A JavaScript module from which the custom types should be imported, e.g. '@joystream/types/augment'`,
     }),
     outDir: flags.string({
       char: 'o',
@@ -124,19 +107,6 @@ types don't much the metadata definiton`,
   }
 
   parseFlags(flags: Flags): IConfig {
-    let customTypes: CustomTypes | undefined
-    if (flags.typedefs) {
-      if (flags.typelib === undefined) {
-        throw new Error(
-          `Please specify the library with type definitions with --typelib`
-        )
-      }
-      customTypes = {
-        lib: flags.typelib,
-        typedefsLoc: path.resolve(flags.typedefs),
-      }
-    }
-
     const events: string[] = flags.events
       ? flags.events.split(',').map((e) => e.trim())
       : []
@@ -153,25 +123,21 @@ types don't much the metadata definiton`,
         blockHash: flags.blockHash,
       },
       strict: flags.strict,
-      customTypes,
     } as IConfig
   }
 
   async buildGeneratorConfig(config: IConfig): Promise<GeneratorConfig> {
-    const { outDir, customTypes } = config
+    const { outDir } = config
 
-    if (customTypes) {
-      registerCustomTypes(customTypes.typedefsLoc)
-    }
-
-    const modules = await extractMeta(config)
+    const originalMetadata = await getMetadata(config.metadata)
+    const modules = await extractMeta(config, originalMetadata)
 
     return {
-      customTypes,
-      importsRegistry: buildImportsRegistry(customTypes),
+      importsRegistry: buildImportsRegistry(),
       modules,
       validateArgs: config.strict || false, // do not enforce validation by default
       dest: path.resolve(outDir),
+      originalMetadata,
     }
   }
 

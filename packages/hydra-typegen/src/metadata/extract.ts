@@ -1,51 +1,44 @@
 import { IConfig } from '../commands/typegen'
-import { getMetadata, registry } from './metadata'
-import { uniq, compact } from 'lodash'
-import { Vec } from '@polkadot/types/codec'
-import { Text } from '@polkadot/types/primitive'
-import {
-  ExtractedMetadata,
-  Module,
-  ModuleMeta,
-  Event,
-  Call,
-  weakEquals,
-} from './types'
+import { getMetadata } from './metadata'
+import { uniq } from 'lodash'
+import { ExtractedModuleMeta, weakEquals, ExtractedVaraintData } from './types'
 import { pushToDictionary } from '../util'
-import { builtInClasses } from './default-types'
+import {
+  MetadataLatest,
+  PalletMetadataLatest,
+} from '@polkadot/types/interfaces/metadata'
+import { Si1Variant } from '@polkadot/types/interfaces/scaleInfo'
+import { Metadata } from '@polkadot/types'
+import { TypeDef } from '@polkadot/types/types'
 
 const debug = require('debug')('hydra-typegen:extract')
 
-export async function extractMeta({
-  metadata: metadataSource,
-  events,
-  calls,
-}: IConfig): Promise<ModuleMeta[]> {
-  const modules: Record<string, Module> = {}
-  const moduleEvents: Record<string, Event[]> = {}
-  const moduleCalls: Record<string, Call[]> = {}
+export async function extractMeta(
+  { metadata: metadataSource, events, calls }: IConfig,
+  originalMetadata?: Metadata
+): Promise<ExtractedModuleMeta[]> {
+  const modules: Record<string, PalletMetadataLatest> = {}
+  const moduleEvents: Record<string, ExtractedVaraintData[]> = {}
+  const moduleCalls: Record<string, ExtractedVaraintData[]> = {}
   const moduleTypes: Record<string, string[]> = {}
 
-  const metadata = await getMetadata(metadataSource)
+  const metadata = (originalMetadata || (await getMetadata(metadataSource)))
+    .asLatest
 
   for (const e of events) {
-    const [module, event] = findEvent(metadata, e)
+    const [module, event, types] = extractEvent(metadata, e)
     const name = module.name.toString()
     modules[name] = module
     pushToDictionary(moduleEvents, name, event)
-    pushToDictionary(moduleTypes, name, ...stripTypes(event.args))
+    pushToDictionary(moduleTypes, name, ...types)
   }
 
   for (const c of calls) {
-    const [module, call] = findCall(metadata, c)
+    const [module, call, types] = extractCall(metadata, c)
     const name = module.name.toString()
     modules[name] = module
     pushToDictionary(moduleCalls, name, call)
-    pushToDictionary(
-      moduleTypes,
-      name,
-      ...stripTypes(call.args.map((a) => a.type.toString()))
-    )
+    pushToDictionary(moduleTypes, name, ...types)
   }
 
   return Object.keys(modules).map((name) => ({
@@ -56,78 +49,136 @@ export async function extractMeta({
   }))
 }
 
-function findCall(
-  metadata: ExtractedMetadata,
+function extractCall(
+  meta: MetadataLatest,
   callName: string
-): [Module, Call] {
+): [PalletMetadataLatest, ExtractedVaraintData, string[]] {
   const [moduleName, method] = callName.split('.')
 
-  const module = metadata.modules.find((v) => weakEquals(v.name, moduleName))
+  const module = meta.pallets.find((v) => weakEquals(v.name, moduleName))
 
   if (module === undefined || module.calls === undefined) {
     throw new Error(`No metadata found for module ${moduleName}`)
   }
 
-  const call = module.calls
-    .unwrapOr<Call[]>([])
-    .find((c) => weakEquals(c.name, method))
+  let callVariant: Si1Variant | undefined
+  if (module.calls.isSome) {
+    const lookupId = module.calls.unwrap().type
+    const callsType = meta.lookup.getSiType(lookupId)
+    callVariant = callsType.def.asVariant.variants.find(
+      (v) => v.name.toString() === method
+    )
+  }
 
-  if (call === undefined) {
+  if (callVariant === undefined) {
     throw new Error(`No metadata found for the call ${callName}`)
   }
 
-  validateTypes(call.args.map((arg) => arg.type))
-
-  return [module, call]
+  return [
+    module,
+    extractDataFromVariant(meta, callVariant),
+    extractTypesFromVariant(meta, callVariant),
+  ]
 }
 
-function findEvent(
-  metadata: ExtractedMetadata,
+function extractEvent(
+  meta: MetadataLatest,
   eventName: string
-): [Module, Event] {
+): [PalletMetadataLatest, ExtractedVaraintData, string[]] {
   const [moduleName, method] = eventName.split('.')
 
-  const module = metadata.modules.find((v) => weakEquals(v.name, moduleName))
+  const module = meta.pallets.find((v) => weakEquals(v.name, moduleName))
 
   if (module === undefined || module.events === undefined) {
     throw new Error(`No metadata found for module ${moduleName}`)
   }
 
-  const event = module.events
-    .unwrapOr<Event[]>([])
-    .find((e) => weakEquals(e.name, method))
+  let eventVaraint: Si1Variant | undefined
+  if (module.events.isSome) {
+    const lookupId = module.events.unwrap().type
+    const eventsType = meta.lookup.getSiType(lookupId)
+    eventVaraint = eventsType.def.asVariant.variants.find(
+      (v) => v.name.toString() === method
+    )
+  }
 
-  if (event === undefined) {
+  if (eventVaraint === undefined) {
     throw new Error(`No metadata found for the event ${eventName}`)
   }
 
-  validateTypes(event.args)
-
-  return [module, event]
+  return [
+    module,
+    extractDataFromVariant(meta, eventVaraint),
+    extractTypesFromVariant(meta, eventVaraint),
+  ]
 }
 
-function validateTypes(argTypes: string[] | Text[] | Vec<Text>) {
-  const stripped = stripTypes(argTypes)
-  for (const t of stripped) {
-    if (!builtInClasses.includes(t) && !registry.hasType(t)) {
-      throw new Error(
-        `Cannot find a type defintion for ${t}. Make sure it is included in the type definition file`
-      )
+export function extractDataFromVariant(
+  meta: MetadataLatest,
+  varaint: Si1Variant
+): ExtractedVaraintData {
+  const params = varaint.fields.map(({ type: lookupId, name }) => {
+    const t = meta.lookup.getTypeDef(lookupId)
+    return {
+      type: t.lookupName || t.type,
+      name: name.unwrapOr(undefined)?.toString(),
     }
+  })
+  return {
+    params,
+    documentation: varaint.docs.map((t) => t.toString()),
+    name: varaint.name.toString(),
   }
-  debug(`Validated types: ${stripTypes(argTypes).join(',')}`)
 }
 
 /**
- * Reduce all argument types to single types, e.g. Compact<Balance> to [Compact, Balance]
- *
- * @param e event
+ * Extract all types from Si1Varaint (event / call).
+ * Compound types like `Vec<u64>` will also be separated into atomic types (['Vec', 'u64'])
  */
-export function stripTypes(argTypes: string[] | Text[] | Vec<Text>): string[] {
-  const types: string[] = []
-  argTypes.forEach((a: string | Text) => {
-    const type = a.toString().trim()
-    types.push(...type.split(/[<>&|,()]/).map((t) => t.trim()))
-  })
-  return compact(uniq(types))
+export function extractTypesFromVariant(
+  meta: MetadataLatest,
+  varaint: Si1Variant
+): string[] {
+  let types: string[] = []
+  const typeDefs = varaint.fields.map(({ type }) =>
+    meta.lookup.getTypeDef(type)
+  )
+  typeDefs.forEach((t) => (types = types.concat(extractTypeDef(meta, t))))
+  return uniq(types)
+}
+
+/**
+ * Extract all types from TypeDef (which is possibly a compound type).
+ * This extracts types like `Vec<u64>` into (['Vec', 'u64']) etc.
+ */
+export function extractTypeDef(meta: MetadataLatest, type: TypeDef): string[] {
+  let types: string[] = []
+  if (type.lookupName) {
+    types.push(type.lookupName)
+  } else {
+    const parentType = extractParentType(type.type)
+    if (parentType) {
+      types.push(parentType)
+    }
+    if (Array.isArray(type.sub)) {
+      type.sub.forEach((s) => (types = types.concat(extractTypeDef(meta, s))))
+    } else if (type.sub) {
+      types = types.concat(extractTypeDef(meta, type.sub))
+    }
+  }
+
+  types = uniq(types)
+  debug('Type:', type)
+  debug('Was extracted into:', types)
+
+  return types
+}
+
+/**
+ * Converts type names like: 'Vec<u8>', 'BTreeMap<u8, u32>' etc. to 'Vec', 'BTreeMap'...
+ */
+export function extractParentType(typeName: string): string {
+  return typeName.startsWith('(')
+    ? 'Codec' // for Tuples we just need to import 'Codec'
+    : typeName.replace(/[<[].+[>\])]/, '')
 }

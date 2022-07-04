@@ -58,11 +58,9 @@ export interface ArrayFilter<T extends readonly unknown[]> {
   none: ArrayFilterValue<T>
 }
 
-export type ObjectFilter<T> = Partial<
-  {
-    [P in keyof T]: Partial<TypedFilter<T[P]>>
-  }
->
+export type ObjectFilter<T> = Partial<{
+  [P in keyof T]: Partial<TypedFilter<T[P]>>
+}>
 
 export interface QueryFilter<T> {
   where: ObjectFilter<T>
@@ -74,19 +72,16 @@ export interface QueryFilter<T> {
 }
 
 // extract T from type of Array<T>
-export type ArrayElement<
-  ArrayType extends readonly unknown[]
-> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never
 
 export type QueryField<T> =
   | keyof T
-  | Partial<
-      {
-        [P in keyof T]: QueryFields<
-          T[P] extends readonly unknown[] ? ArrayElement<T[P]> : T[P]
-        >
-      }
-    >
+  | Partial<{
+      [P in keyof T]: QueryFields<
+        T[P] extends readonly unknown[] ? ArrayElement<T[P]> : T[P]
+      >
+    }>
 
 export type AsJson<T> = T extends
   | string
@@ -124,17 +119,13 @@ export interface GraphQLQuery<T> {
 }
 
 export interface IProcessorSource {
-  nextBatch<T>(
-    queries: {
-      [K in keyof T]: IndexerQuery
-    }
-  ): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }>
+  nextBatch<T>(queries: {
+    [K in keyof T]: IndexerQuery
+  }): Promise<{ [K in keyof typeof queries]: SubstrateEvent[] }>
 
-  executeQueries<T>(
-    queries: {
-      [K in keyof T]: GraphQLQuery<T[K]>
-    }
-  ): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>
+  executeQueries<T>(queries: {
+    [K in keyof T]: GraphQLQuery<T[K]>
+  }): Promise<{ [K in keyof T]: (T[K] & AsJson<T[K]>)[] }>
 
   getIndexerStatus(): Promise<IndexerStatus>
 

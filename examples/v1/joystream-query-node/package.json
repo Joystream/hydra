@@ -32,7 +32,7 @@
   "license": "ISC",
   "dependencies": {
     "@joystream/types": "^0.14.0",
-    "@types/bn.js": "^4.11.6",
+    "@types/bn.js": "^5.1.0",
     "assert": "^2.0.0",
     "bn.js": "^5.1.2",
     "tslib": "^2.0.0"

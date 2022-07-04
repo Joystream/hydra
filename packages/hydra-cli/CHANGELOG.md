@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.0.0-alpha.0 (2022-06-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* customTypes and metadata < v14 are no longer supported, @polkadot/api was updated from 5.9.1 =>
+8.9.1
+
+* Updated @polkadot/* dependencies, support for metadata v14 (#497) ([e44f674](https://github.com/Joystream/hydra/commit/e44f6747c7226b30e73e6d4cdbc489bc0dd29ba3)), closes [#497](https://github.com/Joystream/hydra/issues/497) [#495](https://github.com/Joystream/hydra/issues/495)
+
+
+
 ## 3.1.0-alpha.27 (2022-05-26)
 
 **Note:** Version bump only for package @joystream/hydra-cli

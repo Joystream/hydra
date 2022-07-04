@@ -1,6 +1,8 @@
-export function parseEventId(
-  eventId: string
-): { blockHeight: number; eventId: number; hash?: string } {
+export function parseEventId(eventId: string): {
+  blockHeight: number
+  eventId: number
+  hash?: string
+} {
   const parts = eventId.split('-')
 
   if (parts.length < 2) {

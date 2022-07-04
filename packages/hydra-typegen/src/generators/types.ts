@@ -1,11 +1,11 @@
-import { ModuleMeta } from '../metadata'
-import { CustomTypes } from '../commands/typegen'
+import { ExtractedModuleMeta } from '../metadata'
+import { Metadata } from '@polkadot/types/metadata'
 
 export type GeneratorConfig = {
-  modules: ModuleMeta[]
+  modules: ExtractedModuleMeta[]
   importsRegistry: ImportsRegistry
+  originalMetadata: Metadata
   dest: string
-  customTypes?: CustomTypes
   validateArgs: boolean
 }
 
