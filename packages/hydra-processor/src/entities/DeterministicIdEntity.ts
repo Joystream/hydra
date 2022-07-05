@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, PrimaryColumn, Column } from 'typeorm'
 
 @Entity({
   name: 'deterministic_id',
 })
 export class DeterministicIdEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   className!: string
 
   @Column()

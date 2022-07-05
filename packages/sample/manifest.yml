@@ -2,7 +2,7 @@ version: '3.0'
 description: Sample manifest
 repository: https://github.com/
 ## reserved but unused fields
-hydraVersion: "3"
+hydraVersion: '4'
 dataSource:
   kind: substrate 
   chain: node-template

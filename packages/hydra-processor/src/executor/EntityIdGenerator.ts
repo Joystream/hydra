@@ -12,6 +12,7 @@ export class EntityIdGenerator {
 
   public static idSize = 8
 
+  // this id will actually never by used in db - use .entityIdAfter(zeroEntityId) to get first id
   public static zeroEntityId = Array.from(
     { length: EntityIdGenerator.idSize },
     () => EntityIdGenerator.alphabet[0]
