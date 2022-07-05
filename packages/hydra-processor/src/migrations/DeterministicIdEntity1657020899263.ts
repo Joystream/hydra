@@ -1,7 +1,6 @@
-import { MigrationInterface, QueryRunner } from "typeorm"
+import { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class DeterministicIdEntity1657020899263 implements MigrationInterface {
-
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `CREATE TABLE "deterministic_id" (
@@ -16,5 +15,4 @@ export class DeterministicIdEntity1657020899263 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP TABLE "deterministic_id"`)
   }
-
 }
