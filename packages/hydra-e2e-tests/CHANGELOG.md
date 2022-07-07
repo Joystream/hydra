@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.0.0-alpha.1 (2022-07-07)
+
+
+### Features
+
+* prettier and warthog dependencies update ([#499](https://github.com/Joystream/hydra/issues/499)) ([5ee1a6e](https://github.com/Joystream/hydra/commit/5ee1a6ea9752316239df56740bd1a06179692497))
+
+
+
 ## 4.0.0-alpha.0 (2022-06-29)
 
 
