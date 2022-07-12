@@ -1,6 +1,6 @@
 {
   "name": "@joystream/hydra-db-utils",
-  "version": "4.0.0-alpha.1",
+  "version": "4.0.0-alpha.2",
   "description": "Hydra Database tools",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -19,7 +19,7 @@
     "test": "nyc --extension .ts mocha --timeout 50000 --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },
   "dependencies": {
-    "@joystream/hydra-common": "^4.0.0-alpha.1",
+    "@joystream/hydra-common": "^4.0.0-alpha.2",
     "@types/ioredis": "^4.17.4",
     "bn.js": "^5.2.1",
     "ioredis": "^4.17.3",

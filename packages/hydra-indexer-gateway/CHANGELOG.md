@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.0.0-alpha.2 (2022-07-12)
+
+
+### Features
+
+* deterministic id generator - take deletions into account ([#498](https://github.com/Joystream/hydra/issues/498)) ([a626fb6](https://github.com/Joystream/hydra/commit/a626fb6d8389ee246efdbb3a48c84c55a4b118d4))
+
+
+
 ## 4.0.0-alpha.1 (2022-07-07)
 
 
