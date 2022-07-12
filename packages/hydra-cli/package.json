@@ -48,7 +48,7 @@
     "@inquirer/input": "^0.0.13-alpha.0",
     "@inquirer/password": "^0.0.12-alpha.0",
     "@inquirer/select": "^0.0.13-alpha.0",
-    "@joystream/warthog": "^2.41.7",
+    "@joystream/warthog": "^2.41.8",
     "@oclif/command": "^1.5.20",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.3.3",
@@ -80,7 +80,7 @@
     "lodash": "^4.17.20",
     "pg": "^8.3.2",
     "pg-listen": "^1.7.0",
-    "@joystream/warthog": "^2.41.7"
+    "@joystream/warthog": "^2.41.8"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1",

@@ -19,7 +19,7 @@ import {
   TRANSFER_IN_QUERY,
   VARIANT_FILTER_MISREABLE_ACCOUNTS,
 } from './api/graphql-queries'
-import { EntityIdGenerator } from '@joystream/hydra-processor/src/executor/TransactionalExecutor'
+import { EntityIdGenerator } from '@joystream/hydra-processor/src/executor/EntityIdGenerator'
 // You need to be connected to a development chain for this example to work.
 const ALICE = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
 const BOB = '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'
@@ -236,9 +236,9 @@ describe('end-to-end transfer tests', () => {
 
   it('should create transfer chunks with auto-generated ids', async () => {
     const chunks = await transferChunksByTransferId(
-      EntityIdGenerator.firstEntityId
+      EntityIdGenerator.entityIdAfter(EntityIdGenerator.zeroEntityId)
     )
-    let id: string | undefined
+    let id: string = EntityIdGenerator.zeroEntityId
     const expectedIds = Array.from(
       { length: 100 },
       () => (id = EntityIdGenerator.entityIdAfter(id))
