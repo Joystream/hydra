@@ -1171,10 +1171,10 @@
   resolved "https://registry.yarnpkg.com/@joystream/prettier-config/-/prettier-config-1.0.0.tgz#d87c6370244f39281d9052c619977ca60f6e21cd"
   integrity sha512-ZY2H1PH05Yhn22B7G8ilLyIT9LxQ9b/PyErkPx8OOW+znary5QgExMhgBl1Gmv3k9m/QX1qIxKHZveO4R2yfeA==
 
-"@joystream/warthog@^2.41.7":
-  version "2.41.7"
-  resolved "https://registry.yarnpkg.com/@joystream/warthog/-/warthog-2.41.7.tgz#fb28f158394b33b612defc8388430fff8230d5d5"
-  integrity sha512-43e32Opp3+uowWojIunSXCX3MX7t0hZSVJkLIShifavNj6QfhZjPwo0olXY+wzS0NJ05axPNf2tBI5p6wybICQ==
+"@joystream/warthog@^2.41.8":
+  version "2.41.8"
+  resolved "https://registry.yarnpkg.com/@joystream/warthog/-/warthog-2.41.8.tgz#c5a837ab59306c18da22bccede8bbbc8dd0e5a83"
+  integrity sha512-IWlEf0RZf8gvMZ+u6Rkwsq5q4CFrrSl1LOrSpdK38AprYqKQtiMcQ/OTFE+gSB+2bDz42RqHkc+a3U1/3a7Ehw==
   dependencies:
     "@apollographql/graphql-playground-react" "https://github.com/Joystream/graphql-playground/releases/download/graphql-playground-react%401.7.30/graphql-playground-react-v1.7.30.tgz"
     "@types/app-root-path" "^1.2.4"

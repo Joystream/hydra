@@ -43,7 +43,7 @@ export class SubstrateExtrinsic extends BaseModel {
   @StringField()
   section!: string
 
-  @JSONField()
+  @JSONField({ array: true })
   args!: ExtrinsicArg[]
 
   @StringField()
