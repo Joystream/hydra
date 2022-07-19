@@ -1,9 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  VersionColumn,
-} from 'typeorm'
+import { Column, VersionColumn } from 'typeorm'
 
 /**
  * Abstract class with Warthog fields. All Entities exposed as warthog model class
@@ -11,7 +6,7 @@ import {
  */
 export abstract class AbstractWarthogModel {
   // Warthog Fields
-  @CreateDateColumn()
+  @Column()
   createdAt!: Date
 
   @Column({
@@ -19,7 +14,7 @@ export abstract class AbstractWarthogModel {
   })
   createdById!: string
 
-  @UpdateDateColumn({ nullable: true })
+  @Column({ nullable: true })
   updatedAt?: Date
 
   @Column({
