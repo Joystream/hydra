@@ -175,7 +175,7 @@ async function fillRequiredWarthogFields<T extends Record<string, unknown>>(
 
   // set createdAt to the block timestamp if not set
   // eslint-disable-next-line no-prototype-builtins
-  if (entity.hasOwnProperty('createdAt') || entity.createdAt === undefined) {
+  if (!entity.hasOwnProperty('createdAt') || entity.createdAt === undefined) {
     Object.assign(entity, {
       createdAt: new Date(block.timestamp),
     })
