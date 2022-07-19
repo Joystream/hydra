@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.0.0-alpha.3 (2022-07-19)
+
+
+### Features
+
+* github actions dependencies version update ([#501](https://github.com/Joystream/hydra/issues/501)) ([6331b4a](https://github.com/Joystream/hydra/commit/6331b4a61c7954be1c99f14ea700e75f7fbe46bb))
+
+
+
 ## 4.0.0-alpha.2 (2022-07-12)
 
 
