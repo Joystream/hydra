@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.0.0-alpha.4 (2022-07-20)
+
+
+### Bug Fixes
+
+* `createdAt` & `updatedAt` fields timestamps inconsistency ([#502](https://github.com/Joystream/hydra/issues/502)) ([cbae090](https://github.com/Joystream/hydra/commit/cbae090e44935b3e0ec1a50a0a949486415413fa))
+
+
+
 ## 4.0.0-alpha.3 (2022-07-19)
 
 

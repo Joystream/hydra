@@ -1,7 +1,7 @@
 {
   "name": "sample-mappings",
   "private": true,
-  "version": "4.0.0-alpha.3",
+  "version": "4.0.0-alpha.4",
   "description": "Mappings for hydra-processor",
   "main": "lib/mappings/index.js",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "clean": "rimraf lib"
   },
   "dependencies": {
-    "@joystream/hydra-common": "^4.0.0-alpha.3",
+    "@joystream/hydra-common": "^4.0.0-alpha.4",
     "@polkadot/types": "8.9.1"
   },
   "devDependencies": {
