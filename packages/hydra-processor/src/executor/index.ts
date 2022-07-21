@@ -10,6 +10,7 @@ let mappingsLookup: MappingsLookupService
 export * from './IMappingExecutor'
 export * from './IMappingsLookup'
 export * from './tx-aware'
+export { generateNextId } from './EntityIdGenerator' // expose for external usage
 
 export async function getMappingExecutor(): Promise<IMappingExecutor> {
   if (!mappingExecutor) {

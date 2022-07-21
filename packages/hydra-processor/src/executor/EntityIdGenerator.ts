@@ -1,11 +1,11 @@
-import { EntityManager } from 'typeorm'
 import { ObjectType } from 'typedi'
 import AsyncLock from 'async-lock'
 import { DeterministicIdEntity } from '../entities'
+import { DatabaseManager } from '@joystream/hydra-common'
 
 export class EntityIdGenerator {
   private entityClass: ObjectType<{ id: string }>
-  private entityRecord: DeterministicIdEntity | null = null
+  private entityRecord: DeterministicIdEntity | undefined = undefined
   private static lock = new AsyncLock({ maxPending: 10000 })
   // each id is 8 chars out of 36-size alphabet, giving us 2821109907456 possible ids (per entity type)
   public static alphabet = '0123456789abcdefghijklmnopqrstuvwxyz'
@@ -48,14 +48,14 @@ export class EntityIdGenerator {
   }
 
   private async loadEntityRecord(
-    em: EntityManager
+    store: DatabaseManager
   ): Promise<DeterministicIdEntity> {
     if (this.entityRecord) {
       return this.entityRecord
     }
 
     // try load record from db
-    this.entityRecord = await em.findOne(DeterministicIdEntity, {
+    this.entityRecord = await store.get(DeterministicIdEntity, {
       where: { className: this.entityClass.name },
     })
 
@@ -69,24 +69,24 @@ export class EntityIdGenerator {
     return this.entityRecord
   }
 
-  private async generateNextEntityId(em: EntityManager): Promise<string> {
+  private async generateNextEntityId(store: DatabaseManager): Promise<string> {
     // ensure entity record
-    const entityRecord = await this.loadEntityRecord(em)
+    const entityRecord = await this.loadEntityRecord(store)
 
     // generate next id
     const nextEntityId = EntityIdGenerator.entityIdAfter(entityRecord.highestId)
 
     // save new id to db
     entityRecord.highestId = nextEntityId
-    await em.save(entityRecord)
+    await store.save(entityRecord)
 
     // return next id
     return nextEntityId
   }
 
-  public async getNextEntityId(em: EntityManager): Promise<string> {
+  public async getNextEntityId(store: DatabaseManager): Promise<string> {
     return EntityIdGenerator.lock.acquire(this.entityClass.name, () =>
-      this.generateNextEntityId(em)
+      this.generateNextEntityId(store)
     )
   }
 }
@@ -110,10 +110,10 @@ function ensureEntityIdGenerator(
   Generates next sequential id for the given entity class.
 */
 export async function generateNextId(
-  em: EntityManager,
+  store: DatabaseManager,
   entityClass: ObjectType<{ id: string }>
 ): Promise<string> {
   const idGenerator = ensureEntityIdGenerator(entityClass)
 
-  return idGenerator.getNextEntityId(em)
+  return idGenerator.getNextEntityId(store)
 }

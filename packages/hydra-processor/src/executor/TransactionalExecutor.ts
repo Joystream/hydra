@@ -13,6 +13,7 @@ import {
 import { TxAwareBlockContext } from './tx-aware'
 import { ObjectType } from 'typedi'
 import { generateNextId } from './EntityIdGenerator'
+import { DeterministicIdEntity } from '../entities'
 
 const debug = Debug('hydra-processor:mappings-executor')
 
@@ -94,12 +95,12 @@ export function makeDatabaseManager(
   entityManager: EntityManager,
   blockData: BlockData
 ): DatabaseManager {
-  return {
+  const databaseManager: DatabaseManager = {
     save: async <T>(entity: DeepPartial<T>): Promise<void> => {
       // TODO: try to move ` as DeepPartial<T & Record<string, unknown>>` typecast to function definition
       entity = await fillRequiredWarthogFields(
         entity as DeepPartial<T & Record<string, unknown>>,
-        entityManager,
+        databaseManager,
         blockData
       )
       await entityManager.save(entity)
@@ -129,7 +130,9 @@ export function makeDatabaseManager(
       } // required by typeorm '0.3.5'
       return await entityManager.find(entity, fixedOptions)
     },
-  } as DatabaseManager
+  }
+
+  return databaseManager
 }
 
 /**
@@ -143,7 +146,7 @@ export function makeDatabaseManager(
  */
 async function fillRequiredWarthogFields<T extends Record<string, unknown>>(
   entity: DeepPartial<T>,
-  entityManager: EntityManager,
+  store: DatabaseManager,
   { block }: BlockData
 ): Promise<DeepPartial<T>> {
   // TODO: find a way how to remove this; needed to limit possible `entity` types
@@ -152,8 +155,11 @@ async function fillRequiredWarthogFields<T extends Record<string, unknown>>(
     throw new Error('Unexpected situation in prefilling Warthog fields')
   }
 
-  // eslint-disable-next-line no-prototype-builtins
-  if (!entity.hasOwnProperty('id')) {
+  if (
+    // eslint-disable-next-line no-prototype-builtins
+    !entity.hasOwnProperty('id') &&
+    !(entity instanceof DeterministicIdEntity)
+  ) {
     const entityClass = (
       entity as unknown as {
         constructor: ObjectType<{ id: string }>
@@ -161,7 +167,7 @@ async function fillRequiredWarthogFields<T extends Record<string, unknown>>(
     ).constructor
 
     Object.assign(entity, {
-      id: await generateNextId(entityManager, entityClass),
+      id: await generateNextId(store, entityClass),
     })
   }
   // eslint-disable-next-line no-prototype-builtins
