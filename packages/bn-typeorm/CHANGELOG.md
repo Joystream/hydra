@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.0.0-alpha.5 (2022-07-21)
+
+
+### Features
+
+* deterministic id generator - utilities exposure fix ([#504](https://github.com/Joystream/hydra/issues/504)) ([7b183b7](https://github.com/Joystream/hydra/commit/7b183b76c4c22b6691a7f768ca753e8f52bc3511))
+
+
+
 ## 4.0.0-alpha.4 (2022-07-20)
 
 
