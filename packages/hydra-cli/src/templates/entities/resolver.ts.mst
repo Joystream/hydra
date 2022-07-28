@@ -79,7 +79,7 @@ export class {{className}}ConnectionWhereArgs extends ConnectionPageInputOptions
   @Field(() => {{className}}WhereInput, { nullable: true })
   where?: {{className}}WhereInput;
 
-  @Field(() => {{className}}OrderByEnum, { nullable: true })
+  @Field(() => [{{className}}OrderByEnum], { nullable: true })
   orderBy?: [{{className}}OrderByEnum];
 }
 
