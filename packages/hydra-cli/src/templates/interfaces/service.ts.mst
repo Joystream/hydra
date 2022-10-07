@@ -71,7 +71,7 @@ export class {{className}}Service {
         (this.typeToService[t]
           .buildFindQueryWithParams(
             <any>where,
-            undefined,
+            ob,
             undefined,
             commonFields,
             (field) => snakeCase(field)
