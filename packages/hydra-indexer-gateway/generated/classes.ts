@@ -1066,9 +1066,6 @@ export class SubstrateEventWhereInput {
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   data_json?: JsonObject
 
-  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
-  extrinsicArgs_json?: JsonObject
-
   @TypeGraphQLField({ nullable: true })
   extrinsicHash_eq?: string
 
@@ -1168,9 +1165,6 @@ export class SubstrateEventCreateInput {
   @TypeGraphQLField(() => GraphQLJSONObject)
   data!: JsonObject
 
-  @TypeGraphQLField(() => GraphQLJSONObject)
-  extrinsicArgs!: JsonObject
-
   @TypeGraphQLField({ nullable: true })
   extrinsicHash?: string
 
@@ -1206,9 +1200,6 @@ export class SubstrateEventUpdateInput {
 
   @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
   data?: JsonObject
-
-  @TypeGraphQLField(() => GraphQLJSONObject, { nullable: true })
-  extrinsicArgs?: JsonObject
 
   @TypeGraphQLField({ nullable: true })
   extrinsicHash?: string

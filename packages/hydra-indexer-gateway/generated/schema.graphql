@@ -458,7 +458,6 @@ type SubstrateEvent implements BaseGraphQLObject {
   method: String!
   phase: JSONObject!
   data: JSONObject!
-  extrinsicArgs: JSONObject!
   extrinsicHash: String
   blockNumber: Int!
   index: Int!
@@ -480,7 +479,6 @@ input SubstrateEventCreateInput {
   method: String!
   phase: JSONObject!
   data: JSONObject!
-  extrinsicArgs: JSONObject!
   extrinsicHash: String
   blockNumber: Float!
   index: Float!
@@ -525,7 +523,6 @@ input SubstrateEventUpdateInput {
   method: String
   phase: JSONObject
   data: JSONObject
-  extrinsicArgs: JSONObject
   extrinsicHash: String
   blockNumber: Float
   index: Float
@@ -580,7 +577,6 @@ input SubstrateEventWhereInput {
   method_in: [String!]
   phase_json: JSONObject
   data_json: JSONObject
-  extrinsicArgs_json: JSONObject
   extrinsicHash_eq: String
   extrinsicHash_contains: String
   extrinsicHash_startsWith: String

@@ -54,9 +54,6 @@ export class SubstrateEvent extends BaseModel {
   @JSONField()
   data!: AnyJson
 
-  @JSONField()
-  extrinsicArgs!: AnyJson
-
   @StringField({ nullable: true })
   extrinsicHash?: string
 
