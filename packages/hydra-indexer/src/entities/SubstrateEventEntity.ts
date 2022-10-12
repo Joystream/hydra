@@ -11,7 +11,6 @@ import {
   EventParam,
   SubstrateEvent,
   formatId,
-  ExtrinsicArg,
 } from '@joystream/hydra-common'
 import { EventRecord } from '@polkadot/types/interfaces'
 import { SubstrateExtrinsicEntity } from './SubstrateExtrinsicEntity'
@@ -45,11 +44,6 @@ export class SubstrateEventEntity
   @Column({ nullable: true })
   @Index()
   extrinsicName?: string
-
-  @Column({
-    type: 'jsonb',
-  })
-  extrinsicArgs!: AnyJson
 
   @Column({ nullable: true })
   extrinsicHash?: string
@@ -152,19 +146,12 @@ export class SubstrateEventEntity
       })
     }
 
-    const extrinsicArgs: AnyJson = {}
-
     if (q.extrinsicEntity) {
       _entity.extrinsic = q.extrinsicEntity
-      _entity.extrinsic.args.forEach(({ name, value, type }: ExtrinsicArg) => {
-        extrinsicArgs[name] = { type, value }
-      })
       _entity.extrinsicName = _entity.extrinsic.name
       _entity.extrinsicHash = _entity.extrinsic.hash
       _entity.extrinsicIndex = _entity.extrinsic.indexInBlock
     }
-
-    _entity.extrinsicArgs = extrinsicArgs
 
     // debug(`Event entity: ${JSON.stringify(_entity, null, 2)}`);
 

@@ -415,7 +415,6 @@ export interface SubstrateEventCreateInput {
   method: String
   phase: JSONObject
   data: JSONObject
-  extrinsicArgs: JSONObject
   extrinsicHash?: String | null
   blockNumber: Float
   index: Float
@@ -430,7 +429,6 @@ export interface SubstrateEventUpdateInput {
   method?: String | null
   phase?: JSONObject | null
   data?: JSONObject | null
-  extrinsicArgs?: JSONObject | null
   extrinsicHash?: String | null
   blockNumber?: Float | null
   index?: Float | null
@@ -485,7 +483,6 @@ export interface SubstrateEventWhereInput {
   method_in?: String[] | String | null
   phase_json?: JSONObject | null
   data_json?: JSONObject | null
-  extrinsicArgs_json?: JSONObject | null
   extrinsicHash_eq?: String | null
   extrinsicHash_contains?: String | null
   extrinsicHash_startsWith?: String | null
@@ -747,7 +744,6 @@ export interface SubstrateEvent extends BaseGraphQLObject {
   method: String
   phase: JSONObject
   data: JSONObject
-  extrinsicArgs: JSONObject
   extrinsicHash?: String | null
   blockNumber: Int
   index: Int
