@@ -12,6 +12,8 @@ import { isInRange, Range, parseEventId, info, warn } from '../util'
 import { formatEventId, SubstrateEvent } from '@joystream/hydra-common'
 import { IndexerStatus } from '.'
 import { validateIndexerVersion } from './version'
+import axios from 'axios'
+
 const debug = Debug('hydra-processor:processor-state-handler')
 
 export class StateKeeper implements IStateKeeper {
@@ -24,10 +26,10 @@ export class StateKeeper implements IStateKeeper {
     //   head: -1,
     //   chainHeight: -1,
     // }
-    eventEmitter.on(
-      ProcessorEvents.INDEXER_STATUS_CHANGE,
-      (indexerStatus) => (this.indexerStatus = indexerStatus)
-    )
+    eventEmitter.on(ProcessorEvents.INDEXER_STATUS_CHANGE, (indexerStatus) => {
+      this.indexerStatus = indexerStatus
+      sendStateUpdateRequest()
+    })
 
     const throttle = pThrottle({
       limit: 1,
@@ -47,14 +49,33 @@ export class StateKeeper implements IStateKeeper {
       )
     })
 
+    const sendStateUpdateRequest = () => {
+      axios
+        .post(conf().STATE_UPDATE_ENDPOINT, {
+          state: {
+            indexerHead: this.indexerStatus.head,
+            chainHead: this.indexerStatus.chainHeight,
+            lastScannedBlock: this.processorState.lastScannedBlock,
+            lastProcessedEvent: this.processorState.lastProcessedEvent,
+          },
+        })
+        .catch((e) =>
+          debug(`State update request failed: ${(e as Error).message}`)
+        )
+    }
+
     // additionally log every status change
     eventEmitter.on(
       ProcessorEvents.PROCESSED_EVENT,
       (event: SubstrateEvent) => {
         this.processorState.lastProcessedEvent = event.id
+        // We don't call sendStateUpdateRequest here, since it may happen too often
       }
     )
-    eventEmitter.on(ProcessorEvents.STATE_CHANGE, stateLog)
+    eventEmitter.on(ProcessorEvents.STATE_CHANGE, () => {
+      stateLog()
+      sendStateUpdateRequest()
+    })
   }
 
   async updateState(

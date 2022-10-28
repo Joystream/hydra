@@ -18,7 +18,7 @@ export class ProcessorState {
 
 @Resolver()
 export class ProcessorStateResolver {
-  @Subscription({ topics: TOPICS.processorState })
+  @Subscription({ topics: TOPICS.ProcessorState })
   stateSubscription(
     @Root()
     state: {

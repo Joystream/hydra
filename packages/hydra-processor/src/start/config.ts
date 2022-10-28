@@ -44,6 +44,8 @@ let conf: {
   EVENT_QUEUE_MAX_CAPACITY: number
 
   BLOCK_CACHE_CAPACITY: number
+
+  STATE_UPDATE_ENDPOINT: string
 }
 
 export function configure(): void {
@@ -64,6 +66,9 @@ export function configure(): void {
     QUEUE_FACTOR: num({ default: 2 }),
     QUEUE_MAX_CAP_FACTOR: num({ default: 5 }),
     BLOCK_CACHE_CAPACITY: num({ default: 10000 }),
+    STATE_UPDATE_ENDPOINT: str({
+      devDefault: 'http://localhost:8082/update-processor-state',
+    }),
   })
   conf = {
     ...envConf,
