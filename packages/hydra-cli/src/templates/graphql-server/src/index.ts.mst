@@ -7,16 +7,18 @@ import { loadConfig } from '../src/config';
 import { Logger } from '../src/logger';
 
 import { buildServerSchema, getServer } from './server';
-import { startPgSubsribers } from './pubsub';
-import { queryTemplates } from './queryTemplates'
-
+import { queryTemplates } from './queryTemplates';
+import { createProcessorStateApp } from './processorStateApp';
+import dns from 'node:dns';
+import { promisify } from 'node:util';
 
 class CustomNamingStrategy extends SnakeNamingStrategy {
   constructor() {
     super();
   }
+
   tableName(className: string, customName?: string): string {
-    return customName ? customName : `${snakeCase(className)}`;
+    return customName || `${snakeCase(className)}`;
   }
 }
 
@@ -31,12 +33,12 @@ async function bootstrap() {
         endpoint: process.env.GRAPHQL_PLAYGROUND_ENDPOINT || undefined,
         subscriptionEndpoint: process.env.GRAPHQL_PLAYGROUND_SUBSCRIPTION_ENDPOINT || undefined,
         queryTemplates,
-      }
+      },
     },
     {
       namingStrategy: new CustomNamingStrategy(),
       maxQueryExecutionTime: 1000,
-      logging: [ process.env.WARTHOG_DB_LOGGING || "error"]
+      logging: [process.env.WARTHOG_DB_LOGGING || 'error'],
     }
   );
 
@@ -48,8 +50,21 @@ async function bootstrap() {
     process.exit(0);
   }
   await buildServerSchema(server);
-  await startPgSubsribers();
   await server.start();
+
+  const lookup = promisify(dns.lookup);
+  let processorAddr: string;
+  try {
+    const { address } = await lookup(process.env.PROCESSOR_HOST || 'localhost');
+    processorAddr = address;
+  } catch (e) {
+    processorAddr = '127.0.0.1';
+  }
+  const processorStateApp = createProcessorStateApp(processorAddr);
+  await processorStateApp.listen(
+    parseInt(process.env.PROCESSOR_STATE_APP_PORT || '8082'),
+    '0.0.0.0'
+  );
 }
 
 bootstrap().catch((error: Error) => {

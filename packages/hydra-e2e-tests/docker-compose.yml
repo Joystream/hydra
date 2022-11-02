@@ -12,8 +12,11 @@ services:
       - DB_PORT=5432
       - GRAPHQL_SERVER_HOST=localhost
       - GRAPHQL_SERVER_PORT=4000
+      - PROCESSOR_STATE_APP_PORT=8082
+      - PROCESSOR_HOST=hydra-processor
     ports:
       - "4000:4000"
+      - "127.0.0.1:8082:8082"
     depends_on:
       - hydra-processor
     command: ["yarn", "query-node:start:prod"]
@@ -38,6 +41,7 @@ services:
       - NODE_URL=ws://node-template:9944
       - POLL_INTERVAL_MS=500 # refresh every second 
       - DEBUG=hydra-processor:*
+      - STATE_UPDATE_ENDPOINT=http://query-node:8082/update-processor-state
     ports:
       - "3000:3000"
     depends_on:

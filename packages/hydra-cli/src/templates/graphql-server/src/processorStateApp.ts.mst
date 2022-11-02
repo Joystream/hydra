@@ -1,0 +1,79 @@
+import express from 'express';
+import { getPubSub, TOPICS } from './pubsub';
+import { Logger } from './logger';
+
+type ProcessorState = {
+  lastProcessedEvent: string;
+  lastScannedBlock: number;
+  chainHead: number;
+  indexerHead: number;
+};
+
+type Unvalidated<O> =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | unknown[]
+  | { [K in keyof O]?: unknown };
+
+const validateUpdateProcessorStateRequest = (req: express.Request): ProcessorState => {
+  const state: Unvalidated<ProcessorState> = req.body.state;
+  if (
+    state &&
+    typeof state === 'object' &&
+    state !== null &&
+    'lastProcessedEvent' in state &&
+    typeof state.lastProcessedEvent === 'string' &&
+    'lastScannedBlock' in state &&
+    typeof state.lastScannedBlock === 'number' &&
+    Number.isInteger(state.lastScannedBlock) &&
+    state.lastScannedBlock >= 0 &&
+    'chainHead' in state &&
+    typeof state.chainHead === 'number' &&
+    Number.isInteger(state.chainHead) &&
+    state.chainHead >= 0 &&
+    'indexerHead' in state &&
+    typeof state.indexerHead === 'number' &&
+    Number.isInteger(state.indexerHead) &&
+    state.indexerHead >= 0
+  ) {
+    const validated: ProcessorState = {
+      lastProcessedEvent: state.lastProcessedEvent,
+      lastScannedBlock: state.lastScannedBlock,
+      chainHead: state.chainHead,
+      indexerHead: state.indexerHead,
+    };
+    return validated;
+  } else {
+    throw new Error('Request validation failed');
+  }
+};
+
+export function createProcessorStateApp(processorAddr: string): express.Application {
+  const app = express();
+  const pubSub = getPubSub();
+  app.use(express.json());
+  app.post('/update-processor-state', (req, res) => {
+    if (req.ip !== processorAddr) {
+      Logger.warn(`Unauthorized access on /update-processor-state: ${req.ip}`);
+      res.status(403).send('Forbidden');
+      return;
+    }
+    let processorState: ProcessorState;
+    try {
+      processorState = validateUpdateProcessorStateRequest(req);
+    } catch (e) {
+      res.status(400).send((e as Error).message);
+      return;
+    }
+
+    pubSub
+      .publish(TOPICS.ProcessorState, processorState)
+      .then(() => res.status(200).send('OK'))
+      .catch((e) => res.status(500).send(e.message));
+  });
+
+  return app;
+}
