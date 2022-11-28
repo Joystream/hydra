@@ -1,6 +1,8 @@
 import express from 'express';
 import { getPubSub, TOPICS } from './pubsub';
 import { Logger } from './logger';
+import dns from 'node:dns';
+import { promisify } from 'node:util';
 
 type ProcessorState = {
   lastProcessedEvent: string;
@@ -51,16 +53,33 @@ const validateUpdateProcessorStateRequest = (req: express.Request): ProcessorSta
   }
 };
 
-export function createProcessorStateApp(processorAddr: string): express.Application {
+export function createProcessorStateApp(processorHost: string): express.Application {
   const app = express();
   const pubSub = getPubSub();
+  const lookup = promisify(dns.lookup);
+
   app.use(express.json());
+
+  if (processorHost !== '*') {
+    app.use((req, res, next) => {
+      lookup(processorHost)
+        .then(({ address }) => {
+          if (req.ip !== address) {
+            Logger.warn(
+              `Unauthorized access on /update-processor-state: ${req.ip} (expected: ${address})`
+            );
+            return res.status(403).send('Forbidden');
+          }
+          return next();
+        })
+        .catch((e) => {
+          Logger.warn(`Processor host ip lookup failed: ${(e as Error).message}`);
+          return res.status(500).send(`Processor host ip lookup failed`);
+        });
+    });
+  }
+
   app.post('/update-processor-state', (req, res) => {
-    if (req.ip !== processorAddr) {
-      Logger.warn(`Unauthorized access on /update-processor-state: ${req.ip}`);
-      res.status(403).send('Forbidden');
-      return;
-    }
     let processorState: ProcessorState;
     try {
       processorState = validateUpdateProcessorStateRequest(req);
