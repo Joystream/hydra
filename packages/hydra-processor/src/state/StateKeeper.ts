@@ -6,6 +6,7 @@ import { getProcessorSource, IProcessorSource } from '../ingest'
 
 import Debug from 'debug'
 import pThrottle from 'p-throttle'
+import debounce from 'lodash.debounce'
 import { eventEmitter, ProcessorEvents } from '../start/processor-events'
 import { getConfig as conf, getManifest } from '../start/config'
 import { isInRange, Range, parseEventId, info, warn } from '../util'
@@ -49,7 +50,9 @@ export class StateKeeper implements IStateKeeper {
       )
     })
 
-    const sendStateUpdateRequest = () => {
+    // Send state update request only after 100ms of "inactivity" to avoid
+    // overwhelming the endpoint during initial sync
+    const sendStateUpdateRequest = debounce(() => {
       axios
         .post(conf().STATE_UPDATE_ENDPOINT, {
           state: {
@@ -62,14 +65,14 @@ export class StateKeeper implements IStateKeeper {
         .catch((e) =>
           debug(`State update request failed: ${(e as Error).message}`)
         )
-    }
+    }, 100)
 
     // additionally log every status change
     eventEmitter.on(
       ProcessorEvents.PROCESSED_EVENT,
       (event: SubstrateEvent) => {
         this.processorState.lastProcessedEvent = event.id
-        // We don't call sendStateUpdateRequest here, since it may happen too often
+        // We don't call sendStateUpdateRequest here, since it happens too often
       }
     )
     eventEmitter.on(ProcessorEvents.STATE_CHANGE, () => {
