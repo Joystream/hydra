@@ -137,17 +137,17 @@ describe('VariantsRenderer', () => {
     const gen = new VariantsRenderer(model)
     const rendered = c(gen.render(variantsTemplate))
     expect(rendered).to.include(
-      c(`@Field(() => String, { nullable: true, }) hates?: string`),
+      c(`@StringField({ nullable: true, }) hates?: string;`),
       'should render nullable fields'
     )
 
     expect(rendered).to.include(
-      c(`@Field(() => [String]!, {}) loves!: string[]`),
+      c(` @StringField({}) loves!: string[];`),
       'should render array fields'
     )
 
     expect(rendered).to.include(
-      c(`@Field(() => [String], { nullable: true, }) maybeLoves?: string[]`),
+      c(`@StringField({ nullable: true, }) maybeLoves?: string[];`),
       'should render nullable array fields'
     )
   })
