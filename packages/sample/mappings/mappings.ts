@@ -19,6 +19,12 @@ import {
   DatabaseManager,
   FindOptionsWhere,
 } from '@joystream/hydra-common'
+import {
+  FixedPriceSaleEventDto,
+  FixedPriceSaleEventMethod,
+  TokenIdDto,
+} from './sync-service/dto'
+import { listFixedPrice } from './sync-service/sync-service'
 
 const start = Date.now()
 const blockTime = 0
@@ -104,20 +110,42 @@ export async function nftFixedPriceSaleList({
 
   await store.save<NftFixedPriceSale>(fixedPriceListing)
 
-  tokens.forEach(async (t) => {
-    const token = await getOrCreate<TokenId>(
+  const tokensDto: TokenIdDto[] = []
+  for (const token of tokens) {
+    const tokenId = await getOrCreate<TokenId>(
       TokenId,
-      `${t[0]} - ${t[1]}`,
+      `${token[0]} - ${token[1]}`,
       store
     )
-    token.status = 'listing'
-    token.collectionId = t[0]
-    token.serialNumber = t[1]
-    token.fixedPriceListingId = fixedPriceListing
-    await store.save<TokenId>(token)
-  })
+    tokenId.status = 'listing'
+    tokenId.collectionId = token[0]
+    tokenId.serialNumber = token[1]
+    tokenId.fixedPriceListingId = fixedPriceListing
+
+    tokensDto.push({
+      collectionId: token[0].toString(),
+      serialNumber: token[1].toString(),
+    })
+
+    await store.save<TokenId>(tokenId)
+  }
 
   totalEvents++
+
+  // step: call sync service
+  const dto = new FixedPriceSaleEventDto()
+  dto.eventMethod = FixedPriceSaleEventMethod.FixedPriceSaleList
+  dto.blockHash = block.hash
+  dto.blockHeight = block.height
+  dto.extrinsicHash = extrinsic?.hash
+  dto.txIndex = extrinsic?.indexInBlock
+  dto.tokens = tokensDto
+  dto.listingId = fixedPriceListing.listingId.toString()
+  dto.marketplaceId = fixedPriceListing.marketplaceId.toString()
+  dto.seller = fixedPriceListing.seller.id
+  dto.price = fixedPriceListing.price.toString()
+  dto.paymentAsset = fixedPriceListing.paymentAsset.toString()
+  await listFixedPrice(dto)
 }
 
 // export async function timestampCall({

@@ -42,7 +42,8 @@
   "dependencies": {
     "@types/bn.js": "^5.1.0",
     "bn.js": "^5.2.1",
-    "tslib": "^2.0.0"
+    "tslib": "^2.0.0",
+    "axios": "^1.3.2"
   },
   "devDependencies": {
     "@joystream/hydra-cli": "^4.0.0-alpha.9",
