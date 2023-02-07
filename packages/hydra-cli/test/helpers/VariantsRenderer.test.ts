@@ -73,13 +73,30 @@ describe('VariantsRenderer', () => {
   it('Should import BN module', () => {
     const model = fromStringSchema(`
     type Rich @variant {
-      balance: BigInt
+      balance: BigInt!
+      maybeBalance: BigInt
+      balances: [BigInt]
     }`)
 
     const gen = new VariantsRenderer(model)
-    const rendered = gen.render(variantsTemplate)
+    const rendered = c(gen.render(variantsTemplate))
 
     expect(rendered).include(`import BN from 'bn.js'`)
+
+    expect(rendered).to.include(
+      c(`@Field(() => BigInt!, {}) balance!: BN`),
+      'should render BigInt field'
+    )
+
+    expect(rendered).to.include(
+      c(`@Field(() => BigInt, { nullable: true, }) maybeBalance?: BN`),
+      'should render nullable BigInt field'
+    )
+
+    expect(rendered).to.include(
+      c(`@Field(() => [BigInt], { nullable: true, }) balances?: BN[]`),
+      'should render nullable BigInt array fields'
+    )
   })
 
   it('Should generate data fetch method', () => {
@@ -137,17 +154,17 @@ describe('VariantsRenderer', () => {
     const gen = new VariantsRenderer(model)
     const rendered = c(gen.render(variantsTemplate))
     expect(rendered).to.include(
-      c(`@StringField({ nullable: true, }) hates?: string;`),
+      c(`@Field(() => String, { nullable: true, }) hates?: string`),
       'should render nullable fields'
     )
 
     expect(rendered).to.include(
-      c(` @StringField({}) loves!: string[];`),
+      c(`@Field(() => [String]!, {}) loves!: string[]`),
       'should render array fields'
     )
 
     expect(rendered).to.include(
-      c(`@StringField({ nullable: true, }) maybeLoves?: string[];`),
+      c(`@Field(() => [String], { nullable: true, }) maybeLoves?: string[]`),
       'should render nullable array fields'
     )
   })

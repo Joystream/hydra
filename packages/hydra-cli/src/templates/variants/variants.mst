@@ -8,7 +8,8 @@ import {
   JSONField,
   BytesField,
   EnumField,
-  StringField
+  StringField,
+  BigInt
 } from '@joystream/warthog';
 
 import {
@@ -73,10 +74,9 @@ export class {{name}} {
     {{/is.union}}
 
     {{#is.primitive}}
-     @{{decorator}}({
-      {{^required}}nullable: true,{{/required}}
-      {{#description}}description: `{{{description}}}`,{{/description}}
-      {{#transformer}} transformer: {{{transformer}}}, {{/transformer}}
+    @Field(() => {{gqlType}}{{#required}}!{{/required}}, {
+        {{^required}}nullable: true,{{/required}}
+        {{#description}}description: `{{{description}}}`{{/description}}
     })
     {{camelName}}{{^required}}?{{/required}}{{#required}}!{{/required}}:{{tsType}}{{#array}}[]{{/array}};
     {{/is.primitive}}
