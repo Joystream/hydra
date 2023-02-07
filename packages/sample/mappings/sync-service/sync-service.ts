@@ -7,10 +7,6 @@ const baseSyncServiceUrl =
 export async function listFixedPrice(
   event: FixedPriceSaleEventDto
 ): Promise<string> {
-  const result = await axios.post(
-    `${baseSyncServiceUrl}/fixed-price-sale-events`,
-    event
-  )
-  console.log(result)
+  await axios.post(`${baseSyncServiceUrl}/fixed-price-sale-events`, [event])
   return ''
 }

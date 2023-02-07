@@ -138,13 +138,13 @@ export async function nftFixedPriceSaleList({
   dto.blockHash = block.hash
   dto.blockHeight = block.height
   dto.extrinsicHash = extrinsic?.hash
-  dto.txIndex = extrinsic?.indexInBlock
+  dto.txIndex = event.indexInBlock
   dto.tokens = tokensDto
-  dto.listingId = fixedPriceListing.listingId.toString()
-  dto.marketplaceId = fixedPriceListing.marketplaceId.toString()
-  dto.seller = fixedPriceListing.seller.id
-  dto.price = fixedPriceListing.price.toString()
-  dto.paymentAsset = fixedPriceListing.paymentAsset.toString()
+  dto.listingId = listingId.toString()
+  dto.marketplaceId = marketplaceId.toString()
+  dto.seller = seller.toString()
+  dto.price = price.toString()
+  dto.paymentAsset = paymentAsset.toString()
   await listFixedPrice(dto)
 }
 
