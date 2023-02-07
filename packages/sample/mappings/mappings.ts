@@ -4,14 +4,15 @@ import {
   BlockHook,
   HookType,
   Account,
+  NftFixedPriceSale,
+  TokenId,
 } from '../generated/graphql-server/model'
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
-import { Balances, Timestamp } from './generated/types'
+import { Balances, Nft } from './generated/types'
 import BN from 'bn.js'
 import {
-  ExtrinsicContext,
   EventContext,
   BlockContext,
   StoreContext,
@@ -20,7 +21,7 @@ import {
 } from '@joystream/hydra-common'
 
 const start = Date.now()
-let blockTime = 0
+const blockTime = 0
 let totalEvents = 0
 let totalBlocks = 0
 
@@ -34,6 +35,7 @@ async function getOrCreate<T>(
   })
 
   if (entity === undefined) {
+    // eslint-disable-next-line new-cap
     entity = new e() as T
     ;(<any>entity).id = id
   }
@@ -78,25 +80,65 @@ export async function balancesTransfer({
   await store.save<Transfer>(transfer)
 }
 
-export async function timestampCall({
+export async function nftFixedPriceSaleList({
   store,
   event,
   block,
-}: ExtrinsicContext & StoreContext) {
-  const call = new Timestamp.SetCall(event)
-  const ts = call.args.now.toBn()
-  const blockTs = await store.get(BlockTimestamp, {
-    where: { timestamp: ts },
+  extrinsic,
+}: EventContext & StoreContext) {
+  const fixedPriceListing = new NftFixedPriceSale()
+
+  const [tokens, listingId, marketplaceId, price, paymentAsset, seller] =
+    new Nft.FixedPriceSaleListEvent(event).params
+
+  const fromAcc = await getOrCreate<Account>(Account, seller.toString(), store)
+  fromAcc.hex = seller.toHex()
+  fromAcc.balance = fromAcc.balance || new BN(0)
+  await store.save<Account>(fromAcc)
+
+  fixedPriceListing.listingId = listingId.toBn()
+  fixedPriceListing.marketplaceId = marketplaceId?.value.toBn()
+  fixedPriceListing.price = price.toBn()
+  fixedPriceListing.paymentAsset = paymentAsset.toBn()
+  fixedPriceListing.seller = fromAcc
+
+  await store.save<NftFixedPriceSale>(fixedPriceListing)
+
+  tokens.forEach(async (t) => {
+    const token = await getOrCreate<TokenId>(
+      TokenId,
+      `${t[0]} - ${t[1]}`,
+      store
+    )
+    token.status = 'listing'
+    token.collectionId = t[0]
+    token.serialNumber = t[1]
+    token.fixedPriceListingId = fixedPriceListing
+    await store.save<TokenId>(token)
   })
 
-  if (blockTs === undefined) {
-    throw new Error(`Expected the timestamp ${ts.toString()} to be saved`)
-  }
-
-  if (block.timestamp !== ts.toNumber()) {
-    throw new Error(`Block timestamp should match the time int TimeStamp`)
-  }
+  totalEvents++
 }
+
+// export async function timestampCall({
+//   store,
+//   event,
+//   block,
+// }: ExtrinsicContext & StoreContext) {
+//   const call = new Timestamp.SetCall(event)
+//   const ts = call.args.now.toBn()
+//   const blockTs = await store.get(BlockTimestamp, {
+//     where: { timestamp: ts },
+//   })
+
+//   if (blockTs === undefined) {
+//     throw new Error(`Expected the timestamp ${ts.toString()} to be saved`)
+//   }
+
+//   if (block.timestamp !== ts.toNumber()) {
+//     throw new Error(`Block timestamp should match the time int TimeStamp`)
+//   }
+// }
 
 export async function preHook({
   block: { height, timestamp, hash },

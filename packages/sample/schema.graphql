@@ -1,3 +1,21 @@
+" Pallet NFT Sell FixedPriceSaleList "
+type NftFixedPriceSale @entity {
+  tokens: [TokenId!] @derivedFrom(field: "fixedPriceListingId")
+  listingId: BigInt!
+  marketplaceId: BigInt!
+  price: BigInt!
+  paymentAsset: BigInt!
+  seller: Account
+}
+
+type TokenId @entity {
+  collectionId: BigInt!
+  serialNumber: BigInt!
+  fixedPriceListingId: NftFixedPriceSale
+  status: String!
+}
+
+
 " All transfers "
 type Transfer @entity {
   from: Account
