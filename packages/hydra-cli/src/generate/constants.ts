@@ -63,7 +63,7 @@ export const TYPE_FIELDS: { [key: string]: { [key: string]: string } } = {
   numeric: {
     decorator: 'NumericField',
     tsType: 'BN',
-    gqlType: 'Float',
+    gqlType: 'BigInt',
   },
   decimal: {
     decorator: 'NumericField',
