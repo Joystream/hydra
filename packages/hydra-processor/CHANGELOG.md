@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 4.0.0-alpha.11 (2023-02-08)
+
+**Note:** Version bump only for package @joystream/hydra-processor
+
+
+
+
+
 ## 4.0.0-alpha.10 (2023-01-11)
 
 **Note:** Version bump only for package @joystream/hydra-processor
