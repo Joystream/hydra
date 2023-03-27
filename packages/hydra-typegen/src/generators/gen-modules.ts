@@ -14,6 +14,7 @@ const generateModuleTemplate = handlebars.compile(readTemplate('module'))
 type ModuleTemplateProps = {
   validateArgs: boolean
   imports: ImportsDef
+  specVersion: number
 } & ExtractedModuleMeta
 
 export function generateModuleTypes(config: GeneratorConfig): void {
@@ -32,13 +33,14 @@ export function buildModuleProps(
   meta: ExtractedModuleMeta,
   config: GeneratorConfig
 ): ModuleTemplateProps {
-  const { validateArgs } = config
+  const { validateArgs, specVersion } = config
   const imports = buildModuleImports(meta, config)
 
   debug(`Imports: ${JSON.stringify(imports, null, 2)}`)
 
   return {
     validateArgs,
+    specVersion,
     imports,
     ...meta,
   }

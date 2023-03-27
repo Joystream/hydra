@@ -15,9 +15,8 @@ export interface MetadataSource {
 }
 
 interface ChainSpec {
-  chain: string
-  name: string
-  version: BN
+  specName: string
+  specVersion: number
 }
 
 export async function getMetadata({
@@ -31,7 +30,9 @@ export async function getMetadata({
     debug(`Reading from chain: ${source}`)
     metaHex = await fromChain(source, blockHash)
   } else {
-    metaHex = require(path.join(process.cwd(), source)).result as string
+    throw new Error(
+      `Unsupported metadata source: ${source}. Typegen only supports reading metadata from a chain. Please provide a a valid chain endpoint.`
+    )
   }
 
   const meta = new Metadata(registry, metaHex as `0x${string}`)
@@ -39,6 +40,54 @@ export async function getMetadata({
   registry.setMetadata(meta)
 
   return meta
+}
+
+export async function getChainSpec(endpoint: string): Promise<ChainSpec> {
+  return new Promise<ChainSpec>((resolve, reject) => {
+    try {
+      const websocket = new WebSocket(endpoint)
+
+      websocket.onclose = (event: { code: number; reason: string }): void => {
+        reject(
+          new Error(
+            `disconnected, code: '${event.code}' reason: '${event.reason}'`
+          )
+        )
+      }
+
+      websocket.onerror = (event: unknown): void => {
+        reject(new Error(JSON.stringify(event, null, 2)))
+      }
+
+      websocket.onopen = (): void => {
+        debug('connected')
+        websocket.send(
+          `{"id":1, "jsonrpc":"2.0", "method": "state_getRuntimeVersion"}`
+        )
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      websocket.onmessage = (message: any): void => {
+        const data = JSON.parse(message.data)
+        if (data.error) {
+          reject(new Error(`RPC error: ${JSON.stringify(data.error, null, 2)}`))
+        } else {
+          resolve(data.result)
+        }
+        websocket.close()
+      }
+    } catch (e) {
+      reject(
+        new Error(
+          `Cannot fetch chain spec: ${(e as Error).message}, ${JSON.stringify(
+            e,
+            null,
+            2
+          )}`
+        )
+      )
+    }
+  })
 }
 
 async function fromChain(

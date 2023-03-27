@@ -3,7 +3,11 @@ import fs from 'fs'
 import path from 'path'
 import Debug from 'debug'
 
-import { getMetadata, MetadataSource } from '../../metadata/metadata'
+import {
+  getChainSpec,
+  getMetadata,
+  MetadataSource,
+} from '../../metadata/metadata'
 import { extractMeta } from '../../metadata'
 import {
   generateModuleTypes,
@@ -13,6 +17,7 @@ import {
 } from '../../generators'
 import { parseConfigFile } from '../../config/parse-yaml'
 import { validate } from '../../config/validate'
+import { generateTypeRegistry } from '../../generators/gen-typeRegistry'
 
 export interface IConfig {
   metadata: MetadataSource
@@ -132,12 +137,14 @@ types don't much the metadata definiton`,
     const originalMetadata = await getMetadata(config.metadata)
     const modules = await extractMeta(config, originalMetadata)
 
+    const { specVersion } = await getChainSpec(config.metadata.source)
     return {
       importsRegistry: buildImportsRegistry(),
       modules,
       validateArgs: config.strict || false, // do not enforce validation by default
-      dest: path.resolve(outDir),
+      dest: path.resolve(path.join(outDir, specVersion.toString())),
       originalMetadata,
+      specVersion,
     }
   }
 
@@ -150,5 +157,6 @@ types don't much the metadata definiton`,
 
     generateModuleTypes(generatorConfig)
     generateIndex(generatorConfig)
+    generateTypeRegistry(generatorConfig)
   }
 }
