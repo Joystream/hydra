@@ -73,13 +73,30 @@ describe('VariantsRenderer', () => {
   it('Should import BN module', () => {
     const model = fromStringSchema(`
     type Rich @variant {
-      balance: BigInt
+      balance: BigInt!
+      maybeBalance: BigInt
+      balances: [BigInt]
     }`)
 
     const gen = new VariantsRenderer(model)
-    const rendered = gen.render(variantsTemplate)
+    const rendered = c(gen.render(variantsTemplate))
 
     expect(rendered).include(`import BN from 'bn.js'`)
+
+    expect(rendered).to.include(
+      c(`@Field(() => BigInt!, {}) balance!: BN`),
+      'should render BigInt field'
+    )
+
+    expect(rendered).to.include(
+      c(`@Field(() => BigInt, { nullable: true, }) maybeBalance?: BN`),
+      'should render nullable BigInt field'
+    )
+
+    expect(rendered).to.include(
+      c(`@Field(() => [BigInt], { nullable: true, }) balances?: BN[]`),
+      'should render nullable BigInt array fields'
+    )
   })
 
   it('Should generate data fetch method', () => {
