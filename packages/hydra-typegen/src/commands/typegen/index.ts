@@ -18,12 +18,14 @@ import {
 import { parseConfigFile } from '../../config/parse-yaml'
 import { validate } from '../../config/validate'
 import { generateTypeRegistry } from '../../generators/gen-typeRegistry'
+import { generateTypesLookup } from '../../generators/gen-typesLookup'
 
 export interface IConfig {
   metadata: MetadataSource
   events: string[]
   calls: string[]
   outDir: string
+  typegenBinPath: string
   strict?: boolean
 }
 
@@ -35,6 +37,7 @@ export type Flags = {
   outDir: string
   strict: boolean
   debug: boolean
+  typegenBinPath?: string
 }
 
 const debug = Debug('hydra-typegen:typegen')
@@ -76,6 +79,12 @@ Otherwise a relative path to a json file matching the RPC call response is expec
       description:
         'A relative path the root folder where the generated files will be generated',
       default: 'generated/types',
+    }),
+    typegenBinPath: flags.string({
+      char: 't',
+      description:
+        'A relative path to the polkadot typegen binary (polkadot-types-from-defs)',
+      default: 'node_modules/.bin/polkadot-types-from-defs',
     }),
     strict: flags.boolean({
       char: 's',
@@ -155,6 +164,7 @@ types don't much the metadata definiton`,
     debug(`Output dir: ${dest}`)
     fs.mkdirSync(dest, { recursive: true })
 
+    await generateTypesLookup(config, generatorConfig)
     generateModuleTypes(generatorConfig)
     generateIndex(generatorConfig)
     generateTypeRegistry(generatorConfig)

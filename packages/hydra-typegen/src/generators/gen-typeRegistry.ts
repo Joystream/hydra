@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 import { GeneratorConfig } from '.'
 import { formatWithPrettier, readTemplate, writeFile } from '../util'
@@ -9,7 +10,19 @@ const generateTypeRegistryTemplate = handlebars.compile(
   readTemplate('typeRegistry')
 )
 
-export function generateTypeRegistry({ dest }: GeneratorConfig): void {
+export function generateTypeRegistry({
+  dest,
+  originalMetadata,
+}: GeneratorConfig): void {
+  fs.writeFileSync(
+    path.join(dest, `metadata.json`),
+    JSON.stringify({
+      'id': 1,
+      'jsonrpc': '2.0',
+      result: originalMetadata.toHex(),
+    })
+  )
+
   writeFile(path.join(dest, `typeRegistry.ts`), () =>
     formatWithPrettier(generateTypeRegistryTemplate({}))
   )

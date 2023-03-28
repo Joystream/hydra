@@ -8,7 +8,7 @@ export function buildModuleImports(
   const importsDef: ImportsDef = {}
 
   types.forEach((i) => {
-    const importLoc = importsRegistry[i] || '@polkadot/types/lookup'
+    const importLoc = importsRegistry[i] || './types-lookup'
 
     if (!importsDef[importLoc]) {
       importsDef[importLoc] = {}
