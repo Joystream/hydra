@@ -9,7 +9,7 @@ import { formatWithPrettier, writeFile } from '../util'
 const debug = require('debug')('hydra-typegen:gen-typesLookup')
 
 export async function generateTypesLookup(
-  { outDir, metadata: { source }, typegenBinPath }: IConfig,
+  { outDir, typegenBinPath }: IConfig,
   { dest, specVersion }: GeneratorConfig
 ) {
   const TYPES_LOOKUP_FILE_NAME = 'types-lookup.ts'
@@ -21,11 +21,23 @@ export async function generateTypesLookup(
 
   // generate types-lookup.ts using polkadot typegen
   const pExecFile = promisify(execFile)
+
+  const typegenInput = path.join(
+    outDir,
+    specVersion.toString(),
+    TYPES_OUT_DIR_NAME
+  )
+  const typegenSource = path.join(
+    outDir,
+    specVersion.toString(),
+    'metadata.json'
+  )
+
   await pExecFile(path.join(process.cwd(), typegenBinPath), [
     '--endpoint',
-    source,
+    typegenSource,
     '--input',
-    path.join(outDir, specVersion.toString(), TYPES_OUT_DIR_NAME),
+    typegenInput,
     '--package',
     dest,
   ])

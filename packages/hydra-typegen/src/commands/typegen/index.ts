@@ -1,24 +1,21 @@
 import { Command, flags } from '@oclif/command'
+import Debug from 'debug'
 import fs from 'fs'
 import path from 'path'
-import Debug from 'debug'
 
-import {
-  getChainSpec,
-  getMetadata,
-  MetadataSource,
-} from '../../metadata/metadata'
-import { extractMeta } from '../../metadata'
-import {
-  generateModuleTypes,
-  GeneratorConfig,
-  buildImportsRegistry,
-  generateIndex,
-} from '../../generators'
 import { parseConfigFile } from '../../config/parse-yaml'
 import { validate } from '../../config/validate'
-import { generateTypeRegistry } from '../../generators/gen-typeRegistry'
-import { generateTypesLookup } from '../../generators/gen-typesLookup'
+import {
+  buildImportsRegistry,
+  generateIndex,
+  generateModuleTypes,
+  generateRootIndex,
+  generateTypeRegistry,
+  generateTypesLookup,
+  GeneratorConfig,
+} from '../../generators'
+import { extractMeta } from '../../metadata'
+import { getAllMetadata, MetadataSource } from '../../metadata/metadata'
 
 export interface IConfig {
   metadata: MetadataSource
@@ -140,33 +137,44 @@ types don't much the metadata definiton`,
     } as IConfig
   }
 
-  async buildGeneratorConfig(config: IConfig): Promise<GeneratorConfig> {
+  async buildGeneratorConfigs(config: IConfig): Promise<GeneratorConfig[]> {
     const { outDir } = config
 
-    const originalMetadata = await getMetadata(config.metadata)
-    const modules = await extractMeta(config, originalMetadata)
+    const specsMetadata = await getAllMetadata(config.metadata)
 
-    const { specVersion } = await getChainSpec(config.metadata.source)
-    return {
-      importsRegistry: buildImportsRegistry(),
-      modules,
-      validateArgs: config.strict || false, // do not enforce validation by default
-      dest: path.resolve(path.join(outDir, specVersion.toString())),
-      originalMetadata,
-      specVersion,
-    }
+    return Promise.all(
+      specsMetadata.map(async ([originalMetadata, chainSpec]) => {
+        const modules = await extractMeta(config, originalMetadata)
+
+        return {
+          importsRegistry: buildImportsRegistry(),
+          modules,
+          validateArgs: config.strict || false, // do not enforce validation by default
+          dest: path.resolve(
+            path.join(outDir, chainSpec.specVersion.toString())
+          ),
+          originalMetadata,
+          specVersion: chainSpec.specVersion,
+        }
+      })
+    )
   }
 
   async generate(config: IConfig): Promise<void> {
-    const generatorConfig = await this.buildGeneratorConfig(config)
-    const { dest } = generatorConfig
+    const generatorConfigs = await this.buildGeneratorConfigs(config)
 
-    debug(`Output dir: ${dest}`)
-    fs.mkdirSync(dest, { recursive: true })
+    for (const generatorConfig of generatorConfigs) {
+      const { dest } = generatorConfig
 
-    await generateTypesLookup(config, generatorConfig)
-    generateModuleTypes(generatorConfig)
-    generateIndex(generatorConfig)
-    generateTypeRegistry(generatorConfig)
+      debug(`Output dir: ${dest}`)
+      fs.mkdirSync(dest, { recursive: true })
+
+      generateIndex(generatorConfig)
+      generateTypeRegistry(generatorConfig)
+      await generateTypesLookup(config, generatorConfig)
+      generateModuleTypes(generatorConfig)
+    }
+
+    generateRootIndex(config, generatorConfigs)
   }
 }
