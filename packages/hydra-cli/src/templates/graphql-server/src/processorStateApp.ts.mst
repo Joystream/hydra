@@ -31,7 +31,7 @@ const validateUpdateProcessorStateRequest = (req: express.Request): ProcessorSta
     'lastScannedBlock' in state &&
     typeof state.lastScannedBlock === 'number' &&
     Number.isInteger(state.lastScannedBlock) &&
-    state.lastScannedBlock >= 0 &&
+    state.lastScannedBlock >= -1 &&
     'chainHead' in state &&
     typeof state.chainHead === 'number' &&
     Number.isInteger(state.chainHead) &&
