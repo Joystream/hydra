@@ -1,7 +1,7 @@
 {
   "name": "@joystream/hydra-indexer-gateway",
   "private": "true",
-  "version": "5.0.0-alpha.0",
+  "version": "5.0.0-alpha.1",
   "description": "Generated Warthog Project",
   "license": "MIT",
   "scripts": {
@@ -41,9 +41,9 @@
     "test:watch": "DEBUG= jest --watch"
   },
   "dependencies": {
-    "@joystream/bn-typeorm": "^5.0.0-alpha.0",
-    "@joystream/hydra-common": "^5.0.0-alpha.0",
-    "@joystream/hydra-db-utils": "^5.0.0-alpha.0",
+    "@joystream/bn-typeorm": "^5.0.0-alpha.1",
+    "@joystream/hydra-common": "^5.0.0-alpha.1",
+    "@joystream/hydra-db-utils": "^5.0.0-alpha.1",
     "@joystream/warthog": "^2.41.9",
     "@types/ioredis": "^4.17.4",
     "bn.js": "^5.2.1",
