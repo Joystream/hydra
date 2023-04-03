@@ -16,17 +16,16 @@ export async function generateTypesLookup(
   const TYPES_OUT_DIR_NAME = 'types'
 
   // create the temporary types-lookup directory
-  const typesLookupOutDir = path.join(dest, TYPES_OUT_DIR_NAME)
+  const typesLookupOutDir = path.join(
+    outDir,
+    specVersion.toString(),
+    TYPES_OUT_DIR_NAME
+  )
   fs.mkdirSync(typesLookupOutDir, { recursive: true })
 
   // generate types-lookup.ts using polkadot typegen
   const pExecFile = promisify(execFile)
 
-  const typegenInput = path.join(
-    outDir,
-    specVersion.toString(),
-    TYPES_OUT_DIR_NAME
-  )
   const typegenSource = path.join(
     outDir,
     specVersion.toString(),
@@ -37,7 +36,7 @@ export async function generateTypesLookup(
     '--endpoint',
     typegenSource,
     '--input',
-    typegenInput,
+    typesLookupOutDir,
     '--package',
     dest,
   ])
