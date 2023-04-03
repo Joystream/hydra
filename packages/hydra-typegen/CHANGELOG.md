@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.0-alpha.0](https://github.com/Joystream/hydra/compare/v4.0.0-alpha.11...v5.0.0-alpha.0) (2023-04-03)
+
+
+### Features
+
+* feat: generate types for different runtime versions ([89b9976](https://github.com/Joystream/hydra/commit/89b9976935faf47de5f0cae9e0e3a84f15f4637b))
+
+
+### Bug Fixes
+
+* import event's parameters types of the same spec version ([b9319e6](https://github.com/Joystream/hydra/commit/b9319e6f9ce9331573265697bd18ad6d5f65cea6))
+
+
+
 ## 4.0.0-alpha.11 (2023-02-08)
 
 **Note:** Version bump only for package @joystream/hydra-typegen
