@@ -1,24 +1,28 @@
 import { Command, flags } from '@oclif/command'
+import Debug from 'debug'
 import fs from 'fs'
 import path from 'path'
-import Debug from 'debug'
 
-import { getMetadata, MetadataSource } from '../../metadata/metadata'
-import { extractMeta } from '../../metadata'
-import {
-  generateModuleTypes,
-  GeneratorConfig,
-  buildImportsRegistry,
-  generateIndex,
-} from '../../generators'
 import { parseConfigFile } from '../../config/parse-yaml'
 import { validate } from '../../config/validate'
+import {
+  buildImportsRegistry,
+  generateIndex,
+  generateModuleTypes,
+  generateRootIndex,
+  generateTypeRegistry,
+  generateTypesLookup,
+  GeneratorConfig,
+} from '../../generators'
+import { extractMeta } from '../../metadata'
+import { getAllMetadata, MetadataSource } from '../../metadata/metadata'
 
 export interface IConfig {
   metadata: MetadataSource
   events: string[]
   calls: string[]
   outDir: string
+  typegenBinPath: string
   strict?: boolean
 }
 
@@ -30,6 +34,7 @@ export type Flags = {
   outDir: string
   strict: boolean
   debug: boolean
+  typegenBinPath?: string
 }
 
 const debug = Debug('hydra-typegen:typegen')
@@ -71,6 +76,12 @@ Otherwise a relative path to a json file matching the RPC call response is expec
       description:
         'A relative path the root folder where the generated files will be generated',
       default: 'generated/types',
+    }),
+    typegenBinPath: flags.string({
+      char: 't',
+      description:
+        'A relative path to the polkadot typegen binary (polkadot-types-from-defs)',
+      default: 'node_modules/.bin/polkadot-types-from-defs',
     }),
     strict: flags.boolean({
       char: 's',
@@ -126,29 +137,44 @@ types don't much the metadata definiton`,
     } as IConfig
   }
 
-  async buildGeneratorConfig(config: IConfig): Promise<GeneratorConfig> {
+  async buildGeneratorConfigs(config: IConfig): Promise<GeneratorConfig[]> {
     const { outDir } = config
 
-    const originalMetadata = await getMetadata(config.metadata)
-    const modules = await extractMeta(config, originalMetadata)
+    const specsMetadata = await getAllMetadata(config.metadata)
 
-    return {
-      importsRegistry: buildImportsRegistry(),
-      modules,
-      validateArgs: config.strict || false, // do not enforce validation by default
-      dest: path.resolve(outDir),
-      originalMetadata,
-    }
+    return Promise.all(
+      specsMetadata.map(async ([originalMetadata, chainSpec]) => {
+        const modules = await extractMeta(config, originalMetadata)
+
+        return {
+          importsRegistry: buildImportsRegistry(),
+          modules,
+          validateArgs: config.strict || false, // do not enforce validation by default
+          dest: path.resolve(
+            path.join(outDir, chainSpec.specVersion.toString())
+          ),
+          originalMetadata,
+          specVersion: chainSpec.specVersion,
+        }
+      })
+    )
   }
 
   async generate(config: IConfig): Promise<void> {
-    const generatorConfig = await this.buildGeneratorConfig(config)
-    const { dest } = generatorConfig
+    const generatorConfigs = await this.buildGeneratorConfigs(config)
 
-    debug(`Output dir: ${dest}`)
-    fs.mkdirSync(dest, { recursive: true })
+    for (const generatorConfig of generatorConfigs) {
+      const { dest } = generatorConfig
 
-    generateModuleTypes(generatorConfig)
-    generateIndex(generatorConfig)
+      debug(`Output dir: ${dest}`)
+      fs.mkdirSync(dest, { recursive: true })
+
+      generateIndex(generatorConfig)
+      generateTypeRegistry(generatorConfig)
+      await generateTypesLookup(config, generatorConfig)
+      generateModuleTypes(generatorConfig)
+    }
+
+    generateRootIndex(config, generatorConfigs)
   }
 }

@@ -7,6 +7,7 @@ export type GeneratorConfig = {
   originalMetadata: Metadata
   dest: string
   validateArgs: boolean
+  specVersion: number
 }
 
 // these map all the codec and primitive types for import, see the ImportsDef below. If

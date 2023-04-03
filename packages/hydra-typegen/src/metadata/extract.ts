@@ -1,29 +1,27 @@
-import { IConfig } from '../commands/typegen'
-import { getMetadata } from './metadata'
-import { uniq } from 'lodash'
-import { ExtractedModuleMeta, weakEquals, ExtractedVaraintData } from './types'
-import { pushToDictionary } from '../util'
+import { Metadata } from '@polkadot/types'
 import {
   MetadataLatest,
   PalletMetadataLatest,
 } from '@polkadot/types/interfaces/metadata'
 import { Si1Variant } from '@polkadot/types/interfaces/scaleInfo'
-import { Metadata } from '@polkadot/types'
 import { TypeDef } from '@polkadot/types/types'
+import { uniq } from 'lodash'
+import { IConfig } from '../commands/typegen'
+import { pushToDictionary } from '../util'
+import { ExtractedModuleMeta, ExtractedVaraintData, weakEquals } from './types'
 
 const debug = require('debug')('hydra-typegen:extract')
 
 export async function extractMeta(
-  { metadata: metadataSource, events, calls }: IConfig,
-  originalMetadata?: Metadata
+  { events, calls }: IConfig,
+  originalMetadata: Metadata
 ): Promise<ExtractedModuleMeta[]> {
   const modules: Record<string, PalletMetadataLatest> = {}
   const moduleEvents: Record<string, ExtractedVaraintData[]> = {}
   const moduleCalls: Record<string, ExtractedVaraintData[]> = {}
   const moduleTypes: Record<string, string[]> = {}
 
-  const metadata = (originalMetadata || (await getMetadata(metadataSource)))
-    .asLatest
+  const metadata = originalMetadata.asLatest
 
   for (const e of events) {
     const [module, event, types] = extractEvent(metadata, e)

@@ -1,10 +1,11 @@
+/* eslint-disable */
+
 import { createTypeUnsafe } from "@polkadot/types/create";
 import { SubstrateEvent, SubstrateExtrinsic } from "@joystream/hydra-common";
-import { typeRegistry } from ".";
+import { typeRegistry } from "./typeRegistry";
 
 {{{imports}}}
 
-export namespace {{module.name}} {
 {{#each events}}
     {{#if documentation}}
     /**
@@ -15,7 +16,7 @@ export namespace {{module.name}} {
      *  Event parameters: [{{#each args}}{{{this}}}, {{/each}}]
      */
     {{/if}}
-    export class {{name}}Event {
+    export class {{@root.module.name}}_{{name}}Event_V{{@root.specVersion}} {
         public readonly expectedParamTypes = [{{#each args}}'{{{this}}}', {{/each}}]
 
         constructor(public readonly ctx: SubstrateEvent) {}
@@ -29,6 +30,10 @@ export namespace {{module.name}} {
             {{/if}}
 
             {{{paramsReturnStmt}}}
+        }
+
+        get specVersion(): number {
+            return {{@root.specVersion}}
         }
 
         validateParams(): boolean {
@@ -100,4 +105,3 @@ export namespace {{module.name}} {
     }
 {{/each}}
 
-}
