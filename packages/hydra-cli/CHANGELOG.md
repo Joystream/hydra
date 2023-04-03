@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## 4.0.0-alpha.12 (2023-04-03)
+## [5.0.0-alpha.0](https://github.com/Joystream/hydra/compare/v4.0.0-alpha.11...v5.0.0-alpha.0) (2023-04-03)
 
 **Note:** Version bump only for package @joystream/hydra-cli
 
