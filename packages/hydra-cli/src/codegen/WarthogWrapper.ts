@@ -210,6 +210,9 @@ export default class WarthogWrapper {
       // this should overwrite warthog dep as well
       ...pkgFile.dependencies,
       ...extraDependencies,
+      // fix the issue with the latest version of @types/lodash
+      // which prevents the graphql-server from compiling
+      '@types/lodash': '4.14.182',
     }
 
     // resolutions can be used for fixing temporary package dependency issues
