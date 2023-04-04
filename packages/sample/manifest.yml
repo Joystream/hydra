@@ -1,8 +1,8 @@
-version: '3.0'
+version: '5.0'
 description: Sample manifest
 repository: https://github.com/
 ## reserved but unused fields
-hydraVersion: '4'
+hydraVersion: '5'
 dataSource:
   kind: substrate 
   chain: node-template

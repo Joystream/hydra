@@ -1,7 +1,7 @@
-version: '0.2'
+version: '5.0'
 description: Test manifest
 repository: https://github.com/
-hydraVersion: '4'
+hydraVersion: '5'
 dataSource:
   kind: substrate
   chain: node-template
