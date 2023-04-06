@@ -159,7 +159,13 @@ export class BlockQueue implements IBlockQueue {
 
       debug(`Next block: ${block.id}`)
       // wait until all the events up to blockNumber are fully fetched
-      pWaitFor(() => this.rangeFilter.block.gt >= block.height)
+      await pWaitFor(
+        () =>
+          this.rangeFilter.block.gt >= block.height ||
+          (this.eventQueue.length > 0 &&
+            this.eventQueue[this.eventQueue.length - 1].event.blockNumber >
+              block.height)
+      )
 
       while (
         !this.isEmpty() &&
