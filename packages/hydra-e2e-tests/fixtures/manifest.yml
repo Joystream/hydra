@@ -1,7 +1,7 @@
-version: '3.0'
+version: '5.0'
 description: Test manifest
 repository: https://github.com/
-hydraVersion: "4"
+hydraVersion: "5"
 dataSource:
   kind: substrate 
   chain: node-template
@@ -15,6 +15,7 @@ typegen:
   calls:
     - timestamp.set
   outDir: ./mappings/generated/types
+  typegenBinPath: ./node_modules/.bin/polkadot-types-from-defs
 mappings:
   mappingsModule: mappings/lib/mappings
   imports:
