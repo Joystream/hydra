@@ -158,20 +158,12 @@ export class BlockQueue implements IBlockQueue {
       )
 
       debug(`Next block: ${block.id}`)
-      // wait until all the events up to blockNumber are fully fetched
-      await pWaitFor(
-        () =>
-          this.rangeFilter.block.gt >= block.height ||
-          (this.eventQueue.length > 0 &&
-            this.eventQueue[this.eventQueue.length - 1].event.blockNumber >
-              block.height)
-      )
 
-      while (
-        !this.isEmpty() &&
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        first(this.eventQueue)!.event.blockNumber === block.height
-      ) {
+      while (this._hasNext) {
+        await pWaitFor(() => this.eventQueue.length > 0)
+        if (this.eventQueue[0].event.blockNumber > block.height) {
+          break
+        }
         nextEventData = (await this.poll()) as EventData
         events.push(nextEventData)
       }
