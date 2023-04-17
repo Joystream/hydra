@@ -159,9 +159,33 @@ export class BlockQueue implements IBlockQueue {
 
       debug(`Next block: ${block.id}`)
 
-      while (this._hasNext) {
-        await pWaitFor(() => this.eventQueue.length > 0)
-        if (this.eventQueue[0].event.blockNumber > block.height) {
+      while (
+        // If the rangeFiler.block.gt is below the current block height,
+        // it means that there may still be events in the current block
+        // to be fetched from the indexer
+        this.rangeFilter.block.gt < block.height ||
+        // Alternatively, there may also be events in the queue we haven't processed yet
+        (this.eventQueue.length > 0 &&
+          this.eventQueue[0].event.blockNumber === block.height)
+      ) {
+        // If the queue is empty, we need to wait for either:
+        // - the next event to arrive
+        // - the rangeFilter.block.gt to be updated to >= block.height
+        //   (which would mean that we already fetched all the events in the current block from the indexer)
+        await pWaitFor(
+          () =>
+            this.eventQueue.length > 0 ||
+            this.rangeFilter.block.gt >= block.height
+        )
+        // Break conditions
+        if (
+          // The quque is empty and all the events in the current block are already fetched from the indexer
+          (this.eventQueue.length === 0 &&
+            this.rangeFilter.block.gt >= block.height) ||
+          // The queue is not empty, but the first event in the queue is from a higher block
+          (this.eventQueue.length > 0 &&
+            this.eventQueue[0].event.blockNumber !== block.height)
+        ) {
           break
         }
         nextEventData = (await this.poll()) as EventData
