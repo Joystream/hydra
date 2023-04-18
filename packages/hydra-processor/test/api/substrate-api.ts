@@ -55,7 +55,7 @@ export async function createApi(wsProviderURI: string): Promise<ApiPromise> {
 
   // Create the API and wait until ready
   const apiPromise = new ApiPromise({ provider, typesSpec })
-  const api = await apiPromise.isReadyOrError
+  const api = await apiPromise.isReady
 
   Container.set('ApiPromise', apiPromise)
 
