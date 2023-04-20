@@ -62,9 +62,11 @@ export class StateKeeper implements IStateKeeper {
             lastProcessedEvent: this.processorState.lastProcessedEvent,
           },
         })
-        .catch((e) =>
-          debug(`State update request failed: ${(e as Error).message}`)
-        )
+        .catch((e) => {
+          if (conf().VERBOSE) {
+            debug(`State update request failed: ${(e as Error).message}`)
+          }
+        })
     }, 100)
 
     // additionally log every status change

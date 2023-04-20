@@ -19,7 +19,10 @@ jobs:
           yarn 
           yarn workspaces run lint
       - name: run unit tests
+        # We use `sudo rm -rf /usr/share/dotnet` as a workaround to free up some space
+        # (see hydra-e2e-tests.yml for explaination)
         run: |
+          sudo rm -rf /usr/share/dotnet
           yarn  
           yarn workspace @joystream/hydra-cli test 
           yarn workspace @joystream/hydra-typegen test
