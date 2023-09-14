@@ -64,5 +64,9 @@
     "ts-node": "^10.2.1",
     "ts-node-dev": "^1.0.0-pre.40",
     "typescript": "4.4.2"
+  },
+  "volta": {
+    "node": "18.6.0",
+    "yarn": "1.22.19"
   }
 }

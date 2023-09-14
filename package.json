@@ -57,5 +57,9 @@
     "commitizen": {
       "path": "cz-lerna-changelog"
     }
+  },
+  "volta": {
+    "node": "18.6.0",
+    "yarn": "1.22.19"
   }
 }
