@@ -2,10 +2,10 @@
 
 cleanup()
 {
-  (echo "## Processor Logs ##" && docker logs hydra-e2e-tests_hydra-processor_1 --tail 50) || :
-  (echo "## Query Node Logs ##" && docker logs hydra-e2e-tests_query-node_1 --tail 50) || :  
-  (echo "## Indexer Logs ##" && docker logs hydra-e2e-tests_hydra-indexer_1 --tail 50) || :  
-  (echo "## Indexer API Server ##" && docker logs hydra-e2e-tests_hydra-indexer-gateway_1 --tail 50) || :  
+  (echo "## Processor Logs ##" && docker logs hydra-e2e-tests_hydra-processor_1 --tail 200) || :
+  (echo "## Query Node Logs ##" && docker logs hydra-e2e-tests_query-node_1 --tail 200) || :
+  (echo "## Indexer Logs ##" && docker logs hydra-e2e-tests_hydra-indexer_1 --tail 50) || :
+  (echo "## Indexer API Server ##" && docker logs hydra-e2e-tests_hydra-indexer-gateway_1 --tail 50) || :
   (yarn post-e2e-test) || :
   rm -rf ./hydra-test
 }
