@@ -10,6 +10,8 @@ import { buildServerSchema, getServer } from './server';
 import { queryTemplates } from './queryTemplates';
 import { createProcessorStateApp } from './processorStateApp';
 
+import { EnvelopArmor } from "@escape.tech/graphql-armor";
+
 class CustomNamingStrategy extends SnakeNamingStrategy {
   constructor() {
     super();
@@ -20,8 +22,43 @@ class CustomNamingStrategy extends SnakeNamingStrategy {
   }
 }
 
-async function bootstrap() {
+function getArmorConfig() {
+  if (process.env.GRAPHQL_ENABLE_PROTECTION === 'true') {
+    const armor = new EnvelopArmor({
+        blockFieldSuggestion: {
+          enabled: false,
+        },
+        maxDepth: {
+          enabled: true,
+          n: 3,
+        },
+        maxAliases: {
+          enabled: true,
+          n: 5,
+        },
+        //characterLimit: {
+        //  enabled: true,
+        //  maxLength: 1000,
+        //},
+        maxDirectives: {
+          enabled: true,
+          n: 0,
+        },
+    });
+
+    const config = armor.protect();
+    const { plugins } = config;
+    Logger.info(`Enabling GraphQL Armor with ${plugins.length} plugins.`);
+    return config
+  } else {
+    return {};
+  }
+}
+
+function prepareServer() {
   loadConfig();
+
+  const armor = getArmorConfig();
 
   const server = getServer(
     {
@@ -32,28 +69,37 @@ async function bootstrap() {
         subscriptionEndpoint: process.env.GRAPHQL_PLAYGROUND_SUBSCRIPTION_ENDPOINT || undefined,
         queryTemplates,
       },
+      ...armor,
     },
     {
       namingStrategy: new CustomNamingStrategy(),
       maxQueryExecutionTime: 1000,
       logging: [process.env.WARTHOG_DB_LOGGING || 'error'],
+      extra: {
+        poolSize: 10,
+        //cache: {
+        //
+        //}
+      },
     }
   );
 
-  // Create database tables. Warthog migrate command does not support CustomNamingStrategy thats why
-  // we have this code
+  return server;
+}
+
+async function bootstrap() {
+  const server = prepareServer();
+
   const syncDatabase: string | undefined = process.env.SYNC;
   if (syncDatabase === 'true') {
     await server.establishDBConnection();
     process.exit(0);
   }
+
   await buildServerSchema(server);
   await server.start();
   const processorStateApp = createProcessorStateApp(process.env.PROCESSOR_HOST || 'localhost');
-  await processorStateApp.listen(
-    parseInt(process.env.PROCESSOR_STATE_APP_PORT || '8082'),
-    '0.0.0.0'
-  );
+  processorStateApp.listen(parseInt(process.env.PROCESSOR_STATE_APP_PORT || '8082'), '0.0.0.0');
 }
 
 bootstrap().catch((error: Error) => {
