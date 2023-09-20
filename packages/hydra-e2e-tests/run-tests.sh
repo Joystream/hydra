@@ -37,7 +37,7 @@ until $(curl -s --head  --request GET http://localhost:3000/metrics/hydra_proces
 
     printf '.'
     attempt_counter=$(($attempt_counter+1))
-    sleep 5
+    sleep 10
 done
 
 # start rest of services (query-node most importantly)
