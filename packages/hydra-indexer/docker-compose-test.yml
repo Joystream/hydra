@@ -5,7 +5,7 @@ services:
     image: joystream/node:latest
     ports:
       - "9944:9944"
-    command: ["/joystream/node", "--dev", "--tmp", "--ws-external"]
+    command: ["--dev", "--tmp", "--ws-external"]
   
   redis:
     image: redis:6.0-alpine
