@@ -1,4 +1,4 @@
-FROM node:14-alpine 
+FROM node:18 
 
 RUN mkdir -p /home/hydra && chown -R node:node /home/hydra
 
