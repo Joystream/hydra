@@ -20,6 +20,12 @@ export type ExtractedModuleMeta = {
   types: string[]
 }
 
+export type MetaExtractionResult = {
+  extracted: ExtractedModuleMeta[]
+  missingEvents: string[]
+  missingCalls: string[]
+}
+
 export function weakEquals(s1: string | Text, s2: string | Text): boolean {
   if (s1 === undefined || s2 === undefined) {
     return false
