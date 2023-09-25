@@ -119,7 +119,7 @@ export function buildQueryFields<T>(fields: QueryFields<T>): string {
       )[key] as QueryFields<T[typeof key]>
 
       output = `
-      ${output}${key} {
+      ${output}${String(key)} {
         ${buildQueryFields(nestedFields)}
       }\n`
     }

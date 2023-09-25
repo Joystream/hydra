@@ -2,11 +2,11 @@ version: "3"
 
 services:
   node-template:
-    image: paritytech/substrate-playground-template-node-template:sha-af065c19
+    image: joystream/node:2f8fe07f801618c1371ecc5d5ee944fe4e2c0d1f
     restart: unless-stopped
     ports:
       - "9944:9944"
-    command: ["./target/debug/node-template", "--dev", "--tmp", "--ws-external"]
+    command: ["--dev", "--tmp", "--ws-external"]
 
   redis:
     image: redis:6.0-alpine

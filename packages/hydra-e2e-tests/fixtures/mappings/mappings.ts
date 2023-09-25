@@ -9,7 +9,7 @@ import {
 
 // run 'NODE_URL=<RPC_ENDPOINT> EVENTS=<comma separated list of events> yarn codegen:mappings-types'
 // to genenerate typescript classes for events, such as Balances.TransferEvent
-import { Balances_TransferEvent_V100, SetCall } from './generated/types'
+import { Balances_TransferEvent_V2001, SetCall } from './generated/types'
 import BN from 'bn.js'
 import {
   ExtrinsicContext,
@@ -43,7 +43,7 @@ export async function balancesTransfer({
   extrinsic,
 }: EventContext & StoreContext) {
   const transfer = new Transfer()
-  const [from, to, value] = new Balances_TransferEvent_V100(event).params
+  const [from, to, value] = new Balances_TransferEvent_V2001(event).params
   transfer.from = Buffer.from(from.toHex())
   transfer.to = Buffer.from(to.toHex())
   transfer.value = value.toBn()
