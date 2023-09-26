@@ -1,6 +1,6 @@
 {
   "name": "@joystream/hydra-processor",
-  "version": "5.0.0-alpha.4",
+  "version": "5.0.0-alpha.5",
   "description": "Hydra Processor CLI",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -37,8 +37,8 @@
     "test:run": "yarn nyc --extension .ts mocha --timeout 70000 --exit --require ts-node/register --forbid-only \"./{src,test}/**/*.spec.ts\""
   },
   "dependencies": {
-    "@joystream/hydra-common": "^5.0.0-alpha.4",
-    "@joystream/hydra-db-utils": "^5.0.0-alpha.4",
+    "@joystream/hydra-common": "^5.0.0-alpha.5",
+    "@joystream/hydra-db-utils": "^5.0.0-alpha.5",
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.3.3",
@@ -65,7 +65,7 @@
     "yaml-validator": "^3.0.0"
   },
   "devDependencies": {
-    "@joystream/hydra-cli": "^5.0.0-alpha.4",
+    "@joystream/hydra-cli": "^5.0.0-alpha.5",
     "@polkadot/api": "8.9.1",
     "@types/async-lock": "^1.1.3",
     "@types/bn.js": "^5.1.0",
