@@ -8,14 +8,14 @@ import { TypeDef } from '@polkadot/types/types'
 import { uniq } from 'lodash'
 import { IConfig } from '../commands/typegen'
 import { pushToDictionary } from '../util'
-import { ExtractedModuleMeta, ExtractedVaraintData, weakEquals } from './types'
+import { ExtractedVaraintData, MetaExtractionResult, weakEquals } from './types'
 
 const debug = require('debug')('hydra-typegen:extract')
 
 export async function extractMeta(
   { events, calls }: IConfig,
   originalMetadata: Metadata
-): Promise<ExtractedModuleMeta[]> {
+): Promise<MetaExtractionResult> {
   const modules: Record<string, PalletMetadataLatest> = {}
   const moduleEvents: Record<string, ExtractedVaraintData[]> = {}
   const moduleCalls: Record<string, ExtractedVaraintData[]> = {}
@@ -23,40 +23,57 @@ export async function extractMeta(
 
   const metadata = originalMetadata.asLatest
 
+  const missingEvents: string[] = []
+  const missingCalls: string[] = []
+
   for (const e of events) {
-    const [module, event, types] = extractEvent(metadata, e)
-    const name = module.name.toString()
-    modules[name] = module
-    pushToDictionary(moduleEvents, name, event)
-    pushToDictionary(moduleTypes, name, ...types)
+    const extractedEvent = extractEvent(metadata, e)
+    if (extractedEvent) {
+      const [module, event, types] = extractedEvent
+      const name = module.name.toString()
+      modules[name] = module
+      pushToDictionary(moduleEvents, name, event)
+      pushToDictionary(moduleTypes, name, ...types)
+    } else {
+      missingEvents.push(e)
+    }
   }
 
   for (const c of calls) {
-    const [module, call, types] = extractCall(metadata, c)
-    const name = module.name.toString()
-    modules[name] = module
-    pushToDictionary(moduleCalls, name, call)
-    pushToDictionary(moduleTypes, name, ...types)
+    const extractedCall = extractCall(metadata, c)
+    if (extractedCall) {
+      const [module, call, types] = extractedCall
+      const name = module.name.toString()
+      modules[name] = module
+      pushToDictionary(moduleCalls, name, call)
+      pushToDictionary(moduleTypes, name, ...types)
+    } else {
+      missingCalls.push(c)
+    }
   }
 
-  return Object.keys(modules).map((name) => ({
-    module: modules[name],
-    events: moduleEvents[name],
-    calls: moduleCalls[name],
-    types: moduleTypes[name],
-  }))
+  return {
+    extracted: Object.keys(modules).map((name) => ({
+      module: modules[name],
+      events: moduleEvents[name],
+      calls: moduleCalls[name],
+      types: moduleTypes[name],
+    })),
+    missingEvents,
+    missingCalls,
+  }
 }
 
 function extractCall(
   meta: MetadataLatest,
   callName: string
-): [PalletMetadataLatest, ExtractedVaraintData, string[]] {
+): [PalletMetadataLatest, ExtractedVaraintData, string[]] | undefined {
   const [moduleName, method] = callName.split('.')
 
   const module = meta.pallets.find((v) => weakEquals(v.name, moduleName))
 
   if (module === undefined || module.calls === undefined) {
-    throw new Error(`No metadata found for module ${moduleName}`)
+    return undefined // extrinsic module not found
   }
 
   let callVariant: Si1Variant | undefined
@@ -69,7 +86,7 @@ function extractCall(
   }
 
   if (callVariant === undefined) {
-    throw new Error(`No metadata found for the call ${callName}`)
+    return undefined // extrinsic call not found
   }
 
   return [
@@ -82,13 +99,13 @@ function extractCall(
 function extractEvent(
   meta: MetadataLatest,
   eventName: string
-): [PalletMetadataLatest, ExtractedVaraintData, string[]] {
+): [PalletMetadataLatest, ExtractedVaraintData, string[]] | undefined {
   const [moduleName, method] = eventName.split('.')
 
   const module = meta.pallets.find((v) => weakEquals(v.name, moduleName))
 
   if (module === undefined || module.events === undefined) {
-    throw new Error(`No metadata found for module ${moduleName}`)
+    return undefined // Event module not found
   }
 
   let eventVaraint: Si1Variant | undefined
@@ -101,7 +118,7 @@ function extractEvent(
   }
 
   if (eventVaraint === undefined) {
-    throw new Error(`No metadata found for the event ${eventName}`)
+    return undefined // Event variant not found
   }
 
   return [

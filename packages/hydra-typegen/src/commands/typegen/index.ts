@@ -137,33 +137,74 @@ types don't much the metadata definiton`,
     } as IConfig
   }
 
-  async buildGeneratorConfigs(config: IConfig): Promise<GeneratorConfig[]> {
+  async buildGeneratorConfigs(config: IConfig): Promise<{
+    configs: GeneratorConfig[]
+    allMissingEvents: string[][]
+    allMissingCalls: string[][]
+  }> {
     const { outDir } = config
 
     const specsMetadata = await getAllMetadata(config.metadata)
 
-    return Promise.all(
+    const results = await Promise.all(
       specsMetadata.map(async ([originalMetadata, chainSpec]) => {
-        const modules = await extractMeta(config, originalMetadata)
+        const { extracted, missingEvents, missingCalls } = await extractMeta(
+          config,
+          originalMetadata
+        )
 
         return {
-          importsRegistry: buildImportsRegistry(),
-          modules,
-          validateArgs: config.strict || false, // do not enforce validation by default
-          dest: path.resolve(
-            path.join(outDir, chainSpec.specVersion.toString())
-          ),
-          originalMetadata,
-          specVersion: chainSpec.specVersion,
+          config: {
+            importsRegistry: buildImportsRegistry(),
+            modules: extracted,
+            validateArgs: config.strict || false,
+            dest: path.resolve(
+              path.join(outDir, chainSpec.specVersion.toString())
+            ),
+            originalMetadata,
+            specVersion: chainSpec.specVersion,
+          },
+          missingEvents,
+          missingCalls,
         }
       })
     )
+
+    const generatorConfigs = results.map((r) => r.config)
+    const allMissingEvents = results.map((r) => r.missingEvents)
+    const allMissingCalls = results.map((r) => r.missingCalls)
+
+    return { configs: generatorConfigs, allMissingEvents, allMissingCalls }
   }
 
   async generate(config: IConfig): Promise<void> {
-    const generatorConfigs = await this.buildGeneratorConfigs(config)
+    const { configs, allMissingEvents, allMissingCalls } =
+      await this.buildGeneratorConfigs(config)
 
-    for (const generatorConfig of generatorConfigs) {
+    const globalMissingEvents = config.events.filter(
+      (event) =>
+        !allMissingEvents.some(
+          (missingEvents) => !missingEvents.includes(event)
+        )
+    )
+
+    const globalMissingCalls = config.calls.filter(
+      (call) =>
+        !allMissingCalls.some((missingCalls) => !missingCalls.includes(call))
+    )
+
+    if (globalMissingEvents.length > 0) {
+      throw new Error(
+        `No metadata found for the events: ${globalMissingEvents.join(', ')}`
+      )
+    }
+    if (globalMissingCalls.length > 0) {
+      throw new Error(
+        `No metadata found for the calls: ${globalMissingCalls.join(', ')}`
+      )
+    }
+
+    for (const generatorConfig of configs) {
       const { dest } = generatorConfig
 
       debug(`Output dir: ${dest}`)
@@ -175,6 +216,6 @@ types don't much the metadata definiton`,
       generateModuleTypes(generatorConfig)
     }
 
-    generateRootIndex(config, generatorConfigs)
+    generateRootIndex(config, configs)
   }
 }
