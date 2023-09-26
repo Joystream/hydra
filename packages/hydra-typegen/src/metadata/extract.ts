@@ -73,7 +73,7 @@ function extractCall(
   const module = meta.pallets.find((v) => weakEquals(v.name, moduleName))
 
   if (module === undefined || module.calls === undefined) {
-    throw new Error(`No metadata found for module ${moduleName}`)
+    return undefined // extrinsic module not found
   }
 
   let callVariant: Si1Variant | undefined
@@ -105,7 +105,7 @@ function extractEvent(
   const module = meta.pallets.find((v) => weakEquals(v.name, moduleName))
 
   if (module === undefined || module.events === undefined) {
-    throw new Error(`No metadata found for module ${moduleName}`)
+    return undefined // Event module not found
   }
 
   let eventVaraint: Si1Variant | undefined
