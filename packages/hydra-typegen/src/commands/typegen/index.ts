@@ -136,6 +136,7 @@ types don't much the metadata definiton`,
       strict: flags.strict,
     } as IConfig
   }
+
   async buildGeneratorConfigs(config: IConfig): Promise<{
     configs: GeneratorConfig[]
     allMissingEvents: string[][]
