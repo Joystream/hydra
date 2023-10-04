@@ -19,7 +19,9 @@ export async function getSubstrateService(): Promise<ISubstrateService> {
     return substrateService
   }
   substrateService = new SubstrateService()
-  await (substrateService as SubstrateService).init()
+  await (substrateService as SubstrateService).init({
+    poolSize: getConfig().SUBSTRATE_API_POOL_SIZE,
+  })
   return substrateService
 }
 
