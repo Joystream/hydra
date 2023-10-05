@@ -200,14 +200,12 @@ export class SubstrateService implements ISubstrateService {
     functionName = 'api request'
   ): Promise<T> {
     return pRetry(
-      async (attempt: number) => {
+      async () => {
         if (this.shouldStop) {
           throw new pRetry.AbortError(
             'The indexer is stopping, aborting all API calls'
           )
         }
-
-        // on first attempt try runtime versioned guess, on second attempt let the api get the version from chain
 
         const api = await this.nextApi().at(hash)
         try {
