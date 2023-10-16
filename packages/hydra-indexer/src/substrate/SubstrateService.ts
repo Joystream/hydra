@@ -232,6 +232,7 @@ export class SubstrateService implements ISubstrateService {
     this.shouldStop = true
     if (this.api && this.api.isConnected) {
       await this.api.disconnect()
+      debug(`Api disconnected`)
     }
     debug(`Done`)
   }
