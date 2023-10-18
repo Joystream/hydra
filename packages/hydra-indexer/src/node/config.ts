@@ -29,6 +29,7 @@ let conf: {
   BLOCK_PRODUCER_FETCH_RETRIES: number
   SUBSTRATE_API_TIMEOUT: number
   SUBSTRATE_API_CALL_RETRIES: number
+  SUBSTRATE_API_POOL_SIZE: number
   NEW_BLOCK_TIMEOUT_MS: number
   HEADER_CACHE_CAPACITY: number
   FINALITY_THRESHOLD: number
@@ -178,6 +179,11 @@ export function configure(): void {
       SUBSTRATE_API_CALL_RETRIES: num({
         default: 5,
         desc: 'Number of times an API call is retried before giving up and throwing and error',
+      }),
+      // Api connection pool size
+      SUBSTRATE_API_POOL_SIZE: num({
+        default: 2,
+        desc: 'Number of websocket connections to setup for API calls',
       }),
 
       // If the block producer does not recieve a new block within this time limit,
