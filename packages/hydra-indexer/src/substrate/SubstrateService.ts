@@ -290,6 +290,7 @@ export class SubstrateService implements ISubstrateService {
     this.apiPool.map(async (api) => {
       if (api && api.isConnected) {
         await api.disconnect()
+        debug(`Api disconnected`)
       }
     })
     debug(`Done`)
