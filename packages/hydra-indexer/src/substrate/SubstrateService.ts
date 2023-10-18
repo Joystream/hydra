@@ -18,30 +18,26 @@ import Debug from 'debug'
 import pProps from 'p-props'
 
 import { getConfig } from '../'
-import { getApiPromise, getBlockTimestamp, ISubstrateService } from '.'
+import { createApiPromise, getBlockTimestamp, ISubstrateService } from '.'
 
-// import pTimeout from 'p-timeout'
 import pRetry from 'p-retry'
 
 import BN from 'bn.js'
 import { BlockData } from '../model'
 import { eventEmitter, IndexerEvents } from '../node/event-emitter'
+import { Subscription } from 'rxjs'
 
 const debug = Debug('hydra-indexer:substrate-service')
 
 export class SubstrateService implements ISubstrateService {
   private shouldStop = false
+  private api: ApiPromise | undefined
 
   async init(): Promise<void> {
     debug(`Initializing SubstrateService`)
-    await getApiPromise()
-    await this.subscribeToHeads()
+    await this.connect()
 
     eventEmitter.on(IndexerEvents.INDEXER_STOP, async () => await this.stop())
-    // eventEmitter.on(
-    //   IndexerEvents.API_CONNECTED,
-    //   async () => await this.subscribeToHeads()
-    // )
 
     pForever(async () => {
       if (this.shouldStop) {
@@ -50,6 +46,33 @@ export class SubstrateService implements ISubstrateService {
       await this.ping()
       await delay(getConfig().NODE_PING_INTERVAL)
     })
+  }
+
+  private async connect() {
+    this.api = await createApiPromise()
+
+    const subscriptions = this.subscribeToHeads(this.api)
+
+    this.api
+      .once('disconnected', () => {
+        debug('Api disconnected')
+      })
+      .on('error', async (e) => {
+        debug(`Api error: ${JSON.stringify(e)}`)
+      })
+      .once('decorated', async () => {
+        debug('Api decorated')
+        subscriptions.forEach((sub) => sub.unsubscribe())
+        const oldApi = this.api
+        await this.connect()
+        // allow short time for running queries to complete
+        await delay(1000)
+        try {
+          oldApi?.isConnected && (await oldApi?.disconnect())
+        } catch (err) {
+          debug(`Error trying to disconnection Api ${err}`)
+        }
+      })
   }
 
   async getHeader(hash: Hash | Uint8Array | string): Promise<Header> {
@@ -66,39 +89,34 @@ export class SubstrateService implements ISubstrateService {
     )
   }
 
-  async subscribeToHeads(): Promise<void> {
+  subscribeToHeads(api: ApiPromise): Subscription[] {
     debug(`Subscribing to new heads`)
-    const api = await getApiPromise()
-    api.rx.rpc.chain.subscribeFinalizedHeads().subscribe({
-      next: (header: Header) =>
-        eventEmitter.emit(IndexerEvents.NEW_FINALIZED_HEAD, {
-          header,
-          height: header.number.toNumber(),
-        }),
-    })
+    return [
+      api.rx.rpc.chain.subscribeFinalizedHeads().subscribe({
+        next: (header: Header) =>
+          eventEmitter.emit(IndexerEvents.NEW_FINALIZED_HEAD, {
+            header,
+            height: header.number.toNumber(),
+          }),
+      }),
 
-    api.rx.rpc.chain.subscribeNewHeads().subscribe({
-      next: (header: Header) =>
-        eventEmitter.emit(IndexerEvents.NEW_BEST_HEAD, {
-          header,
-          height: header.number.toNumber(),
-        }),
-    })
+      api.rx.rpc.chain.subscribeNewHeads().subscribe({
+        next: (header: Header) =>
+          eventEmitter.emit(IndexerEvents.NEW_BEST_HEAD, {
+            header,
+            height: header.number.toNumber(),
+          }),
+      }),
 
-    api.rx.rpc.chain.subscribeAllHeads().subscribe({
-      next: (header: Header) =>
-        eventEmitter.emit(IndexerEvents.NEW_HEAD, {
-          header,
-          height: header.number.toNumber(),
-        }),
-    })
+      api.rx.rpc.chain.subscribeAllHeads().subscribe({
+        next: (header: Header) =>
+          eventEmitter.emit(IndexerEvents.NEW_HEAD, {
+            header,
+            height: header.number.toNumber(),
+          }),
+      }),
+    ]
   }
-
-  // async subscribeFinalizedHeads(v: Callback<Header>): UnsubscribePromise {
-  //   const api = await getApiPromise()
-  //   api.rpc.chain.subscribeFinalizedHeads()
-  //   return (await getApiPromise()).rpc.chain.subscribeFinalizedHeads(v)
-  // }
 
   async getBlockHash(
     blockNumber?: BlockNumber | Uint8Array | number | string
@@ -139,15 +157,19 @@ export class SubstrateService implements ISubstrateService {
             'The indexer is stopping, aborting all API calls'
           )
         }
-        const api = await getApiPromise()
-        return promiseFn(api)
+        if (!this.api || !this.api.isConnected) {
+          throw Error(`Api connection not ready`)
+        }
+        return promiseFn(this.api)
       },
       {
         retries: getConfig().SUBSTRATE_API_CALL_RETRIES,
-        onFailedAttempt: (i) =>
+        onFailedAttempt: async (i) => {
           debug(
             `Failed to execute "${functionName}" after ${i.attemptNumber} attempts. Retries left: ${i.retriesLeft}`
-          ),
+          )
+          await delay(200)
+        },
       }
     )
   }
@@ -174,25 +196,33 @@ export class SubstrateService implements ISubstrateService {
   }
 
   async metadata(hash: Hash): Promise<MetadataLatest> {
-    const metadata = await this.apiCall((api) =>
-      api.rpc.state.getMetadata(hash)
+    const metadata = await this.apiCall(
+      (api) => api.rpc.state.getMetadata(hash),
+      'get metadata'
     )
     return metadata.asLatest
   }
 
   async runtimeVersion(hash: Hash): Promise<RuntimeVersion> {
-    return this.apiCall((api) => api.rpc.state.getRuntimeVersion(hash))
+    return this.apiCall(
+      (api) => api.rpc.state.getRuntimeVersion(hash),
+      'get runtime version'
+    )
   }
 
   async timestamp(hash: Hash): Promise<BN> {
-    return this.apiCall((api) => api.query.timestamp.now.at(hash))
+    return this.apiCall(
+      (api) => api.query.timestamp.now.at(hash),
+      'get timestamp'
+    )
   }
 
   async lastRuntimeUpgrade(
     hash: Hash
   ): Promise<LastRuntimeUpgradeInfo | undefined> {
-    const info = await this.apiCall((api) =>
-      api.query.system.lastRuntimeUpgrade.at(hash)
+    const info = await this.apiCall(
+      (api) => api.query.system.lastRuntimeUpgrade.at(hash),
+      'get last runtime upgrade'
     )
     return info.unwrapOr(undefined)
   }
@@ -200,9 +230,8 @@ export class SubstrateService implements ISubstrateService {
   async stop(): Promise<void> {
     debug(`Stopping substrate service`)
     this.shouldStop = true
-    const api = await getApiPromise()
-    if (api.isConnected) {
-      await api.disconnect()
+    if (this.api && this.api.isConnected) {
+      await this.api.disconnect()
       debug(`Api disconnected`)
     }
     debug(`Done`)

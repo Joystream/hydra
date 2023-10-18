@@ -5,7 +5,6 @@ import Debug from 'debug'
 import { getConfig } from '../node/config'
 import { ISubstrateService } from './ISubstrateService'
 import { SubstrateService } from './SubstrateService'
-import { eventEmitter, IndexerEvents } from '../node/event-emitter'
 
 export * from './ISubstrateService'
 export * from './SubstrateService'
@@ -14,7 +13,6 @@ export { getBlockTimestamp } from './timestamp'
 const debug = Debug('hydra-indexer:substrate-api')
 
 let substrateService: ISubstrateService
-let apiPromise: ApiPromise
 
 export async function getSubstrateService(): Promise<ISubstrateService> {
   if (substrateService) {
@@ -25,11 +23,7 @@ export async function getSubstrateService(): Promise<ISubstrateService> {
   return substrateService
 }
 
-export async function getApiPromise(): Promise<ApiPromise> {
-  if (apiPromise) {
-    return apiPromise
-  }
-
+export async function createApiPromise(): Promise<ApiPromise> {
   debug(`Creating new Api Promise`)
 
   const conf = getConfig()
@@ -39,7 +33,7 @@ export async function getApiPromise(): Promise<ApiPromise> {
 
   names.length && debug(`Injected types: ${names.join(', ')}`)
 
-  apiPromise = await pRetry(
+  return pRetry(
     async () =>
       new ApiPromise({
         provider,
@@ -54,16 +48,4 @@ export async function getApiPromise(): Promise<ApiPromise> {
         debug(`API failed to connect: ${JSON.stringify(error)}`),
     }
   )
-
-  apiPromise.on('error', async (e) => {
-    debug(`Api error: ${JSON.stringify(e)}, reconnecting....`)
-    apiPromise = await getApiPromise()
-  })
-
-  apiPromise.on('connected', () => {
-    debug(`Api connected`)
-    eventEmitter.emit(IndexerEvents.API_CONNECTED)
-  })
-
-  return apiPromise
 }
