@@ -1,5 +1,5 @@
 /* eslint-disable */
 
-{{#each modules}}
-export * from './{{kebabCase name}}'
+{{#each moduleNames}}
+export * from './{{kebabCase this}}'
 {{/each}}

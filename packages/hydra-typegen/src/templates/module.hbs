@@ -16,7 +16,7 @@ import { typeRegistry } from "./typeRegistry";
      *  Event parameters: [{{#each args}}{{{this}}}, {{/each}}]
      */
     {{/if}}
-    export class {{@root.module.name}}_{{name}}Event_V{{@root.specVersion}} {
+    export class {{@root.moduleName}}_{{name}}Event_V{{@root.specVersion}} {
         public readonly expectedParamTypes = [{{#each args}}'{{{this}}}', {{/each}}]
 
         constructor(public readonly ctx: SubstrateEvent) {}

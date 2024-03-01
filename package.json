@@ -47,7 +47,7 @@
     "prettier": "^2.7.1"
   },
   "resolutions": {
-    "@polkadot/types": "8.9.1",
+    "@polkadot/types": "10.1.4",
     "node-gyp": "^9.4.0"
   },
   "lint-staged": {
