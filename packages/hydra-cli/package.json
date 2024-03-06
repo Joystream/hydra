@@ -42,7 +42,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "lint": "eslint . --ext .ts",
     "prepack": "rm -rf lib && yarn tsc -b && cp -R ./src/templates ./lib/src/templates && oclif-dev manifest",
-    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\""
+    "test": "nyc --extension .ts mocha --require ts-node/register --forbid-only \"test/**/*.test.ts\""
   },
   "dependencies": {
     "@inquirer/input": "^0.0.13-alpha.0",
