@@ -28,7 +28,7 @@
     "fetch": "^1.1.0",
     "graphql-request": "^3.3.0",
     "graphql-subscriptions-client": "^0.16.0",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "^2",
     "p-wait-for": "^3.2.0",
     "typedi": "^0.8.0"
   },
