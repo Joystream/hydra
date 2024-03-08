@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 5.0.0-alpha.8 (2024-03-08)
+
+**Note:** Version bump only for package @joystream/hydra-db-utils
+
+
+
+
+
 ## 5.0.0-alpha.7 (2023-10-18)
 
 **Note:** Version bump only for package @joystream/hydra-db-utils
