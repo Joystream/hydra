@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@joystream/hydra-common": "^5.0.0-alpha.7",
-    "@polkadot/types": "8.9.1"
+    "@polkadot/types": "10.1.4"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",

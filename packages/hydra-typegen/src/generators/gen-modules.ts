@@ -15,6 +15,7 @@ type ModuleTemplateProps = {
   validateArgs: boolean
   imports: ImportsDef
   specVersion: number
+  moduleName: string
 } & ExtractedModuleMeta
 
 export function generateModuleTypes(config: GeneratorConfig): void {
@@ -42,6 +43,7 @@ export function buildModuleProps(
     validateArgs,
     specVersion,
     imports,
+    moduleName: meta.module.name.toString(),
     ...meta,
   }
 }

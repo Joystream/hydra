@@ -47,10 +47,12 @@ export async function generateTypesLookup(
     'utf8'
   )
 
-  // remove module augmentation from the file
+  // remove module augmentation from the file, and export all types and interfaces
   const outFile = file
     .replace(`declare module '@polkadot/types/lookup' {`, '')
     .replace('} // declare module', '')
+    .replaceAll('  interface ', 'export interface ')
+    .replaceAll('  type ', 'export type ')
 
   // save the file
   writeFile(path.join(dest, TYPES_LOOKUP_FILE_NAME), () =>

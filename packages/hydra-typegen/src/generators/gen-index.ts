@@ -11,7 +11,7 @@ export function generateIndex({ modules, dest }: GeneratorConfig): void {
   writeFile(path.join(dest, `index.ts`), () =>
     formatWithPrettier(
       generateIndexTemplate({
-        modules: modules.map((m) => m.module),
+        moduleNames: modules.map((m) => m.module.name.toString()),
       })
     )
   )
