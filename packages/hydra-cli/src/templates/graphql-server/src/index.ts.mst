@@ -35,7 +35,7 @@ async function bootstrap() {
     },
     {
       namingStrategy: new CustomNamingStrategy(),
-      maxQueryExecutionTime: 1000,
+      maxQueryExecutionTime: Number(process.env.GRAPHQL_SERVER_DB_QUERY_TIMEOUT) || undefined,
       logging: [process.env.WARTHOG_DB_LOGGING || 'error'],
     }
   );
